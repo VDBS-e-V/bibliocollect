@@ -32,4 +32,12 @@ final class Title extends Model
     {
         return $this->hasMany(Edition::class, 'title_id');
     }
+
+    /** @return HasMany<TitleContribution, $this> */
+    public function contributions(): HasMany
+    {
+        return $this->hasMany(TitleContribution::class, 'title_id')
+            ->orderBy('position')
+            ->orderBy('id');
+    }
 }

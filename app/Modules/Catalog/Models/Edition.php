@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $isbn
  * @property string|null $publisher_name
  * @property int|null $publication_year
+ * @property string|null $media_type
+ * @property string|null $language_code
  * @property int|null $minimum_age
  * @property string|null $age_rating_label
  */
@@ -32,6 +34,8 @@ final class Edition extends Model
         'isbn',
         'publisher_name',
         'publication_year',
+        'media_type',
+        'language_code',
         'minimum_age',
         'age_rating_label',
     ];

@@ -1,8 +1,8 @@
 # Nächste Schritte — BiblioCollect
 
-1. T3 v0.4.0 Catalog-Grundmodell lokal und in GitHub Actions grün bestätigen.
-2. T3 in kleinen Schritten erweitern: bibliografische Felder und titelbasierte Queries, danach interne Katalogpflege.
-3. Öffentliche Katalogsuche auf `Title`/`Edition` aufbauen; physische Verfügbarkeit bleibt `Copy`-bezogen.
+1. T3 v0.4.1 mit bibliografischen Metadaten, strukturierten Verantwortlichen und titelbasierter Query lokal und in GitHub Actions grün bestätigen.
+2. Danach interne Katalogpflege mit eigenen Actions, Validierung und fein geschnittenen Catalog-Permissions umsetzen.
+3. Öffentliche Katalogsuche auf der titelbasierten Query aufbauen; physische Verfügbarkeit bleibt `Copy`-bezogen.
 4. CSV/MARC21-Import erst danach mit Preview, Normalisierung und Konfliktbehandlung ergänzen.
 5. T4 `Circulation` anschließend mit zentralem Regel-Evaluator, Altersprüfung gegen Patron-Geburtsdatum und Edition-Mindestalter, Transaktionen und Row Locks umsetzen.
 

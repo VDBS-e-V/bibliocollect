@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T3 v0.4.0 – Catalog-Grundmodell
+Stand: T3 v0.4.1 – Bibliografische Metadaten und titelbasierte Suche
 
 ## Abgeschlossen
 
@@ -24,10 +24,17 @@ Diese Punkte sind bewusst nicht Teil des T2-Abschluss-Gates und können später 
 
 ## T3 Catalog
 
-v0.4.0 startet das reine Catalog-Domänenfundament:
+v0.4.0 hat das reine Catalog-Domänenfundament eingeführt:
 
 - `Title` beschreibt den titelbezogenen bibliografischen Kern.
 - `Edition` beschreibt eine konkrete Ausgabe und trägt die technische Vorbereitung für Altersfreigaben.
 - `Copy` beschreibt das physische Exemplar; sichtbare Barcodes sind eindeutig, aber niemals Primärschlüssel.
 - interne IDs bleiben ULIDs.
 - Lieferanten-, Preis- und Budgetlogik gehört ausdrücklich nicht in Catalog.
+
+v0.4.1 ergänzt die bibliografische Arbeitsbasis:
+
+- Verantwortliche werden als eigene `Contributor`-Datensätze geführt und über geordnete `TitleContribution`-Einträge mit flexiblen Rollen an einen Titel gebunden.
+- `Edition` erhält offene Felder für Medientyp und Sprachcode, ohne Importformate vorwegzunehmen.
+- `SearchCatalogTitlesQuery` sucht titelbasiert über Titelangaben, Verantwortliche und ausgewählte Editionsdaten.
+- Suche und spätere Reservierungen bleiben titelbezogen; exemplarbezogene Vorgänge bleiben bei `Copy`.
