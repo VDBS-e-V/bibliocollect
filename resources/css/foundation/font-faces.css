@@ -1,9 +1,67 @@
-/* Font binaries are not bundled. `php install_fonts.php` can import them from your local original ZIPs. */
-@font-face { font-family:"Lato"; src:url('/fonts/vdbs/Lato-Regular.ttf') format('truetype'); font-style:normal; font-weight:400; font-display:swap; }
-@font-face { font-family:"Lato"; src:url('/fonts/vdbs/Lato-Italic.ttf') format('truetype'); font-style:italic; font-weight:400; font-display:swap; }
-@font-face { font-family:"Lato"; src:url('/fonts/vdbs/Lato-Bold.ttf') format('truetype'); font-style:normal; font-weight:700; font-display:swap; }
-@font-face { font-family:"Lato"; src:url('/fonts/vdbs/Lato-Black.ttf') format('truetype'); font-style:normal; font-weight:900; font-display:swap; }
-@font-face { font-family:"Source Serif 4"; src:url('/fonts/vdbs/SourceSerif4-Regular.ttf') format('truetype'); font-style:normal; font-weight:400; font-display:swap; }
-@font-face { font-family:"Source Serif 4"; src:url('/fonts/vdbs/SourceSerif4-Italic.ttf') format('truetype'); font-style:italic; font-weight:400; font-display:swap; }
-@font-face { font-family:"Source Serif 4"; src:url('/fonts/vdbs/SourceSerif4-SemiBold.ttf') format('truetype'); font-style:normal; font-weight:600; font-display:swap; }
-@font-face { font-family:"Neuland"; src:url('/fonts/vdbs/NeulandFont_2017.ttf') format('truetype'); font-style:normal; font-weight:400; font-display:swap; }
+/*
+ * VDBS web fonts are source assets under resources/fonts/vdbs and are bundled by Vite.
+ * Refresh them only from the original local source archives via tools/sync_vdbs_fonts.php.
+ */
+@font-face {
+    font-family: "Lato";
+    src: url('../../fonts/vdbs/Lato-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Lato";
+    src: url('../../fonts/vdbs/Lato-Italic.ttf') format('truetype');
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Lato";
+    src: url('../../fonts/vdbs/Lato-Bold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Lato";
+    src: url('../../fonts/vdbs/Lato-Black.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Source Serif 4";
+    src: url('../../fonts/vdbs/SourceSerif4-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Source Serif 4";
+    src: url('../../fonts/vdbs/SourceSerif4-Italic.ttf') format('truetype');
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Source Serif 4";
+    src: url('../../fonts/vdbs/SourceSerif4-SemiBold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Neuland";
+    src: url('../../fonts/vdbs/NeulandFont_2017.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}

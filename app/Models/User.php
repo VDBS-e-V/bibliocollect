@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -23,6 +24,8 @@ use Illuminate\Support\Str;
  * @property string|null $patron_id
  * @property string $name
  * @property string $email
+ * @property Carbon|null $disabled_at
+ * @property string|null $disabled_reason
  */
 #[Fillable(['name', 'email', 'password', 'patron_id'])]
 #[Hidden(['password', 'remember_token'])]
@@ -57,8 +60,17 @@ class User extends Authenticatable implements AuthorizesPermissions, MustVerifyE
             ->all();
     }
 
+    public function isEnabled(): bool
+    {
+        return $this->disabled_at === null;
+    }
+
     public function allowsPermission(string $permission): bool
     {
+        if (! $this->isEnabled()) {
+            return false;
+        }
+
         $permissions = app(RoleRegistry::class)->permissionsFor($this->roleKeys());
 
         return in_array($permission, $permissions, true);
@@ -71,6 +83,7 @@ class User extends Authenticatable implements AuthorizesPermissions, MustVerifyE
     {
         return [
             'email_verified_at' => 'datetime',
+            'disabled_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

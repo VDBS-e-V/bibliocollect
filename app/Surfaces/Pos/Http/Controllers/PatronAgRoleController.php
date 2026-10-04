@@ -29,6 +29,10 @@ final class PatronAgRoleController
         }
 
         $patron = $findPatron->byId($patronId);
+        if (! $patron->isActive()) {
+            return $this->inactivePatron((string) $patron->getKey());
+        }
+
         $target = $findUser->execute((string) $patron->getKey());
         $actor = $request->user();
 
@@ -61,6 +65,11 @@ final class PatronAgRoleController
         }
 
         $patron = $findPatron->byId($patronId);
+
+        if (! $patron->isActive()) {
+            return $this->inactivePatron((string) $patron->getKey());
+        }
+
         $target = $findUser->execute((string) $patron->getKey());
 
         if (! $request->user() instanceof User) {
@@ -76,6 +85,13 @@ final class PatronAgRoleController
         return redirect()
             ->route('pos.patrons.show', ['patronId' => $patron->getKey()])
             ->with('workspace_success', 'Die AG-Rolle wurde entfernt.');
+    }
+
+    private function inactivePatron(string $patronId): RedirectResponse
+    {
+        return redirect()
+            ->route('pos.patrons.show', ['patronId' => $patronId])
+            ->with('workspace_error', 'AG-Rollen können nur für aktive Ausleihkonten geändert werden.');
     }
 
     private function withoutOnlineAccount(string $patronId): RedirectResponse

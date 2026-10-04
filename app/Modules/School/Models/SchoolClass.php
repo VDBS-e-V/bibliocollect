@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $school_year_id
+ * @property string $name
+ * @property int $grade_level
+ * @property bool $is_active
+ * @property-read SchoolYear|null $schoolYear
+ */
 final class SchoolClass extends Model
 {
     use HasUlids;

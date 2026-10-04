@@ -1,16 +1,16 @@
 # Nächste Schritte — BiblioCollect
 
-1. Bootstrap ausführen und ersten grünen CI-Lauf herstellen.
-2. Permission- und Navigation-Registry als Foundation-Infrastruktur ergänzen.
-3. T2 starten: `Identity`, `Patrons`, `School` mit konkreten Models und Migrations.
-4. Erst danach Catalog und Circulation implementieren.
+1. T2 v0.3.4 lokal und in GitHub Actions grün bestätigen.
+2. T2 fachlich abschließen: Entscheidung, ob der vollständige Schuljahres-Massenwechsel noch vor T3 umgesetzt wird oder als Verwaltungsworkflow nachgezogen wird.
+3. T3 `Catalog` beginnen: Title/Edition und Copy strikt trennen, ULIDs intern, sichtbare Barcodes nicht als Primärschlüssel verwenden.
+4. Danach T4 `Circulation` mit zentralem `LoanRuleEvaluator`, Transaktionen und Row Locks umsetzen.
 
-## Definition of Done für Bootstrap
+## Qualitäts-Gate
 
-- `php artisan foundation:check` erfolgreich
-- `./vendor/bin/pint --test` erfolgreich
-- `./vendor/bin/phpstan analyse` erfolgreich
-- `./vendor/bin/pest` erfolgreich
-- `npm run build` erfolgreich
-- `/` antwortet mit HTTP 200
-- `/up` antwortet mit HTTP 200
+Vor jedem Commit:
+
+- `php vendor/bin/pint --test`
+- `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+- `php artisan foundation:check`
+- `php vendor/bin/pest`
+- `npm run build`

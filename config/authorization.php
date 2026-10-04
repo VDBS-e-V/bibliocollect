@@ -32,6 +32,10 @@ return [
             'label' => 'Ausleihkonten sperren',
             'description' => 'Erlaubt das kritische Sperren und Entsperren eines Ausleihkontos mit protokolliertem Grund.',
         ],
+        'patrons.depart' => [
+            'label' => 'Ausleihkonten dauerhaft ausscheiden',
+            'description' => 'Erlaubt den kontrollierten dauerhaften Austritt eines Ausleihkontos mit Statusprotokoll und Deaktivierung des verknüpften Onlinekontos.',
+        ],
         'patrons.link-code.issue' => [
             'label' => 'Onlinekonto-Code ausgeben',
             'description' => 'Erlaubt die Ausgabe eines einmaligen Codes zur Verknüpfung eines Onlinekontos mit einem bestehenden Ausleihkonto.',
@@ -73,6 +77,7 @@ return [
                 'patrons.sensitive.view',
                 'patrons.manage',
                 'patrons.block',
+                'patrons.depart',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
             ],
@@ -87,6 +92,7 @@ return [
                 'patrons.sensitive.view',
                 'patrons.manage',
                 'patrons.block',
+                'patrons.depart',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
                 'school.manage',

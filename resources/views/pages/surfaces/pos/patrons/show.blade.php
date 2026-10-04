@@ -36,7 +36,7 @@
         <x-ui.alert variant="error" title="Fehler">{{ session('workspace_error') }}</x-ui.alert>
     @endif
 
-    @if ($patron->blocked_at !== null)
+    @if ($patron->blocked_at !== null && $patron->isActive())
         <x-ui.alert variant="error" title="Ausleihkonto gesperrt">
             Für dieses Ausleihkonto ist eine Sperre hinterlegt.
             @can('patrons.sensitive.view')
@@ -81,7 +81,11 @@
                 <h2 id="online-account-heading">Onlinekonto</h2>
 
                 @if ($hasOnlineAccount)
-                    <p><x-ui.badge variant="success">Verknüpft</x-ui.badge></p>
+                    @if ($onlineAccount !== null)
+                        <p><x-ui.badge :variant="$onlineAccount->isEnabled() ? 'success' : 'neutral'">{{ $onlineAccount->isEnabled() ? 'Verknüpft' : 'Deaktiviert' }}</x-ui.badge></p>
+                    @else
+                        <p><x-ui.badge variant="success">Verknüpft</x-ui.badge></p>
+                    @endif
                     @can('patrons.sensitive.view')
                         <dl class="bc-side-definition-list">
                             <div><dt>E-Mail</dt><dd>{{ $onlineAccount->email }}</dd></div>
@@ -105,7 +109,7 @@
                 @endif
             </section>
 
-            @if ($onlineAccount)
+            @if ($onlineAccount && $patron->isActive())
                 @can('identity.roles.assign')
                     <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="roles-heading">
                         <h2 id="roles-heading">Rollen</h2>
@@ -154,11 +158,43 @@
                 </section>
             @endcan
 
+            @can('patrons.depart')
+                <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="departure-heading">
+                    <h2 id="departure-heading">Dauerhafter Austritt</h2>
+                    @if ($patron->isActive())
+                        <div class="bc-departure-workflow">
+                            <p>Der Austritt setzt den Kontostatus auf „Ausgeschieden“, entfernt die aktuelle Klassenzuordnung, widerruft offene Aktivierungscodes und deaktiviert ein verknüpftes Onlinekonto.</p>
+                            <form method="post" action="{{ route('pos.patrons.departure.store', ['patronId' => $patron->getKey()]) }}" class="bc-departure-workflow">
+                                @csrf
+                                <x-ui.input
+                                    label="Austrittsdatum"
+                                    name="leaving_on"
+                                    type="date"
+                                    :value="old('leaving_on', app(\App\Foundation\Support\BusinessClock::class)->now()->toDateString())"
+                                    :error="$errors->first('leaving_on') ?: null"
+                                />
+                                <label class="bc-departure-confirm">
+                                    <input type="checkbox" name="confirm_departure" value="1" required>
+                                    <span>Ich bestätige, dass die Person dauerhaft ausgeschieden ist. Dieser Statuswechsel wird protokolliert.</span>
+                                </label>
+                                @error('confirm_departure')
+                                    <p class="bc-field__error"><strong>Fehler:</strong> {{ $message }}</p>
+                                @enderror
+                                <x-ui.button type="submit">Als ausgeschieden markieren</x-ui.button>
+                            </form>
+                            <p class="bc-management-note">Reservierungen und weitere Fachfälle reagieren später über das Ereignis <code>PatronDeparted</code>, sobald die betreffenden Module implementiert sind.</p>
+                        </div>
+                    @else
+                        <p>Dieses Ausleihkonto ist nicht mehr aktiv. Ein weiterer Austritt ist nicht möglich.</p>
+                    @endif
+                </section>
+            @endcan
+
             @can('patrons.block')
                 <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="blocking-heading">
                     <h2 id="blocking-heading">Ausleihsperre</h2>
                     <div class="bc-block-workflow">
-                        @if ($patron->blocked_at !== null)
+                        @if ($patron->blocked_at !== null && $patron->isActive())
                             <p>Die Ausleihe ist derzeit gesperrt. Das Entsperren wird mit handelnder Person und bisherigem Sperrgrund protokolliert.</p>
                             <form method="post" action="{{ route('pos.patrons.block.destroy', ['patronId' => $patron->getKey()]) }}">
                                 @csrf

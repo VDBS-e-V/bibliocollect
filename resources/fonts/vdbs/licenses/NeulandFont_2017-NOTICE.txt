@@ -1,0 +1,25 @@
+NeulandFont 2017 - Lizenzhinweis
+================================
+
+Name: NeulandFont_2017
+Art: TrueType/OpenType-Schrift
+Version: 001.000
+Copyright: © Neuland AG Schweiz
+Designer: Neuland AG Schweiz
+
+Lizenz laut der mit dem Originalfont ausgelieferten Datei "Neuland_Font_2017_read_me_first.pdf":
+
+1. Die Schrift ist für den persönlichen wie auch den professionellen Gebrauch frei.
+2. Die Weiterverteilung dieser Schrift zum Verkauf ist nicht zulässig. Die Schrift darf nicht einer Schriften-CD oder einem kommerziellen Archiv beigefügt werden, in dem Schriften geteilt oder verkauft werden.
+3. Mit dem Herunterladen übernimmt die Nutzerin bzw. der Nutzer Haftung und Verantwortung für die Schriftdatei und Begleitdateien. Die Neuland AG Schweiz übernimmt keine Haftung für Schäden, Verluste oder sonstige Folgen im Zusammenhang mit dem Download.
+
+Englische Fassung der wesentlichen Bedingungen aus dem Originalhinweis:
+
+1. This font is free for personal and professional use.
+2. The distribution of this font for financial gain or profit is not permitted. Do not add this font to a font CD or compilation/archive that is sold for profit.
+3. Upon downloading this font, the user accepts liability and responsibility for the font file and accompanying files; Neuland AG Schweiz disclaims liability for damages or losses associated with the download.
+
+Herstellerkontakt aus dem Originalhinweis: info@neuland.ch
+Hersteller-/Lizenz-URL aus dem Originalhinweis: www.neuland.ch
+
+Dieser Text dient dazu, die mit dem Projekt ausgelieferte Webfont-Datei mit dem zugehörigen Lizenzhinweis zu dokumentieren. Maßgeblich bleiben die Bedingungen des ursprünglichen Font-Herstellers.

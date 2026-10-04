@@ -12,6 +12,9 @@
             <strong>Verwaltung</strong>
             <span aria-current="page">Übersicht</span>
             <span>Leihregeln</span>
+            @can('school.manage')
+                <a href="{{ route('administration.school.index') }}">Schule</a>
+            @endcan
             <span>Öffnungstage</span>
             <span>Importe</span>
             <span>Datenschutz</span>
@@ -23,6 +26,9 @@
                 <div class="bc-section-heading"><h2 id="admin-tasks-heading">Bereiche</h2></div>
                 <div class="bc-admin-list">
                     <div><strong>Leihregeln</strong><span>Fristen, Limits und Verlängerungen</span><span class="bc-status-text">später</span></div>
+                    @can('school.manage')
+                        <div><strong><a href="{{ route('administration.school.index') }}">Schule & Schuljahre</a></strong><span>Schuljahre, Klassen und Wechsel vorbereiten</span><span class="bc-status-text">T2</span></div>
+                    @endcan
                     <div><strong>Öffnungstage</strong><span>Kalender und Bibliothekszeiten</span><span class="bc-status-text">T2</span></div>
                     <div><strong>Importe</strong><span>Schul- und Mediendaten mit Vorschau</span><span class="bc-status-text">später</span></div>
                     <div><strong>Datenschutz</strong><span>Aufbewahrung, Auskunft und Anonymisierung</span><span class="bc-status-text">T8</span></div>

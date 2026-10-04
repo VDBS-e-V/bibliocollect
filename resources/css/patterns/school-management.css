@@ -1,0 +1,99 @@
+.bc-section-nav a {
+    display: block;
+    border-bottom: 1px solid var(--border-default);
+    color: var(--text-primary);
+    padding: .7rem .25rem;
+    font-size: var(--text-sm);
+    text-decoration-thickness: 1px;
+    text-underline-offset: .18em;
+}
+
+.bc-school-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+}
+
+.bc-school-layout__main { min-width: 0; }
+.bc-school-layout__aside { position: sticky; top: 1rem; }
+
+.bc-school-year-create-form,
+.bc-school-year-form,
+.bc-school-class-row {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1.2fr) repeat(2, minmax(9rem, .8fr)) auto;
+    gap: .75rem;
+    align-items: end;
+}
+
+.bc-school-year-create-form { margin-top: 1.1rem; }
+
+.bc-school-year-card {
+    border-top: 3px solid var(--action-secondary);
+    border-bottom: 1px solid var(--border-default);
+    padding: 1.2rem 0 1.6rem;
+}
+
+.bc-school-year-card + .bc-school-year-card { margin-top: 2rem; }
+.bc-school-year-card__header h3 { margin: .45rem 0 .15rem; font-size: 1.25rem; }
+.bc-school-year-card__header p { margin: 0; color: var(--text-secondary); }
+.bc-school-year-form { margin-top: 1rem; }
+
+.bc-school-classes { margin-top: 1.3rem; }
+.bc-school-classes__heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: .35rem 1rem;
+    border-bottom: 1px solid var(--border-default);
+    padding-bottom: .55rem;
+}
+.bc-school-classes__heading span { color: var(--text-secondary); font-size: var(--text-xs); }
+
+.bc-school-class-row {
+    grid-template-columns: minmax(10rem, 1fr) minmax(7rem, .45fr) minmax(11rem, .75fr) auto;
+    border-bottom: 1px solid var(--border-default);
+    padding: .8rem 0;
+}
+.bc-school-class-row--new { background: var(--bg-surface-muted); padding: .9rem; }
+
+.bc-school-active-control {
+    display: flex;
+    min-height: var(--control-min-height);
+    align-items: center;
+    gap: .5rem;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 700;
+}
+
+.bc-school-empty { color: var(--text-secondary); }
+.bc-school-form-action { display: flex; align-items: end; }
+
+.bc-transition-target-form { display: grid; gap: .4rem; margin: 1rem 0; }
+.bc-transition-activate { margin-top: 1rem; border-top: 1px solid var(--border-default); padding-top: 1rem; }
+.bc-transition-activate p { color: var(--text-secondary); font-size: var(--text-sm); line-height: 1.55; }
+
+.bc-departure-workflow {
+    display: grid;
+    gap: .75rem;
+}
+.bc-departure-confirm {
+    display: flex;
+    align-items: flex-start;
+    gap: .55rem;
+    font-size: var(--text-sm);
+    line-height: 1.45;
+}
+
+@media (max-width: 70rem) {
+    .bc-school-layout { grid-template-columns: 1fr; }
+    .bc-school-layout__aside { position: static; }
+}
+
+@media (max-width: 52rem) {
+    .bc-school-year-create-form,
+    .bc-school-year-form,
+    .bc-school-class-row { grid-template-columns: 1fr; }
+}

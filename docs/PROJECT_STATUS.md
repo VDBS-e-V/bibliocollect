@@ -1,32 +1,26 @@
 # Projektstatus — BiblioCollect
 
-Stand: Bootstrap v0.1.1
+Stand: T2 v0.3.4
 
-## Fertig in diesem Paket
+## Abgeschlossen
 
-- Laravel-13-Bootstrap auf leerem Repository
-- generische Webapp-Foundation
-- Produktname `BiblioCollect`
-- sichtbare VDBS-Markenidentität
-- VDBS-Farbrollen inkl. manuellem Light/Dark Theme
-- ausgewählte VDBS-SVG-Assets
-- optionale lokale Font-Installation aus den vom Projekt bereitgestellten Archiven
-- Surfaces: Public, Portal, Pos, Administration
-- Modulmanifeste für alle geplanten Domänenmodule
-- ModuleRegistry, SurfaceRegistry und FoundationValidator
-- Foundation-Check
-- erste Architektur- und Smoke-Tests
-- Pint, PHPStan/Larastan und Pest in CI
+- T0 Foundation mit Laravel 13, Modul-/Surface-Struktur, CI, Pint, PHPStan und Pest
+- T1 mit Permission-/Role-Registry, Navigation, vier Surfaces, VDBS-App-Shell und `Europe/Berlin`
+- getrennte Onlinekonten (`User`) und Ausleihkonten (`Patron`)
+- E-Mail-Verifikation und einmalige Patron-Verknüpfungscodes
+- persistierte kombinierbare Rollen
+- Mitarbeiteroberfläche für Patron-Suche, Stammdaten und Klassenzuordnung
+- protokolliertes Sperren/Entsperren
+- kontrollierter dauerhafter Austritt mit Statusprotokoll und Onlinekonto-Deaktivierung
+- Schuljahr-/Klassenverwaltung und Vorbereitung des Schuljahreswechsels
+- `SchoolCalendarService` als Grundlage für Öffnungstage
 
-## Noch nicht implementiert
+## Noch offen in/ab T2
 
-- Authentifizierung und Onlinekonto
-- Permission-/Role-Registry
-- Navigation Registry
-- Patron-/Schul-/Katalogdatenmodell
-- Ausleihe, Rückgabe, Vormerkungen, Mahnungen
-- produktive Integrationen
+- vollständiger Massenworkflow für Schuljahreswechsel mit Vorschau, Mapping und Konfliktbehandlung
+- produktiver Schulimport
+- Öffnungszeiten-/Schließtage-Verwaltungsmaske
 
-## Nächster Meilenstein
+## Danach
 
-T1/T2: Permission-/Navigation-Grundlage sowie Identity, Patrons und School.
+T3 `Catalog`: Titel/Editionen, physische Exemplare, Medienarten, Barcode- und Statusmodell, öffentliche Recherche und erste interne Katalogpflege.

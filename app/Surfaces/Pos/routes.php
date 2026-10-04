@@ -6,6 +6,7 @@ use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
 use App\Surfaces\Pos\Http\Controllers\PatronCreateController;
+use App\Surfaces\Pos\Http\Controllers\PatronDepartureController;
 use App\Surfaces\Pos\Http\Controllers\PatronEditController;
 use App\Surfaces\Pos\Http\Controllers\PatronIndexController;
 use App\Surfaces\Pos\Http\Controllers\PatronShowController;
@@ -46,6 +47,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::delete('/betrieb/ausleihkonten/{patronId}/sperre', [PatronBlockController::class, 'destroy'])
         ->middleware('permission:patrons.block')
         ->name('pos.patrons.block.destroy');
+
+    Route::post('/betrieb/ausleihkonten/{patronId}/austritt', [PatronDepartureController::class, 'store'])
+        ->middleware('permission:patrons.depart')
+        ->name('pos.patrons.departure.store');
 
     Route::post('/betrieb/ausleihkonten/{patronId}/onlinekonto-code', IssuePatronLinkCodeController::class)
         ->middleware('permission:patrons.link-code.issue')

@@ -30,6 +30,8 @@ final class LoginController extends Controller
         $remember = (bool) ($credentials['remember'] ?? false);
         unset($credentials['remember']);
 
+        $credentials['disabled_at'] = null;
+
         if (! Auth::attempt($credentials, $remember)) {
             throw ValidationException::withMessages([
                 'email' => 'E-Mail-Adresse oder Passwort sind nicht korrekt.',
