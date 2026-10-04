@@ -28,21 +28,33 @@
 <a class="bc-skip-link" href="#main-content">Zum Inhalt springen</a>
 <div class="bc-shell">
     <header class="bc-shell__header">
-        <div class="bc-shell__header-inner">
-            <a href="{{ route('public.home') }}" class="bc-brand-lockup" aria-label="BiblioCollect Startseite">
-                <span class="relative block">
-                    <img class="bc-brand-lockup__vdbs bc-brand-logo--light" src="/brand/vdbs/logo-light.svg" alt="VDBS">
-                    <img class="bc-brand-lockup__vdbs bc-brand-logo--dark" src="/brand/vdbs/logo-dark.svg" alt="VDBS">
-                </span>
-                <span class="bc-brand-lockup__product">BiblioCollect</span>
-            </a>
+        <div class="bc-utility-bar">
+            <div class="bc-utility-bar__inner">
+                <span>VDBS e. V.</span>
+                <div class="bc-utility-bar__actions">
+                    <a href="{{ route('public.home') }}">Startseite</a>
+                    <span aria-hidden="true">·</span>
+                    <span>{{ $surfaceLabel }}</span>
+                    <span aria-hidden="true">·</span>
+                    <button class="bc-theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+                        <span data-theme-label>Dunkel</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-            <div class="bc-shell__utility">
-                <span class="bc-surface-label">{{ $surfaceLabel }}</span>
-                <button class="bc-theme-toggle" type="button" data-theme-toggle aria-pressed="false">
-                    <span aria-hidden="true">◐</span>
-                    <span data-theme-label>Dunkel</span>
-                </button>
+        <div class="bc-masthead">
+            <div class="bc-masthead__inner">
+                <a href="{{ route('public.home') }}" class="bc-brand-lockup" aria-label="BiblioCollect Startseite">
+                    <span class="bc-brand-lockup__logo-wrap">
+                        <img class="bc-brand-lockup__vdbs bc-brand-logo--light" src="/brand/vdbs/logo-light.svg" alt="VDBS">
+                        <img class="bc-brand-lockup__vdbs bc-brand-logo--dark" src="/brand/vdbs/logo-dark.svg" alt="VDBS">
+                    </span>
+                    <span class="bc-brand-lockup__text">
+                        <strong>BiblioCollect</strong>
+                        <small>Schulbibliothek</small>
+                    </span>
+                </a>
             </div>
         </div>
 
@@ -67,7 +79,7 @@
 
     @if ($preview)
         <div class="bc-preview-banner" role="status">
-            Entwicklungsansicht: Diese Oberfläche zeigt nur das T1-Grundgerüst; Fachfunktionen sind noch nicht aktiv.
+            Entwicklungsansicht · Fachfunktionen sind noch nicht aktiv.
         </div>
     @endif
 
@@ -77,8 +89,8 @@
 
     <footer class="bc-shell__footer">
         <div class="bc-shell__footer-inner">
-            <span>BiblioCollect</span>
-            <span>Eine VDBS-Anwendung</span>
+            <strong>BiblioCollect</strong>
+            <span>Eine Anwendung des VDBS e. V.</span>
         </div>
     </footer>
 </div>

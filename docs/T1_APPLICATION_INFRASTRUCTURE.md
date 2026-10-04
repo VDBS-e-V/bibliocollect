@@ -25,4 +25,8 @@ Technische Zeitstempel bleiben in der Laravel-Anwendung weiterhin UTC-orientiert
 
 ## UI
 
-Die App-Shell nutzt die vorhandenen VDBS-Farbtokens, lokal ausgelieferte Schriften und den manuellen Light/Dark-Umschalter. Basis-Komponenten decken Buttons, Karten, Formfelder, Alerts, Badges, Tabellen und Seitenköpfe ab. Formfehler werden zusätzlich zum visuellen Zustand immer mit dem Wort „Fehler:“ ausgegeben.
+Die App-Shell nutzt die vorhandenen VDBS-Farbtokens, lokal ausgelieferte Schriften und den manuellen Light/Dark-Umschalter. Die Oberfläche ist bewusst funktional aufgebaut: schmale Utility-Leiste, klarer Marken-/Produktkopf, horizontale Hauptnavigation, prominente Katalogsuche und ruhige Inhaltsbereiche. Runde "Dashboard-Karten" und dekorative Effekte werden vermieden; VDBS-Grün und -Lila strukturieren stattdessen Suche, aktive Navigation und Abschnittsüberschriften.
+
+Für die Informationsarchitektur dienen etablierte Bibliotheksoberflächen wie FU-/HU-Primo, der VÖBB-Katalog und besonders der Webauftritt der Universitätsbibliothek der TU Berlin als Orientierung. Suche steht früh und deutlich im Ablauf, Suchbereich und Suchbegriff sind getrennt. Die öffentliche Oberfläche nutzt großzügige Weißräume, klare Abschnittsüberschriften und wenige, ruhige Markenakzente; Arbeitsbereiche bleiben dichter und nutzen Tabellen, Listen, Seiten-/Bereichsnavigation und eindeutige Statusinformationen. Das visuelle Erscheinungsbild bleibt dabei eigenständig VDBS.
+
+Basis-Komponenten decken Buttons, Karten/Arbeitsflächen, Formfelder, Alerts, Badges, Tabellen und Seitenköpfe ab. Formfehler werden zusätzlich zum visuellen Zustand immer mit dem Wort „Fehler:“ ausgegeben.

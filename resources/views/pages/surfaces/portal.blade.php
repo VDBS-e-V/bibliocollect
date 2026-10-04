@@ -2,30 +2,47 @@
 
 <x-app-shell surface="portal" title="Mein Konto" :preview="$preview">
     <x-ui.page-header
-        kicker="Portal"
-        title="Mein Konto"
-        lead="Hier sehen Nutzer:innen später ausschließlich ihre eigenen Bibliotheksvorgänge."
+        kicker="Mein Konto"
+        title="Übersicht"
+        lead="Eigene Ausleihen, Vormerkungen und Kontodaten auf einen Blick."
     />
 
-    <div class="mt-7 grid gap-4 md:grid-cols-3">
-        <x-ui.card class="p-5">
-            <p class="text-sm font-bold text-app-text-muted">Ausgeliehen</p>
-            <p class="mt-2 text-3xl font-black">–</p>
-            <p class="mt-1 text-sm text-app-text-muted">Eigene aktive Ausleihen</p>
-        </x-ui.card>
-        <x-ui.card class="p-5">
-            <p class="text-sm font-bold text-app-text-muted">Vormerkungen</p>
-            <p class="mt-2 text-3xl font-black">–</p>
-            <p class="mt-1 text-sm text-app-text-muted">Zeitraum und Click & Collect</p>
-        </x-ui.card>
-        <x-ui.card class="p-5">
-            <p class="text-sm font-bold text-app-text-muted">Onlinekonto</p>
-            <p class="mt-3"><x-ui.badge>Vorschau</x-ui.badge></p>
-            <p class="mt-2 text-sm text-app-text-muted">Verknüpfung mit Ausleihkonto folgt in T2.</p>
-        </x-ui.card>
-    </div>
+    <div class="bc-work-layout">
+        <aside class="bc-section-nav" aria-label="Kontobereiche">
+            <strong>Mein Konto</strong>
+            <span aria-current="page">Übersicht</span>
+            <span>Ausleihen</span>
+            <span>Vormerkungen</span>
+            <span>Persönliche Daten</span>
+        </aside>
 
-    <x-ui.alert class="mt-7" title="Datenschutzprinzip">
-        Das Portal wird nur eigene Daten anzeigen. Lehrkräfte erhalten durch ihre Lehrerrolle keinen Zugriff auf Ausleihen von Schüler:innen.
-    </x-ui.alert>
+        <div class="bc-work-layout__main">
+            <section class="bc-content-section" aria-labelledby="loan-heading">
+                <div class="bc-section-heading bc-section-heading--with-meta">
+                    <h2 id="loan-heading">Aktuelle Ausleihen</h2>
+                    <span>0 Medien</span>
+                </div>
+                <x-ui.table>
+                    <thead>
+                        <tr><th scope="col">Titel</th><th scope="col">Fällig</th><th scope="col">Status</th><th scope="col">Aktion</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" class="bc-table__empty">Noch keine Fachdaten vorhanden. Die Ausleihübersicht folgt mit Circulation.</td></tr>
+                    </tbody>
+                </x-ui.table>
+            </section>
+
+            <section class="bc-content-section" aria-labelledby="reservation-heading">
+                <div class="bc-section-heading bc-section-heading--with-meta">
+                    <h2 id="reservation-heading">Vormerkungen</h2>
+                    <span>0 Vormerkungen</span>
+                </div>
+                <p class="bc-section-copy">Zeitraumsvormerkungen und Click & Collect werden hier getrennt und nachvollziehbar angezeigt.</p>
+            </section>
+
+            <x-ui.alert title="Datenschutz">
+                Dieses Portal zeigt nur die eigenen Bibliotheksvorgänge. Eine Lehrerrolle erhält dadurch keinen Zugriff auf Ausleihen von Schüler:innen.
+            </x-ui.alert>
+        </div>
+    </div>
 </x-app-shell>

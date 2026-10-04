@@ -1,60 +1,109 @@
-<x-app-shell surface="public" title="Start">
-    <section class="bc-search-stage" aria-labelledby="catalog-heading">
-        <div class="bc-search-stage__content">
-            <p class="mb-2 text-sm font-bold uppercase tracking-[0.12em] text-app-text-muted">VDBS Bibliothekssoftware</p>
-            <h1 id="catalog-heading" class="text-3xl font-black tracking-tight sm:text-4xl">BiblioCollect</h1>
-            <p class="mt-3 max-w-2xl text-lg text-app-text-muted">Finden, ausleihen, organisieren: BiblioCollect verbindet öffentlichen Katalog, persönliches Konto und den Bibliotheksbetrieb in einer VDBS-Anwendung.</p>
-            <div class="bc-search" role="search" aria-label="Katalogsuche Vorschau">
-                <label class="sr-only" for="catalog-search">Titel, Autor:in, ISBN oder Stichwort</label>
-                <input id="catalog-search" class="bc-search__input" type="search" placeholder="Titel, Autor:in, ISBN oder Stichwort …" disabled>
-                <x-ui.button disabled>Suchen</x-ui.button>
-            </div>
-            <p class="mt-2 text-sm text-app-text-muted">Die echte Katalogsuche folgt mit dem Catalog-Modul in T3.</p>
+<x-app-shell surface="public" title="Katalog">
+    <section class="bc-home-intro" aria-labelledby="home-heading">
+        <div class="bc-home-intro__copy">
+            <p class="bc-eyebrow">BiblioCollect · VDBS</p>
+            <h1 id="home-heading">Die Schulbibliothek.</h1>
+            <p class="bc-home-intro__lead">Medien finden, ausleihen und gemeinsam entdecken. BiblioCollect verbindet den öffentlichen Katalog mit den Services der Schulbibliothek – klar, zugänglich und ohne unnötige Hürden.</p>
+        </div>
+
+        <div class="bc-home-intro__brand" aria-label="Über BiblioCollect">
+            <strong>Für den Schulalltag gemacht.</strong>
+            <p>Die Bibliothek bleibt auch ohne Onlinekonto vollständig nutzbar. Digitale Funktionen ergänzen die Ausleihe vor Ort.</p>
+            <img class="bc-home-intro__figures" src="/brand/vdbs/figures-chain.svg" alt="" aria-hidden="true">
         </div>
     </section>
 
-    <section class="mt-8 grid gap-4 md:grid-cols-3" aria-label="Projektstand">
-        <x-ui.card class="p-5">
-            <p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">T0 · abgeschlossen</p>
-            <h2 class="mt-2 text-xl font-black">Foundation</h2>
-            <p class="mt-2 text-sm text-app-text-muted">Laravel 13, Livewire 4, Vite, Pest, PHPStan, Pint und grüne CI.</p>
-        </x-ui.card>
-        <x-ui.card class="p-5">
-            <p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">T1 · jetzt</p>
-            <h2 class="mt-2 text-xl font-black">Anwendungsinfrastruktur</h2>
-            <p class="mt-2 text-sm text-app-text-muted">Permissions, Rollen-Bundles, Navigation, vier Surfaces und VDBS-App-Shell.</p>
-        </x-ui.card>
-        <x-ui.card class="p-5">
-            <p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">Als Nächstes</p>
-            <h2 class="mt-2 text-xl font-black">Identity, Patrons & School</h2>
-            <p class="mt-2 text-sm text-app-text-muted">Onlinekonto, Ausleihkonto und Schulkontext bleiben fachlich getrennte Bausteine.</p>
-        </x-ui.card>
+    <section class="bc-catalog-search" aria-labelledby="catalog-heading">
+        <div class="bc-catalog-search__heading">
+            <h2 id="catalog-heading">Katalog durchsuchen</h2>
+            <p>Suche nach Titel, Autor:in, ISBN oder Stichwort</p>
+        </div>
+
+        <div class="bc-catalog-search__form" role="search" aria-label="Katalogsuche Vorschau">
+            <label class="sr-only" for="catalog-scope">Suchbereich</label>
+            <select id="catalog-scope" class="bc-catalog-search__scope" disabled>
+                <option>Alle Medien</option>
+                <option>Bücher</option>
+                <option>Comics & Manga</option>
+                <option>Spiele</option>
+            </select>
+
+            <label class="sr-only" for="catalog-search">Suchbegriff</label>
+            <input id="catalog-search" class="bc-catalog-search__input" type="search" placeholder="Was möchtest du finden?" disabled>
+            <x-ui.button disabled>Suchen</x-ui.button>
+        </div>
+
+        <div class="bc-catalog-search__meta">
+            <span>Erweiterte Suche und Filter folgen mit dem Katalogmodul.</span>
+        </div>
     </section>
 
-    @if (app()->environment('local'))
-        <section class="mt-10" aria-labelledby="preview-heading">
-            <x-ui.page-header
-                kicker="Nur lokal"
-                title="Entwicklungsansichten"
-                lead="Diese Links umgehen keine Produktionsberechtigungen: Die Preview-Routen werden ausschließlich in der lokalen Umgebung registriert."
-            />
-            <div class="mt-5 grid gap-4 md:grid-cols-3">
-                <x-ui.card class="p-5">
-                    <h2 class="text-lg font-black">Mein Konto</h2>
-                    <p class="mt-2 text-sm text-app-text-muted">Vorschau des Portals für eigene Ausleihen, Vormerkungen und Profilfunktionen.</p>
-                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.portal')">Portal ansehen</x-ui.button>
-                </x-ui.card>
-                <x-ui.card class="p-5">
-                    <h2 class="text-lg font-black">Bibliotheksbetrieb</h2>
-                    <p class="mt-2 text-sm text-app-text-muted">Scanner- und tastaturorientierte Arbeitsoberfläche für AG und Mitarbeitende.</p>
-                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.pos')">POS ansehen</x-ui.button>
-                </x-ui.card>
-                <x-ui.card class="p-5">
-                    <h2 class="text-lg font-black">Verwaltung</h2>
-                    <p class="mt-2 text-sm text-app-text-muted">Ruhige, datenreiche Oberfläche für Regeln, Importe, Datenschutz und Betrieb.</p>
-                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.administration')">Verwaltung ansehen</x-ui.button>
-                </x-ui.card>
-            </div>
-        </section>
-    @endif
+    <div class="bc-home-layout">
+        <div class="bc-home-layout__main">
+            <section class="bc-content-section" aria-labelledby="quick-heading">
+                <div class="bc-section-heading">
+                    <h2 id="quick-heading">Schnell finden</h2>
+                </div>
+                <div class="bc-link-list">
+                    <div class="bc-link-list__row">
+                        <div><strong>Neu im Bestand</strong><span>Neue Bücher und andere Medien entdecken</span></div>
+                        <span class="bc-status-text">ab T3</span>
+                    </div>
+                    <div class="bc-link-list__row">
+                        <div><strong>Veranstaltungen</strong><span>Termine, Aktionen und Anmeldungen</span></div>
+                        <span class="bc-status-text">später</span>
+                    </div>
+                    <div class="bc-link-list__row">
+                        <div><strong>Leselisten</strong><span>Freigegebene Listen von Lehrkräften</span></div>
+                        <span class="bc-status-text">später</span>
+                    </div>
+                    <div class="bc-link-list__row">
+                        <div><strong>Öffnungszeiten</strong><span>Bibliothekstage und aktuelle Hinweise</span></div>
+                        <span class="bc-status-text">ab T2</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bc-content-section" aria-labelledby="info-heading">
+                <div class="bc-section-heading">
+                    <h2 id="info-heading">Gut zu wissen</h2>
+                </div>
+                <div class="bc-notice-row">
+                    <strong>Ausleihe vor Ort</strong>
+                    <p>Ein Onlinekonto ist für die Nutzung der Bibliothek nicht erforderlich. Bibliotheksnummer und Ausleihkonto funktionieren unabhängig davon.</p>
+                </div>
+                <div class="bc-notice-row">
+                    <strong>Selbstbedienung</strong>
+                    <p>Mit einem optionalen Onlinekonto können später eigene Ausleihen, Vormerkungen und weitere persönliche Funktionen genutzt werden.</p>
+                </div>
+            </section>
+        </div>
+
+        <aside class="bc-home-layout__aside" aria-label="Service">
+            <section class="bc-side-panel" aria-labelledby="account-heading">
+                <h2 id="account-heading">Mein Konto</h2>
+                <p>Eigene Ausleihen, Vormerkungen und Kontodaten verwalten.</p>
+                @if (app()->environment('local'))
+                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.portal')">Portal-Vorschau</x-ui.button>
+                @else
+                    <x-ui.button class="mt-4" variant="secondary" disabled>Zum Konto</x-ui.button>
+                @endif
+            </section>
+
+            <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="help-heading">
+                <h2 id="help-heading">Hilfe & Orientierung</h2>
+                <p>Informationen zur Bibliotheksnutzung, zu Ausleihe und Vormerkungen werden hier später gebündelt.</p>
+            </section>
+
+            @if (app()->environment('local'))
+                <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="dev-heading">
+                    <h2 id="dev-heading">Entwicklungsansichten</h2>
+                    <ul class="bc-plain-links">
+                        <li><a href="{{ route('preview.pos') }}">Bibliotheksbetrieb</a></li>
+                        <li><a href="{{ route('preview.administration') }}">Verwaltung</a></li>
+                    </ul>
+                </section>
+            @endif
+        </aside>
+    </div>
 </x-app-shell>

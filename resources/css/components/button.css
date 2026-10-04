@@ -1,8 +1,37 @@
-.bc-button { display:inline-flex; min-height:var(--control-min-height); align-items:center; justify-content:center; gap:var(--space-2); border:1px solid transparent; border-radius:var(--radius-full); padding:.65rem 1.1rem; font-weight:var(--font-weight-bold); line-height:1; text-decoration:none; transition:box-shadow var(--transition-fast),transform var(--transition-fast),background-color var(--transition-fast); }
-.bc-button--primary { background:var(--action-primary); color:var(--text-on-action); }
-.bc-button--primary:visited { color:var(--text-on-action); }
-.bc-button--primary:hover { box-shadow:var(--shadow-sm); transform:translateY(-1px); }
-.bc-button--secondary { background:var(--action-secondary); color:var(--action-secondary-text); }
-.bc-button--secondary:visited { color:var(--action-secondary-text); }
-.bc-button--secondary:hover { box-shadow:var(--shadow-sm); transform:translateY(-1px); }
-.bc-button:disabled { cursor:not-allowed; opacity:.55; transform:none; }
+.bc-button {
+    display: inline-flex;
+    min-height: var(--control-min-height);
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    border: 1px solid transparent;
+    border-radius: .3rem;
+    padding: .64rem 1.05rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.1;
+    text-decoration: none;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.bc-button--primary {
+    border-color: color-mix(in srgb, var(--action-primary) 72%, var(--vdbs-ink));
+    background: var(--action-primary);
+    color: var(--text-on-action);
+}
+
+.bc-button--primary:visited { color: var(--text-on-action); }
+.bc-button--primary:hover { background: color-mix(in srgb, var(--action-primary) 88%, var(--vdbs-ink)); }
+
+.bc-button--secondary {
+    border-color: var(--action-secondary);
+    background: var(--bg-surface);
+    color: var(--action-secondary);
+}
+
+.bc-button--secondary:visited { color: var(--action-secondary); }
+.bc-button--secondary:hover { background: var(--bg-surface-muted); }
+
+.bc-button:disabled {
+    cursor: not-allowed;
+    opacity: .58;
+}

@@ -2,36 +2,55 @@
 
 <x-app-shell surface="pos" title="Bibliotheksbetrieb" :preview="$preview">
     <x-ui.page-header
-        kicker="POS"
-        title="Bibliotheksbetrieb"
-        lead="Der Arbeitsplatz ist auf Barcode-Scanner, Tastatur und schnelle, eindeutige Rückmeldungen ausgelegt."
+        kicker="Bibliotheksbetrieb"
+        title="Ausleihe und Rückgabe"
+        lead="Arbeitsoberfläche für Barcode-Scanner und Tastatur."
     />
 
-    <div class="mt-7 grid gap-6 lg:grid-cols-[1.3fr_.7fr]">
-        <x-ui.card class="p-5 sm:p-6">
-            <h2 class="text-xl font-black">Scanbereich</h2>
-            <div class="mt-5">
-                <x-ui.input
-                    label="Bibliotheksnummer oder Medienbarcode"
-                    name="barcode-preview"
-                    hint="Scanner arbeiten wie eine Tastatur. In T4 wird das Feld den Ausleihvorgang steuern."
-                    placeholder="Barcode scannen …"
-                    disabled
-                />
-            </div>
-            <div class="mt-5 flex flex-wrap gap-3">
-                <x-ui.button disabled>Ausleihe</x-ui.button>
-                <x-ui.button variant="secondary" disabled>Rückgabe</x-ui.button>
-            </div>
-        </x-ui.card>
-
-        <x-ui.card class="p-5 sm:p-6">
-            <h2 class="text-xl font-black">Arbeitsstatus</h2>
-            <dl class="mt-4 grid gap-3 text-sm">
-                <div class="flex items-center justify-between gap-4"><dt>Scanner</dt><dd><x-ui.badge>bereit für T4</x-ui.badge></dd></div>
-                <div class="flex items-center justify-between gap-4"><dt>Ausleihe</dt><dd><x-ui.badge>noch inaktiv</x-ui.badge></dd></div>
-                <div class="flex items-center justify-between gap-4"><dt>Rückgabe</dt><dd><x-ui.badge>noch inaktiv</x-ui.badge></dd></div>
-            </dl>
-        </x-ui.card>
+    <div class="bc-pos-toolbar" role="toolbar" aria-label="Vorgangsart">
+        <button type="button" class="bc-pos-toolbar__item bc-pos-toolbar__item--active" disabled>Ausleihe</button>
+        <button type="button" class="bc-pos-toolbar__item" disabled>Rückgabe</button>
+        <button type="button" class="bc-pos-toolbar__item" disabled>Verlängern</button>
+        <button type="button" class="bc-pos-toolbar__item" disabled>Abholen</button>
     </div>
+
+    <div class="bc-pos-layout">
+        <section class="bc-work-panel" aria-labelledby="scan-heading">
+            <div class="bc-section-heading">
+                <h2 id="scan-heading">Scannen</h2>
+            </div>
+            <x-ui.input
+                label="Bibliotheksnummer oder Medienbarcode"
+                name="barcode-preview"
+                hint="Der Scanner arbeitet wie eine Tastatur. Die Verarbeitung folgt in T4."
+                placeholder="Barcode scannen oder Nummer eingeben"
+                disabled
+            />
+            <div class="bc-action-row">
+                <x-ui.button disabled>Übernehmen</x-ui.button>
+                <x-ui.button variant="secondary" disabled>Vorgang leeren</x-ui.button>
+            </div>
+        </section>
+
+        <aside class="bc-work-panel" aria-labelledby="status-heading">
+            <div class="bc-section-heading"><h2 id="status-heading">Arbeitsstatus</h2></div>
+            <dl class="bc-definition-list">
+                <div><dt>Vorgang</dt><dd>Ausleihe</dd></div>
+                <div><dt>Person</dt><dd>nicht gewählt</dd></div>
+                <div><dt>Medien</dt><dd>0</dd></div>
+                <div><dt>System</dt><dd><x-ui.badge>Vorschau</x-ui.badge></dd></div>
+            </dl>
+        </aside>
+    </div>
+
+    <section class="bc-content-section" aria-labelledby="transaction-heading">
+        <div class="bc-section-heading bc-section-heading--with-meta">
+            <h2 id="transaction-heading">Aktueller Vorgang</h2>
+            <span>keine Positionen</span>
+        </div>
+        <x-ui.table>
+            <thead><tr><th scope="col">Barcode</th><th scope="col">Medium</th><th scope="col">Status</th></tr></thead>
+            <tbody><tr><td colspan="3" class="bc-table__empty">Medien erscheinen nach dem Scan in dieser Liste.</td></tr></tbody>
+        </x-ui.table>
+    </section>
 </x-app-shell>
