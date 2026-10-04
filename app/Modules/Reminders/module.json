@@ -1,0 +1,11 @@
+{
+  "name": "Reminders",
+  "description": "Fälligkeitserinnerungen, Mahn-E-Mails, Mahnregister und Mahnbriefe.",
+  "dependencies": [
+    "Circulation",
+    "Patrons",
+    "School"
+  ],
+  "providers": [],
+  "enabled": true
+}

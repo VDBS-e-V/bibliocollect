@@ -1,0 +1,116 @@
+/* BiblioCollect — VDBS design tokens. Use semantic roles in app CSS, not raw colours. */
+:root {
+    --vdbs-green: #2dc08e;
+    --vdbs-ink: #0f172a;
+    --vdbs-white: #ffffff;
+    --vdbs-purple: #58275a;
+    --vdbs-group-blue: #52bdf2;
+    --vdbs-group-yellow: #ffcb1f;
+    --vdbs-group-petrol: #0a7fa0;
+    --vdbs-group-pink: #f76ca3;
+    --vdbs-group-red: #d93425;
+    --vdbs-group-orange: #f5912b;
+    --vdbs-green-dark: #057f5b;
+    --vdbs-green-soft: #dcf8ea;
+    --vdbs-grey-soft: #f5f7f6;
+    --vdbs-grey-line: #d4dbd8;
+    --vdbs-grey-frame: #7f8d88;
+    --vdbs-grey-text: #52605b;
+    --vdbs-error: #b42318;
+
+    --bg-page: var(--vdbs-white);
+    --bg-surface: var(--vdbs-white);
+    --bg-surface-muted: var(--vdbs-grey-soft);
+    --bg-brand-soft: var(--vdbs-green-soft);
+    --bg-stage: var(--vdbs-purple);
+    --text-primary: var(--vdbs-ink);
+    --text-secondary: var(--vdbs-grey-text);
+    --text-on-action: var(--vdbs-ink);
+    --text-on-stage: var(--vdbs-white);
+    --border-default: var(--vdbs-grey-line);
+    --border-strong: var(--vdbs-grey-frame);
+    --action-primary: var(--vdbs-green);
+    --action-primary-hover: var(--vdbs-green);
+    --action-secondary: var(--vdbs-purple);
+    --action-secondary-text: var(--vdbs-white);
+    --action-danger: var(--vdbs-error);
+    --action-warning: var(--vdbs-group-orange);
+    --action-success: var(--vdbs-green-dark);
+    --link-default: var(--vdbs-green-dark);
+    --link-visited: var(--vdbs-purple);
+    --focus-ring: var(--vdbs-purple);
+
+    /* Group colours are reserved for group markers, figures, bubbles and similar brand elements. */
+    --group-1: var(--vdbs-group-blue);
+    --group-2: var(--vdbs-group-yellow);
+    --group-3: var(--vdbs-group-petrol);
+    --group-4: var(--vdbs-group-pink);
+    --group-5: var(--vdbs-group-red);
+    --group-6: var(--vdbs-group-orange);
+
+    --font-family-base: "Lato", Arial, "Segoe UI", system-ui, sans-serif;
+    --font-family-display: "Neuland", "Lato", Arial, sans-serif;
+    --font-family-editorial: "Source Serif 4", Georgia, serif;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 700;
+    --font-weight-bold: 700;
+    --font-weight-black: 900;
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --leading-tight: 1.15;
+    --leading-body: 1.5;
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --control-min-height: 2.75rem;
+    --control-touch-height: 3rem;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 999px;
+    --shadow-sm: 0 1px 2px rgb(15 23 42 / 8%);
+    --shadow-md: 0 10px 30px rgb(15 23 42 / 10%);
+    --transition-fast: 120ms ease;
+    --transition-normal: 180ms ease;
+    --z-header: 100;
+    --z-dropdown: 200;
+    --z-overlay: 300;
+    --z-toast: 400;
+}
+
+:root[data-vdbs-theme="dark"] {
+    color-scheme: dark;
+    --bg-page: #180f18;
+    --bg-surface: #261926;
+    --bg-surface-muted: #261926;
+    --bg-brand-soft: #381d39;
+    --bg-stage: #3b203b;
+    --text-primary: #f1f4f2;
+    --text-secondary: #a49ca3;
+    --text-on-stage: #ffffff;
+    --border-default: #3d303e;
+    --border-strong: #a49ca3;
+    --link-default: #40cd9a;
+    --link-visited: #e0a7e1;
+    --focus-ring: #e0a7e1;
+    --action-danger: #ff8a80;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root { --transition-fast: 0ms; --transition-normal: 0ms; }
+}

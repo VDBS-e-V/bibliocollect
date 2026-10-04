@@ -1,0 +1,10 @@
+{
+  "name": "Lists",
+  "description": "Lehrer- und Leselisten sowie öffentliche Token-Links.",
+  "dependencies": [
+    "Catalog",
+    "Identity"
+  ],
+  "providers": [],
+  "enabled": true
+}

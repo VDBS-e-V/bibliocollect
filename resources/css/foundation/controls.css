@@ -1,0 +1,22 @@
+button, input, select, textarea {
+    font: inherit;
+}
+
+button, [role='button'], input, select, textarea {
+    min-height: var(--control-min-height);
+}
+
+button, [role='button'] {
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+button:disabled, input:disabled, select:disabled, textarea:disabled {
+    cursor: not-allowed;
+}
+
+@media (pointer: coarse) {
+    button, [role='button'], input, select {
+        min-height: var(--control-touch-height);
+    }
+}

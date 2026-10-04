@@ -1,0 +1,9 @@
+{
+  "name": "Events",
+  "description": "Bibliotheksveranstaltungen und Anmeldungen.",
+  "dependencies": [
+    "Patrons"
+  ],
+  "providers": [],
+  "enabled": true
+}

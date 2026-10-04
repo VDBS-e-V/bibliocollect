@@ -1,0 +1,9 @@
+{
+  "name": "Acquisition",
+  "description": "Medienwünsche und leichter Beschaffungsstatus.",
+  "dependencies": [
+    "Catalog"
+  ],
+  "providers": [],
+  "enabled": true
+}

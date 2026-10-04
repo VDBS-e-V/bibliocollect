@@ -1,0 +1,9 @@
+{
+  "name": "Content",
+  "description": "News, Empfehlungen und öffentliche Bibliotheksinformationen.",
+  "dependencies": [
+    "Catalog"
+  ],
+  "providers": [],
+  "enabled": true
+}

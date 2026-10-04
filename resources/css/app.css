@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+@import './tokens.css';
+@import './foundation/font-faces.css';
+@import './foundation/base.css';
+@import './foundation/typography.css';
+@import './foundation/controls.css';
+@import './components/index.css';
+@import './patterns/index.css';
+@import './parts/index.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme inline {
+    --font-sans: var(--font-family-base);
+    --font-display: var(--font-family-display);
+    --font-editorial: var(--font-family-editorial);
+    --color-app-bg: var(--bg-page);
+    --color-app-surface: var(--bg-surface);
+    --color-app-surface-muted: var(--bg-surface-muted);
+    --color-app-brand-soft: var(--bg-brand-soft);
+    --color-app-stage: var(--bg-stage);
+    --color-app-text: var(--text-primary);
+    --color-app-text-muted: var(--text-secondary);
+    --color-app-border: var(--border-default);
+    --color-app-border-strong: var(--border-strong);
+    --color-app-primary: var(--action-primary);
+    --color-app-secondary: var(--action-secondary);
+    --color-app-success: var(--action-success);
+    --color-app-danger: var(--action-danger);
+    --color-app-warning: var(--action-warning);
+    --color-app-link: var(--link-default);
+}

@@ -1,0 +1,7 @@
+{
+  "name": "School",
+  "description": "Schuljahre, Klassen, Öffnungstage, Schließungen und Ferienlogik.",
+  "dependencies": [],
+  "providers": [],
+  "enabled": true
+}

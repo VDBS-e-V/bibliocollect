@@ -1,0 +1,7 @@
+.bc-search-stage { position:relative; overflow:hidden; border-radius:var(--radius-xl); background:var(--bg-brand-soft); padding:clamp(1.5rem,4vw,3rem); }
+.bc-search-stage::after { position:absolute; top:-1rem; right:-1rem; width:min(11rem,30vw); height:min(11rem,30vw); background:url('/brand/vdbs/bubbles-top-right.svg') top right/contain no-repeat; content:''; pointer-events:none; }
+.bc-search-stage__content { position:relative; z-index:1; max-width:52rem; }
+.bc-search { display:grid; grid-template-columns:1fr auto; gap:.65rem; margin-top:1.5rem; }
+.bc-search__input { width:100%; min-height:3.25rem; border:1px solid var(--border-strong); border-radius:var(--radius-full); background:var(--bg-surface); color:var(--text-primary); padding:0 1.2rem; }
+.bc-search__input::placeholder { color:var(--text-secondary); }
+@media (max-width:40rem) { .bc-search { grid-template-columns:1fr; } }

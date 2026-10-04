@@ -1,0 +1,7 @@
+{
+  "name": "Catalog",
+  "description": "Titel, Exemplare, Medientypen, Standorte, Barcodes und bibliografische Daten.",
+  "dependencies": [],
+  "providers": [],
+  "enabled": true
+}

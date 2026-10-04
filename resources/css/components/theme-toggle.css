@@ -1,0 +1,1 @@
+.bc-theme-toggle { display:inline-flex; min-height:2.5rem; align-items:center; gap:.5rem; border:1px solid var(--border-default); border-radius:var(--radius-full); background:var(--bg-surface); color:var(--text-primary); padding:.5rem .8rem; font-weight:700; }

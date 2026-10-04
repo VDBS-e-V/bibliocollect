@@ -1,0 +1,9 @@
+{
+  "name": "Identity",
+  "description": "Onlineidentitäten, Registrierung, Rollen- und Permission-Zuweisung.",
+  "dependencies": [
+    "Patrons"
+  ],
+  "providers": [],
+  "enabled": true
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Patrons",
+  "description": "Ausleihkonten, Bibliotheksnummern, Karten, Sperren und Schulzugehörigkeit.",
+  "dependencies": [
+    "School"
+  ],
+  "providers": [],
+  "enabled": true
+}

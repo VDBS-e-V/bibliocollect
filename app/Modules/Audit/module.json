@@ -1,0 +1,7 @@
+{
+  "name": "Audit",
+  "description": "Kritische fachliche und administrative Auditereignisse.",
+  "dependencies": [],
+  "providers": [],
+  "enabled": true
+}

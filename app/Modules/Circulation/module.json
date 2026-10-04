@@ -1,0 +1,11 @@
+{
+  "name": "Circulation",
+  "description": "Ausleihe, Rückgabe, Verlängerung, Zeitraumsvormerkungen und Pickups.",
+  "dependencies": [
+    "Patrons",
+    "School",
+    "Catalog"
+  ],
+  "providers": [],
+  "enabled": true
+}

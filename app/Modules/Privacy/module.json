@@ -1,0 +1,9 @@
+{
+  "name": "Privacy",
+  "description": "Datenauskunft, Anonymisierung und Retention-Orchestrierung.",
+  "dependencies": [
+    "Patrons"
+  ],
+  "providers": [],
+  "enabled": true
+}

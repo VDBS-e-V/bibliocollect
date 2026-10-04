@@ -1,0 +1,4 @@
+const storageKey='bibliocollect-theme';
+function applyTheme(theme){const root=document.documentElement;const dark=theme==='dark';if(dark){root.setAttribute('data-vdbs-theme','dark')}else{root.removeAttribute('data-vdbs-theme')}document.querySelectorAll('[data-theme-toggle]').forEach((button)=>{button.setAttribute('aria-pressed',dark?'true':'false');const label=button.querySelector('[data-theme-label]');if(label)label.textContent=dark?'Hell':'Dunkel';});}
+let initialTheme='light';try{initialTheme=localStorage.getItem(storageKey)==='dark'?'dark':'light'}catch(_){}applyTheme(initialTheme);
+document.addEventListener('click',(event)=>{const button=event.target.closest('[data-theme-toggle]');if(!button)return;const next=document.documentElement.hasAttribute('data-vdbs-theme')?'light':'dark';applyTheme(next);try{localStorage.setItem(storageKey,next)}catch(_){}});

@@ -1,0 +1,7 @@
+.bc-shell { min-height:100vh; background:var(--bg-page); color:var(--text-primary); }
+.bc-shell__header { position:relative; z-index:var(--z-header); border-bottom:1px solid var(--border-default); background:color-mix(in srgb,var(--bg-surface) 94%,transparent); }
+.bc-brand-lockup { display:flex; align-items:center; gap:1rem; min-width:0; }
+.bc-brand-lockup__vdbs { display:block; width:9rem; max-width:32vw; height:auto; }
+.bc-brand-lockup__product { border-left:1px solid var(--border-default); padding-left:1rem; color:var(--text-primary); font-size:1.15rem; font-weight:900; letter-spacing:-.02em; }
+:root[data-vdbs-theme="dark"] .bc-brand-logo--light { display:none; }
+:root:not([data-vdbs-theme="dark"]) .bc-brand-logo--dark { display:none; }

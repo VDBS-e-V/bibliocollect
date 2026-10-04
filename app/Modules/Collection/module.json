@@ -1,0 +1,11 @@
+{
+  "name": "Collection",
+  "description": "Schäden, Reparatur, Vermisst, Inventur, Aussonderung und Ersatzfälle.",
+  "dependencies": [
+    "Catalog",
+    "Patrons",
+    "Circulation"
+  ],
+  "providers": [],
+  "enabled": true
+}
