@@ -1,7 +1,9 @@
 {
   "name": "Catalog",
-  "description": "Titel, Exemplare, Medientypen, Standorte, Barcodes und bibliografische Daten.",
+  "description": "Titel, Ausgaben, physische Exemplare, Barcodes und bibliografische Daten.",
   "dependencies": [],
-  "providers": [],
+  "providers": [
+    "App\\Modules\\Catalog\\Providers\\CatalogServiceProvider"
+  ],
   "enabled": true
 }

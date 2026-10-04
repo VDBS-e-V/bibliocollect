@@ -1,16 +1,16 @@
 # T2 – Mitarbeiteroberfläche für Ausleihkonten
 
-Stand: v0.3.2
+Stand: v0.3.4
 
 ## Zweck
 
-Der Bibliotheksbetrieb erhält erstmals eine echte, serverseitig geschützte Oberfläche zum gezielten Nachschlagen von Ausleihkonten. Die Oberfläche ist bewusst kein allgemeines Personenverzeichnis.
+Der Bibliotheksbetrieb erhält eine echte, serverseitig geschützte Oberfläche zum gezielten Nachschlagen und Bearbeiten von Ausleihkonten. Die Oberfläche ist bewusst kein allgemeines Personenverzeichnis.
 
 ## Need-to-know
 
 - `student_ag_basic` und `student_ag_extended` dürfen gezielt nach Bibliotheksnummer oder Name suchen und Basisdaten sehen. Die Suche verlangt mindestens zwei Buchstaben/Ziffern, entfernt LIKE-Wildcards und liefert höchstens 25 Treffer.
 - Geburtsdatum, E-Mail, Austrittsdatum und Sperrgrund benötigen `patrons.sensitive.view`.
-- Diese Permission liegt in v0.3.2 nur bei `staff` und `management`.
+- Diese Permission liegt bei `staff` und `management`.
 - Technische Admin-Konten erhalten dadurch keine Patron-Sichtbarkeit.
 
 ## Onlinekonto-Verknüpfung
@@ -24,14 +24,13 @@ Mitarbeiter:innen und Verwaltung können für geeignete, aktive Schüler:innen- 
 
 ## AG-Rollen
 
-Auf der Patron-Seite werden ausschließlich die Rollen `student_ag_basic` und `student_ag_extended` verwaltet. Grundrollen sowie Mitarbeiter-, Verwaltungs- und technische Rollen sind nicht über diesen Workflow zuweisbar. Damit kann eine Mitarbeiterin oder ein Mitarbeiter insbesondere die kompetenzbasierte Freigabe `Schüler-AG Erweitert` erteilen, ohne einen allgemeinen Rollen-Editor zu erhalten.
+Auf der Patron-Seite werden ausschließlich die Rollen `student_ag_basic` und `student_ag_extended` verwaltet. Grundrollen sowie Mitarbeiter-, Verwaltungs- und technische Rollen sind nicht über diesen Workflow zuweisbar.
 
-## Noch nicht enthalten
+## Im weiteren T2-Verlauf ergänzt
 
-- Stammdatenbearbeitung
-- Sperren/Entsperren
-- Klassenwechsel und Schuljahresübergang
-- Audit-Ansicht
-- Ausleihe/Rückgabe
+- Stammdatenbearbeitung mit Pflicht-Geburtsdatum und aktiver Klassenzuordnung für Schüler:innen
+- protokolliertes Sperren und Entsperren
+- kontrollierter dauerhafter Austritt mit Onlinekonto-Deaktivierung
+- Schuljahres- und Klassenverwaltung mit Readiness-Prüfung
 
-Diese Funktionen folgen in ihren jeweiligen fachlichen Workflows.
+Ausleihe/Rückgabe gehört nicht zu T2 und folgt mit der Circulation-Domäne.

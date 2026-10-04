@@ -31,3 +31,7 @@ Das Aktivieren eines Schuljahres führt bewusst **keine automatische Massenumstu
 ## IDs
 
 Neue fachliche Tabellen verwenden ULIDs. Die Laravel-Auth-Tabelle `users` behält vorerst ihren technischen numerischen Primärschlüssel, bekommt aber zusätzlich `public_id` als ULID für modulübergreifende/externe Referenzen. Diese Ausnahme vermeidet eine destruktive Änderung der bereits installierten Laravel-Sessionstruktur in T2.
+
+## Abschlussentscheidung
+
+T2 ist mit v0.3.4 fachlich und technisch abgeschlossen. Der vollständige Schuljahres-Massenwechsel, produktive Schulimporte und die Verwaltungsoberfläche für Öffnungszeiten/Schließtage bleiben bewusst nachgelagerte Verwaltungsworkflows. Sie blockieren den Start von T3 nicht, weil die benötigten Domänenobjekte, Berechtigungsgrenzen und Kalender-/Readiness-Grundlagen bereits vorhanden sind.

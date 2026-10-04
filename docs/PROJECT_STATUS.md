@@ -1,26 +1,33 @@
 # Projektstatus — BiblioCollect
 
-Stand: T2 v0.3.4
+Stand: T3 v0.4.0 – Catalog-Grundmodell
 
 ## Abgeschlossen
 
 - T0 Foundation mit Laravel 13, Modul-/Surface-Struktur, CI, Pint, PHPStan und Pest
 - T1 mit Permission-/Role-Registry, Navigation, vier Surfaces, VDBS-App-Shell und `Europe/Berlin`
-- getrennte Onlinekonten (`User`) und Ausleihkonten (`Patron`)
-- E-Mail-Verifikation und einmalige Patron-Verknüpfungscodes
-- persistierte kombinierbare Rollen
-- Mitarbeiteroberfläche für Patron-Suche, Stammdaten und Klassenzuordnung
-- protokolliertes Sperren/Entsperren
-- kontrollierter dauerhafter Austritt mit Statusprotokoll und Onlinekonto-Deaktivierung
-- Schuljahr-/Klassenverwaltung und Vorbereitung des Schuljahreswechsels
-- `SchoolCalendarService` als Grundlage für Öffnungstage
+- T2 Identity / Patrons / School:
+  - getrennte Onlinekonten (`User`) und Ausleihkonten (`Patron`)
+  - E-Mail-Verifikation und einmalige Patron-Verknüpfungscodes
+  - persistierte kombinierbare Rollen und Need-to-know-Patronzugriff
+  - Patron-Stammdaten, Klassenbezug, Sperren/Entsperren und dauerhafter Austritt
+  - Schuljahr-/Klassenverwaltung und Readiness-Prüfung
+  - `SchoolCalendarService` als Grundlage für Öffnungstage
 
-## Noch offen in/ab T2
+## Nachgelagerte Verwaltungsworkflows
+
+Diese Punkte sind bewusst nicht Teil des T2-Abschluss-Gates und können später ergänzt werden:
 
 - vollständiger Massenworkflow für Schuljahreswechsel mit Vorschau, Mapping und Konfliktbehandlung
 - produktiver Schulimport
 - Öffnungszeiten-/Schließtage-Verwaltungsmaske
 
-## Danach
+## T3 Catalog
 
-T3 `Catalog`: Titel/Editionen, physische Exemplare, Medienarten, Barcode- und Statusmodell, öffentliche Recherche und erste interne Katalogpflege.
+v0.4.0 startet das reine Catalog-Domänenfundament:
+
+- `Title` beschreibt den titelbezogenen bibliografischen Kern.
+- `Edition` beschreibt eine konkrete Ausgabe und trägt die technische Vorbereitung für Altersfreigaben.
+- `Copy` beschreibt das physische Exemplar; sichtbare Barcodes sind eindeutig, aber niemals Primärschlüssel.
+- interne IDs bleiben ULIDs.
+- Lieferanten-, Preis- und Budgetlogik gehört ausdrücklich nicht in Catalog.

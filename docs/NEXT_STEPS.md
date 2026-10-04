@@ -1,9 +1,10 @@
 # Nächste Schritte — BiblioCollect
 
-1. T2 v0.3.4 lokal und in GitHub Actions grün bestätigen.
-2. T2 fachlich abschließen: Entscheidung, ob der vollständige Schuljahres-Massenwechsel noch vor T3 umgesetzt wird oder als Verwaltungsworkflow nachgezogen wird.
-3. T3 `Catalog` beginnen: Title/Edition und Copy strikt trennen, ULIDs intern, sichtbare Barcodes nicht als Primärschlüssel verwenden.
-4. Danach T4 `Circulation` mit zentralem `LoanRuleEvaluator`, Transaktionen und Row Locks umsetzen.
+1. T3 v0.4.0 Catalog-Grundmodell lokal und in GitHub Actions grün bestätigen.
+2. T3 in kleinen Schritten erweitern: bibliografische Felder und titelbasierte Queries, danach interne Katalogpflege.
+3. Öffentliche Katalogsuche auf `Title`/`Edition` aufbauen; physische Verfügbarkeit bleibt `Copy`-bezogen.
+4. CSV/MARC21-Import erst danach mit Preview, Normalisierung und Konfliktbehandlung ergänzen.
+5. T4 `Circulation` anschließend mit zentralem Regel-Evaluator, Altersprüfung gegen Patron-Geburtsdatum und Edition-Mindestalter, Transaktionen und Row Locks umsetzen.
 
 ## Qualitäts-Gate
 
