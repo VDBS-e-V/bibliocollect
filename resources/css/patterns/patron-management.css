@@ -1,0 +1,61 @@
+.bc-patron-form {
+    display: grid;
+    gap: 2rem;
+    max-width: 64rem;
+}
+
+.bc-patron-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+}
+
+.bc-patron-form__wide { grid-column: 1 / -1; }
+
+.bc-readonly-field {
+    display: grid;
+    gap: .35rem;
+}
+
+.bc-readonly-field__label {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 700;
+}
+
+.bc-readonly-field__value {
+    min-height: var(--control-min-height);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface-muted);
+    padding: .62rem .7rem;
+}
+
+.bc-field__textarea {
+    min-height: 7.5rem;
+    resize: vertical;
+}
+
+.bc-block-workflow {
+    display: grid;
+    gap: .8rem;
+}
+
+.bc-block-workflow form { display: grid; gap: .75rem; }
+
+.bc-management-note {
+    margin: .5rem 0 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+}
+
+.bc-status-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+}
+
+@media (max-width: 42rem) {
+    .bc-patron-form__grid { grid-template-columns: 1fr; }
+    .bc-patron-form__wide { grid-column: auto; }
+}

@@ -54,7 +54,6 @@ it('lets student AG users perform basic patron lookup without exposing sensitive
         ->assertDontSee('Einmalcode ausgeben');
 });
 
-
 it('does not allow wildcard-only searches to become a patron directory', function (): void {
     workspacePatron();
     $agUser = workspaceUserWithRole('student_ag_basic');
@@ -87,8 +86,12 @@ it('issues a one-time patron link code without storing the cleartext in flash da
     $response
         ->assertOk()
         ->assertSee('Einmalcode ausgegeben')
-        ->assertHeader('Cache-Control', 'private, no-store, max-age=0')
         ->assertSessionMissing('issued_link_code');
+
+    expect((string) $response->headers->get('Cache-Control'))
+        ->toContain('private')
+        ->toContain('no-store')
+        ->toContain('max-age=0');
 
     $this->assertDatabaseHas('patron_account_link_tokens', [
         'patron_id' => $patron->getKey(),

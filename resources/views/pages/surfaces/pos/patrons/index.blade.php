@@ -7,6 +7,9 @@
 
     <div class="bc-context-actions">
         <a href="{{ route('pos.home') }}">← Zurück zum Arbeitsplatz</a>
+        @can('patrons.manage')
+            <x-ui.button href="{{ route('pos.patrons.create') }}">Neues Ausleihkonto</x-ui.button>
+        @endcan
     </div>
 
     <section class="bc-patron-search" aria-labelledby="patron-search-heading">
@@ -78,9 +81,14 @@
                             <td>{{ $patron->schoolClass?->name ?? '—' }}</td>
                             <td>{{ $kindLabel }}</td>
                             <td>
-                                <x-ui.badge :variant="$patron->status->value === 'active' ? 'success' : 'neutral'">
-                                    {{ $statusLabel }}
-                                </x-ui.badge>
+                                <div class="bc-status-stack">
+                                    <x-ui.badge :variant="$patron->status->value === 'active' ? 'success' : 'neutral'">
+                                        {{ $statusLabel }}
+                                    </x-ui.badge>
+                                    @if ($patron->blocked_at !== null)
+                                        <x-ui.badge variant="danger">Gesperrt</x-ui.badge>
+                                    @endif
+                                </div>
                             </td>
                             <td><a href="{{ route('pos.patrons.show', ['patronId' => $patron->getKey()]) }}">Öffnen</a></td>
                         </tr>

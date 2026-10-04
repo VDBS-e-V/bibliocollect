@@ -26,7 +26,11 @@ return [
         ],
         'patrons.manage' => [
             'label' => 'Ausleihkonten verwalten',
-            'description' => 'Erlaubt Änderungen an Ausleihkonten. Kritische Sperren bleiben später gesondert abgesichert.',
+            'description' => 'Erlaubt das Anlegen und Bearbeiten fachlicher Stammdaten von Ausleihkonten.',
+        ],
+        'patrons.block' => [
+            'label' => 'Ausleihkonten sperren',
+            'description' => 'Erlaubt das kritische Sperren und Entsperren eines Ausleihkontos mit protokolliertem Grund.',
         ],
         'patrons.link-code.issue' => [
             'label' => 'Onlinekonto-Code ausgeben',
@@ -68,6 +72,7 @@ return [
                 'patrons.lookup',
                 'patrons.sensitive.view',
                 'patrons.manage',
+                'patrons.block',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
             ],
@@ -81,6 +86,7 @@ return [
                 'patrons.lookup',
                 'patrons.sensitive.view',
                 'patrons.manage',
+                'patrons.block',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
                 'school.manage',

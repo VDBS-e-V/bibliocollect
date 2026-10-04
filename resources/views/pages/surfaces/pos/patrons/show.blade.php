@@ -23,6 +23,9 @@
 
     <div class="bc-context-actions">
         <a href="{{ route('pos.patrons.index') }}">← Zurück zur Suche</a>
+        @can('patrons.manage')
+            <x-ui.button href="{{ route('pos.patrons.edit', ['patronId' => $patron->getKey()]) }}" variant="secondary">Stammdaten bearbeiten</x-ui.button>
+        @endcan
     </div>
 
     @if (session('workspace_success'))
@@ -145,8 +148,38 @@
 
             @can('patrons.manage')
                 <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="management-heading">
-                    <h2 id="management-heading">Stammdaten & Sperren</h2>
-                    <p>Änderungen und kritisches Sperren/Entsperren folgen als eigener, protokollierter Workflow. Diese Seite ist in v0.3.2 bewusst nur lesend.</p>
+                    <h2 id="management-heading">Stammdaten</h2>
+                    <p>Name, Bibliotheksnummer, Geburtsdatum, E-Mail, Klasse und geplantes Austrittsdatum können hier gepflegt werden. Kontotyp und Status bleiben eigenen Fachworkflows vorbehalten.</p>
+                    <p><x-ui.button href="{{ route('pos.patrons.edit', ['patronId' => $patron->getKey()]) }}" variant="secondary">Bearbeiten</x-ui.button></p>
+                </section>
+            @endcan
+
+            @can('patrons.block')
+                <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="blocking-heading">
+                    <h2 id="blocking-heading">Ausleihsperre</h2>
+                    <div class="bc-block-workflow">
+                        @if ($patron->blocked_at !== null)
+                            <p>Die Ausleihe ist derzeit gesperrt. Das Entsperren wird mit handelnder Person und bisherigem Sperrgrund protokolliert.</p>
+                            <form method="post" action="{{ route('pos.patrons.block.destroy', ['patronId' => $patron->getKey()]) }}">
+                                @csrf
+                                @method('DELETE')
+                                <x-ui.button type="submit" variant="secondary">Sperre aufheben</x-ui.button>
+                            </form>
+                        @elseif ($patron->status->value === 'active')
+                            <form method="post" action="{{ route('pos.patrons.block.store', ['patronId' => $patron->getKey()]) }}">
+                                @csrf
+                                <div class="bc-field">
+                                    <label class="bc-field__label" for="block-reason">Sperrgrund</label>
+                                    <p class="bc-field__hint" id="block-reason-hint">Der Grund ist nur für Mitarbeiter:innen und Verwaltung sichtbar und wird protokolliert.</p>
+                                    <textarea id="block-reason" name="reason" class="bc-field__control bc-field__textarea" maxlength="500" required aria-describedby="block-reason-hint"></textarea>
+                                </div>
+                                <x-ui.button type="submit">Ausleihkonto sperren</x-ui.button>
+                            </form>
+                        @else
+                            <p>Ausgeschiedene oder archivierte Konten werden nicht zusätzlich gesperrt.</p>
+                        @endif
+                        <p class="bc-management-note">Die Sperre ist als fachlicher Kontozustand hinterlegt. T4 bezieht sie in die Ausleihentscheidung ein.</p>
+                    </div>
                 </section>
             @endcan
         </aside>

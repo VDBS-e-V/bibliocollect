@@ -19,7 +19,7 @@ final class SearchPatronsQuery
 
         if (mb_strlen($searchableCharacters) < 2) {
             /** @var Collection<int, Patron> $empty */
-            $empty = new Collection();
+            $empty = new Collection;
 
             return $empty;
         }
