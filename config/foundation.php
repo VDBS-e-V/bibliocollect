@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'modules_path' => app_path('Modules'),
     'surfaces_path' => app_path('Surfaces'),
+    'business_timezone' => env('BUSINESS_TIMEZONE', 'Europe/Berlin'),
 
     'architecture' => [
         'prevent_module_cycles' => true,

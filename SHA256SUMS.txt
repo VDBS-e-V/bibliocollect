@@ -1,0 +1,1 @@
+45b129121eb4f9b4ef36ef9c70ed776a16ea6ab32687f233565adf4bfc8906ae  BiblioCollect_T1_v0.2.0.patch

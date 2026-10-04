@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-/*
-|--------------------------------------------------------------------------
-| Portal surface routes
-|--------------------------------------------------------------------------
-| Intentionally empty in bootstrap v0.1.0. Authentication, permissions and
-| product pages are introduced in later implementation phases.
-*/
+use Illuminate\Support\Facades\Route;
+
+Route::view('/konto', 'pages.surfaces.portal', ['preview' => false])
+    ->middleware('permission:surface.portal.access')
+    ->name('portal.home');
+
+if (app()->environment('local')) {
+    Route::view('/_preview/portal', 'pages.surfaces.portal', ['preview' => true])
+        ->name('preview.portal');
+}

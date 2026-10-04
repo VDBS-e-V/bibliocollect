@@ -1,0 +1,4 @@
+.bc-page-header { max-width:52rem; }
+.bc-page-header__kicker { margin:0 0 .5rem; color:var(--text-secondary); font-size:var(--text-sm); font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+.bc-page-header__title { margin:0; font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-.03em; }
+.bc-page-header__lead { margin:1rem 0 0; color:var(--text-secondary); font-size:var(--text-lg); }

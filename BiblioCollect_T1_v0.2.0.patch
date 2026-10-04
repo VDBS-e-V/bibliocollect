@@ -1,0 +1,1410 @@
+diff --git a/.env.example b/.env.example
+index 067e9c4..59d3eba 100644
+--- a/.env.example
++++ b/.env.example
+@@ -6,6 +6,7 @@ APP_URL=http://localhost
+ APP_LOCALE=de
+ APP_FALLBACK_LOCALE=de
+ APP_FAKER_LOCALE=de_DE
++BUSINESS_TIMEZONE=Europe/Berlin
+ 
+ APP_MAINTENANCE_DRIVER=file
+ 
+diff --git a/app/Foundation/Auth/PermissionRegistry.php b/app/Foundation/Auth/PermissionRegistry.php
+new file mode 100644
+index 0000000..962487c
+--- /dev/null
++++ b/app/Foundation/Auth/PermissionRegistry.php
+@@ -0,0 +1,65 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Foundation\Auth;
++
++use RuntimeException;
++
++final class PermissionRegistry
++{
++    /**
++     * @return array<string, array{label:string,description:string}>
++     */
++    public function all(): array
++    {
++        $configured = config('authorization.permissions', []);
++
++        if (! is_array($configured)) {
++            throw new RuntimeException('authorization.permissions must be an array.');
++        }
++
++        $permissions = [];
++
++        foreach ($configured as $key => $definition) {
++            if (! is_string($key) || $key === '') {
++                throw new RuntimeException('Every permission needs a non-empty string key.');
++            }
++
++            if (! is_array($definition)) {
++                throw new RuntimeException("Permission [{$key}] must be configured as an array.");
++            }
++
++            $label = $definition['label'] ?? null;
++            $description = $definition['description'] ?? '';
++
++            if (! is_string($label) || $label === '') {
++                throw new RuntimeException("Permission [{$key}] needs a non-empty label.");
++            }
++
++            if (! is_string($description)) {
++                throw new RuntimeException("Permission [{$key}] description must be a string.");
++            }
++
++            $permissions[$key] = [
++                'label' => $label,
++                'description' => $description,
++            ];
++        }
++
++        ksort($permissions);
++
++        return $permissions;
++    }
++
++    /** @return list<string> */
++    public function keys(): array
++    {
++        return array_keys($this->all());
++    }
++
++    public function has(string $permission): bool
++    {
++        return array_key_exists($permission, $this->all());
++    }
++}
+diff --git a/app/Foundation/Auth/RoleRegistry.php b/app/Foundation/Auth/RoleRegistry.php
+new file mode 100644
+index 0000000..2fbcfe1
+--- /dev/null
++++ b/app/Foundation/Auth/RoleRegistry.php
+@@ -0,0 +1,93 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Foundation\Auth;
++
++use RuntimeException;
++
++final class RoleRegistry
++{
++    public function __construct(private readonly PermissionRegistry $permissions) {}
++
++    /**
++     * @return array<string, array{label:string,permissions:list<string>}>
++     */
++    public function all(): array
++    {
++        $configured = config('authorization.roles', []);
++
++        if (! is_array($configured)) {
++            throw new RuntimeException('authorization.roles must be an array.');
++        }
++
++        $roles = [];
++
++        foreach ($configured as $key => $definition) {
++            if (! is_string($key) || $key === '') {
++                throw new RuntimeException('Every role needs a non-empty string key.');
++            }
++
++            if (! is_array($definition)) {
++                throw new RuntimeException("Role [{$key}] must be configured as an array.");
++            }
++
++            $label = $definition['label'] ?? null;
++            $permissionKeys = $definition['permissions'] ?? [];
++
++            if (! is_string($label) || $label === '') {
++                throw new RuntimeException("Role [{$key}] needs a non-empty label.");
++            }
++
++            if (! is_array($permissionKeys)) {
++                throw new RuntimeException("Role [{$key}] permissions must be an array.");
++            }
++
++            $normalized = [];
++
++            foreach ($permissionKeys as $permission) {
++                if (! is_string($permission) || $permission === '') {
++                    throw new RuntimeException("Role [{$key}] contains an invalid permission key.");
++                }
++
++                if (! $this->permissions->has($permission)) {
++                    throw new RuntimeException("Role [{$key}] references unknown permission [{$permission}].");
++                }
++
++                $normalized[] = $permission;
++            }
++
++            $roles[$key] = [
++                'label' => $label,
++                'permissions' => array_values(array_unique($normalized)),
++            ];
++        }
++
++        ksort($roles);
++
++        return $roles;
++    }
++
++    /**
++     * @param  list<string>  $roleKeys
++     * @return list<string>
++     */
++    public function permissionsFor(array $roleKeys): array
++    {
++        $roles = $this->all();
++        $permissions = [];
++
++        foreach ($roleKeys as $roleKey) {
++            if (! isset($roles[$roleKey])) {
++                continue;
++            }
++
++            $permissions = [...$permissions, ...$roles[$roleKey]['permissions']];
++        }
++
++        $permissions = array_values(array_unique($permissions));
++        sort($permissions);
++
++        return $permissions;
++    }
++}
+diff --git a/app/Foundation/Contracts/AuthorizesPermissions.php b/app/Foundation/Contracts/AuthorizesPermissions.php
+new file mode 100644
+index 0000000..47518a6
+--- /dev/null
++++ b/app/Foundation/Contracts/AuthorizesPermissions.php
+@@ -0,0 +1,10 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Foundation\Contracts;
++
++interface AuthorizesPermissions
++{
++    public function allowsPermission(string $permission): bool;
++}
+diff --git a/app/Foundation/Http/Middleware/RequirePermission.php b/app/Foundation/Http/Middleware/RequirePermission.php
+new file mode 100644
+index 0000000..983799a
+--- /dev/null
++++ b/app/Foundation/Http/Middleware/RequirePermission.php
+@@ -0,0 +1,38 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Foundation\Http\Middleware;
++
++use App\Foundation\Auth\PermissionRegistry;
++use Closure;
++use Illuminate\Http\Request;
++use Illuminate\Support\Facades\Gate;
++use Symfony\Component\HttpFoundation\Response;
++
++final class RequirePermission
++{
++    public function __construct(private readonly PermissionRegistry $permissions) {}
++
++    /**
++     * @param  Closure(Request): Response  $next
++     */
++    public function handle(Request $request, Closure $next, string $permission): Response
++    {
++        if (! $this->permissions->has($permission)) {
++            abort(500, "Unknown permission [{$permission}].");
++        }
++
++        $user = $request->user();
++
++        if ($user === null) {
++            abort(401);
++        }
++
++        if (! Gate::forUser($user)->allows($permission)) {
++            abort(403);
++        }
++
++        return $next($request);
++    }
++}
+diff --git a/app/Foundation/Navigation/NavigationItem.php b/app/Foundation/Navigation/NavigationItem.php
+new file mode 100644
+index 0000000..57c9ec8
+--- /dev/null
++++ b/app/Foundation/Navigation/NavigationItem.php
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Foundation\Navigation;
++
++final readonly class NavigationItem
++{
++    public function __construct(
++        public string $surface,
++        public string $label,
++        public string $route,
++        public string $activePattern,
++        public ?string $permission = null,
++        public ?string $previewRoute = null,
++        public int $order = 100,
++    ) {}
++}
+diff --git a/app/Foundation/Navigation/NavigationRegistry.php b/app/Foundation/Navigation/NavigationRegistry.php
+new file mode 100644
+index 0000000..0d0bb13
+--- /dev/null
++++ b/app/Foundation/Navigation/NavigationRegistry.php
+@@ -0,0 +1,106 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Foundation\Navigation;
++
++use RuntimeException;
++
++final class NavigationRegistry
++{
++    public function surfaceLabel(string $surface): string
++    {
++        $definition = $this->surfaceDefinition($surface);
++        $label = $definition['label'] ?? null;
++
++        if (! is_string($label) || $label === '') {
++            throw new RuntimeException("Navigation surface [{$surface}] needs a label.");
++        }
++
++        return $label;
++    }
++
++    /** @return list<NavigationItem> */
++    public function allForSurface(string $surface): array
++    {
++        $definition = $this->surfaceDefinition($surface);
++        $configured = $definition['items'] ?? [];
++
++        if (! is_array($configured)) {
++            throw new RuntimeException("Navigation items for surface [{$surface}] must be an array.");
++        }
++
++        $items = [];
++
++        foreach ($configured as $item) {
++            if (! is_array($item)) {
++                throw new RuntimeException("Navigation item for surface [{$surface}] must be an array.");
++            }
++
++            $label = $item['label'] ?? null;
++            $route = $item['route'] ?? null;
++            $activePattern = $item['active'] ?? $route;
++            $permission = $item['permission'] ?? null;
++            $previewRoute = $item['preview_route'] ?? null;
++            $order = $item['order'] ?? 100;
++
++            if (! is_string($label) || $label === '' || ! is_string($route) || $route === '') {
++                throw new RuntimeException("Navigation item for surface [{$surface}] needs label and route.");
++            }
++
++            if (! is_string($activePattern) || $activePattern === '') {
++                throw new RuntimeException("Navigation item [{$label}] needs a valid active pattern.");
++            }
++
++            if ($permission !== null && (! is_string($permission) || $permission === '')) {
++                throw new RuntimeException("Navigation item [{$label}] has an invalid permission.");
++            }
++
++            if ($previewRoute !== null && (! is_string($previewRoute) || $previewRoute === '')) {
++                throw new RuntimeException("Navigation item [{$label}] has an invalid preview route.");
++            }
++
++            if (! is_int($order)) {
++                throw new RuntimeException("Navigation item [{$label}] order must be an integer.");
++            }
++
++            $items[] = new NavigationItem(
++                surface: $surface,
++                label: $label,
++                route: $route,
++                activePattern: $activePattern,
++                permission: $permission,
++                previewRoute: $previewRoute,
++                order: $order,
++            );
++        }
++
++        usort($items, static fn (NavigationItem $left, NavigationItem $right): int => $left->order <=> $right->order);
++
++        return $items;
++    }
++
++    /**
++     * @param  callable(string): bool  $allows
++     * @return list<NavigationItem>
++     */
++    public function visibleForSurface(string $surface, callable $allows): array
++    {
++        return array_values(array_filter(
++            $this->allForSurface($surface),
++            static fn (NavigationItem $item): bool => $item->permission === null || $allows($item->permission),
++        ));
++    }
++
++    /** @return array<string, mixed> */
++    private function surfaceDefinition(string $surface): array
++    {
++        $configured = config("navigation.surfaces.{$surface}");
++
++        if (! is_array($configured)) {
++            throw new RuntimeException("Unknown navigation surface [{$surface}].");
++        }
++
++        return $configured;
++    }
++}
+diff --git a/app/Foundation/Providers/FoundationServiceProvider.php b/app/Foundation/Providers/FoundationServiceProvider.php
+index d68824f..87956a9 100644
+--- a/app/Foundation/Providers/FoundationServiceProvider.php
++++ b/app/Foundation/Providers/FoundationServiceProvider.php
+@@ -4,9 +4,15 @@ declare(strict_types=1);
+ 
+ namespace App\Foundation\Providers;
+ 
++use App\Foundation\Auth\PermissionRegistry;
++use App\Foundation\Auth\RoleRegistry;
+ use App\Foundation\Console\FoundationCheckCommand;
++use App\Foundation\Contracts\AuthorizesPermissions;
++use App\Foundation\Navigation\NavigationRegistry;
++use App\Foundation\Support\BusinessClock;
+ use App\Foundation\Support\ModuleRegistry;
+ use App\Foundation\Support\SurfaceRegistry;
++use Illuminate\Support\Facades\Gate;
+ use Illuminate\Support\ServiceProvider;
+ 
+ final class FoundationServiceProvider extends ServiceProvider
+@@ -15,6 +21,10 @@ final class FoundationServiceProvider extends ServiceProvider
+     {
+         $this->app->singleton(ModuleRegistry::class);
+         $this->app->singleton(SurfaceRegistry::class);
++        $this->app->singleton(PermissionRegistry::class);
++        $this->app->singleton(RoleRegistry::class);
++        $this->app->singleton(NavigationRegistry::class);
++        $this->app->singleton(BusinessClock::class);
+ 
+         $registry = $this->app->make(ModuleRegistry::class);
+ 
+@@ -27,8 +37,16 @@ final class FoundationServiceProvider extends ServiceProvider
+         }
+     }
+ 
+-    public function boot(): void
++    public function boot(PermissionRegistry $permissions): void
+     {
++        foreach ($permissions->keys() as $permission) {
++            Gate::define(
++                $permission,
++                static fn (mixed $user): bool => $user instanceof AuthorizesPermissions
++                    && $user->allowsPermission($permission),
++            );
++        }
++
+         if ($this->app->runningInConsole()) {
+             $this->commands([
+                 FoundationCheckCommand::class,
+diff --git a/app/Foundation/Support/BusinessClock.php b/app/Foundation/Support/BusinessClock.php
+new file mode 100644
+index 0000000..1b6db0c
+--- /dev/null
++++ b/app/Foundation/Support/BusinessClock.php
+@@ -0,0 +1,21 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Foundation\Support;
++
++use Carbon\CarbonImmutable;
++use DateTimeZone;
++
++final class BusinessClock
++{
++    public function timezone(): DateTimeZone
++    {
++        return new DateTimeZone((string) config('foundation.business_timezone', 'Europe/Berlin'));
++    }
++
++    public function now(): CarbonImmutable
++    {
++        return CarbonImmutable::now($this->timezone());
++    }
++}
+diff --git a/app/Modules/Identity/module.json b/app/Modules/Identity/module.json
+index 3fcf35f..5dd4330 100644
+--- a/app/Modules/Identity/module.json
++++ b/app/Modules/Identity/module.json
+@@ -1,9 +1,7 @@
+ {
+   "name": "Identity",
+   "description": "Onlineidentitäten, Registrierung, Rollen- und Permission-Zuweisung.",
+-  "dependencies": [
+-    "Patrons"
+-  ],
++  "dependencies": [],
+   "providers": [],
+   "enabled": true
+ }
+diff --git a/app/Surfaces/Administration/routes.php b/app/Surfaces/Administration/routes.php
+index f7341c2..bb9e282 100644
+--- a/app/Surfaces/Administration/routes.php
++++ b/app/Surfaces/Administration/routes.php
+@@ -2,10 +2,13 @@
+ 
+ declare(strict_types=1);
+ 
+-/*
+-|--------------------------------------------------------------------------
+-| Administration surface routes
+-|--------------------------------------------------------------------------
+-| Intentionally empty in bootstrap v0.1.0. Authentication, permissions and
+-| product pages are introduced in later implementation phases.
+-*/
++use Illuminate\Support\Facades\Route;
++
++Route::view('/verwaltung', 'pages.surfaces.administration', ['preview' => false])
++    ->middleware('permission:surface.administration.access')
++    ->name('administration.home');
++
++if (app()->environment('local')) {
++    Route::view('/_preview/administration', 'pages.surfaces.administration', ['preview' => true])
++        ->name('preview.administration');
++}
+diff --git a/app/Surfaces/Portal/routes.php b/app/Surfaces/Portal/routes.php
+index 6cb1633..ddc2c96 100644
+--- a/app/Surfaces/Portal/routes.php
++++ b/app/Surfaces/Portal/routes.php
+@@ -2,10 +2,13 @@
+ 
+ declare(strict_types=1);
+ 
+-/*
+-|--------------------------------------------------------------------------
+-| Portal surface routes
+-|--------------------------------------------------------------------------
+-| Intentionally empty in bootstrap v0.1.0. Authentication, permissions and
+-| product pages are introduced in later implementation phases.
+-*/
++use Illuminate\Support\Facades\Route;
++
++Route::view('/konto', 'pages.surfaces.portal', ['preview' => false])
++    ->middleware('permission:surface.portal.access')
++    ->name('portal.home');
++
++if (app()->environment('local')) {
++    Route::view('/_preview/portal', 'pages.surfaces.portal', ['preview' => true])
++        ->name('preview.portal');
++}
+diff --git a/app/Surfaces/Pos/routes.php b/app/Surfaces/Pos/routes.php
+index 4adaa48..effebdb 100644
+--- a/app/Surfaces/Pos/routes.php
++++ b/app/Surfaces/Pos/routes.php
+@@ -2,10 +2,13 @@
+ 
+ declare(strict_types=1);
+ 
+-/*
+-|--------------------------------------------------------------------------
+-| Pos surface routes
+-|--------------------------------------------------------------------------
+-| Intentionally empty in bootstrap v0.1.0. Authentication, permissions and
+-| product pages are introduced in later implementation phases.
+-*/
++use Illuminate\Support\Facades\Route;
++
++Route::view('/betrieb', 'pages.surfaces.pos', ['preview' => false])
++    ->middleware('permission:surface.pos.access')
++    ->name('pos.home');
++
++if (app()->environment('local')) {
++    Route::view('/_preview/pos', 'pages.surfaces.pos', ['preview' => true])
++        ->name('preview.pos');
++}
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index 1085719..56ad7c2 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -1,5 +1,6 @@
+ <?php
+ 
++use App\Foundation\Http\Middleware\RequirePermission;
+ use Illuminate\Foundation\Application;
+ use Illuminate\Foundation\Configuration\Exceptions;
+ use Illuminate\Foundation\Configuration\Middleware;
+@@ -12,7 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
+         health: '/up',
+     )
+     ->withMiddleware(function (Middleware $middleware): void {
+-        //
++        $middleware->alias([
++            'permission' => RequirePermission::class,
++        ]);
+     })
+     ->withExceptions(function (Exceptions $exceptions): void {
+         $exceptions->shouldRenderJsonWhen(
+diff --git a/config/authorization.php b/config/authorization.php
+new file mode 100644
+index 0000000..dfaed38
+--- /dev/null
++++ b/config/authorization.php
+@@ -0,0 +1,52 @@
++<?php
++
++declare(strict_types=1);
++
++return [
++    'permissions' => [
++        'surface.portal.access' => [
++            'label' => 'Portal öffnen',
++            'description' => 'Erlaubt den Zugang zum persönlichen BiblioCollect-Portal.',
++        ],
++        'surface.pos.access' => [
++            'label' => 'Bibliotheksbetrieb öffnen',
++            'description' => 'Erlaubt den Zugang zur Arbeitsoberfläche für Ausleihe und Bibliotheksbetrieb.',
++        ],
++        'surface.administration.access' => [
++            'label' => 'Verwaltung öffnen',
++            'description' => 'Erlaubt den Zugang zur Verwaltungsoberfläche. Fachliche Einzelrechte bleiben separat.',
++        ],
++    ],
++
++    // Rollen sind kombinierbare Permission-Bundles. Fachfunktionen prüfen Permissions, nie Rollennamen.
++    'roles' => [
++        'student' => [
++            'label' => 'Schüler:in',
++            'permissions' => ['surface.portal.access'],
++        ],
++        'teacher' => [
++            'label' => 'Lehrkraft',
++            'permissions' => ['surface.portal.access'],
++        ],
++        'student_ag_basic' => [
++            'label' => 'Schüler-AG Basis',
++            'permissions' => ['surface.portal.access', 'surface.pos.access'],
++        ],
++        'student_ag_extended' => [
++            'label' => 'Schüler-AG Erweitert',
++            'permissions' => ['surface.portal.access', 'surface.pos.access'],
++        ],
++        'staff' => [
++            'label' => 'Mitarbeiter:in',
++            'permissions' => ['surface.portal.access', 'surface.pos.access'],
++        ],
++        'management' => [
++            'label' => 'Verwaltung',
++            'permissions' => ['surface.portal.access', 'surface.pos.access', 'surface.administration.access'],
++        ],
++        'technical_admin' => [
++            'label' => 'Technische Administration',
++            'permissions' => ['surface.administration.access'],
++        ],
++    ],
++];
+diff --git a/config/foundation.php b/config/foundation.php
+index e441037..fdd5e14 100644
+--- a/config/foundation.php
++++ b/config/foundation.php
+@@ -5,6 +5,7 @@ declare(strict_types=1);
+ return [
+     'modules_path' => app_path('Modules'),
+     'surfaces_path' => app_path('Surfaces'),
++    'business_timezone' => env('BUSINESS_TIMEZONE', 'Europe/Berlin'),
+ 
+     'architecture' => [
+         'prevent_module_cycles' => true,
+diff --git a/config/navigation.php b/config/navigation.php
+new file mode 100644
+index 0000000..9385ca8
+--- /dev/null
++++ b/config/navigation.php
+@@ -0,0 +1,58 @@
++<?php
++
++declare(strict_types=1);
++
++return [
++    'surfaces' => [
++        'public' => [
++            'label' => 'Katalog',
++            'items' => [
++                [
++                    'label' => 'Start',
++                    'route' => 'public.home',
++                    'active' => 'public.*',
++                    'order' => 10,
++                ],
++            ],
++        ],
++        'portal' => [
++            'label' => 'Mein Konto',
++            'items' => [
++                [
++                    'label' => 'Übersicht',
++                    'route' => 'portal.home',
++                    'preview_route' => 'preview.portal',
++                    'active' => 'portal.*',
++                    'permission' => 'surface.portal.access',
++                    'order' => 10,
++                ],
++            ],
++        ],
++        'pos' => [
++            'label' => 'Bibliotheksbetrieb',
++            'items' => [
++                [
++                    'label' => 'Arbeitsplatz',
++                    'route' => 'pos.home',
++                    'preview_route' => 'preview.pos',
++                    'active' => 'pos.*',
++                    'permission' => 'surface.pos.access',
++                    'order' => 10,
++                ],
++            ],
++        ],
++        'administration' => [
++            'label' => 'Verwaltung',
++            'items' => [
++                [
++                    'label' => 'Übersicht',
++                    'route' => 'administration.home',
++                    'preview_route' => 'preview.administration',
++                    'active' => 'administration.*',
++                    'permission' => 'surface.administration.access',
++                    'order' => 10,
++                ],
++            ],
++        ],
++    ],
++];
+diff --git a/docs/T1_APPLICATION_INFRASTRUCTURE.md b/docs/T1_APPLICATION_INFRASTRUCTURE.md
+new file mode 100644
+index 0000000..134da71
+--- /dev/null
++++ b/docs/T1_APPLICATION_INFRASTRUCTURE.md
+@@ -0,0 +1,28 @@
++# T1 – Anwendungsinfrastruktur
++
++T1 baut die gemeinsame Infrastruktur für alle BiblioCollect-Surfaces auf, ohne bereits Fachlogik für Katalog, Ausleihe oder Konten zu implementieren.
++
++## Berechtigungen
++
++Permissions sind stabile technische Schlüssel. Rollen sind kombinierbare Bundles dieser Schlüssel. Fachcode darf später Permissions prüfen, aber keine Rollennamen vergleichen. Die technische Administration erhält durch ihre Rolle nur Zugang zur Verwaltungs-Surface; daraus entsteht ausdrücklich kein automatischer Zugriff auf Ausleih- oder Lesedaten.
++
++Die Persistenz von Rollen und Permissions auf Onlinekonten folgt in T2. Bis dahin verweigern die produktiven Portal-, POS- und Verwaltungsrouten ohne autorisierten Benutzer serverseitig den Zugriff.
++
++## Navigation und Surfaces
++
++Die Navigation wird zentral aus `config/navigation.php` aufgebaut. BiblioCollect besitzt vier Surfaces:
++
++- Public: öffentlicher Katalog und öffentliche Inhalte
++- Portal: persönliche Selbstbedienung
++- Pos: scanner- und tastaturorientierter Bibliotheksbetrieb
++- Administration: Regeln, Importe, Datenschutz und Verwaltung
++
++Lokale Preview-Routen unter `/_preview/*` werden nur bei `APP_ENV=local` registriert. Sie dienen ausschließlich zur visuellen Entwicklung und existieren nicht in Test- oder Produktionsumgebungen.
++
++## Zeit
++
++Technische Zeitstempel bleiben in der Laravel-Anwendung weiterhin UTC-orientiert. Für fachliche Regeln wie Öffnungstage, Fälligkeitstage und Ferien stellt `BusinessClock` explizit die konfigurierte Fachzeitzone bereit. Standard ist `Europe/Berlin`.
++
++## UI
++
++Die App-Shell nutzt die vorhandenen VDBS-Farbtokens, lokal ausgelieferte Schriften und den manuellen Light/Dark-Umschalter. Basis-Komponenten decken Buttons, Karten, Formfelder, Alerts, Badges, Tabellen und Seitenköpfe ab. Formfehler werden zusätzlich zum visuellen Zustand immer mit dem Wort „Fehler:“ ausgegeben.
+diff --git a/resources/css/components/alert.css b/resources/css/components/alert.css
+new file mode 100644
+index 0000000..1c54c4c
+--- /dev/null
++++ b/resources/css/components/alert.css
+@@ -0,0 +1,4 @@
++.bc-alert { display:grid; gap:.35rem; border:1px solid var(--border-default); border-left:4px solid var(--action-secondary); border-radius:var(--radius-md); background:var(--bg-surface-muted); padding:1rem 1.1rem; }
++.bc-alert--success { border-left-color:var(--action-success); }
++.bc-alert--error { border-left-color:var(--action-danger); }
++.bc-alert__title { display:block; }
+diff --git a/resources/css/components/badge.css b/resources/css/components/badge.css
+new file mode 100644
+index 0000000..29456eb
+--- /dev/null
++++ b/resources/css/components/badge.css
+@@ -0,0 +1,3 @@
++.bc-badge { display:inline-flex; align-items:center; min-height:1.8rem; border:1px solid var(--border-default); border-radius:var(--radius-full); background:var(--bg-surface-muted); color:var(--text-primary); padding:.2rem .65rem; font-size:var(--text-xs); font-weight:700; }
++.bc-badge--success { border-color:var(--action-success); }
++.bc-badge--danger { border-color:var(--action-danger); }
+diff --git a/resources/css/components/button.css b/resources/css/components/button.css
+index 8542525..2a7c6bb 100644
+--- a/resources/css/components/button.css
++++ b/resources/css/components/button.css
+@@ -1,5 +1,8 @@
+ .bc-button { display:inline-flex; min-height:var(--control-min-height); align-items:center; justify-content:center; gap:var(--space-2); border:1px solid transparent; border-radius:var(--radius-full); padding:.65rem 1.1rem; font-weight:var(--font-weight-bold); line-height:1; text-decoration:none; transition:box-shadow var(--transition-fast),transform var(--transition-fast),background-color var(--transition-fast); }
+ .bc-button--primary { background:var(--action-primary); color:var(--text-on-action); }
++.bc-button--primary:visited { color:var(--text-on-action); }
+ .bc-button--primary:hover { box-shadow:var(--shadow-sm); transform:translateY(-1px); }
+ .bc-button--secondary { background:var(--action-secondary); color:var(--action-secondary-text); }
++.bc-button--secondary:visited { color:var(--action-secondary-text); }
++.bc-button--secondary:hover { box-shadow:var(--shadow-sm); transform:translateY(-1px); }
+ .bc-button:disabled { cursor:not-allowed; opacity:.55; transform:none; }
+diff --git a/resources/css/components/form-field.css b/resources/css/components/form-field.css
+new file mode 100644
+index 0000000..c998ecb
+--- /dev/null
++++ b/resources/css/components/form-field.css
+@@ -0,0 +1,7 @@
++.bc-field { display:grid; gap:.4rem; }
++.bc-field__label { color:var(--text-primary); font-weight:700; }
++.bc-field__hint { margin:0; color:var(--text-secondary); font-size:var(--text-sm); }
++.bc-field__control { width:100%; min-height:var(--control-min-height); border:1px solid var(--border-strong); border-radius:var(--radius-md); background:var(--bg-surface); color:var(--text-primary); padding:.65rem .8rem; }
++.bc-field__control::placeholder { color:var(--text-secondary); }
++.bc-field__control--error { border-color:var(--action-danger); }
++.bc-field__error { margin:0; color:var(--action-danger); font-size:var(--text-sm); }
+diff --git a/resources/css/components/index.css b/resources/css/components/index.css
+index 705c26e..f8653aa 100644
+--- a/resources/css/components/index.css
++++ b/resources/css/components/index.css
+@@ -1,3 +1,8 @@
+ @import './button.css';
+ @import './card.css';
+ @import './theme-toggle.css';
++@import './form-field.css';
++@import './alert.css';
++@import './badge.css';
++@import './page-header.css';
++@import './table.css';
+diff --git a/resources/css/components/page-header.css b/resources/css/components/page-header.css
+new file mode 100644
+index 0000000..a3f7ece
+--- /dev/null
++++ b/resources/css/components/page-header.css
+@@ -0,0 +1,4 @@
++.bc-page-header { max-width:52rem; }
++.bc-page-header__kicker { margin:0 0 .5rem; color:var(--text-secondary); font-size:var(--text-sm); font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
++.bc-page-header__title { margin:0; font-size:clamp(2rem,5vw,3rem); font-weight:900; letter-spacing:-.03em; }
++.bc-page-header__lead { margin:1rem 0 0; color:var(--text-secondary); font-size:var(--text-lg); }
+diff --git a/resources/css/components/table.css b/resources/css/components/table.css
+new file mode 100644
+index 0000000..d4403a4
+--- /dev/null
++++ b/resources/css/components/table.css
+@@ -0,0 +1,5 @@
++.bc-table-wrap { overflow-x:auto; border:1px solid var(--border-default); border-radius:var(--radius-lg); background:var(--bg-surface); }
++.bc-table { width:100%; border-collapse:collapse; text-align:left; }
++.bc-table th,.bc-table td { padding:.8rem 1rem; border-bottom:1px solid var(--border-default); vertical-align:top; }
++.bc-table th { background:var(--bg-surface-muted); font-size:var(--text-sm); font-weight:700; }
++.bc-table tbody tr:last-child td { border-bottom:0; }
+diff --git a/resources/css/patterns/app-shell.css b/resources/css/patterns/app-shell.css
+index 1c66242..0aa5ee3 100644
+--- a/resources/css/patterns/app-shell.css
++++ b/resources/css/patterns/app-shell.css
+@@ -1,7 +1,25 @@
+-.bc-shell { min-height:100vh; background:var(--bg-page); color:var(--text-primary); }
+-.bc-shell__header { position:relative; z-index:var(--z-header); border-bottom:1px solid var(--border-default); background:color-mix(in srgb,var(--bg-surface) 94%,transparent); }
+-.bc-brand-lockup { display:flex; align-items:center; gap:1rem; min-width:0; }
++.bc-skip-link { position:fixed; top:.5rem; left:.5rem; z-index:calc(var(--z-toast) + 1); transform:translateY(-160%); border-radius:var(--radius-md); background:var(--bg-surface); color:var(--text-primary); padding:.65rem .9rem; box-shadow:var(--shadow-md); font-weight:700; }
++.bc-skip-link:focus { transform:translateY(0); }
++.bc-shell { display:flex; min-height:100vh; flex-direction:column; background:var(--bg-page); color:var(--text-primary); }
++.bc-shell__header { position:relative; z-index:var(--z-header); border-bottom:1px solid var(--border-default); background:color-mix(in srgb,var(--bg-surface) 96%,transparent); }
++.bc-shell__header-inner,.bc-nav__inner,.bc-shell__main,.bc-shell__footer-inner { width:min(100% - 2.5rem,80rem); margin-inline:auto; }
++.bc-shell__header-inner { display:flex; min-height:4.75rem; align-items:center; justify-content:space-between; gap:1.5rem; }
++.bc-shell__utility { display:flex; align-items:center; gap:.8rem; }
++.bc-surface-label { color:var(--text-secondary); font-size:var(--text-sm); font-weight:700; }
++.bc-brand-lockup { display:flex; align-items:center; gap:1rem; min-width:0; color:var(--text-primary); text-decoration:none; }
++.bc-brand-lockup:visited { color:var(--text-primary); }
+ .bc-brand-lockup__vdbs { display:block; width:9rem; max-width:32vw; height:auto; }
+ .bc-brand-lockup__product { border-left:1px solid var(--border-default); padding-left:1rem; color:var(--text-primary); font-size:1.15rem; font-weight:900; letter-spacing:-.02em; }
++.bc-nav { border-top:1px solid var(--border-default); }
++.bc-nav__inner { display:flex; gap:.25rem; overflow-x:auto; padding-block:.35rem; }
++.bc-nav__link { border-radius:var(--radius-full); color:var(--text-primary); padding:.55rem .85rem; font-size:var(--text-sm); font-weight:700; text-decoration:none; white-space:nowrap; }
++.bc-nav__link:visited { color:var(--text-primary); }
++.bc-nav__link:hover,.bc-nav__link--active { background:var(--bg-brand-soft); }
++.bc-preview-banner { border-bottom:1px solid var(--border-default); background:var(--bg-brand-soft); color:var(--text-primary); padding:.65rem 1rem; text-align:center; font-size:var(--text-sm); font-weight:700; }
++.bc-shell__main { flex:1; padding-block:clamp(2rem,5vw,4rem); }
++.bc-shell__footer { margin-top:auto; border-top:1px solid var(--border-default); background:var(--bg-surface-muted); }
++.bc-shell__footer-inner { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.75rem 1.5rem; padding-block:1.25rem; color:var(--text-secondary); font-size:var(--text-sm); }
+ :root[data-vdbs-theme="dark"] .bc-brand-logo--light { display:none; }
+ :root:not([data-vdbs-theme="dark"]) .bc-brand-logo--dark { display:none; }
++@media (max-width:48rem) { .bc-shell__header-inner { align-items:flex-start; padding-block:1rem; } .bc-shell__utility { align-items:flex-end; flex-direction:column-reverse; } .bc-surface-label { max-width:10rem; text-align:right; } }
++@media (max-width:36rem) { .bc-brand-lockup__vdbs { width:7rem; } .bc-brand-lockup__product { font-size:1rem; } }
+diff --git a/resources/views/components/app-shell.blade.php b/resources/views/components/app-shell.blade.php
+new file mode 100644
+index 0000000..11286f0
+--- /dev/null
++++ b/resources/views/components/app-shell.blade.php
+@@ -0,0 +1,86 @@
++@props([
++    'surface' => 'public',
++    'title' => null,
++    'preview' => false,
++])
++
++@php
++    use App\Foundation\Navigation\NavigationRegistry;
++    use Illuminate\Support\Facades\Gate;
++
++    $navigation = app(NavigationRegistry::class);
++    $surfaceLabel = $navigation->surfaceLabel($surface);
++    $navigationItems = $preview
++        ? $navigation->allForSurface($surface)
++        : $navigation->visibleForSurface($surface, static fn (string $permission): bool => Gate::allows($permission));
++@endphp
++
++<!DOCTYPE html>
++<html lang="de">
++<head>
++    <meta charset="utf-8">
++    <meta name="viewport" content="width=device-width, initial-scale=1">
++    <meta name="theme-color" content="#2DC08E">
++    <title>{{ $title ? $title.' · ' : '' }}{{ config('app.name', 'BiblioCollect') }} · VDBS</title>
++    @vite(['resources/css/app.css', 'resources/js/app.js'])
++</head>
++<body>
++<a class="bc-skip-link" href="#main-content">Zum Inhalt springen</a>
++<div class="bc-shell">
++    <header class="bc-shell__header">
++        <div class="bc-shell__header-inner">
++            <a href="{{ route('public.home') }}" class="bc-brand-lockup" aria-label="BiblioCollect Startseite">
++                <span class="relative block">
++                    <img class="bc-brand-lockup__vdbs bc-brand-logo--light" src="/brand/vdbs/logo-light.svg" alt="VDBS">
++                    <img class="bc-brand-lockup__vdbs bc-brand-logo--dark" src="/brand/vdbs/logo-dark.svg" alt="VDBS">
++                </span>
++                <span class="bc-brand-lockup__product">BiblioCollect</span>
++            </a>
++
++            <div class="bc-shell__utility">
++                <span class="bc-surface-label">{{ $surfaceLabel }}</span>
++                <button class="bc-theme-toggle" type="button" data-theme-toggle aria-pressed="false">
++                    <span aria-hidden="true">◐</span>
++                    <span data-theme-label>Dunkel</span>
++                </button>
++            </div>
++        </div>
++
++        @if ($navigationItems !== [])
++            <nav class="bc-nav" aria-label="Hauptnavigation">
++                <div class="bc-nav__inner">
++                    @foreach ($navigationItems as $item)
++                        @php
++                            $routeName = $preview && $item->previewRoute !== null ? $item->previewRoute : $item->route;
++                            $isCurrent = request()->routeIs($item->activePattern) || ($preview && request()->routeIs($item->previewRoute ?? ''));
++                        @endphp
++                        <a
++                            href="{{ route($routeName) }}"
++                            @class(['bc-nav__link', 'bc-nav__link--active' => $isCurrent])
++                            @if ($isCurrent) aria-current="page" @endif
++                        >{{ $item->label }}</a>
++                    @endforeach
++                </div>
++            </nav>
++        @endif
++    </header>
++
++    @if ($preview)
++        <div class="bc-preview-banner" role="status">
++            Entwicklungsansicht: Diese Oberfläche zeigt nur das T1-Grundgerüst; Fachfunktionen sind noch nicht aktiv.
++        </div>
++    @endif
++
++    <main id="main-content" class="bc-shell__main" tabindex="-1">
++        {{ $slot }}
++    </main>
++
++    <footer class="bc-shell__footer">
++        <div class="bc-shell__footer-inner">
++            <span>BiblioCollect</span>
++            <span>Eine VDBS-Anwendung</span>
++        </div>
++    </footer>
++</div>
++</body>
++</html>
+diff --git a/resources/views/components/ui/alert.blade.php b/resources/views/components/ui/alert.blade.php
+new file mode 100644
+index 0000000..b211514
+--- /dev/null
++++ b/resources/views/components/ui/alert.blade.php
+@@ -0,0 +1,11 @@
++@props([
++    'variant' => 'info',
++    'title' => null,
++])
++
++<div {{ $attributes->class('bc-alert bc-alert--'.$variant) }} role="{{ $variant === 'error' ? 'alert' : 'status' }}">
++    @if ($title)
++        <strong class="bc-alert__title">{{ $title }}</strong>
++    @endif
++    <div>{{ $slot }}</div>
++</div>
+diff --git a/resources/views/components/ui/badge.blade.php b/resources/views/components/ui/badge.blade.php
+new file mode 100644
+index 0000000..09e039a
+--- /dev/null
++++ b/resources/views/components/ui/badge.blade.php
+@@ -0,0 +1,3 @@
++@props(['variant' => 'neutral'])
++
++<span {{ $attributes->class('bc-badge bc-badge--'.$variant) }}>{{ $slot }}</span>
+diff --git a/resources/views/components/ui/button.blade.php b/resources/views/components/ui/button.blade.php
+new file mode 100644
+index 0000000..6a20005
+--- /dev/null
++++ b/resources/views/components/ui/button.blade.php
+@@ -0,0 +1,13 @@
++@props([
++    'href' => null,
++    'variant' => 'primary',
++    'type' => 'button',
++])
++
++@php($classes = 'bc-button bc-button--'.$variant)
++
++@if ($href)
++    <a {{ $attributes->class($classes)->merge(['href' => $href]) }}>{{ $slot }}</a>
++@else
++    <button {{ $attributes->class($classes)->merge(['type' => $type]) }}>{{ $slot }}</button>
++@endif
+diff --git a/resources/views/components/ui/card.blade.php b/resources/views/components/ui/card.blade.php
+new file mode 100644
+index 0000000..f9715dd
+--- /dev/null
++++ b/resources/views/components/ui/card.blade.php
+@@ -0,0 +1,5 @@
++@props(['as' => 'section'])
++
++<{{ $as }} {{ $attributes->class('bc-card') }}>
++    {{ $slot }}
++</{{ $as }}>
+diff --git a/resources/views/components/ui/input.blade.php b/resources/views/components/ui/input.blade.php
+new file mode 100644
+index 0000000..891f137
+--- /dev/null
++++ b/resources/views/components/ui/input.blade.php
+@@ -0,0 +1,38 @@
++@props([
++    'label',
++    'name',
++    'type' => 'text',
++    'value' => null,
++    'hint' => null,
++    'error' => null,
++])
++
++@php
++    $id = (string) $attributes->get('id', $name);
++    $hintId = $id.'-hint';
++    $errorId = $id.'-error';
++    $describedBy = collect([
++        $hint ? $hintId : null,
++        $error ? $errorId : null,
++    ])->filter()->implode(' ');
++@endphp
++
++<div class="bc-field">
++    <label class="bc-field__label" for="{{ $id }}">{{ $label }}</label>
++    @if ($hint)
++        <p class="bc-field__hint" id="{{ $hintId }}">{{ $hint }}</p>
++    @endif
++    <input
++        {{ $attributes->class(['bc-field__control', 'bc-field__control--error' => (bool) $error])->merge([
++            'id' => $id,
++            'name' => $name,
++            'type' => $type,
++            'value' => $value,
++            'aria-invalid' => $error ? 'true' : 'false',
++            'aria-describedby' => $describedBy !== '' ? $describedBy : null,
++        ]) }}
++    >
++    @if ($error)
++        <p class="bc-field__error" id="{{ $errorId }}"><strong>Fehler:</strong> {{ $error }}</p>
++    @endif
++</div>
+diff --git a/resources/views/components/ui/page-header.blade.php b/resources/views/components/ui/page-header.blade.php
+new file mode 100644
+index 0000000..b6c65ca
+--- /dev/null
++++ b/resources/views/components/ui/page-header.blade.php
+@@ -0,0 +1,15 @@
++@props([
++    'kicker' => null,
++    'title',
++    'lead' => null,
++])
++
++<header {{ $attributes->class('bc-page-header') }}>
++    @if ($kicker)
++        <p class="bc-page-header__kicker">{{ $kicker }}</p>
++    @endif
++    <h1 class="bc-page-header__title">{{ $title }}</h1>
++    @if ($lead)
++        <p class="bc-page-header__lead">{{ $lead }}</p>
++    @endif
++</header>
+diff --git a/resources/views/components/ui/select.blade.php b/resources/views/components/ui/select.blade.php
+new file mode 100644
+index 0000000..6e412a8
+--- /dev/null
++++ b/resources/views/components/ui/select.blade.php
+@@ -0,0 +1,34 @@
++@props([
++    'label',
++    'name',
++    'hint' => null,
++    'error' => null,
++])
++
++@php
++    $id = (string) $attributes->get('id', $name);
++    $hintId = $id.'-hint';
++    $errorId = $id.'-error';
++    $describedBy = collect([
++        $hint ? $hintId : null,
++        $error ? $errorId : null,
++    ])->filter()->implode(' ');
++@endphp
++
++<div class="bc-field">
++    <label class="bc-field__label" for="{{ $id }}">{{ $label }}</label>
++    @if ($hint)
++        <p class="bc-field__hint" id="{{ $hintId }}">{{ $hint }}</p>
++    @endif
++    <select
++        {{ $attributes->class(['bc-field__control', 'bc-field__control--error' => (bool) $error])->merge([
++            'id' => $id,
++            'name' => $name,
++            'aria-invalid' => $error ? 'true' : 'false',
++            'aria-describedby' => $describedBy !== '' ? $describedBy : null,
++        ]) }}
++    >{{ $slot }}</select>
++    @if ($error)
++        <p class="bc-field__error" id="{{ $errorId }}"><strong>Fehler:</strong> {{ $error }}</p>
++    @endif
++</div>
+diff --git a/resources/views/components/ui/table.blade.php b/resources/views/components/ui/table.blade.php
+new file mode 100644
+index 0000000..a0cb1e9
+--- /dev/null
++++ b/resources/views/components/ui/table.blade.php
+@@ -0,0 +1,5 @@
++<div {{ $attributes->class('bc-table-wrap') }}>
++    <table class="bc-table">
++        {{ $slot }}
++    </table>
++</div>
+diff --git a/resources/views/pages/surfaces/administration.blade.php b/resources/views/pages/surfaces/administration.blade.php
+new file mode 100644
+index 0000000..ef3fd36
+--- /dev/null
++++ b/resources/views/pages/surfaces/administration.blade.php
+@@ -0,0 +1,29 @@
++@php($preview = $preview ?? false)
++
++<x-app-shell surface="administration" title="Verwaltung" :preview="$preview">
++    <x-ui.page-header
++        kicker="Administration"
++        title="Verwaltung"
++        lead="Datenreiche Aufgaben bleiben ruhig, klar strukturiert und durch Einzelberechtigungen abgesichert."
++    />
++
++    <div class="mt-7 grid gap-4 md:grid-cols-3">
++        <x-ui.card class="p-5"><h2 class="font-black">Regeln</h2><p class="mt-2 text-sm text-app-text-muted">Leihfristen, Limits und Öffnungstage werden später fachlich konfiguriert.</p></x-ui.card>
++        <x-ui.card class="p-5"><h2 class="font-black">Importe</h2><p class="mt-2 text-sm text-app-text-muted">Schul- und Mediendaten erhalten Vorschau und Konfliktbehandlung.</p></x-ui.card>
++        <x-ui.card class="p-5"><h2 class="font-black">Datenschutz</h2><p class="mt-2 text-sm text-app-text-muted">Sensible Vorgänge werden separat berechtigt und auditierbar.</p></x-ui.card>
++    </div>
++
++    <section class="mt-8" aria-labelledby="permission-preview-heading">
++        <h2 id="permission-preview-heading" class="text-xl font-black">Berechtigungsprinzip</h2>
++        <x-ui.table class="mt-4">
++            <thead>
++                <tr><th scope="col">Rolle</th><th scope="col">Verwaltungsoberfläche</th><th scope="col">Fachrechte</th></tr>
++            </thead>
++            <tbody>
++                <tr><td>Verwaltung</td><td><x-ui.badge variant="success">Zugang</x-ui.badge></td><td>werden einzeln ergänzt</td></tr>
++                <tr><td>Technische Administration</td><td><x-ui.badge variant="success">Zugang</x-ui.badge></td><td>kein automatischer Lesedatenzugriff</td></tr>
++                <tr><td>Schüler-AG</td><td><x-ui.badge>kein Standardzugang</x-ui.badge></td><td>Arbeitsrechte im POS</td></tr>
++            </tbody>
++        </x-ui.table>
++    </section>
++</x-app-shell>
+diff --git a/resources/views/pages/surfaces/portal.blade.php b/resources/views/pages/surfaces/portal.blade.php
+new file mode 100644
+index 0000000..0834266
+--- /dev/null
++++ b/resources/views/pages/surfaces/portal.blade.php
+@@ -0,0 +1,31 @@
++@php($preview = $preview ?? false)
++
++<x-app-shell surface="portal" title="Mein Konto" :preview="$preview">
++    <x-ui.page-header
++        kicker="Portal"
++        title="Mein Konto"
++        lead="Hier sehen Nutzer:innen später ausschließlich ihre eigenen Bibliotheksvorgänge."
++    />
++
++    <div class="mt-7 grid gap-4 md:grid-cols-3">
++        <x-ui.card class="p-5">
++            <p class="text-sm font-bold text-app-text-muted">Ausgeliehen</p>
++            <p class="mt-2 text-3xl font-black">–</p>
++            <p class="mt-1 text-sm text-app-text-muted">Eigene aktive Ausleihen</p>
++        </x-ui.card>
++        <x-ui.card class="p-5">
++            <p class="text-sm font-bold text-app-text-muted">Vormerkungen</p>
++            <p class="mt-2 text-3xl font-black">–</p>
++            <p class="mt-1 text-sm text-app-text-muted">Zeitraum und Click & Collect</p>
++        </x-ui.card>
++        <x-ui.card class="p-5">
++            <p class="text-sm font-bold text-app-text-muted">Onlinekonto</p>
++            <p class="mt-3"><x-ui.badge>Vorschau</x-ui.badge></p>
++            <p class="mt-2 text-sm text-app-text-muted">Verknüpfung mit Ausleihkonto folgt in T2.</p>
++        </x-ui.card>
++    </div>
++
++    <x-ui.alert class="mt-7" title="Datenschutzprinzip">
++        Das Portal wird nur eigene Daten anzeigen. Lehrkräfte erhalten durch ihre Lehrerrolle keinen Zugriff auf Ausleihen von Schüler:innen.
++    </x-ui.alert>
++</x-app-shell>
+diff --git a/resources/views/pages/surfaces/pos.blade.php b/resources/views/pages/surfaces/pos.blade.php
+new file mode 100644
+index 0000000..b1c3a4a
+--- /dev/null
++++ b/resources/views/pages/surfaces/pos.blade.php
+@@ -0,0 +1,37 @@
++@php($preview = $preview ?? false)
++
++<x-app-shell surface="pos" title="Bibliotheksbetrieb" :preview="$preview">
++    <x-ui.page-header
++        kicker="POS"
++        title="Bibliotheksbetrieb"
++        lead="Der Arbeitsplatz ist auf Barcode-Scanner, Tastatur und schnelle, eindeutige Rückmeldungen ausgelegt."
++    />
++
++    <div class="mt-7 grid gap-6 lg:grid-cols-[1.3fr_.7fr]">
++        <x-ui.card class="p-5 sm:p-6">
++            <h2 class="text-xl font-black">Scanbereich</h2>
++            <div class="mt-5">
++                <x-ui.input
++                    label="Bibliotheksnummer oder Medienbarcode"
++                    name="barcode-preview"
++                    hint="Scanner arbeiten wie eine Tastatur. In T4 wird das Feld den Ausleihvorgang steuern."
++                    placeholder="Barcode scannen …"
++                    disabled
++                />
++            </div>
++            <div class="mt-5 flex flex-wrap gap-3">
++                <x-ui.button disabled>Ausleihe</x-ui.button>
++                <x-ui.button variant="secondary" disabled>Rückgabe</x-ui.button>
++            </div>
++        </x-ui.card>
++
++        <x-ui.card class="p-5 sm:p-6">
++            <h2 class="text-xl font-black">Arbeitsstatus</h2>
++            <dl class="mt-4 grid gap-3 text-sm">
++                <div class="flex items-center justify-between gap-4"><dt>Scanner</dt><dd><x-ui.badge>bereit für T4</x-ui.badge></dd></div>
++                <div class="flex items-center justify-between gap-4"><dt>Ausleihe</dt><dd><x-ui.badge>noch inaktiv</x-ui.badge></dd></div>
++                <div class="flex items-center justify-between gap-4"><dt>Rückgabe</dt><dd><x-ui.badge>noch inaktiv</x-ui.badge></dd></div>
++            </dl>
++        </x-ui.card>
++    </div>
++</x-app-shell>
+diff --git a/resources/views/pages/welcome.blade.php b/resources/views/pages/welcome.blade.php
+index a7f948c..8cc110a 100644
+--- a/resources/views/pages/welcome.blade.php
++++ b/resources/views/pages/welcome.blade.php
+@@ -1,48 +1,60 @@
+-<!DOCTYPE html>
+-<html lang="de">
+-<head>
+-    <meta charset="utf-8">
+-    <meta name="viewport" content="width=device-width, initial-scale=1">
+-    <meta name="theme-color" content="#2DC08E">
+-    <title>{{ config('app.name', 'BiblioCollect') }} · VDBS</title>
+-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+-</head>
+-<body>
+-<div class="bc-shell">
+-    <header class="bc-shell__header">
+-        <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
+-            <a href="/" class="bc-brand-lockup no-underline" aria-label="BiblioCollect Startseite">
+-                <span class="relative block">
+-                    <img class="bc-brand-lockup__vdbs bc-brand-logo--light" src="/brand/vdbs/logo-light.svg" alt="VDBS">
+-                    <img class="bc-brand-lockup__vdbs bc-brand-logo--dark" src="/brand/vdbs/logo-dark.svg" alt="VDBS">
+-                </span>
+-                <span class="bc-brand-lockup__product">BiblioCollect</span>
+-            </a>
+-            <button class="bc-theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span><span data-theme-label>Dunkel</span></button>
++<x-app-shell surface="public" title="Start">
++    <section class="bc-search-stage" aria-labelledby="catalog-heading">
++        <div class="bc-search-stage__content">
++            <p class="mb-2 text-sm font-bold uppercase tracking-[0.12em] text-app-text-muted">VDBS Bibliothekssoftware</p>
++            <h1 id="catalog-heading" class="text-3xl font-black tracking-tight sm:text-4xl">BiblioCollect</h1>
++            <p class="mt-3 max-w-2xl text-lg text-app-text-muted">Finden, ausleihen, organisieren: BiblioCollect verbindet öffentlichen Katalog, persönliches Konto und den Bibliotheksbetrieb in einer VDBS-Anwendung.</p>
++            <div class="bc-search" role="search" aria-label="Katalogsuche Vorschau">
++                <label class="sr-only" for="catalog-search">Titel, Autor:in, ISBN oder Stichwort</label>
++                <input id="catalog-search" class="bc-search__input" type="search" placeholder="Titel, Autor:in, ISBN oder Stichwort …" disabled>
++                <x-ui.button disabled>Suchen</x-ui.button>
++            </div>
++            <p class="mt-2 text-sm text-app-text-muted">Die echte Katalogsuche folgt mit dem Catalog-Modul in T3.</p>
+         </div>
+-    </header>
++    </section>
+ 
+-    <main class="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12">
+-        <section class="bc-search-stage" aria-labelledby="catalog-heading">
+-            <div class="bc-search-stage__content">
+-                <p class="mb-2 text-sm font-bold uppercase tracking-[0.12em] text-app-text-muted">VDBS Bibliothekssoftware</p>
+-                <h1 id="catalog-heading" class="text-3xl font-black tracking-tight sm:text-4xl">BiblioCollect</h1>
+-                <p class="mt-3 max-w-2xl text-lg text-app-text-muted">Die modulare Schulbibliotheks-Anwendung. Katalogsuche, Konto und Bibliotheksbetrieb werden schrittweise auf dieser Foundation aufgebaut.</p>
+-                <div class="bc-search" role="search" aria-label="Katalogsuche Vorschau">
+-                    <label class="sr-only" for="catalog-search">Titel, Autor:in, ISBN oder Stichwort</label>
+-                    <input id="catalog-search" class="bc-search__input" type="search" placeholder="Titel, Autor:in, ISBN oder Stichwort …" disabled>
+-                    <button class="bc-button bc-button--primary" type="button" disabled>Suchen</button>
+-                </div>
+-                <p class="mt-2 text-sm text-app-text-muted">Die echte Katalogsuche folgt mit dem Catalog-Modul in T3.</p>
+-            </div>
+-        </section>
++    <section class="mt-8 grid gap-4 md:grid-cols-3" aria-label="Projektstand">
++        <x-ui.card class="p-5">
++            <p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">T0 · abgeschlossen</p>
++            <h2 class="mt-2 text-xl font-black">Foundation</h2>
++            <p class="mt-2 text-sm text-app-text-muted">Laravel 13, Livewire 4, Vite, Pest, PHPStan, Pint und grüne CI.</p>
++        </x-ui.card>
++        <x-ui.card class="p-5">
++            <p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">T1 · jetzt</p>
++            <h2 class="mt-2 text-xl font-black">Anwendungsinfrastruktur</h2>
++            <p class="mt-2 text-sm text-app-text-muted">Permissions, Rollen-Bundles, Navigation, vier Surfaces und VDBS-App-Shell.</p>
++        </x-ui.card>
++        <x-ui.card class="p-5">
++            <p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">Als Nächstes</p>
++            <h2 class="mt-2 text-xl font-black">Identity, Patrons & School</h2>
++            <p class="mt-2 text-sm text-app-text-muted">Onlinekonto, Ausleihkonto und Schulkontext bleiben fachlich getrennte Bausteine.</p>
++        </x-ui.card>
++    </section>
+ 
+-        <section class="mt-8 grid gap-4 md:grid-cols-3" aria-label="Technischer Projektstand">
+-            <article class="bc-card p-5"><p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">T0</p><h2 class="mt-2 text-xl font-black">Foundation</h2><p class="mt-2 text-sm text-app-text-muted">Laravel 13, Livewire 4, Vite, Pest, PHPStan, Pint und CI.</p></article>
+-            <article class="bc-card p-5"><p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">T1</p><h2 class="mt-2 text-xl font-black">VDBS Web UI</h2><p class="mt-2 text-sm text-app-text-muted">Semantische Farbrollen, Light/Dark Theme, Branding und Surface-Grundstruktur.</p></article>
+-            <article class="bc-card p-5"><p class="text-sm font-bold uppercase tracking-wide text-app-text-muted">Als Nächstes</p><h2 class="mt-2 text-xl font-black">Identity & Patrons</h2><p class="mt-2 text-sm text-app-text-muted">Permissions, Navigation, Onlineidentität, Ausleihkonten und Schulkalender.</p></article>
++    @if (app()->environment('local'))
++        <section class="mt-10" aria-labelledby="preview-heading">
++            <x-ui.page-header
++                kicker="Nur lokal"
++                title="Entwicklungsansichten"
++                lead="Diese Links umgehen keine Produktionsberechtigungen: Die Preview-Routen werden ausschließlich in der lokalen Umgebung registriert."
++            />
++            <div class="mt-5 grid gap-4 md:grid-cols-3">
++                <x-ui.card class="p-5">
++                    <h2 class="text-lg font-black">Mein Konto</h2>
++                    <p class="mt-2 text-sm text-app-text-muted">Vorschau des Portals für eigene Ausleihen, Vormerkungen und Profilfunktionen.</p>
++                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.portal')">Portal ansehen</x-ui.button>
++                </x-ui.card>
++                <x-ui.card class="p-5">
++                    <h2 class="text-lg font-black">Bibliotheksbetrieb</h2>
++                    <p class="mt-2 text-sm text-app-text-muted">Scanner- und tastaturorientierte Arbeitsoberfläche für AG und Mitarbeitende.</p>
++                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.pos')">POS ansehen</x-ui.button>
++                </x-ui.card>
++                <x-ui.card class="p-5">
++                    <h2 class="text-lg font-black">Verwaltung</h2>
++                    <p class="mt-2 text-sm text-app-text-muted">Ruhige, datenreiche Oberfläche für Regeln, Importe, Datenschutz und Betrieb.</p>
++                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.administration')">Verwaltung ansehen</x-ui.button>
++                </x-ui.card>
++            </div>
+         </section>
+-    </main>
+-</div>
+-</body>
+-</html>
++    @endif
++</x-app-shell>
+diff --git a/tests/Architecture/ApplicationInfrastructureTest.php b/tests/Architecture/ApplicationInfrastructureTest.php
+new file mode 100644
+index 0000000..0d09994
+--- /dev/null
++++ b/tests/Architecture/ApplicationInfrastructureTest.php
+@@ -0,0 +1,47 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Foundation\Auth\PermissionRegistry;
++use App\Foundation\Auth\RoleRegistry;
++use App\Foundation\Navigation\NavigationRegistry;
++use App\Foundation\Support\BusinessClock;
++use App\Foundation\Support\ModuleRegistry;
++
++it('defines stable surface permissions and combinable role bundles', function (): void {
++    $permissions = app(PermissionRegistry::class);
++    $roles = app(RoleRegistry::class);
++
++    expect($permissions->keys())->toContain(
++        'surface.portal.access',
++        'surface.pos.access',
++        'surface.administration.access',
++    );
++
++    expect($roles->permissionsFor(['student_ag_basic']))
++        ->toContain('surface.portal.access', 'surface.pos.access')
++        ->not->toContain('surface.administration.access');
++
++    expect($roles->permissionsFor(['technical_admin']))
++        ->toBe(['surface.administration.access']);
++});
++
++it('keeps identity independent from patrons at module level', function (): void {
++    $modules = app(ModuleRegistry::class)->all();
++
++    expect($modules['Identity']['dependencies'])->toBe([]);
++    expect($modules['Patrons']['dependencies'])->toContain('School');
++});
++
++it('builds navigation for all four surfaces', function (): void {
++    $navigation = app(NavigationRegistry::class);
++
++    expect($navigation->allForSurface('public'))->toHaveCount(1);
++    expect($navigation->allForSurface('portal'))->toHaveCount(1);
++    expect($navigation->allForSurface('pos'))->toHaveCount(1);
++    expect($navigation->allForSurface('administration'))->toHaveCount(1);
++});
++
++it('uses Europe Berlin as the business timezone by default', function (): void {
++    expect(app(BusinessClock::class)->timezone()->getName())->toBe('Europe/Berlin');
++});
+diff --git a/tests/Feature/SurfaceAccessTest.php b/tests/Feature/SurfaceAccessTest.php
+new file mode 100644
+index 0000000..e212065
+--- /dev/null
++++ b/tests/Feature/SurfaceAccessTest.php
+@@ -0,0 +1,17 @@
++<?php
++
++declare(strict_types=1);
++
++it('keeps protected surfaces closed without an authorized online account', function (string $uri): void {
++    $this->get($uri)->assertStatus(401);
++})->with([
++    '/konto',
++    '/betrieb',
++    '/verwaltung',
++]);
++
++it('does not register local preview routes in the test environment', function (): void {
++    $this->get('/_preview/portal')->assertNotFound();
++    $this->get('/_preview/pos')->assertNotFound();
++    $this->get('/_preview/administration')->assertNotFound();
++});

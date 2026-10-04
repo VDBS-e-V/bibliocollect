@@ -1,0 +1,5 @@
+.bc-table-wrap { overflow-x:auto; border:1px solid var(--border-default); border-radius:var(--radius-lg); background:var(--bg-surface); }
+.bc-table { width:100%; border-collapse:collapse; text-align:left; }
+.bc-table th,.bc-table td { padding:.8rem 1rem; border-bottom:1px solid var(--border-default); vertical-align:top; }
+.bc-table th { background:var(--bg-surface-muted); font-size:var(--text-sm); font-weight:700; }
+.bc-table tbody tr:last-child td { border-bottom:0; }

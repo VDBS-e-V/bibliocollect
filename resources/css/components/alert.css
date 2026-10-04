@@ -1,0 +1,4 @@
+.bc-alert { display:grid; gap:.35rem; border:1px solid var(--border-default); border-left:4px solid var(--action-secondary); border-radius:var(--radius-md); background:var(--bg-surface-muted); padding:1rem 1.1rem; }
+.bc-alert--success { border-left-color:var(--action-success); }
+.bc-alert--error { border-left-color:var(--action-danger); }
+.bc-alert__title { display:block; }

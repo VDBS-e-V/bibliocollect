@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-/*
-|--------------------------------------------------------------------------
-| Administration surface routes
-|--------------------------------------------------------------------------
-| Intentionally empty in bootstrap v0.1.0. Authentication, permissions and
-| product pages are introduced in later implementation phases.
-*/
+use Illuminate\Support\Facades\Route;
+
+Route::view('/verwaltung', 'pages.surfaces.administration', ['preview' => false])
+    ->middleware('permission:surface.administration.access')
+    ->name('administration.home');
+
+if (app()->environment('local')) {
+    Route::view('/_preview/administration', 'pages.surfaces.administration', ['preview' => true])
+        ->name('preview.administration');
+}

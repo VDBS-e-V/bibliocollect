@@ -1,0 +1,7 @@
+.bc-field { display:grid; gap:.4rem; }
+.bc-field__label { color:var(--text-primary); font-weight:700; }
+.bc-field__hint { margin:0; color:var(--text-secondary); font-size:var(--text-sm); }
+.bc-field__control { width:100%; min-height:var(--control-min-height); border:1px solid var(--border-strong); border-radius:var(--radius-md); background:var(--bg-surface); color:var(--text-primary); padding:.65rem .8rem; }
+.bc-field__control::placeholder { color:var(--text-secondary); }
+.bc-field__control--error { border-color:var(--action-danger); }
+.bc-field__error { margin:0; color:var(--action-danger); font-size:var(--text-sm); }
