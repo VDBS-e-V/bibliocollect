@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 
 Route::view('/konto', 'pages.surfaces.portal', ['preview' => false])
-    ->middleware('permission:surface.portal.access')
+    ->middleware(['auth', 'verified', 'permission:surface.portal.access'])
     ->name('portal.home');
 
 if (app()->environment('local')) {

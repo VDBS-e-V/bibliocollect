@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 
 Route::view('/betrieb', 'pages.surfaces.pos', ['preview' => false])
-    ->middleware('permission:surface.pos.access')
+    ->middleware(['auth', 'verified', 'permission:surface.pos.access'])
     ->name('pos.home');
 
 if (app()->environment('local')) {

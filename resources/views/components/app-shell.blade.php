@@ -36,6 +36,21 @@
                     <span aria-hidden="true">·</span>
                     <span>{{ $surfaceLabel }}</span>
                     <span aria-hidden="true">·</span>
+                    @auth
+                        @can('surface.portal.access')
+                            <a href="{{ route('portal.home') }}">Mein Konto</a>
+                            <span aria-hidden="true">·</span>
+                        @endcan
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="bc-utility-link">Abmelden</button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}">Anmelden</a>
+                        <span aria-hidden="true">·</span>
+                        <a href="{{ route('identity.claim.create') }}">Konto aktivieren</a>
+                        <span aria-hidden="true">·</span>
+                    @endauth
                     <button class="bc-theme-toggle" type="button" data-theme-toggle aria-pressed="false">
                         <span data-theme-label>Dunkel</span>
                     </button>

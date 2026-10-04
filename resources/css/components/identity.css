@@ -1,0 +1,14 @@
+.bc-utility-link {
+    min-height: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: .18em;
+}
+
+.bc-utility-link:hover {
+    text-decoration-thickness: 2px;
+}

@@ -1,24 +1,96 @@
-# BiblioCollect T2 v0.3.0
+# BiblioCollect
 
-Dieser Patch baut auf **T1 v0.2.2** auf und führt die ersten fachlichen Kerndomänen ein:
+**BiblioCollect** ist die webbasierte VDBS-Schulbibliothekssoftware auf Laravel 13. Die Anwendung ist als modularer Monolith aufgebaut und trennt öffentliche Recherche, persönliches Portal, Bibliotheksbetrieb und Verwaltung in eigene Surfaces.
 
-- Identity: Anmeldung, Abmeldung, E-Mail-Verifikation, persistierte kombinierbare Rollen
-- Patrons: eigenständige Ausleihkonten mit Bibliotheksnummer, Pflicht-Geburtsdatum und optionaler E-Mail
-- Sichere Verknüpfung Onlinekonto ↔ Ausleihkonto über einmaligen persönlich ausgegebenen Code
-- School: Schuljahre, Klassen, Wochenöffnungszeiten, konkrete Schließtage und `SchoolCalendarService`
-- Server-seitiger Schutz von Portal, POS und Verwaltung mit `auth` + `verified` + Permission
-- VDBS-konforme Anmelde-, Aktivierungs- und Verifikationsseiten
-- Architektur- und Feature-Tests für Modulgrenzen, Rollen, Verknüpfungscodes und Öffnungstage
+## Technische Basis
 
-## Wichtige Architekturentscheidung
+- PHP 8.4+
+- Laravel 13
+- Livewire 4
+- Blade / Tailwind CSS 4 / Vite
+- Pest, PHPStan/Larastan und Pint
+- SQLite für lokale Entwicklung und Tests
+- MySQL/MariaDB für Produktion
 
-`User` und `Patron` bleiben getrennte Datensätze. Identity kennt das Patrons-Modul nicht konkret, sondern nur das Interface `PatronLinkGateway`. Die Implementierung liegt im Patrons-Modul. Technische Admin-Konten benötigen keinen Patron.
+## Architektur
 
-Neue fachliche Tabellen verwenden ULIDs. Die bestehende Laravel-Auth-Tabelle `users` behält in T2 ihren numerischen technischen Primärschlüssel, erhält aber zusätzlich eine `public_id` als ULID. Damit vermeiden wir jetzt eine destruktive Änderung an der Session-/Auth-Basis.
+```text
+Foundation
+  ↓
+Domain Modules
+  ↓
+Application Surfaces
+  ↓
+VDBS Design System / Presentation
+```
 
-## Dateien
+Writes laufen über **Actions**, Reads über **Queries**, wiederverwendbare Fachlogik über **Services**. Module dürfen keine konkreten Surfaces kennen. Rollen sind kombinierbare Bündel stabiler Permissions.
 
-- `BiblioCollect_T2_v0.3.0_from_v0.2.2.patch` – normaler Patch für den aktuellen Stand
-- `prerequisite/00_T1_v0.2.2_from_main.patch` – nur für einen frischen Checkout, der noch auf dem gepushten T1-v0.2.0-Stand steht
-- `APPLY.md` – konkrete Windows-/XAMPP-Schritte
-- `TEST_FLOW.md` – optionaler manueller Test des Konto-Verknüpfungsflusses
+### Surfaces
+
+- `Public` – Katalog, Informationen, Veranstaltungen und öffentliche Listen
+- `Portal` – persönliches Bibliothekskonto
+- `Pos` – Ausleihe und Bibliotheksbetrieb
+- `Administration` – Regeln, Importe, Datenschutz und Verwaltung
+
+### Fachmodule
+
+- Identity
+- Patrons
+- School
+- Catalog
+- Circulation
+- Collection
+- Reminders
+- Acquisition
+- Events
+- Lists
+- Content
+- Privacy
+- Audit
+
+## Aktueller Projektstand
+
+### T0 – Foundation
+
+Abgeschlossen. Laravel-Basis, modulare Struktur, CI, Pint, PHPStan und Pest sind eingerichtet.
+
+### T1 – Application Infrastructure
+
+Abgeschlossen. Enthalten sind Permission- und Rollen-Registry, serverseitige Gates/Middleware, Navigation, vier Surfaces, VDBS-App-Shell, UI-Basiskomponenten und die fachliche Zeitzone `Europe/Berlin`.
+
+### T2 – Identity, Patrons & School
+
+In Umsetzung. Der aktuelle Stand enthält getrennte `User`- und `Patron`-Datensätze, persistierte kombinierbare Rollen, einmalige Codes zur Verknüpfung eines Onlinekontos mit einem Ausleihkonto, E-Mail-Verifikation sowie die ersten School-Modelle und den `SchoolCalendarService`.
+
+Die fachliche Dokumentation liegt unter `docs/`.
+
+## Qualität
+
+Vor einem Commit lokal ausführen:
+
+```bash
+php vendor/bin/pint --test
+php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+php artisan foundation:check
+php vendor/bin/pest
+npm run build
+```
+
+Alternativ bündelt `composer quality` die PHP-Qualitätsprüfungen.
+
+## Lokaler Start
+
+```bash
+php artisan migrate
+npm run dev
+php artisan serve
+```
+
+## VDBS Design
+
+BiblioCollect verwendet das VDBS-Farbsystem und lokal eingebundene Schriften. Die Oberfläche orientiert sich in ihrer Informationsarchitektur an etablierten Bibliothekskatalogen, bleibt visuell aber eine eigenständige VDBS-Anwendung.
+
+## Datenschutz und Kontenmodell
+
+Ein **Ausleihkonto (`Patron`)** ist kein **Onlinekonto (`User`)**. Bibliotheksnutzung bleibt ohne Login und ohne E-Mail möglich. Ein Onlinekonto wird nur über einen einmaligen, persönlich in der Bibliothek ausgegebenen Verknüpfungscode mit einem vorhandenen Ausleihkonto verbunden.

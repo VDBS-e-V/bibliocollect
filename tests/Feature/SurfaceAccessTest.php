@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-it('keeps protected surfaces closed without an authorized online account', function (string $uri): void {
-    $this->get($uri)->assertStatus(401);
+it('redirects protected surfaces to login without an online account', function (string $uri): void {
+    $this->get($uri)->assertRedirect(route('login'));
 })->with([
     '/konto',
     '/betrieb',

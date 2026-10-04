@@ -16,6 +16,26 @@ return [
             'label' => 'Verwaltung öffnen',
             'description' => 'Erlaubt den Zugang zur Verwaltungsoberfläche. Fachliche Einzelrechte bleiben separat.',
         ],
+        'patrons.lookup' => [
+            'label' => 'Ausleihkonten nachschlagen',
+            'description' => 'Erlaubt die einfache Suche nach Ausleihkonten im Bibliotheksbetrieb.',
+        ],
+        'patrons.manage' => [
+            'label' => 'Ausleihkonten verwalten',
+            'description' => 'Erlaubt Änderungen an Ausleihkonten. Kritische Sperren bleiben später gesondert abgesichert.',
+        ],
+        'patrons.link-code.issue' => [
+            'label' => 'Onlinekonto-Code ausgeben',
+            'description' => 'Erlaubt die Ausgabe eines einmaligen Codes zur Verknüpfung eines Onlinekontos mit einem bestehenden Ausleihkonto.',
+        ],
+        'identity.roles.assign' => [
+            'label' => 'Rollen zuweisen',
+            'description' => 'Erlaubt die kontrollierte Zuweisung kombinierbarer Rollen an Onlinekonten.',
+        ],
+        'school.manage' => [
+            'label' => 'Schuldaten verwalten',
+            'description' => 'Erlaubt die Verwaltung von Schuljahren, Klassen und Öffnungstagen.',
+        ],
     ],
 
     // Rollen sind kombinierbare Permission-Bundles. Fachfunktionen prüfen Permissions, nie Rollennamen.
@@ -30,19 +50,35 @@ return [
         ],
         'student_ag_basic' => [
             'label' => 'Schüler-AG Basis',
-            'permissions' => ['surface.portal.access', 'surface.pos.access'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup'],
         ],
         'student_ag_extended' => [
             'label' => 'Schüler-AG Erweitert',
-            'permissions' => ['surface.portal.access', 'surface.pos.access'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup'],
         ],
         'staff' => [
             'label' => 'Mitarbeiter:in',
-            'permissions' => ['surface.portal.access', 'surface.pos.access'],
+            'permissions' => [
+                'surface.portal.access',
+                'surface.pos.access',
+                'patrons.lookup',
+                'patrons.manage',
+                'patrons.link-code.issue',
+                'identity.roles.assign',
+            ],
         ],
         'management' => [
             'label' => 'Verwaltung',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'surface.administration.access'],
+            'permissions' => [
+                'surface.portal.access',
+                'surface.pos.access',
+                'surface.administration.access',
+                'patrons.lookup',
+                'patrons.manage',
+                'patrons.link-code.issue',
+                'identity.roles.assign',
+                'school.manage',
+            ],
         ],
         'technical_admin' => [
             'label' => 'Technische Administration',

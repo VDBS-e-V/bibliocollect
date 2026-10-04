@@ -1,7 +1,9 @@
 {
   "name": "Identity",
-  "description": "Onlineidentitäten, Registrierung, Rollen- und Permission-Zuweisung.",
+  "description": "Onlineidentitäten, Anmeldung, E-Mail-Verifikation sowie Rollen- und Permission-Zuweisung.",
   "dependencies": [],
-  "providers": [],
+  "providers": [
+    "App\\Modules\\Identity\\Providers\\IdentityServiceProvider"
+  ],
   "enabled": true
 }

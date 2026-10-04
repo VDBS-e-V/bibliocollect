@@ -30,3 +30,10 @@ yarn-error.log
 /Lato,Source_Serif_4.zip
 /Neuland_Font_2017(1).zip
 /Neuland_Font_2017*.zip
+
+# Local patch delivery artifacts (keep outside version control)
+/*.patch
+/prerequisite/
+/APPLY.md
+/SHA256SUMS.txt
+/TEST_FLOW.md
