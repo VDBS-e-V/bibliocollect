@@ -25,12 +25,6 @@ yarn-error.log
 /.bootstrap/
 /START_HERE.md
 
-# One-time BiblioCollect bootstrap payload
-/install_fonts.php
-/Lato,Source_Serif_4.zip
-/Neuland_Font_2017(1).zip
-/Neuland_Font_2017*.zip
-
 # Local patch delivery artifacts (keep outside version control)
 /*.patch
 /prerequisite/

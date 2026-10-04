@@ -1,6 +1,6 @@
 body { font-family:var(--font-family-base); font-size:var(--text-base); line-height:var(--leading-body); }
 h1,h2,h3,h4,h5,h6 { margin-block-start:0; color:var(--text-primary); font-family:var(--font-family-base); line-height:var(--leading-tight); }
-.vdbs-display { font-family:var(--font-family-display); font-weight:400; letter-spacing:-0.01em; }
+.vdbs-display { font-family:var(--font-family-display); font-size:var(--text-4xl); font-weight:400; line-height:var(--leading-tight); letter-spacing:-0.01em; }
 .vdbs-editorial { font-family:var(--font-family-editorial); }
 a { color:var(--link-default); text-underline-offset:.18em; }
 a:visited { color:var(--link-visited); }

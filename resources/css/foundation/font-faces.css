@@ -1,6 +1,6 @@
 /*
- * VDBS web fonts are source assets under resources/fonts/vdbs and are bundled by Vite.
- * Refresh them only from the original local source archives via tools/sync_vdbs_fonts.php.
+ * VDBS web fonts are committed source assets under resources/fonts/vdbs and are bundled by Vite.
+ * Do not reintroduce runtime /fonts URLs or dependencies on local source archives.
  */
 @font-face {
     font-family: "Lato";
