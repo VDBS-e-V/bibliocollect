@@ -24,16 +24,24 @@ final readonly class IssuePatronLinkCodeAction
 
     public function execute(Patron $patron, ?User $issuedBy = null, ?int $ttlMinutes = null): IssuedPatronLinkCode
     {
-        if (! $patron->isActive()) {
-            throw new PatronLinkCodeCannotBeIssued;
-        }
-
         $ttl = $ttlMinutes ?? (int) config('identity.patron_link_code_ttl_minutes', 30);
         $expiresAt = $this->clock->now()->addMinutes(max(5, $ttl));
 
         return DB::transaction(function () use ($patron, $issuedBy, $expiresAt): IssuedPatronLinkCode {
+            $lockedPatron = Patron::query()
+                ->whereKey($patron->getKey())
+                ->lockForUpdate()
+                ->first();
+
+            if ($lockedPatron === null
+                || ! $lockedPatron->canLinkOnlineAccount()
+                || User::query()->where('patron_id', $lockedPatron->getKey())->exists()
+            ) {
+                throw new PatronLinkCodeCannotBeIssued;
+            }
+
             PatronAccountLinkToken::query()
-                ->where('patron_id', $patron->getKey())
+                ->where('patron_id', $lockedPatron->getKey())
                 ->whereNull('used_at')
                 ->whereNull('revoked_at')
                 ->update(['revoked_at' => $this->clock->now()]);
@@ -44,7 +52,7 @@ final readonly class IssuePatronLinkCodeAction
             } while (PatronAccountLinkToken::query()->where('fingerprint', $fingerprint)->exists());
 
             PatronAccountLinkToken::query()->create([
-                'patron_id' => $patron->getKey(),
+                'patron_id' => $lockedPatron->getKey(),
                 'fingerprint' => $fingerprint,
                 'expires_at' => $expiresAt,
                 'issued_by_user_id' => $issuedBy?->getKey(),

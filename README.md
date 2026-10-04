@@ -63,6 +63,8 @@ Abgeschlossen. Enthalten sind Permission- und Rollen-Registry, serverseitige Gat
 
 In Umsetzung. Der aktuelle Stand enthält getrennte `User`- und `Patron`-Datensätze, persistierte kombinierbare Rollen, einmalige Codes zur Verknüpfung eines Onlinekontos mit einem Ausleihkonto, E-Mail-Verifikation sowie die ersten School-Modelle und den `SchoolCalendarService`.
 
+Mit v0.3.2 kommt die erste echte Mitarbeiteroberfläche hinzu: gezielte Ausleihkontosuche, need-to-know Detailansicht, sichere Ausgabe der Onlinekonto-Einmalcodes und eine bewusst auf Schüler-AG-Rollen begrenzte Rollenverwaltung.
+
 Die fachliche Dokumentation liegt unter `docs/`.
 
 ## Qualität

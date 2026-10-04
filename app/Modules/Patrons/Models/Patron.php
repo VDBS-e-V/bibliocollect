@@ -61,6 +61,12 @@ final class Patron extends Model
         return $this->status === PatronStatus::Active;
     }
 
+    public function canLinkOnlineAccount(): bool
+    {
+        return $this->isActive()
+            && in_array($this->kind, [PatronKind::Student, PatronKind::Teacher], true);
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {

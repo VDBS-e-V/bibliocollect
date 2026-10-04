@@ -8,7 +8,6 @@ use App\Foundation\Support\BusinessClock;
 use App\Modules\Identity\Contracts\PatronLinkGateway;
 use App\Modules\Identity\DTOs\LinkablePatron;
 use App\Modules\Identity\Exceptions\InvalidPatronLinkCode;
-use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Models\PatronAccountLinkToken;
 use App\Modules\Patrons\Support\PatronLinkCodeHasher;
 
@@ -37,11 +36,7 @@ final readonly class EloquentPatronLinkGateway implements PatronLinkGateway
 
         $patron = $token->patron;
 
-        if ($patron === null || ! $patron->isActive()) {
-            throw InvalidPatronLinkCode::patronUnavailable();
-        }
-
-        if (! in_array($patron->kind, [PatronKind::Student, PatronKind::Teacher], true)) {
+        if ($patron === null || ! $patron->canLinkOnlineAccount()) {
             throw InvalidPatronLinkCode::patronUnavailable();
         }
 

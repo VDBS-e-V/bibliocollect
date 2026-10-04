@@ -7,6 +7,14 @@
         lead="Arbeitsoberfläche für Barcode-Scanner und Tastatur."
     />
 
+    @if (! $preview)
+        @can('patrons.lookup')
+            <div class="bc-context-actions" aria-label="Schnellzugriff">
+                <x-ui.button href="{{ route('pos.patrons.index') }}" variant="secondary">Ausleihkonto suchen</x-ui.button>
+            </div>
+        @endcan
+    @endif
+
     <div class="bc-pos-toolbar" role="toolbar" aria-label="Vorgangsart">
         <button type="button" class="bc-pos-toolbar__item bc-pos-toolbar__item--active" disabled>Ausleihe</button>
         <button type="button" class="bc-pos-toolbar__item" disabled>Rückgabe</button>

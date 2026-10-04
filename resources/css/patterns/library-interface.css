@@ -287,3 +287,140 @@
     .bc-notice-row,
     .bc-admin-list > div { grid-template-columns: 1fr; gap: .3rem; }
 }
+
+/* T2 staff workspace: patron lookup remains compact, readable and need-to-know. */
+.bc-context-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 1rem;
+    margin: -.4rem 0 1.4rem;
+    font-size: var(--text-sm);
+}
+
+.bc-patron-search {
+    max-width: 52rem;
+    border-top: 3px solid var(--action-secondary);
+    background: var(--bg-surface-muted);
+    padding: 1.2rem;
+}
+
+.bc-patron-search__form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .3rem;
+}
+
+.bc-patron-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(17rem, .65fr);
+    gap: clamp(2rem, 5vw, 4rem);
+}
+
+.bc-patron-detail-layout__main,
+.bc-patron-detail-layout__aside { min-width: 0; }
+
+.bc-detail-list,
+.bc-side-definition-list {
+    margin: 0;
+}
+
+.bc-detail-list > div {
+    display: grid;
+    grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
+    gap: 1.25rem;
+    border-bottom: 1px solid var(--border-default);
+    padding: .72rem .1rem;
+}
+
+.bc-detail-list > div:first-child { border-top: 1px solid var(--border-default); }
+.bc-detail-list dt,
+.bc-side-definition-list dt { color: var(--text-secondary); }
+.bc-detail-list dd,
+.bc-side-definition-list dd { margin: 0; font-weight: 700; }
+
+.bc-side-definition-list {
+    margin-top: .8rem;
+}
+.bc-side-definition-list > div {
+    display: grid;
+    gap: .15rem;
+    border-bottom: 1px solid var(--border-default);
+    padding: .55rem 0;
+}
+.bc-side-definition-list > div:last-child { border-bottom: 0; }
+
+.bc-privacy-note {
+    margin: -.25rem 0 .7rem;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+}
+
+.bc-inline-form { margin-top: .9rem; }
+
+
+.bc-one-time-secret {
+    max-width: 46rem;
+    border: 1px solid var(--border-default);
+    border-top: 5px solid var(--action-primary);
+    background: var(--bg-brand-soft);
+    padding: clamp(1.2rem, 3vw, 2rem);
+}
+.bc-one-time-secret h2 {
+    margin: 0;
+    font-size: clamp(1.35rem, 3vw, 1.8rem);
+}
+.bc-one-time-secret p:last-child { margin-bottom: 0; }
+
+.bc-code-output {
+    margin: .35rem 0 .55rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: clamp(1.35rem, 4vw, 2rem);
+    font-weight: 900;
+    letter-spacing: .12em;
+    word-break: break-all;
+}
+
+.bc-role-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    margin-top: .75rem;
+}
+
+.bc-role-list {
+    border-top: 1px solid var(--border-default);
+    margin-top: .8rem;
+}
+
+.bc-role-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .75rem;
+    align-items: center;
+    border-bottom: 1px solid var(--border-default);
+    padding: .7rem 0;
+}
+
+.bc-role-row > div {
+    display: grid;
+    gap: .1rem;
+}
+.bc-role-row span {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+}
+
+.bc-tabular { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 58rem) {
+    .bc-patron-detail-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 42rem) {
+    .bc-detail-list > div,
+    .bc-role-row {
+        grid-template-columns: 1fr;
+        gap: .25rem;
+    }
+}

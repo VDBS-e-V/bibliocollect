@@ -20,6 +20,10 @@ return [
             'label' => 'Ausleihkonten nachschlagen',
             'description' => 'Erlaubt die einfache Suche nach Ausleihkonten im Bibliotheksbetrieb.',
         ],
+        'patrons.sensitive.view' => [
+            'label' => 'Sensible Ausleihkontodaten sehen',
+            'description' => 'Erlaubt die Anzeige von Geburtsdatum, E-Mail, Austrittsdatum und Sperrgrund.',
+        ],
         'patrons.manage' => [
             'label' => 'Ausleihkonten verwalten',
             'description' => 'Erlaubt Änderungen an Ausleihkonten. Kritische Sperren bleiben später gesondert abgesichert.',
@@ -62,6 +66,7 @@ return [
                 'surface.portal.access',
                 'surface.pos.access',
                 'patrons.lookup',
+                'patrons.sensitive.view',
                 'patrons.manage',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
@@ -74,6 +79,7 @@ return [
                 'surface.pos.access',
                 'surface.administration.access',
                 'patrons.lookup',
+                'patrons.sensitive.view',
                 'patrons.manage',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
