@@ -1,10 +1,11 @@
 # Nächste Schritte — BiblioCollect
 
-1. T3 v0.4.1 mit bibliografischen Metadaten, strukturierten Verantwortlichen und titelbasierter Query lokal und in GitHub Actions grün bestätigen.
-2. Danach interne Katalogpflege mit eigenen Actions, Validierung und fein geschnittenen Catalog-Permissions umsetzen.
-3. Öffentliche Katalogsuche auf der titelbasierten Query aufbauen; physische Verfügbarkeit bleibt `Copy`-bezogen.
-4. CSV/MARC21-Import erst danach mit Preview, Normalisierung und Konfliktbehandlung ergänzen.
-5. T4 `Circulation` anschließend mit zentralem Regel-Evaluator, Altersprüfung gegen Patron-Geburtsdatum und Edition-Mindestalter, Transaktionen und Row Locks umsetzen.
+1. T3 v0.4.2 mit interner Titel- und Editionspflege lokal und in GitHub Actions grün bestätigen.
+2. Danach Verantwortliche in der Katalogpflege ergänzen und die vorhandenen `Contributor`-/`TitleContribution`-Strukturen bedienbar machen.
+3. Anschließend Exemplarpflege für Barcode, Standort und Exemplarstatus ergänzen.
+4. Öffentliche Katalogsuche auf `SearchCatalogTitlesQuery` aufbauen; physische Verfügbarkeit bleibt `Copy`-bezogen.
+5. CSV/MARC21-Import erst danach mit Preview, Normalisierung und Konfliktbehandlung ergänzen.
+6. T4 `Circulation` anschließend mit zentralem Regel-Evaluator, Altersprüfung gegen Patron-Geburtsdatum und Edition-Mindestalter, Transaktionen und Row Locks umsetzen.
 
 ## Qualitäts-Gate
 

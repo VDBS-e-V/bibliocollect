@@ -8,11 +8,16 @@
     />
 
     @if (! $preview)
-        @can('patrons.lookup')
+        @canany(['patrons.lookup', 'catalog.manage'])
             <div class="bc-context-actions" aria-label="Schnellzugriff">
-                <x-ui.button href="{{ route('pos.patrons.index') }}" variant="secondary">Ausleihkonto suchen</x-ui.button>
+                @can('patrons.lookup')
+                    <x-ui.button href="{{ route('pos.patrons.index') }}" variant="secondary">Ausleihkonto suchen</x-ui.button>
+                @endcan
+                @can('catalog.manage')
+                    <x-ui.button href="{{ route('pos.catalog.index') }}" variant="secondary">Katalog pflegen</x-ui.button>
+                @endcan
             </div>
-        @endcan
+        @endcanany
     @endif
 
     <div class="bc-pos-toolbar" role="toolbar" aria-label="Vorgangsart">

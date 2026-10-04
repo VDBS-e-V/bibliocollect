@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
+use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
+use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
@@ -15,6 +18,29 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(function (): void {
     Route::view('/betrieb', 'pages.surfaces.pos', ['preview' => false])
         ->name('pos.home');
+
+    Route::middleware('permission:catalog.manage')->group(function (): void {
+        Route::get('/betrieb/katalog', CatalogIndexController::class)
+            ->name('pos.catalog.index');
+
+        Route::post('/betrieb/katalog/titel', [CatalogTitleController::class, 'store'])
+            ->name('pos.catalog.titles.store');
+
+        Route::get('/betrieb/katalog/titel/{titleId}', [CatalogTitleController::class, 'show'])
+            ->name('pos.catalog.titles.show');
+
+        Route::patch('/betrieb/katalog/titel/{titleId}', [CatalogTitleController::class, 'update'])
+            ->name('pos.catalog.titles.update');
+
+        Route::post('/betrieb/katalog/titel/{titleId}/ausgaben', [CatalogEditionController::class, 'store'])
+            ->name('pos.catalog.editions.store');
+
+        Route::get('/betrieb/katalog/ausgaben/{editionId}/bearbeiten', [CatalogEditionController::class, 'edit'])
+            ->name('pos.catalog.editions.edit');
+
+        Route::patch('/betrieb/katalog/ausgaben/{editionId}', [CatalogEditionController::class, 'update'])
+            ->name('pos.catalog.editions.update');
+    });
 
     Route::get('/betrieb/ausleihkonten', PatronIndexController::class)
         ->middleware('permission:patrons.lookup')

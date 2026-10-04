@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T3 v0.4.1 – Bibliografische Metadaten und titelbasierte Suche
+Stand: T3 v0.4.2 – Interne Titel- und Editionspflege
 
 ## Abgeschlossen
 
@@ -38,3 +38,11 @@ v0.4.1 ergänzt die bibliografische Arbeitsbasis:
 - `Edition` erhält offene Felder für Medientyp und Sprachcode, ohne Importformate vorwegzunehmen.
 - `SearchCatalogTitlesQuery` sucht titelbasiert über Titelangaben, Verantwortliche und ausgewählte Editionsdaten.
 - Suche und spätere Reservierungen bleiben titelbezogen; exemplarbezogene Vorgänge bleiben bei `Copy`.
+
+v0.4.2 macht den ersten Teil der internen Katalogpflege bedienbar:
+
+- `catalog.manage` ist ein eigenes Fachrecht im Bibliotheksbetrieb.
+- Schüler-AG Erweitert, Mitarbeiter:innen und Verwaltung dürfen Titel und Editionen anlegen und bearbeiten.
+- Schüler-AG Basis und technische Administration erhalten dieses Recht nicht.
+- Titel- und Editionsänderungen laufen über explizite Actions und validierte DTOs.
+- Verantwortliche, Exemplare und Importe bleiben bewusst separate Folgeschritte.

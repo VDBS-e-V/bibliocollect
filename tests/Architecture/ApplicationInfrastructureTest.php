@@ -16,11 +16,19 @@ it('defines stable surface permissions and combinable role bundles', function ()
         'surface.portal.access',
         'surface.pos.access',
         'surface.administration.access',
+        'catalog.manage',
     );
 
     expect($roles->permissionsFor(['student_ag_basic']))
         ->toContain('surface.portal.access', 'surface.pos.access')
+        ->not->toContain('surface.administration.access', 'catalog.manage');
+
+    expect($roles->permissionsFor(['student_ag_extended']))
+        ->toContain('surface.portal.access', 'surface.pos.access', 'catalog.manage')
         ->not->toContain('surface.administration.access');
+
+    expect($roles->permissionsFor(['staff', 'management']))
+        ->toContain('catalog.manage');
 
     expect($roles->permissionsFor(['technical_admin']))
         ->toBe(['surface.administration.access']);
@@ -38,7 +46,7 @@ it('builds navigation for all four surfaces', function (): void {
 
     expect($navigation->allForSurface('public'))->toHaveCount(1);
     expect($navigation->allForSurface('portal'))->toHaveCount(1);
-    expect($navigation->allForSurface('pos'))->toHaveCount(2);
+    expect($navigation->allForSurface('pos'))->toHaveCount(3);
     expect($navigation->allForSurface('administration'))->toHaveCount(2);
 });
 

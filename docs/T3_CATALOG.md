@@ -27,3 +27,9 @@ Die vorhandenen Felder `minimum_age` und `age_rating_label` bleiben an `Edition`
 `SearchCatalogTitlesQuery` liefert immer `Title`-Datensätze zurück. Gesucht wird über Titel, Untertitel, Sortiertitel, Verantwortliche sowie ausgewählte Editionsfelder. Physische Barcodes sind bewusst nicht Teil dieser titelbasierten Recherche.
 
 Die Query entfernt SQL-LIKE-Wildcards aus Benutzereingaben, verlangt mindestens zwei Buchstaben/Ziffern und begrenzt die Treffermenge.
+
+## Interne Katalogpflege
+
+Ab v0.4.2 liegt die Katalogpflege im Surface `Bibliotheksbetrieb` und nicht in der Systemverwaltung. Das Fachrecht `catalog.manage` wird Schüler-AG Erweitert, Mitarbeiter:innen und Verwaltung zugewiesen. Schüler-AG Basis und technische Administration erhalten es nicht.
+
+Der erste Pflegeworkflow umfasst ausschließlich `Title` und `Edition`. Änderungen laufen über eigene Actions und DTOs; HTTP-Validierung bleibt in der POS-Surface. Es gibt in diesem Schritt keine Löschfunktionen und noch keinen Editor für Verantwortliche oder Exemplare.

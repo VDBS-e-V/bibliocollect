@@ -48,6 +48,10 @@ return [
             'label' => 'Schuldaten verwalten',
             'description' => 'Erlaubt die Verwaltung von Schuljahren, Klassen und Öffnungstagen.',
         ],
+        'catalog.manage' => [
+            'label' => 'Katalog pflegen',
+            'description' => 'Erlaubt das Anlegen und Bearbeiten bibliografischer Titel- und Editionsdaten im Bibliotheksbetrieb.',
+        ],
     ],
 
     // Rollen sind kombinierbare Permission-Bundles. Fachfunktionen prüfen Permissions, nie Rollennamen.
@@ -66,7 +70,7 @@ return [
         ],
         'student_ag_extended' => [
             'label' => 'Schüler-AG Erweitert',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage'],
         ],
         'staff' => [
             'label' => 'Mitarbeiter:in',
@@ -80,6 +84,7 @@ return [
                 'patrons.depart',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
+                'catalog.manage',
             ],
         ],
         'management' => [
@@ -95,6 +100,7 @@ return [
                 'patrons.depart',
                 'patrons.link-code.issue',
                 'identity.roles.assign',
+                'catalog.manage',
                 'school.manage',
             ],
         ],

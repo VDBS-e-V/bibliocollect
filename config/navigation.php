@@ -46,6 +46,13 @@ return [
                     'permission' => 'patrons.lookup',
                     'order' => 20,
                 ],
+                [
+                    'label' => 'Katalogpflege',
+                    'route' => 'pos.catalog.index',
+                    'active' => 'pos.catalog.*',
+                    'permission' => 'catalog.manage',
+                    'order' => 30,
+                ],
             ],
         ],
         'administration' => [
