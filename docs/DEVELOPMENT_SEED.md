@@ -1,0 +1,150 @@
+# Development- und Demo-Seed
+
+Der `DemoSeeder` stellt einen reproduzierbaren Entwicklungsstand für die bereits implementierten BiblioCollect-Domänen bereit. Er ist **nicht für Produktionsdaten** gedacht und wird in `production` nicht über den normalen `DatabaseSeeder` ausgeführt.
+
+## Pflegekonvention
+
+Der Demo-Seed ist ein lebendes Entwicklungsartefakt.
+
+Wenn eine neue Funktion
+
+- einen neuen Domänenzustand,
+- eine neue Rolle oder Permission,
+- einen neuen Workflow,
+- neue Stammdaten,
+- neue Suchzustände oder
+- eine neue Arbeitsoberfläche
+
+einführt, werden `DemoSeeder` und `DemoSeederTest` im selben Entwicklungsschritt ergänzt. Die Seed-Daten sollen die neue Funktion anschließend ohne zusätzliche Handarbeit testbar machen.
+
+## Datenbank neu aufbauen
+
+Achtung: `migrate:fresh` löscht die lokale Datenbank vollständig.
+
+```text
+php artisan migrate:fresh --seed
+```
+
+Ein erneutes `php artisan db:seed` ist ebenfalls möglich. Der Seed ist für seine eigenen Demo-Datensätze idempotent aufgebaut.
+
+## Demo-Passwort
+
+Alle aktiv nutzbaren Demo-Onlinekonten verwenden:
+
+```text
+Bibliothek2026!
+```
+
+## Onlinekonten und Rollen
+
+| E-Mail | Rollen / Zweck |
+| --- | --- |
+| `student@demo.bibliocollect.test` | Schüler:in, mit aktivem Ausleihkonto verknüpft |
+| `teacher@demo.bibliocollect.test` | Lehrkraft, mit aktivem Ausleihkonto verknüpft |
+| `ag-basic@demo.bibliocollect.test` | Schüler:in + Schüler-AG Basis |
+| `ag-extended@demo.bibliocollect.test` | Schüler:in + Schüler-AG Erweitert, inklusive `catalog.manage` |
+| `staff@demo.bibliocollect.test` | Mitarbeiter:in für Patron- und Katalogworkflows |
+| `management@demo.bibliocollect.test` | Verwaltung für Schule, Rollen und fachliche Verwaltung |
+| `technik@demo.bibliocollect.test` | technische Administration ohne Patron- oder Katalogpflege-Rechte |
+| `departed@demo.bibliocollect.test` | deaktiviertes Konto eines dauerhaft ausgeschiedenen Patrons |
+
+Damit sind alle derzeit definierten Rollen sowie die kombinierbaren Schüler-/AG-Rollen abgedeckt.
+
+## Schule
+
+Der Seed enthält drei Schuljahre:
+
+- `2025/26` als abgeschlossenes/inaktives Vorjahr,
+- `2026/27` als aktives Schuljahr,
+- `2027/28` als vorbereitetes Folgejahr.
+
+Je Schuljahr werden sechs Klassen angelegt. Die Klassenstufen bilden einen einfachen Übergang vom Vorjahr über das aktive Jahr zum Folgejahr ab.
+
+Zusätzlich werden Öffnungszeiten für alle sieben Wochentage angelegt:
+
+- Montag und Dienstag: 09:00–15:00,
+- Mittwoch: 09:00–13:00,
+- Donnerstag: 09:00–15:00,
+- Freitag: 09:00–13:00,
+- Samstag und Sonntag: geschlossen.
+
+Mehrere Demo-Schließtage zeigen Ferien- und Feiertagszustände.
+
+## Ausleihkonten
+
+Die Bibliotheksnummern sind absichtlich stabil:
+
+| Bibliotheksnr. | Zustand |
+| --- | --- |
+| `S-10001` | aktive Schülerin mit verknüpftem Onlinekonto |
+| `S-10002` | aktiver Schüler mit AG-Basis-Onlinekonto |
+| `S-10003` | aktive, aktuell gesperrte Schülerin mit AG-Erweitert-Konto |
+| `S-10004` | aktiver, noch nicht verknüpfter Schüler für den Linkcode-Workflow |
+| `S-10005` | aktiver Schüler mit historischer Sperre und anschließender Entsperrung |
+| `S-10006` | dauerhaft ausgeschiedene Schülerin mit deaktiviertem Onlinekonto |
+| `L-20001` | aktive Lehrkraft |
+| `M-30001` | aktives Mitarbeiter-Ausleihkonto |
+| `M-30002` | archiviertes Mitarbeiter-Ausleihkonto |
+
+Block-/Unblock- und Austrittsereignisse werden über die vorhandenen Domain-Actions erzeugt, damit Audit-Zustände realistisch bleiben.
+
+## Demo-Linkcode
+
+Für `S-10004` / Noah Linkcode wird ein offener Demo-Linkcode vorbereitet:
+
+```text
+D3MZ2-26ABC
+```
+
+Die Datenbank speichert davon nur den HMAC-Fingerprint. Der Klartext steht ausschließlich in dieser Development-Dokumentation und in der Konsolenausgabe des Seeders.
+
+Zusätzlich gibt es einen bereits verwendeten Tokenzustand und einen widerrufenen Tokenzustand für die vorhandenen Patron-Workflows.
+
+## Katalog
+
+Der Seed enthält sieben Titel und acht Ausgaben. Darunter:
+
+- `Momo`
+- `Die unendliche Geschichte`
+- `Tschick`
+- `Krabat`
+- `Der kleine Prinz`
+- `Matilda`
+- `Harry Potter und der Stein der Weisen`
+
+`Michael Ende` wird absichtlich an mehreren Titeln wiederverwendet. Damit lässt sich der Hinweis beim Bearbeiten gemeinsam genutzter `Contributor`-Datensätze testen.
+
+Die Beispieldaten enthalten außerdem unterschiedliche Verantwortlichkeitsrollen:
+
+- `author`
+- `illustrator`
+- `translator`
+
+`Momo` besitzt zusätzlich zwei unterschiedliche Ausgaben, darunter eine Hörbuchausgabe. Damit sind `Title` und `Edition` im Seed sichtbar getrennt.
+
+## Exemplare
+
+Es werden 14 physische Exemplare mit stabilen Demo-Barcodes und Regalstandorten angelegt.
+
+Die vorhandenen Exemplarzustände sind vollständig vertreten:
+
+- `active`
+- `damaged`
+- `lost`
+- `withdrawn`
+
+Damit ist die spätere Exemplarpflege bereits mit geeigneten Beispieldaten vorbereitet, obwohl der entsprechende UI-Workflow noch nicht implementiert ist.
+
+## Automatischer Seed-Test
+
+`tests/Feature/DemoSeederTest.php` prüft unter anderem:
+
+- alle Schuljahre, Klassen, Öffnungszeiten und Schließtage,
+- alle Demo-Rollen und Berechtigungsgrenzen,
+- aktive, gesperrte, entsperrte, ausgeschiedene und archivierte Patrons,
+- deaktivierte Onlinekonten,
+- offene, verwendete und widerrufene Patron-Linktokens,
+- Titel, Ausgaben, Verantwortliche und Exemplare,
+- alle vorhandenen Copy-Statuswerte,
+- die Wiederverwendung eines Contributors,
+- Idempotenz bei erneutem Seed-Aufruf.
