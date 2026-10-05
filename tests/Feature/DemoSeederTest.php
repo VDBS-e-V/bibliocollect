@@ -69,11 +69,11 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and($openToken->fingerprint)->not->toContain(DemoSeeder::DEMO_LINK_CODE)
         ->and(PatronAccountLinkToken::query()->count())->toBe(3);
 
-    expect(Title::query()->count())->toBe(7)
-        ->and(Edition::query()->count())->toBe(8)
-        ->and(Copy::query()->count())->toBe(14)
-        ->and(Contributor::query()->count())->toBe(8)
-        ->and(TitleContribution::query()->count())->toBe(9)
+    expect(Title::query()->count())->toBe(9)
+        ->and(Edition::query()->count())->toBe(10)
+        ->and(Copy::query()->count())->toBe(15)
+        ->and(Contributor::query()->count())->toBe(10)
+        ->and(TitleContribution::query()->count())->toBe(11)
         ->and(Copy::query()->where('status', CopyStatus::Damaged->value)->count())->toBe(1)
         ->and(Copy::query()->where('status', CopyStatus::Lost->value)->count())->toBe(1)
         ->and(Copy::query()->where('status', CopyStatus::Withdrawn->value)->count())->toBe(1);
@@ -89,8 +89,14 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and($withdrawnCopy->shelf_location)->toBe('MAG PREU');
 
     $michaelEnde = Contributor::query()->where('display_name', 'Michael Ende')->firstOrFail();
+    $theGiver = Title::query()->where('preferred_title', 'The Giver')->firstOrFail();
+    $theGiverEdition = Edition::query()->where('title_id', $theGiver->getKey())->firstOrFail();
+    $theWave = Title::query()->where('preferred_title', 'Die Welle')->firstOrFail();
 
-    expect($michaelEnde->contributions()->count())->toBe(2);
+    expect($michaelEnde->contributions()->count())->toBe(2)
+        ->and($theGiverEdition->language_code)->toBe('en')
+        ->and($theGiverEdition->copies()->where('status', CopyStatus::Active->value)->count())->toBe(1)
+        ->and($theWave->editions()->firstOrFail()->copies()->count())->toBe(0);
 
     $this->seed(DemoSeeder::class);
 
@@ -101,9 +107,9 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and(PatronBlockEvent::query()->count())->toBe(3)
         ->and(PatronStatusEvent::query()->count())->toBe(1)
         ->and(PatronAccountLinkToken::query()->count())->toBe(3)
-        ->and(Title::query()->count())->toBe(7)
-        ->and(Edition::query()->count())->toBe(8)
-        ->and(Copy::query()->count())->toBe(14)
-        ->and(Contributor::query()->count())->toBe(8)
-        ->and(TitleContribution::query()->count())->toBe(9);
+        ->and(Title::query()->count())->toBe(9)
+        ->and(Edition::query()->count())->toBe(10)
+        ->and(Copy::query()->count())->toBe(15)
+        ->and(Contributor::query()->count())->toBe(10)
+        ->and(TitleContribution::query()->count())->toBe(11);
 });

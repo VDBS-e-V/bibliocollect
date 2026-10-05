@@ -102,7 +102,7 @@ Zusätzlich gibt es einen bereits verwendeten Tokenzustand und einen widerrufene
 
 ## Katalog
 
-Der Seed enthält sieben Titel und acht Ausgaben. Darunter:
+Der Seed enthält neun Titel und zehn Ausgaben. Darunter:
 
 - `Momo`
 - `Die unendliche Geschichte`
@@ -111,6 +111,8 @@ Der Seed enthält sieben Titel und acht Ausgaben. Darunter:
 - `Der kleine Prinz`
 - `Matilda`
 - `Harry Potter und der Stein der Weisen`
+- `The Giver`
+- `Die Welle`
 
 `Michael Ende` wird absichtlich an mehreren Titeln wiederverwendet. Damit lässt sich der Hinweis beim Bearbeiten gemeinsam genutzter `Contributor`-Datensätze testen.
 
@@ -122,9 +124,16 @@ Die Beispieldaten enthalten außerdem unterschiedliche Verantwortlichkeitsrollen
 
 `Momo` besitzt zusätzlich zwei unterschiedliche Ausgaben, darunter eine Hörbuchausgabe. Damit sind `Title` und `Edition` im Seed sichtbar getrennt.
 
+Für die öffentliche Katalogsuche ergänzt `PublicCatalogDemoSeeder` zwei gezielte Suchzustände:
+
+- `The Giver` besitzt eine englischsprachige Buchausgabe (`language_code = en`) mit aktivem Exemplar am Standort `EN 7 LOWR`. Damit können Sprachfilter, unbekontoabhängige Recherche und aktive Bestandsanzeige getestet werden.
+- `Die Welle` besitzt eine deutschsprachige Ausgabe, aber bewusst noch kein physisches Exemplar. Damit lässt sich der öffentliche Zustand „Noch kein Exemplarbestand“ testen.
+
+`PublicCatalogDemoSeeder` wird vom normalen `DemoSeeder` aufgerufen, ist idempotent und verweigert wie der Hauptseeder die direkte Ausführung in `production`.
+
 ## Exemplare
 
-Es werden 14 physische Exemplare mit stabilen Demo-Barcodes und Regalstandorten angelegt.
+Es werden 15 physische Exemplare mit stabilen Demo-Barcodes und Regalstandorten angelegt.
 
 Die vorhandenen Exemplarzustände sind vollständig vertreten:
 
@@ -147,4 +156,6 @@ Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exem
 - Titel, Ausgaben, Verantwortliche und Exemplare,
 - alle vorhandenen Copy-Statuswerte sowie konkrete Demo-Barcodes und Regalstandorte,
 - die Wiederverwendung eines Contributors,
+- den englischsprachigen öffentlichen Suchzustand `The Giver`,
+- den Titel `Die Welle` ohne physische Exemplare,
 - Idempotenz bei erneutem Seed-Aufruf.

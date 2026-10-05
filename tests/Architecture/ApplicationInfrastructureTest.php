@@ -44,7 +44,7 @@ it('keeps identity independent from patrons at module level', function (): void 
 it('builds navigation for all four surfaces', function (): void {
     $navigation = app(NavigationRegistry::class);
 
-    expect($navigation->allForSurface('public'))->toHaveCount(1);
+    expect($navigation->allForSurface('public'))->toHaveCount(2);
     expect($navigation->allForSurface('portal'))->toHaveCount(1);
     expect($navigation->allForSurface('pos'))->toHaveCount(3);
     expect($navigation->allForSurface('administration'))->toHaveCount(2);

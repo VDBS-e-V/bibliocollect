@@ -26,7 +26,7 @@ Die vorhandenen Felder `minimum_age` und `age_rating_label` bleiben an `Edition`
 
 `SearchCatalogTitlesQuery` liefert immer `Title`-Datensätze zurück. Gesucht wird über Titel, Untertitel, Sortiertitel, Verantwortliche sowie ausgewählte Editionsfelder. Physische Barcodes sind bewusst nicht Teil dieser titelbasierten Recherche.
 
-Die Query entfernt SQL-LIKE-Wildcards aus Benutzereingaben, verlangt mindestens zwei Buchstaben/Ziffern und begrenzt die Treffermenge.
+Die Query entfernt SQL-LIKE-Wildcards aus Benutzereingaben, verlangt für eine Textsuche mindestens zwei Buchstaben/Ziffern und begrenzt die Treffermenge. Ab v0.4.5 besitzt sie zusätzlich einen paginierten Kriterienpfad für die öffentliche Recherche. Ein leerer Suchbegriff bedeutet dort bewusst „Katalog durchstöbern“; ein nicht-leerer, nach der Bereinigung aber zu kurzer Suchbegriff liefert dagegen keine Treffer und wird nicht zum unbeabsichtigten Verzeichnis aller Titel.
 
 ## Interne Katalogpflege
 
@@ -59,3 +59,90 @@ Es gibt keine Hard-Delete-Route für Exemplare. `withdrawn` repräsentiert dauer
 Der aktuelle `CopyStatus` beschreibt den Katalog-/Bestandszustand. T4 Circulation muss zusätzlich den tatsächlichen Ausleihzustand berücksichtigen; ein Statuswert allein ist noch keine vollständige Verfügbarkeitsentscheidung.
 
 Barcode-Duplikate werden nicht nur durch den Datenbankindex verhindert. `CreateCopyAction` und `UpdateCopyAction` prüfen die Eindeutigkeit fachlich und liefern der Oberfläche einen verständlichen Fehler. Die Datenbank-Unique-Constraint bleibt die letzte technische Sicherung.
+
+
+## Öffentlicher Katalog
+
+Ab v0.4.5 ist die bisherige Startseiten-Vorschau durch eine echte anonyme Katalogstrecke ergänzt.
+
+### Routen und Surface-Grenze
+
+Die Public-Surface stellt bereit:
+
+- `GET /katalog` für Suche, Browsing, Filter und Pagination,
+- `GET /katalog/titel/{titleId}` für die öffentliche Titel-/Ausgabenansicht.
+
+Für diese Routen gibt es bewusst keine Login- oder Rollenanforderung. Bibliotheksnutzung und Katalogrecherche bleiben damit unabhängig von einem Onlinekonto.
+
+HTTP-Validierung, menschenlesbare Beschriftungen und Blade-Darstellung liegen in `Surfaces/Public`. Das Catalog-Modul bleibt frei von konkreten Surface-Abhängigkeiten.
+
+### Suchkriterien
+
+`CatalogSearchCriteria` transportiert die fachlich neutralen Suchparameter:
+
+- optionaler Suchbegriff,
+- optionaler Medientyp,
+- optionaler Sprachcode,
+- optional „nur Titel mit aktiven Exemplaren“,
+- Sortierung,
+- Seitengröße und Seitennummer.
+
+Die Textsuche bleibt titelbezogen und berücksichtigt:
+
+- Haupttitel,
+- Untertitel,
+- Sortiertitel,
+- Contributor-Anzeige- und Sortiernamen,
+- ISBN,
+- Verlag,
+- Medientyp,
+- Sprachcode.
+
+Copy-Barcodes bleiben ausgeschlossen. Sie identifizieren ein physisches Exemplar und gehören in operative Copy-/Circulation-Workflows, nicht in die öffentliche titelbezogene Recherche.
+
+### Filter und offene Vokabulare
+
+`CatalogSearchFilterOptionsQuery` leitet vorhandene Medientypen und Sprachcodes aus den Editionsdaten ab. Damit werden unbekannte oder später importierte Werte nicht verworfen.
+
+Die Public-Surface übersetzt bekannte Werte wie `book`, `audiobook`, `de` oder `en` in verständliche Beschriftungen. Unbekannte Werte werden lesbar dargestellt, aber nicht in der Domäne auf ein starres Enum gezwungen.
+
+### Bestandszusammenfassung
+
+`CatalogHoldingService` aggregiert pro Titel oder Ausgabe:
+
+- Gesamtzahl physischer Exemplare,
+- aktive Exemplare,
+- beschädigte Exemplare,
+- verlorene Exemplare,
+- ausgesonderte Exemplare,
+- Regalstandorte aktiver Exemplare.
+
+Öffentlich werden keine Copy-Barcodes und keine internen Copy-ULIDs ausgegeben.
+
+Regalstandorte werden nur aus aktiven Exemplaren abgeleitet. Ein Lagerort eines verlorenen, beschädigten oder ausgesonderten Exemplars soll nicht als regulärer Fundort für Leser:innen erscheinen.
+
+### „Aktiv“ ist noch nicht „verfügbar“
+
+Die wichtigste fachliche Grenze von v0.4.5 ist die Sprache der Bestandsanzeige:
+
+- `active` bedeutet: Das Exemplar ist katalogseitig nutzbarer Bestand.
+- `damaged`, `lost` und `withdrawn` sind nicht aktive Bestandszustände.
+- Ob ein aktives Exemplar gerade ausgeliehen ist, ist noch unbekannt.
+
+Die Public-Surface verwendet deshalb Formulierungen wie „2 aktive Exemplare“ und vermeidet Aussagen wie „2 verfügbar“. Erst T4 Circulation kann eine echte Verfügbarkeitsentscheidung aus Copy-Status und laufendem Ausleihzustand zusammensetzen.
+
+### Titel ohne Bestand
+
+Ein `Title` darf öffentlich recherchierbar sein, obwohl aktuell kein physisches `Copy` existiert. Das ist für vorbereitete Katalogisate, noch nicht eingetroffene Bestände und spätere Import-Workflows wichtig.
+
+Die Oberfläche unterscheidet deshalb:
+
+- „Noch kein Exemplarbestand“: Es existiert kein Copy.
+- „Derzeit kein aktives Exemplar“: Copies existieren, aber keines davon ist `active`.
+- „N aktive Exemplare“: Mindestens ein katalogseitig aktives Copy existiert.
+
+### Pagination und Datenschutz
+
+Die öffentliche Browse-Ansicht paginiert serverseitig. Filterparameter werden beim Blättern erhalten, aber nur nach erfolgreicher Validierung wieder an Pagination-Links angehängt.
+
+Die Titelansicht veröffentlicht bibliografische Daten und aggregierten Bestand. Interne operative Identitäten werden nicht als öffentliche Navigations- oder Anzeigedaten verwendet.

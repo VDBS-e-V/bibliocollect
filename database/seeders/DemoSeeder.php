@@ -47,6 +47,7 @@ final class DemoSeeder extends Seeder
         $this->seedPatronWorkflowStates($patrons, $users['staff']);
         $this->seedPatronLinkTokens($patrons, $users['staff']);
         $this->seedCatalog();
+        $this->call(PublicCatalogDemoSeeder::class);
 
         $this->command?->newLine();
         $this->command?->info('BiblioCollect-Demo-Daten wurden angelegt.');

@@ -10,8 +10,14 @@ return [
                 [
                     'label' => 'Start',
                     'route' => 'public.home',
-                    'active' => 'public.*',
+                    'active' => 'public.home',
                     'order' => 10,
+                ],
+                [
+                    'label' => 'Katalog',
+                    'route' => 'public.catalog.index',
+                    'active' => 'public.catalog.*',
+                    'order' => 20,
                 ],
             ],
         ],

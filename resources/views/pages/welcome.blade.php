@@ -19,22 +19,24 @@
             <p>Suche nach Titel, Autor:in, ISBN oder Stichwort</p>
         </div>
 
-        <div class="bc-catalog-search__form" role="search" aria-label="Katalogsuche Vorschau">
-            <label class="sr-only" for="catalog-scope">Suchbereich</label>
-            <select id="catalog-scope" class="bc-catalog-search__scope" disabled>
-                <option>Alle Medien</option>
-                <option>Bücher</option>
-                <option>Comics & Manga</option>
-                <option>Spiele</option>
-            </select>
-
+        <form method="get" action="{{ route('public.catalog.index') }}" class="bc-catalog-search__form bc-home-catalog-form" role="search" aria-label="Katalog durchsuchen">
             <label class="sr-only" for="catalog-search">Suchbegriff</label>
-            <input id="catalog-search" class="bc-catalog-search__input" type="search" placeholder="Was möchtest du finden?" disabled>
-            <x-ui.button disabled>Suchen</x-ui.button>
-        </div>
+            <input
+                id="catalog-search"
+                name="q"
+                class="bc-catalog-search__input"
+                type="search"
+                placeholder="Was möchtest du finden?"
+                minlength="2"
+                maxlength="120"
+                autocomplete="off"
+            >
+            <x-ui.button type="submit">Suchen</x-ui.button>
+        </form>
 
         <div class="bc-catalog-search__meta">
-            <span>Erweiterte Suche und Filter folgen mit dem Katalogmodul.</span>
+            <span>Titel, Verantwortliche, ISBN, Verlag, Medientyp und Sprache durchsuchen.</span>
+            <a href="{{ route('public.catalog.index') }}">Alle Titel und Filter öffnen →</a>
         </div>
     </section>
 
@@ -46,8 +48,8 @@
                 </div>
                 <div class="bc-link-list">
                     <div class="bc-link-list__row">
-                        <div><strong>Neu im Bestand</strong><span>Neue Bücher und andere Medien entdecken</span></div>
-                        <span class="bc-status-text">ab T3</span>
+                        <div><a href="{{ route('public.catalog.index') }}"><strong>Im Katalog stöbern</strong></a><span>Alle erfassten Titel, Ausgaben und Bestandsinformationen entdecken</span></div>
+                        <span class="bc-status-text">aktiv</span>
                     </div>
                     <div class="bc-link-list__row">
                         <div><strong>Veranstaltungen</strong><span>Termine, Aktionen und Anmeldungen</span></div>

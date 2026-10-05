@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T3 v0.4.4 – Exemplarpflege
+Stand: T3 v0.4.5 – Öffentlicher Katalog
 
 ## Abgeschlossen
 
@@ -64,3 +64,18 @@ v0.4.4 ergänzt die physische Exemplarpflege:
 - Es gibt bewusst keine Hard-Delete-Funktion. Dauerhaft entfernte Bestände werden als `withdrawn` markiert.
 - Die vorhandenen Zustände `active`, `damaged`, `lost` und `withdrawn` sind in Oberfläche, Seed und Regressionstests abgedeckt.
 - Der Development-Seed wurde parallel erweitert und sein zuvor in SQLite sichtbarer Idempotenzfehler bei Schließtagen behoben.
+
+
+v0.4.5 öffnet den Katalog für die anonyme Recherche:
+
+- `/katalog` ist ohne Onlinekonto erreichbar und bietet titelbezogene Suche, Browsing und Pagination.
+- Die bestehende `SearchCatalogTitlesQuery` bleibt für bisherige Aufrufer kompatibel und erhält zusätzlich einen paginierten Kriterienpfad.
+- Öffentliche Filter werden aus den offenen Editionswerten für Medientyp und Sprache abgeleitet; es wird kein starres Vokabular in die Domäne gezwungen.
+- Der Filter „Nur Titel mit aktiven Exemplaren“ arbeitet bewusst nur mit `CopyStatus::Active`.
+- Die öffentliche Oberfläche nennt diesen Zustand nicht „verfügbar“, weil laufende Ausleihen erst mit T4 Circulation bekannt sind.
+- `/katalog/titel/{titleId}` zeigt Titel, Verantwortliche, Ausgaben, Altersangaben, aktive Regalstandorte und aggregierte Bestandszustände.
+- Copy-Barcodes und interne ULIDs werden in der öffentlichen Ausgabe nicht angezeigt.
+- `CatalogHoldingService` bündelt die wiederverwendbare Bestandsaggregation für Titel und Ausgaben.
+- `PublicCatalogPresenter` übersetzt offene technische Werte ausschließlich für die Public-Surface; unbekannte Werte bleiben darstellbar.
+- Der Development-Seed enthält zusätzlich einen englischsprachigen Titel mit aktivem Bestand und einen Titel ohne physische Exemplare.
+- HTTP-, Query-, Filter-, Pagination-, Datenschutz- und Seed-Regressionen sind automatisiert abgedeckt.

@@ -3,5 +3,6 @@
 @import './library-interface.css';
 @import './patron-management.css';
 @import './catalog-management.css';
+@import './public-catalog.css';
 
 @import './school-management.css';
