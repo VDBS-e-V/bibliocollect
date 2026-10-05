@@ -1,0 +1,7 @@
+[
+  {"type":"header","version":"demo"},
+  {"type":"table","name":"mediaSignatures","database":"legacy_demo","data":[
+    {"id":"501","signature":"I. A 1 a","topic_ids":"[\"100\",\"110\"]"},
+    {"id":"502","signature":"II. B 2 c","topic_ids":"[\"200\"]"}
+  ]}
+]

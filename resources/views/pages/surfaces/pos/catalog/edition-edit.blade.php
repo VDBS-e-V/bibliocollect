@@ -30,6 +30,26 @@
             'lost' => 'danger',
             'withdrawn' => 'neutral',
         ];
+        $hasExtendedMetadata = $edition->responsibility_statement
+            || $edition->series_statement
+            || $edition->publication_place
+            || $edition->edition_number
+            || (is_array($edition->alternate_identifiers) && $edition->alternate_identifiers !== [])
+            || $edition->issn
+            || $edition->doi_handle
+            || $edition->local_classification
+            || $edition->original_language_code
+            || $edition->page_count
+            || $edition->physical_extent
+            || $edition->file_size_bytes
+            || $edition->format_type
+            || $edition->summary
+            || $edition->subject_keywords
+            || $edition->subject_keywords_system
+            || $edition->target_audience
+            || $edition->age_recommendation
+            || $edition->metadata_source
+            || $edition->source_record_id;
     @endphp
 
     <section class="bc-content-section" aria-labelledby="catalog-edition-edit-heading">
@@ -54,6 +74,44 @@
             </div>
         </form>
     </section>
+
+    @if ($hasExtendedMetadata)
+        <section class="bc-content-section" aria-labelledby="catalog-edition-metadata-heading">
+            <div class="bc-section-heading"><h2 id="catalog-edition-metadata-heading">Erweiterte bibliografische Metadaten</h2></div>
+            <p class="bc-section-copy">
+                Diese Angaben können aus DNB-/Normdaten oder dem Legacy-Import stammen. Die bestehende Kurzpflege oben überschreibt sie nicht; spätere DNB-/MARC21-Anreicherung kann sie gezielt aktualisieren.
+            </p>
+            <dl class="bc-detail-list">
+                @if ($edition->responsibility_statement)<div><dt>Verantwortlichkeitsangabe</dt><dd>{{ $edition->responsibility_statement }}</dd></div>@endif
+                @if ($edition->series_statement)<div><dt>Reihe</dt><dd>{{ $edition->series_statement }}</dd></div>@endif
+                @if ($edition->edition_number)<div><dt>Auflagenangabe</dt><dd>{{ $edition->edition_number }}</dd></div>@endif
+                @if ($edition->publication_place)<div><dt>Erscheinungsort</dt><dd>{{ $edition->publication_place }}</dd></div>@endif
+                @if (is_array($edition->alternate_identifiers) && $edition->alternate_identifiers !== [])<div><dt>Weitere Identifikatoren</dt><dd>{{ implode(', ', $edition->alternate_identifiers) }}</dd></div>@endif
+                @if ($edition->issn)<div><dt>ISSN</dt><dd>{{ $edition->issn }}</dd></div>@endif
+                @if ($edition->doi_handle)<div><dt>DOI / Handle</dt><dd>{{ $edition->doi_handle }}</dd></div>@endif
+                @if ($edition->local_classification)<div><dt>Lokale Klassifikation</dt><dd>{{ $edition->local_classification }}</dd></div>@endif
+                @if ($edition->original_language_code)<div><dt>Originalsprache</dt><dd>{{ $edition->original_language_code }}</dd></div>@endif
+                @if ($edition->page_count)<div><dt>Seiten</dt><dd>{{ $edition->page_count }}</dd></div>@endif
+                @if ($edition->physical_extent)<div><dt>Umfang</dt><dd>{{ $edition->physical_extent }}</dd></div>@endif
+                @if ($edition->file_size_bytes)<div><dt>Dateigröße</dt><dd>{{ number_format($edition->file_size_bytes, 0, ',', '.') }} Bytes</dd></div>@endif
+                @if ($edition->format_type)<div><dt>Format</dt><dd>{{ $edition->format_type }}</dd></div>@endif
+                @if ($edition->target_audience)<div><dt>Zielgruppe</dt><dd>{{ $edition->target_audience }}</dd></div>@endif
+                @if ($edition->summary)<div><dt>Inhaltsangabe</dt><dd>{{ $edition->summary }}</dd></div>@endif
+                @if ($edition->subject_keywords)<div><dt>Lokale Schlagwörter</dt><dd>{{ $edition->subject_keywords }}</dd></div>@endif
+                @if ($edition->subject_keywords_system)<div><dt>System-Schlagwörter</dt><dd>{{ $edition->subject_keywords_system }}</dd></div>@endif
+                @if ($edition->metadata_source || $edition->source_record_id)
+                    <div>
+                        <dt>Metadatenquelle</dt>
+                        <dd>
+                            {{ $edition->metadata_source ?: '—' }}
+                            @if ($edition->source_record_id) · {{ $edition->source_record_id }} @endif
+                            @if ($edition->source_permalink) · <a href="{{ $edition->source_permalink }}" rel="nofollow noopener">Quelldatensatz</a> @endif
+                        </dd>
+                    </div>
+                @endif
+            </dl>
+        </section>
+    @endif
 
     <section class="bc-content-section" aria-labelledby="catalog-copies-heading">
         <div class="bc-section-heading bc-section-heading--with-meta">

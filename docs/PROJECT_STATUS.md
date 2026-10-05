@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T4 v0.5.0 – Circulation-Grundworkflow
+Stand: T4 v0.5.0 – Circulation-Grundworkflow plus Legacy-Katalogmigration
 
 ## Abgeschlossen
 
@@ -65,7 +65,6 @@ v0.4.4 ergänzt die physische Exemplarpflege:
 - Die vorhandenen Zustände `active`, `damaged`, `lost` und `withdrawn` sind in Oberfläche, Seed und Regressionstests abgedeckt.
 - Der Development-Seed wurde parallel erweitert und sein zuvor in SQLite sichtbarer Idempotenzfehler bei Schließtagen behoben.
 
-
 v0.4.5 öffnet den Katalog für die anonyme Recherche:
 
 - `/katalog` ist ohne Onlinekonto erreichbar und bietet titelbezogene Suche, Browsing und Pagination.
@@ -79,7 +78,6 @@ v0.4.5 öffnet den Katalog für die anonyme Recherche:
 - `PublicCatalogPresenter` übersetzt offene technische Werte ausschließlich für die Public-Surface; unbekannte Werte bleiben darstellbar.
 - Der Development-Seed enthält zusätzlich einen englischsprachigen Titel mit aktivem Bestand und einen Titel ohne physische Exemplare.
 - HTTP-, Query-, Filter-, Pagination-, Datenschutz- und Seed-Regressionen sind automatisiert abgedeckt.
-
 
 v0.4.6 ergänzt die Import-Infrastruktur:
 
@@ -96,6 +94,22 @@ v0.4.6 ergänzt die Import-Infrastruktur:
 - Der Development-Seed enthält eine reproduzierbare CSV-Fixture und einen konfliktfreien Preview-Batch, ohne die Demo-Katalogzählwerte durch einen automatischen Commit zu verändern.
 - Die Details sind in `docs/T3_CATALOG_IMPORT.md` dokumentiert.
 
+## Eingeschobener Legacy-Katalogmigrationsblock
+
+Auf Basis von T4 v0.5.0 erweitert ein eigener Zwischenblock den Catalog für den realen Altbestand:
+
+- `Edition` nähert sich dem Informationsumfang des früheren DNB-basierten Katalogs mit Verantwortlichkeitsangabe, Reihe, Erscheinungsort, Auflagenangabe, weiteren Identifikatoren, ISSN/DOI, Originalsprache, Umfang, Inhaltsangabe, Schlagwörtern, Zielgruppe, Altersangaben und Quellenprovenienz an.
+- `Contributor` erhält eine optionale GND-ID.
+- `CatalogTopic` bildet die alte hierarchische `mediaTopicList` mit ULIDs und Legacy-Referenzen ab.
+- `CatalogSignature` übernimmt die Signaturstruktur und ihre geordnete Topic-Zuordnung; Exemplare können strukturiert auf eine Signatur verweisen.
+- `Copy` behält zusätzlich umfangreiche Legacy-/Bestandsmetadaten wie Schul-ID, Zugangsstatus, Kaufdatum/-preis, Aufnahme-/Coverreferenz, Zustand, interne Notizen, Aussonderungsangaben und historische Ausleihstatistik.
+- `inventory_number` wird beim Legacy-Import zum sichtbaren Barcode; die alte `media_id` bleibt reine Legacy-Referenz.
+- `catalog:legacy:analyze` liest phpMyAdmin-JSON ohne Katalog-Writes und meldet Warnungen/Konflikte.
+- `catalog:legacy:import` wiederholt dieselbe Analyse und schreibt nur konfliktfreie Daten als Gesamttransaktion.
+- alte `is_available`-, `loan_counter`-, `last_loan_date`- und `in_transition`-Werte werden nie als aktuelle Circulation-Wahrheit interpretiert.
+- ungültige Legacy-Daten wie `0000`, `0000-00-00` oder nicht standardisierte ISBN-Freitexte werden schonend erhalten/ignoriert und als Warnungen nachvollziehbar gemacht.
+- die öffentliche Titelansicht kann die erweiterten bibliografischen Angaben und die aus Signaturen abgeleiteten Themen anzeigen, ohne interne Exemplaridentitäten oder interne Legacy-Felder offenzulegen.
+- die Details stehen in `docs/LEGACY_CATALOG_IMPORT.md`.
 
 ## T4 Circulation
 

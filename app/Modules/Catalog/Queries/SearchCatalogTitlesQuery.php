@@ -98,11 +98,31 @@ final class SearchCatalogTitlesQuery
                 $titleQuery
                     ->whereAny(['preferred_title', 'subtitle', 'sort_title'], 'like', $like)
                     ->orWhereHas('contributions.contributor', function (Builder $contributorQuery) use ($like): void {
-                        $contributorQuery->whereAny(['display_name', 'sort_name'], 'like', $like);
+                        $contributorQuery->whereAny(['display_name', 'sort_name', 'gnd_id'], 'like', $like);
                     })
                     ->orWhereHas('editions', function (Builder $editionQuery) use ($like): void {
                         $editionQuery->whereAny(
-                            ['isbn', 'publisher_name', 'media_type', 'language_code'],
+                            [
+                                'isbn',
+                                'issn',
+                                'doi_handle',
+                                'publisher_name',
+                                'publication_place',
+                                'edition_statement',
+                                'edition_number',
+                                'series_statement',
+                                'responsibility_statement',
+                                'media_type',
+                                'language_code',
+                                'original_language_code',
+                                'physical_extent',
+                                'local_classification',
+                                'subject_keywords',
+                                'subject_keywords_system',
+                                'target_audience',
+                                'summary',
+                                'source_record_id',
+                            ],
                             'like',
                             $like,
                         );

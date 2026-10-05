@@ -1,0 +1,8 @@
+[
+  {"type":"header","version":"demo"},
+  {"type":"table","name":"mediaTopicList","database":"legacy_demo","data":[
+    {"id":"100","public_topic_id":"100","main_topic":"0","topic":"Kinder- und Jugendmedien","description":"Wurzelthema für Kinder- und Jugendbestand."},
+    {"id":"110","public_topic_id":"110","main_topic":"100","topic":"Metadaten & Bibliothek","description":"Demo-Unterthema für bibliothekarische Metadaten."},
+    {"id":"200","public_topic_id":"200","main_topic":"0","topic":"Sachmedien","description":"Wurzelthema für Sachmedien."}
+  ]}
+]

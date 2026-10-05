@@ -131,6 +131,30 @@ Für die öffentliche Katalogsuche ergänzt `PublicCatalogDemoSeeder` zwei gezie
 
 `PublicCatalogDemoSeeder` wird vom normalen `DemoSeeder` aufgerufen, ist idempotent und verweigert wie der Hauptseeder die direkte Ausführung in `production`.
 
+## Erweiterte Metadaten und Legacy-Klassifikation
+
+Der normale `DatabaseSeeder` ruft nach `DemoSeeder` zusätzlich `LegacyCatalogMetadataDemoSeeder` auf. Dieser Seeder erzeugt **keine** zusätzlichen Titel, Ausgaben oder Exemplare, sondern reichert den vorhandenen Demo-Datensatz `The Giver` an.
+
+Damit stehen im Testbetrieb ohne externe API-Aufrufe sichtbar zur Verfügung:
+
+- ausführliche Editionsmetadaten wie Verantwortlichkeitsangabe, Reihe, Erscheinungsort, Umfang, Zielgruppe, Inhaltsangabe und Schlagwörter,
+- strukturierte Altersangabe,
+- Metadatenquelle und Demo-Quellen-ID,
+- eine GND-artige Demo-Referenz am Contributor,
+- zwei hierarchische `CatalogTopic`-Datensätze,
+- eine `CatalogSignature` mit geordneter Topic-Zuordnung,
+- zusätzliche exemplarbezogene Legacy-/Bestandsmetadaten an `BC-GIVER-001`.
+
+`legacy_is_available=false` ist dort absichtlich gesetzt, obwohl das Exemplar katalogseitig aktiv bleibt. Damit ist im Seed sichtbar, dass alte Verfügbarkeitswerte niemals die neue Circulation-/Copy-Statuslogik steuern.
+
+Zusätzlich liegen unter `database/seeders/fixtures/` drei realistische phpMyAdmin-JSON-Dateien für den Legacy-Console-Importer:
+
+- `legacy-media-demo.json`
+- `legacy-topics-demo.json`
+- `legacy-signatures-demo.json`
+
+Sie enthalten mehrere Exemplare derselben Ausgabe, DNB-/GND-artige Metadaten, Topic-Hierarchie, Signatur-Zuordnung, alte Verfügbarkeits-/Ausleihwerte, `0000`/`0000-00-00` und ein beschädigtes Exemplar. Sie werden von den Legacy-Importtests verwendet, aber nicht automatisch als zusätzlicher Katalogbestand in den normalen Demo-Seed übernommen.
+
 ## Katalogimport
 
 Ab v0.4.6 ruft der normale `DatabaseSeeder` nach dem bestehenden `DemoSeeder` zusätzlich `CatalogImportDemoSeeder` auf. Die Fixture `database/seeders/fixtures/catalog-import-demo.csv` enthält zwei Zeilen für `Der Hobbit` mit derselben normalisierten ISBN und zwei unterschiedlichen Demo-Barcodes.
@@ -148,7 +172,6 @@ Die Fixture deckt unter anderem ab:
 
 `CatalogImportDemoSeeder` verweigert die direkte Ausführung in `production`. Der normale `DatabaseSeeder` beendet sich dort weiterhin vor sämtlichen Demo-Seedern. Ein erneuter Seed-Aufruf erzeugt für die Fixture keinen zweiten Batch.
 
-
 ## Circulation
 
 Ab T4 v0.5.0 ruft der normale `DatabaseSeeder` nach den bestehenden Demo-Seedern zusätzlich `CirculationDemoSeeder` auf.
@@ -162,7 +185,7 @@ Damit lassen sich offene Ausleihe, Rückgabe und die bewusste Nichtanzeige abges
 
 ## Exemplare
 
-Es werden 15 physische Exemplare mit stabilen Demo-Barcodes und Regalstandorten angelegt.
+Es werden weiterhin 15 physische Exemplare mit stabilen Demo-Barcodes und Regalstandorten angelegt.
 
 Die vorhandenen Exemplarzustände sind vollständig vertreten:
 
@@ -175,7 +198,7 @@ Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exem
 
 ## Automatischer Seed-Test
 
-`tests/Feature/DemoSeederTest.php` sowie `tests/Feature/CirculationDemoSeederTest.php` prüfen unter anderem:
+`tests/Feature/DemoSeederTest.php`, `tests/Feature/CirculationDemoSeederTest.php` und `tests/Feature/LegacyCatalogMetadataDemoSeederTest.php` prüfen unter anderem:
 
 - alle Schuljahre, Klassen, Öffnungszeiten und Schließtage,
 - alle Demo-Rollen und Berechtigungsgrenzen,
@@ -188,6 +211,7 @@ Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exem
 - die `catalog.import`-Grenze zwischen Mitarbeiter:innen/Verwaltung und AG Erweitert/Technik,
 - die `circulation.manage`-Grenze und die beiden reproduzierbaren Demo-Loans,
 - den persistenten, konfliktfreien Demo-Import-Batch samt Idempotenz,
+- die erweiterten bibliografischen Metadaten samt Topic-/Signaturstruktur,
 - den englischsprachigen öffentlichen Suchzustand `The Giver`,
 - den Titel `Die Welle` ohne physische Exemplare,
 - Idempotenz bei erneutem Seed-Aufruf.

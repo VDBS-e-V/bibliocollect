@@ -8,6 +8,7 @@ use App\Modules\Catalog\Enums\CopyStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -15,6 +16,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $barcode
  * @property CopyStatus $status
  * @property string|null $shelf_location
+ * @property string|null $signature_id
+ * @property string|null $legacy_source
+ * @property string|null $legacy_media_id
+ * @property bool|null $legacy_in_transition
+ * @property string|null $legacy_school_id
+ * @property string|null $access_status
+ * @property Carbon|null $purchase_date
+ * @property string|null $purchase_price
+ * @property bool|null $legacy_is_available
+ * @property Carbon|null $cataloged_on
+ * @property string|null $legacy_cover_path
+ * @property int|null $legacy_loan_count
+ * @property Carbon|null $legacy_last_loan_date
+ * @property string|null $internal_notes
+ * @property string|null $condition_code
+ * @property string|null $legacy_condition
+ * @property string|null $depreciation_reason
+ * @property Carbon|null $depreciated_at
+ * @property string|null $further_use
+ * @property array<string, mixed>|null $legacy_metadata
+ * @property-read CatalogSignature|null $signature
  */
 final class Copy extends Model
 {
@@ -28,6 +50,26 @@ final class Copy extends Model
         'barcode',
         'status',
         'shelf_location',
+        'signature_id',
+        'legacy_source',
+        'legacy_media_id',
+        'legacy_in_transition',
+        'legacy_school_id',
+        'access_status',
+        'purchase_date',
+        'purchase_price',
+        'legacy_is_available',
+        'cataloged_on',
+        'legacy_cover_path',
+        'legacy_loan_count',
+        'legacy_last_loan_date',
+        'internal_notes',
+        'condition_code',
+        'legacy_condition',
+        'depreciation_reason',
+        'depreciated_at',
+        'further_use',
+        'legacy_metadata',
     ];
 
     /** @return BelongsTo<Edition, $this> */
@@ -36,11 +78,26 @@ final class Copy extends Model
         return $this->belongsTo(Edition::class, 'edition_id');
     }
 
+    /** @return BelongsTo<CatalogSignature, $this> */
+    public function signature(): BelongsTo
+    {
+        return $this->belongsTo(CatalogSignature::class, 'signature_id');
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {
         return [
             'status' => CopyStatus::class,
+            'legacy_in_transition' => 'boolean',
+            'legacy_is_available' => 'boolean',
+            'purchase_date' => 'date',
+            'purchase_price' => 'decimal:2',
+            'cataloged_on' => 'date',
+            'legacy_loan_count' => 'integer',
+            'legacy_last_loan_date' => 'date',
+            'depreciated_at' => 'date',
+            'legacy_metadata' => 'array',
         ];
     }
 }

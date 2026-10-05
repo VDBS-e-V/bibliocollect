@@ -1,0 +1,35 @@
+.bc-public-edition__statement {
+    margin: .8rem 0 0;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+.bc-public-edition__longtext {
+    margin-top: 1rem;
+    border-top: 1px solid var(--border-default);
+    padding-top: .85rem;
+}
+
+.bc-public-edition__longtext h4 {
+    margin: 0 0 .35rem;
+    font-size: var(--text-sm);
+    font-weight: 900;
+}
+
+.bc-public-edition__longtext p {
+    margin: .25rem 0 0;
+    line-height: 1.6;
+}
+
+.bc-public-metadata-source {
+    display: block;
+    margin-top: .6rem;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+}
+
+.bc-public-contributor-list .bc-public-metadata-source {
+    margin-top: .15rem;
+    font-weight: 400;
+}

@@ -20,6 +20,22 @@
             'lost' => 'Verloren',
             'withdrawn' => 'Ausgesondert',
         ];
+        $hasLegacyMetadata = $copy->legacy_source
+            || $copy->legacy_media_id
+            || $copy->access_status
+            || $copy->purchase_date
+            || $copy->purchase_price
+            || $copy->cataloged_on
+            || $copy->legacy_cover_path
+            || $copy->legacy_loan_count !== null
+            || $copy->legacy_last_loan_date
+            || $copy->internal_notes
+            || $copy->condition_code
+            || $copy->legacy_condition
+            || $copy->depreciation_reason
+            || $copy->depreciated_at
+            || $copy->further_use
+            || $copy->signature;
     @endphp
 
     <section class="bc-content-section" aria-labelledby="catalog-copy-context-heading">
@@ -84,4 +100,39 @@
             </div>
         </form>
     </section>
+
+    @if ($hasLegacyMetadata)
+        <section class="bc-content-section" aria-labelledby="catalog-copy-legacy-heading">
+            <div class="bc-section-heading"><h2 id="catalog-copy-legacy-heading">Bestands- und Legacy-Metadaten</h2></div>
+            <p class="bc-section-copy">
+                Diese Angaben stammen aus dem historischen Bestand oder aus strukturierten Signaturen. Alte Verfügbarkeit und Ausleihzähler sind reine Historie und steuern die aktuelle Circulation nicht.
+            </p>
+            <dl class="bc-detail-list">
+                @if ($copy->signature)
+                    <div><dt>Strukturierte Signatur</dt><dd>{{ $copy->signature->signature }}</dd></div>
+                    @if ($copy->signature->topics->isNotEmpty())
+                        <div><dt>Themen</dt><dd>{{ $copy->signature->topics->pluck('name')->implode(', ') }}</dd></div>
+                    @endif
+                @endif
+                @if ($copy->access_status)<div><dt>Zugangsstatus</dt><dd>{{ $copy->access_status }}</dd></div>@endif
+                @if ($copy->condition_code)<div><dt>Zustand</dt><dd>{{ $copy->condition_code }}</dd></div>@endif
+                @if ($copy->purchase_date)<div><dt>Erwerbungsdatum</dt><dd>{{ $copy->purchase_date->format('d.m.Y') }}</dd></div>@endif
+                @if ($copy->purchase_price !== null)<div><dt>Erwerbungspreis</dt><dd>{{ $copy->purchase_price }} €</dd></div>@endif
+                @if ($copy->cataloged_on)<div><dt>Aufgenommen am</dt><dd>{{ $copy->cataloged_on->format('d.m.Y') }}</dd></div>@endif
+                @if ($copy->legacy_school_id)<div><dt>Legacy-Schul-ID</dt><dd>{{ $copy->legacy_school_id }}</dd></div>@endif
+                @if ($copy->legacy_source || $copy->legacy_media_id)
+                    <div><dt>Legacy-Referenz</dt><dd>{{ $copy->legacy_source ?: '—' }} / {{ $copy->legacy_media_id ?: '—' }}</dd></div>
+                @endif
+                @if ($copy->legacy_cover_path)<div><dt>Alter Coverpfad</dt><dd>{{ $copy->legacy_cover_path }}</dd></div>@endif
+                @if ($copy->legacy_loan_count !== null)<div><dt>Historische Ausleihen</dt><dd>{{ $copy->legacy_loan_count }}</dd></div>@endif
+                @if ($copy->legacy_last_loan_date)<div><dt>Historisch zuletzt ausgeliehen</dt><dd>{{ $copy->legacy_last_loan_date->format('d.m.Y') }}</dd></div>@endif
+                @if ($copy->legacy_is_available !== null)<div><dt>Legacy-Verfügbarkeit</dt><dd>{{ $copy->legacy_is_available ? 'ja' : 'nein' }} (nur historisch)</dd></div>@endif
+                @if ($copy->legacy_in_transition !== null)<div><dt>Legacy-Übertragungsstatus</dt><dd>{{ $copy->legacy_in_transition ? 'in Übertragung' : 'nein' }}</dd></div>@endif
+                @if ($copy->depreciation_reason)<div><dt>Aussonderungsgrund</dt><dd>{{ $copy->depreciation_reason }}</dd></div>@endif
+                @if ($copy->depreciated_at)<div><dt>Ausgesondert am</dt><dd>{{ $copy->depreciated_at->format('d.m.Y') }}</dd></div>@endif
+                @if ($copy->further_use)<div><dt>Weitere Verwendung</dt><dd>{{ $copy->further_use }}</dd></div>@endif
+                @if ($copy->internal_notes)<div><dt>Interne Notizen</dt><dd>{{ $copy->internal_notes }}</dd></div>@endif
+            </dl>
+        </section>
+    @endif
 </x-app-shell>

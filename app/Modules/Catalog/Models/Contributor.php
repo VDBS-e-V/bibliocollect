@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $id
  * @property string $display_name
  * @property string|null $sort_name
+ * @property string|null $gnd_id
  */
 final class Contributor extends Model
 {
@@ -23,6 +24,7 @@ final class Contributor extends Model
     protected $fillable = [
         'display_name',
         'sort_name',
+        'gnd_id',
     ];
 
     /** @return HasMany<TitleContribution, $this> */
