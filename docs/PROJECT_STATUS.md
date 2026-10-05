@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T3 v0.4.5 – Öffentlicher Katalog
+Stand: T3 v0.4.6 – Import-Infrastruktur
 
 ## Abgeschlossen
 
@@ -79,3 +79,19 @@ v0.4.5 öffnet den Katalog für die anonyme Recherche:
 - `PublicCatalogPresenter` übersetzt offene technische Werte ausschließlich für die Public-Surface; unbekannte Werte bleiben darstellbar.
 - Der Development-Seed enthält zusätzlich einen englischsprachigen Titel mit aktivem Bestand und einen Titel ohne physische Exemplare.
 - HTTP-, Query-, Filter-, Pagination-, Datenschutz- und Seed-Regressionen sind automatisiert abgedeckt.
+
+
+v0.4.6 ergänzt die Import-Infrastruktur:
+
+- `catalog.import` ist ein eigenes Fachrecht und liegt ausschließlich bei Mitarbeiter:innen und Verwaltung; Schüler-AG Erweitert behält `catalog.manage`, erhält aber kein Massenimportrecht. Technische Administration erhält weder fachlichen Katalogzugriff noch Importrecht.
+- `CatalogImportSource` trennt die Eingangsquelle von der Importpipeline. CSV ist der erste Adapter; MARC21 ist noch nicht implementiert und kann später dieselbe Preview-/Commit-Pipeline speisen.
+- `CatalogImportBatch` und `CatalogImportRow` speichern Upload-Metadaten, Header, Mapping, Rohzeilen, normalisierte Werte, Pläne, Warnungen, Konflikte und Status persistent mit ULIDs.
+- Upload und Preview schreiben keine bibliografischen oder physischen Katalogdatensätze. Erst die ausdrücklich bestätigte Übernahme führt Writes aus.
+- Die Preview erkennt fehlende Pflichtwerte, ungültige Alters-/Jahreswerte, doppelte Barcodes innerhalb der Datei, bereits katalogisierte Barcodes, widersprüchliche ISBN-Gruppen sowie nicht eindeutige Matches.
+- ISBN wird normalisiert. Bekannte Sprach-, Medientyp-, Rollen- und CopyStatus-Werte werden sinnvoll normalisiert; offene Sprach-/Medientyp-/Rollenwerte bleiben erhalten, soweit sie technisch gültig sind.
+- Ein eindeutiger, strukturell plausibler ISBN-10/ISBN-13-Match darf eine vorhandene Edition wiederverwenden, überschreibt aber keine bestehenden Stammdaten; erhaltene nicht standardisierte ISBN-Freitextwerte werden nicht als Merge-Schlüssel verwendet. Widerspricht der importierte Haupttitel dem ISBN-Ziel, blockiert die Zeile.
+- Mehrere konfliktfreie CSV-Zeilen mit derselben ISBN teilen sich einen Editionsplan und erzeugen bei der Übernahme mehrere Exemplare.
+- Der Commit berechnet die Preview unmittelbar vor dem Schreiben erneut und läuft vollständig in einer Datenbanktransaktion. Ein später Fehler rollt alle Katalog-Writes dieses Batches zurück.
+- Der POS-Workflow zeigt Mapping, persistente zeilenweise Vorschau, Zählwerte, Konflikte, Warnungen und nach erfolgreicher Übernahme einen Importbericht.
+- Der Development-Seed enthält eine reproduzierbare CSV-Fixture und einen konfliktfreien Preview-Batch, ohne die Demo-Katalogzählwerte durch einen automatischen Commit zu verändern.
+- Die Details sind in `docs/T3_CATALOG_IMPORT.md` dokumentiert.

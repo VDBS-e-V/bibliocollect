@@ -42,10 +42,10 @@ Bibliothek2026!
 | `student@demo.bibliocollect.test` | Schüler:in, mit aktivem Ausleihkonto verknüpft |
 | `teacher@demo.bibliocollect.test` | Lehrkraft, mit aktivem Ausleihkonto verknüpft |
 | `ag-basic@demo.bibliocollect.test` | Schüler:in + Schüler-AG Basis |
-| `ag-extended@demo.bibliocollect.test` | Schüler:in + Schüler-AG Erweitert, inklusive `catalog.manage` |
-| `staff@demo.bibliocollect.test` | Mitarbeiter:in für Patron- und Katalogworkflows |
-| `management@demo.bibliocollect.test` | Verwaltung für Schule, Rollen und fachliche Verwaltung |
-| `technik@demo.bibliocollect.test` | technische Administration ohne Patron- oder Katalogpflege-Rechte |
+| `ag-extended@demo.bibliocollect.test` | Schüler:in + Schüler-AG Erweitert, inklusive `catalog.manage`, ausdrücklich ohne `catalog.import` |
+| `staff@demo.bibliocollect.test` | Mitarbeiter:in für Patron-, Katalog- und Importworkflows, inklusive `catalog.import` |
+| `management@demo.bibliocollect.test` | Verwaltung für Schule, Rollen, fachliche Verwaltung und Katalogimport, inklusive `catalog.import` |
+| `technik@demo.bibliocollect.test` | technische Administration ohne Patron-, Katalogpflege- oder Importrechte |
 | `departed@demo.bibliocollect.test` | deaktiviertes Konto eines dauerhaft ausgeschiedenen Patrons |
 
 Damit sind alle derzeit definierten Rollen sowie die kombinierbaren Schüler-/AG-Rollen abgedeckt.
@@ -131,6 +131,23 @@ Für die öffentliche Katalogsuche ergänzt `PublicCatalogDemoSeeder` zwei gezie
 
 `PublicCatalogDemoSeeder` wird vom normalen `DemoSeeder` aufgerufen, ist idempotent und verweigert wie der Hauptseeder die direkte Ausführung in `production`.
 
+## Katalogimport
+
+Ab v0.4.6 ruft der normale `DatabaseSeeder` nach dem bestehenden `DemoSeeder` zusätzlich `CatalogImportDemoSeeder` auf. Die Fixture `database/seeders/fixtures/catalog-import-demo.csv` enthält zwei Zeilen für `Der Hobbit` mit derselben normalisierten ISBN und zwei unterschiedlichen Demo-Barcodes.
+
+Der Import-Demo-Seed legt **keine** neuen Bibliotheksdatensätze an. Er erzeugt einmalig einen persistenten `CatalogImportBatch`, berechnet dessen Preview und lässt ihn im Zustand `ready`. Damit können Mapping, Reload, Normalisierung, ISBN-Gruppierung und die explizite Übernahme direkt in der POS-Oberfläche demonstriert werden.
+
+Die Fixture deckt unter anderem ab:
+
+- ISBN-Normalisierung aus `ISBN 978-3-423-21412-6`,
+- `Buch` → `book`,
+- `DEU` → `de`,
+- `Autor` → `author`,
+- `Aktiv` → `active` und `beschädigt` → `damaged`,
+- zwei unterschiedliche Barcodes bei derselben ISBN → eine geplante Edition mit zwei Copies.
+
+`CatalogImportDemoSeeder` verweigert die direkte Ausführung in `production`. Der normale `DatabaseSeeder` beendet sich dort weiterhin vor sämtlichen Demo-Seedern. Ein erneuter Seed-Aufruf erzeugt für die Fixture keinen zweiten Batch.
+
 ## Exemplare
 
 Es werden 15 physische Exemplare mit stabilen Demo-Barcodes und Regalstandorten angelegt.
@@ -156,6 +173,8 @@ Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exem
 - Titel, Ausgaben, Verantwortliche und Exemplare,
 - alle vorhandenen Copy-Statuswerte sowie konkrete Demo-Barcodes und Regalstandorte,
 - die Wiederverwendung eines Contributors,
+- die `catalog.import`-Grenze zwischen Mitarbeiter:innen/Verwaltung und AG Erweitert/Technik,
+- den persistenten, konfliktfreien Demo-Import-Batch samt Idempotenz,
 - den englischsprachigen öffentlichen Suchzustand `The Giver`,
 - den Titel `Die Welle` ohne physische Exemplare,
 - Idempotenz bei erneutem Seed-Aufruf.

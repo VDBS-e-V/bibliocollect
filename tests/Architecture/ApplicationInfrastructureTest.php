@@ -7,6 +7,8 @@ use App\Foundation\Auth\RoleRegistry;
 use App\Foundation\Navigation\NavigationRegistry;
 use App\Foundation\Support\BusinessClock;
 use App\Foundation\Support\ModuleRegistry;
+use App\Modules\Catalog\Contracts\CatalogImportSource;
+use App\Modules\Catalog\Import\CsvCatalogImportSource;
 
 it('defines stable surface permissions and combinable role bundles', function (): void {
     $permissions = app(PermissionRegistry::class);
@@ -17,6 +19,7 @@ it('defines stable surface permissions and combinable role bundles', function ()
         'surface.pos.access',
         'surface.administration.access',
         'catalog.manage',
+        'catalog.import',
     );
 
     expect($roles->permissionsFor(['student_ag_basic']))
@@ -25,10 +28,10 @@ it('defines stable surface permissions and combinable role bundles', function ()
 
     expect($roles->permissionsFor(['student_ag_extended']))
         ->toContain('surface.portal.access', 'surface.pos.access', 'catalog.manage')
-        ->not->toContain('surface.administration.access');
+        ->not->toContain('surface.administration.access', 'catalog.import');
 
     expect($roles->permissionsFor(['staff', 'management']))
-        ->toContain('catalog.manage');
+        ->toContain('catalog.manage', 'catalog.import');
 
     expect($roles->permissionsFor(['technical_admin']))
         ->toBe(['surface.administration.access']);
@@ -52,4 +55,8 @@ it('builds navigation for all four surfaces', function (): void {
 
 it('uses Europe Berlin as the business timezone by default', function (): void {
     expect(app(BusinessClock::class)->timezone()->getName())->toBe('Europe/Berlin');
+});
+
+it('keeps catalog import sources behind a format independent contract', function (): void {
+    expect(is_subclass_of(CsvCatalogImportSource::class, CatalogImportSource::class))->toBeTrue();
 });

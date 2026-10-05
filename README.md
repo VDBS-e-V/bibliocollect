@@ -1,6 +1,6 @@
 # BiblioCollect
 
-Aktueller Entwicklungsstand: **T3 v0.4.5 – Öffentlicher Katalog**.
+Aktueller Entwicklungsstand: **T3 v0.4.6 – Import-Infrastruktur**.
 
 BiblioCollect ist die modulare Schulbibliothekssoftware des VDBS e. V. auf Laravel 13. T0 Foundation, T1 Berechtigungen/Surfaces sowie T2 Identity/Patrons/School sind abgeschlossen. T3 baut den Katalog in kleinen, getrennten Schritten auf.
 

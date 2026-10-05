@@ -52,6 +52,10 @@ return [
             'label' => 'Katalog pflegen',
             'description' => 'Erlaubt das Anlegen und Bearbeiten bibliografischer Titel- und Editionsdaten im Bibliotheksbetrieb.',
         ],
+        'catalog.import' => [
+            'label' => 'Katalog importieren',
+            'description' => 'Erlaubt vorbereitete Massenimporte in den Katalog mit Mapping, Vorschau, Konfliktprüfung und expliziter Übernahme.',
+        ],
     ],
 
     // Rollen sind kombinierbare Permission-Bundles. Fachfunktionen prüfen Permissions, nie Rollennamen.
@@ -85,6 +89,7 @@ return [
                 'patrons.link-code.issue',
                 'identity.roles.assign',
                 'catalog.manage',
+                'catalog.import',
             ],
         ],
         'management' => [
@@ -101,6 +106,7 @@ return [
                 'patrons.link-code.issue',
                 'identity.roles.assign',
                 'catalog.manage',
+                'catalog.import',
                 'school.manage',
             ],
         ],

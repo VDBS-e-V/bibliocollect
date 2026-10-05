@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use App\Modules\Catalog\Enums\CatalogImportStatus;
 use App\Modules\Catalog\Enums\CopyStatus;
+use App\Modules\Catalog\Models\CatalogImportBatch;
+use App\Modules\Catalog\Models\CatalogImportRow;
 use App\Modules\Catalog\Models\Contributor;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
@@ -19,13 +22,15 @@ use App\Modules\School\Models\LibraryClosure;
 use App\Modules\School\Models\LibraryOpeningHour;
 use App\Modules\School\Models\SchoolClass;
 use App\Modules\School\Models\SchoolYear;
+use Database\Seeders\CatalogImportDemoSeeder;
+use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 it('provides comprehensive idempotent demo data for the implemented domains', function (): void {
-    $this->seed(DemoSeeder::class);
+    $this->seed(DatabaseSeeder::class);
 
     expect(SchoolYear::query()->count())->toBe(3)
         ->and(SchoolClass::query()->count())->toBe(18)
@@ -41,8 +46,12 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
     expect($management->roleKeys())->toBe(['management'])
         ->and($extendedAg->roleKeys())->toContain('student', 'student_ag_extended')
         ->and($extendedAg->allowsPermission('catalog.manage'))->toBeTrue()
+        ->and($management->allowsPermission('catalog.import'))->toBeTrue()
+        ->and(User::query()->where('email', 'staff@demo.bibliocollect.test')->firstOrFail()->allowsPermission('catalog.import'))->toBeTrue()
+        ->and($extendedAg->allowsPermission('catalog.import'))->toBeFalse()
         ->and($technicalAdmin->roleKeys())->toBe(['technical_admin'])
-        ->and($technicalAdmin->allowsPermission('catalog.manage'))->toBeFalse();
+        ->and($technicalAdmin->allowsPermission('catalog.manage'))->toBeFalse()
+        ->and($technicalAdmin->allowsPermission('catalog.import'))->toBeFalse();
 
     $blockedPatron = Patron::query()->where('library_number', 'S-10003')->firstOrFail();
     $historyPatron = Patron::query()->where('library_number', 'S-10005')->firstOrFail();
@@ -98,7 +107,19 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and($theGiverEdition->copies()->where('status', CopyStatus::Active->value)->count())->toBe(1)
         ->and($theWave->editions()->firstOrFail()->copies()->count())->toBe(0);
 
-    $this->seed(DemoSeeder::class);
+    $importBatch = CatalogImportBatch::query()
+        ->where('original_filename', CatalogImportDemoSeeder::DEMO_FILENAME)
+        ->firstOrFail();
+
+    expect($importBatch->status)->toBe(CatalogImportStatus::Ready)
+        ->and($importBatch->rows()->count())->toBe(2)
+        ->and(CatalogImportRow::query()->where('batch_id', $importBatch->getKey())->count())->toBe(2)
+        ->and($importBatch->summary['new_titles'] ?? null)->toBe(1)
+        ->and($importBatch->summary['new_editions'] ?? null)->toBe(1)
+        ->and($importBatch->summary['new_copies'] ?? null)->toBe(2)
+        ->and(Copy::query()->where('barcode', 'DEMO-IMPORT-HOBBIT-001')->exists())->toBeFalse();
+
+    $this->seed(DatabaseSeeder::class);
 
     expect(SchoolYear::query()->count())->toBe(3)
         ->and(SchoolClass::query()->count())->toBe(18)
@@ -111,5 +132,7 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and(Edition::query()->count())->toBe(10)
         ->and(Copy::query()->count())->toBe(15)
         ->and(Contributor::query()->count())->toBe(10)
-        ->and(TitleContribution::query()->count())->toBe(11);
+        ->and(TitleContribution::query()->count())->toBe(11)
+        ->and(CatalogImportBatch::query()->where('original_filename', CatalogImportDemoSeeder::DEMO_FILENAME)->count())->toBe(1)
+        ->and(CatalogImportRow::query()->count())->toBe(2);
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Surfaces\Pos\Http\Controllers\CatalogContributionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogCopyController;
 use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
+use App\Surfaces\Pos\Http\Controllers\CatalogImportController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
@@ -20,6 +21,23 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(function (): void {
     Route::view('/betrieb', 'pages.surfaces.pos', ['preview' => false])
         ->name('pos.home');
+
+    Route::middleware('permission:catalog.import')->group(function (): void {
+        Route::get('/betrieb/katalog/import', [CatalogImportController::class, 'create'])
+            ->name('pos.catalog.import.create');
+
+        Route::post('/betrieb/katalog/import', [CatalogImportController::class, 'store'])
+            ->name('pos.catalog.import.store');
+
+        Route::get('/betrieb/katalog/import/{batchId}', [CatalogImportController::class, 'show'])
+            ->name('pos.catalog.import.show');
+
+        Route::post('/betrieb/katalog/import/{batchId}/vorschau', [CatalogImportController::class, 'preview'])
+            ->name('pos.catalog.import.preview');
+
+        Route::post('/betrieb/katalog/import/{batchId}/uebernehmen', [CatalogImportController::class, 'commit'])
+            ->name('pos.catalog.import.commit');
+    });
 
     Route::middleware('permission:catalog.manage')->group(function (): void {
         Route::get('/betrieb/katalog', CatalogIndexController::class)

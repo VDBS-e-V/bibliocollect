@@ -146,3 +146,18 @@ Die Oberfläche unterscheidet deshalb:
 Die öffentliche Browse-Ansicht paginiert serverseitig. Filterparameter werden beim Blättern erhalten, aber nur nach erfolgreicher Validierung wieder an Pagination-Links angehängt.
 
 Die Titelansicht veröffentlicht bibliografische Daten und aggregierten Bestand. Interne operative Identitäten werden nicht als öffentliche Navigations- oder Anzeigedaten verwendet.
+
+
+## Import-Infrastruktur
+
+Ab v0.4.6 besitzt Catalog eine formatunabhängige Importpipeline. Das Modul definiert mit `CatalogImportSource` nur den Vertrag für Header und Quellzeilen. `CsvCatalogImportSource` ist die erste Implementierung; ein späterer MARC21-Adapter soll denselben Normalisierungs-, Preview- und Commitpfad verwenden.
+
+Importe sind bewusst zweiphasig. Upload, Mapping und Preview persistieren ausschließlich `CatalogImportBatch`/`CatalogImportRow` und verändern weder `Title` noch `Edition`, `Contributor`, `TitleContribution` oder `Copy`. Erst eine konfliktfreie Preview mit zusätzlicher Bestätigung darf über `CommitCatalogImportAction` Katalogdaten schreiben.
+
+Das Fachrecht `catalog.import` ist von `catalog.manage` getrennt. Nur Mitarbeiter:innen und Verwaltung erhalten das Massenimportrecht. Schüler-AG Erweitert kann weiterhin einzelne Katalogdatensätze pflegen, aber keine Import-Batches einsehen oder übernehmen. Technische Administration erhält ebenfalls kein Importrecht.
+
+Die Match-Regeln sind konservativ: Nur eine strukturell plausible normalisierte ISBN-10/ISBN-13 darf als eindeutiger Schlüssel eine vorhandene Edition wiederverwenden; nicht standardisierte ISBN-Freitextwerte bleiben erhalten, lösen aber keinen Editions-Merge aus. Ein exakter eindeutiger Haupttitel darf einen Titel wiederverwenden, fuzzy Titelzusammenführungen gibt es nicht. Wiederverwendete Datensätze werden durch Importdaten nicht still überschrieben. Mehrere Zeilen derselben ISBN teilen sich bei übereinstimmenden bibliografischen Angaben einen Editionsplan und können dadurch mehrere Copies erzeugen.
+
+Barcodes bleiben katalogweit eindeutig. Duplikate innerhalb der Importdatei und bereits vorhandene Katalog-Barcodes sind blockierende Konflikte. Die Übernahme prüft den aktuellen Katalog unmittelbar vor dem Schreiben erneut und läuft als Gesamttransaktion.
+
+Weitere Details, Statusmodell, Normalisierung und UI-Ablauf stehen in `docs/T3_CATALOG_IMPORT.md`.
