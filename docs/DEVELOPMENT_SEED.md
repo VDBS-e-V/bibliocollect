@@ -41,11 +41,11 @@ Bibliothek2026!
 | --- | --- |
 | `student@demo.bibliocollect.test` | Schüler:in, mit aktivem Ausleihkonto verknüpft |
 | `teacher@demo.bibliocollect.test` | Lehrkraft, mit aktivem Ausleihkonto verknüpft |
-| `ag-basic@demo.bibliocollect.test` | Schüler:in + Schüler-AG Basis |
-| `ag-extended@demo.bibliocollect.test` | Schüler:in + Schüler-AG Erweitert, inklusive `catalog.manage`, ausdrücklich ohne `catalog.import` |
-| `staff@demo.bibliocollect.test` | Mitarbeiter:in für Patron-, Katalog- und Importworkflows, inklusive `catalog.import` |
-| `management@demo.bibliocollect.test` | Verwaltung für Schule, Rollen, fachliche Verwaltung und Katalogimport, inklusive `catalog.import` |
-| `technik@demo.bibliocollect.test` | technische Administration ohne Patron-, Katalogpflege- oder Importrechte |
+| `ag-basic@demo.bibliocollect.test` | Schüler:in + Schüler-AG Basis, inklusive `circulation.manage` |
+| `ag-extended@demo.bibliocollect.test` | Schüler:in + Schüler-AG Erweitert, inklusive `catalog.manage` und `circulation.manage`, ausdrücklich ohne `catalog.import` |
+| `staff@demo.bibliocollect.test` | Mitarbeiter:in für Patron-, Katalog-, Import- und Circulation-Workflows |
+| `management@demo.bibliocollect.test` | Verwaltung für Schule, Rollen, fachliche Verwaltung, Katalogimport und Circulation |
+| `technik@demo.bibliocollect.test` | technische Administration ohne Patron-, Katalog-, Import- oder Circulation-Rechte |
 | `departed@demo.bibliocollect.test` | deaktiviertes Konto eines dauerhaft ausgeschiedenen Patrons |
 
 Damit sind alle derzeit definierten Rollen sowie die kombinierbaren Schüler-/AG-Rollen abgedeckt.
@@ -148,6 +148,18 @@ Die Fixture deckt unter anderem ab:
 
 `CatalogImportDemoSeeder` verweigert die direkte Ausführung in `production`. Der normale `DatabaseSeeder` beendet sich dort weiterhin vor sämtlichen Demo-Seedern. Ein erneuter Seed-Aufruf erzeugt für die Fixture keinen zweiten Batch.
 
+
+## Circulation
+
+Ab T4 v0.5.0 ruft der normale `DatabaseSeeder` nach den bestehenden Demo-Seedern zusätzlich `CirculationDemoSeeder` auf.
+
+Der Seeder ergänzt zwei feste Workflow-Zustände:
+
+- `S-10001` / Lina Berger hat `BC-MOMO-001` seit dem 01.10.2026 offen ausgeliehen; Fälligkeit ist der 15.10.2026.
+- `L-20001` / Anna Lehrkraft besitzt eine bereits am 22.09.2026 zurückgegebene historische Ausleihe von `BC-PRINZ-001`.
+
+Damit lassen sich offene Ausleihe, Rückgabe und die bewusste Nichtanzeige abgeschlossener Lesehistorie im Patron-Arbeitsbereich direkt prüfen. `CirculationDemoSeeder` ist idempotent und verweigert die direkte Ausführung in `production`.
+
 ## Exemplare
 
 Es werden 15 physische Exemplare mit stabilen Demo-Barcodes und Regalstandorten angelegt.
@@ -163,7 +175,7 @@ Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exem
 
 ## Automatischer Seed-Test
 
-`tests/Feature/DemoSeederTest.php` prüft unter anderem:
+`tests/Feature/DemoSeederTest.php` sowie `tests/Feature/CirculationDemoSeederTest.php` prüfen unter anderem:
 
 - alle Schuljahre, Klassen, Öffnungszeiten und Schließtage,
 - alle Demo-Rollen und Berechtigungsgrenzen,
@@ -174,6 +186,7 @@ Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exem
 - alle vorhandenen Copy-Statuswerte sowie konkrete Demo-Barcodes und Regalstandorte,
 - die Wiederverwendung eines Contributors,
 - die `catalog.import`-Grenze zwischen Mitarbeiter:innen/Verwaltung und AG Erweitert/Technik,
+- die `circulation.manage`-Grenze und die beiden reproduzierbaren Demo-Loans,
 - den persistenten, konfliktfreien Demo-Import-Batch samt Idempotenz,
 - den englischsprachigen öffentlichen Suchzustand `The Giver`,
 - den Titel `Die Welle` ohne physische Exemplare,

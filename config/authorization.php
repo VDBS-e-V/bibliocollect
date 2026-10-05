@@ -56,6 +56,10 @@ return [
             'label' => 'Katalog importieren',
             'description' => 'Erlaubt vorbereitete Massenimporte in den Katalog mit Mapping, Vorschau, Konfliktprüfung und expliziter Übernahme.',
         ],
+        'circulation.manage' => [
+            'label' => 'Ausleihe und Rückgabe durchführen',
+            'description' => 'Erlaubt das Ausleihen und Zurückgeben physischer Exemplare im Bibliotheksbetrieb.',
+        ],
     ],
 
     // Rollen sind kombinierbare Permission-Bundles. Fachfunktionen prüfen Permissions, nie Rollennamen.
@@ -70,11 +74,11 @@ return [
         ],
         'student_ag_basic' => [
             'label' => 'Schüler-AG Basis',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'circulation.manage'],
         ],
         'student_ag_extended' => [
             'label' => 'Schüler-AG Erweitert',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage', 'circulation.manage'],
         ],
         'staff' => [
             'label' => 'Mitarbeiter:in',
@@ -90,6 +94,7 @@ return [
                 'identity.roles.assign',
                 'catalog.manage',
                 'catalog.import',
+                'circulation.manage',
             ],
         ],
         'management' => [
@@ -107,6 +112,7 @@ return [
                 'identity.roles.assign',
                 'catalog.manage',
                 'catalog.import',
+                'circulation.manage',
                 'school.manage',
             ],
         ],

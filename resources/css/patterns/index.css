@@ -2,6 +2,7 @@
 @import './library-search.css';
 @import './library-interface.css';
 @import './patron-management.css';
+@import './circulation.css';
 @import './catalog-management.css';
 @import './public-catalog.css';
 

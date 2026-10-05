@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T3 v0.4.6 – Import-Infrastruktur
+Stand: T4 v0.5.0 – Circulation-Grundworkflow
 
 ## Abgeschlossen
 
@@ -95,3 +95,20 @@ v0.4.6 ergänzt die Import-Infrastruktur:
 - Der POS-Workflow zeigt Mapping, persistente zeilenweise Vorschau, Zählwerte, Konflikte, Warnungen und nach erfolgreicher Übernahme einen Importbericht.
 - Der Development-Seed enthält eine reproduzierbare CSV-Fixture und einen konfliktfreien Preview-Batch, ohne die Demo-Katalogzählwerte durch einen automatischen Commit zu verändern.
 - Die Details sind in `docs/T3_CATALOG_IMPORT.md` dokumentiert.
+
+
+## T4 Circulation
+
+v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
+
+- `circulation.manage` ist das zentrale Fachrecht für laufende Ausleihe und Rückgabe. Schüler-AG Basis/Erweitert, Mitarbeiter:innen und Verwaltung erhalten es; technische Administration, Schüler:innen und Lehrkräfte nicht.
+- `Loan` persistiert Patron, physisches Exemplar, Ausleihzeitpunkt, Fälligkeit, Rückgabezeitpunkt und die handelnden Benutzer:innen mit ULID-Identität.
+- `CirculationRuleEvaluator` bündelt Patronstatus, Sperre, CopyStatus, bereits offene Ausleihe und Altersfreigabe in einer zentralen fachlichen Entscheidung.
+- Die Altersprüfung verwendet das vollständige Patron-Geburtsdatum gegen `Edition::minimum_age` und die Geschäftszeit `Europe/Berlin`.
+- Die Standardleihfrist beträgt zunächst 14 Kalendertage. Fällt das Ziel auf einen geschlossenen Bibliothekstag, verschiebt `LoanDueDateService` die Fälligkeit mit `SchoolCalendarService` auf den nächsten Öffnungstag.
+- Checkout und Return laufen vollständig in Datenbanktransaktionen und sperren die beteiligten Zeilen pessimistisch mit `lockForUpdate()`.
+- Rückgaben überschreiben keinen `CopyStatus`; beschädigt/verloren/ausgesondert bleiben bewusste Catalog-Zustände.
+- Der Patron-Arbeitsbereich zeigt nur offene Ausleihen und bietet Barcode-Checkout sowie Rückgabe. Bereits zurückgegebene Titel werden dort bewusst nicht als allgemeine Lesehistorie dargestellt.
+- `CirculationDemoSeeder` liefert einen offenen und einen zurückgegebenen Demo-Loan reproduzierbar und idempotent.
+- Öffentliche Echtzeit-Verfügbarkeit, Verlängerungen, Vormerkungen, Pickups, Mahnungen und Gebühren bleiben Folgeschritte.
+- Die Details stehen in `docs/T4_CIRCULATION.md`.

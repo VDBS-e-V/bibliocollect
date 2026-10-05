@@ -74,6 +74,61 @@
                     </dl>
                 </section>
             @endcan
+
+            @can('circulation.manage')
+                <section class="bc-content-section bc-circulation-workspace" aria-labelledby="circulation-heading">
+                    <div class="bc-section-heading">
+                        <h2 id="circulation-heading">Ausleihe und Rückgabe</h2>
+                        <x-ui.badge>{{ $openLoans->count() }} offen</x-ui.badge>
+                    </div>
+
+                    @if ($patron->isActive() && $patron->blocked_at === null)
+                        <form method="post" action="{{ route('pos.circulation.checkout', ['patronId' => $patron->getKey()]) }}" class="bc-circulation-checkout">
+                            @csrf
+                            <x-ui.input
+                                label="Exemplar-Barcode"
+                                name="barcode"
+                                :value="old('barcode')"
+                                :error="$errors->first('barcode') ?: null"
+                                autocomplete="off"
+                            />
+                            <x-ui.button type="submit">Ausleihen</x-ui.button>
+                        </form>
+                    @else
+                        <p class="bc-circulation-note">Für dieses Ausleihkonto können aktuell keine neuen Exemplare ausgeliehen werden. Bereits offene Ausleihen können weiterhin zurückgegeben werden.</p>
+                    @endif
+
+                    <div class="bc-loan-list" aria-label="Offene Ausleihen">
+                        @forelse ($openLoans as $loan)
+                            @php
+                                $copy = $loan->copy;
+                                $edition = $copy->edition;
+                                $title = $edition->title;
+                            @endphp
+                            <article class="bc-loan-card">
+                                <div class="bc-loan-card__meta">
+                                    <strong>{{ $title->preferred_title }}</strong>
+                                    <div class="bc-loan-card__facts">
+                                        <span>Barcode: <span class="bc-tabular">{{ $copy->barcode }}</span></span>
+                                        <span>Fällig: <span class="bc-tabular">{{ $loan->due_on->format('d.m.Y') }}</span></span>
+                                        @if ($edition->edition_statement)
+                                            <span>{{ $edition->edition_statement }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <form method="post" action="{{ route('pos.circulation.return', ['patronId' => $patron->getKey(), 'loanId' => $loan->getKey()]) }}">
+                                    @csrf
+                                    <x-ui.button type="submit" variant="secondary">Zurückgeben</x-ui.button>
+                                </form>
+                            </article>
+                        @empty
+                            <p class="bc-circulation-note">Derzeit sind keine Exemplare auf dieses Ausleihkonto ausgeliehen.</p>
+                        @endforelse
+                    </div>
+
+                    <p class="bc-circulation-note">Angezeigt werden nur laufende Ausleihen. Bereits zurückgegebene Titel werden in diesem Arbeitsbereich nicht als Lesehistorie aufgeführt.</p>
+                </section>
+            @endcan
         </div>
 
         <aside class="bc-patron-detail-layout__aside">

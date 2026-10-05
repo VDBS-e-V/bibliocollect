@@ -6,6 +6,8 @@
     "School",
     "Catalog"
   ],
-  "providers": [],
+  "providers": [
+    "App\\Modules\\Circulation\\Providers\\CirculationServiceProvider"
+  ],
   "enabled": true
 }

@@ -8,6 +8,7 @@ use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogImportController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
+use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
@@ -81,6 +82,14 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::patch('/betrieb/katalog/ausgaben/{editionId}/exemplare/{copyId}', [CatalogCopyController::class, 'update'])
             ->name('pos.catalog.copies.update');
+    });
+
+    Route::middleware('permission:circulation.manage')->group(function (): void {
+        Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen', [CirculationController::class, 'checkout'])
+            ->name('pos.circulation.checkout');
+
+        Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen/{loanId}/rueckgabe', [CirculationController::class, 'return'])
+            ->name('pos.circulation.return');
     });
 
     Route::get('/betrieb/ausleihkonten', PatronIndexController::class)
