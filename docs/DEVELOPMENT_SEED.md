@@ -68,7 +68,7 @@ Zusätzlich werden Öffnungszeiten für alle sieben Wochentage angelegt:
 - Freitag: 09:00–13:00,
 - Samstag und Sonntag: geschlossen.
 
-Mehrere Demo-Schließtage zeigen Ferien- und Feiertagszustände.
+Mehrere Demo-Schließtage zeigen Ferien- und Feiertagszustände. Der Seed sucht vorhandene Schließtage über `whereDate`, damit ein erneutes Seeden unter SQLite und MySQL/MariaDB denselben Datensatz aktualisiert statt einen Unique-Konflikt auszulösen.
 
 ## Ausleihkonten
 
@@ -133,7 +133,7 @@ Die vorhandenen Exemplarzustände sind vollständig vertreten:
 - `lost`
 - `withdrawn`
 
-Damit ist die spätere Exemplarpflege bereits mit geeigneten Beispieldaten vorbereitet, obwohl der entsprechende UI-Workflow noch nicht implementiert ist.
+Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exemplarpflege. Insbesondere `BC-MOMO-002`, `BC-UNEND-002` und `BC-KRAB-002` decken die nicht-aktiven Statuswerte samt Regalstandorten ab.
 
 ## Automatischer Seed-Test
 
@@ -145,6 +145,6 @@ Damit ist die spätere Exemplarpflege bereits mit geeigneten Beispieldaten vorbe
 - deaktivierte Onlinekonten,
 - offene, verwendete und widerrufene Patron-Linktokens,
 - Titel, Ausgaben, Verantwortliche und Exemplare,
-- alle vorhandenen Copy-Statuswerte,
+- alle vorhandenen Copy-Statuswerte sowie konkrete Demo-Barcodes und Regalstandorte,
 - die Wiederverwendung eines Contributors,
 - Idempotenz bei erneutem Seed-Aufruf.

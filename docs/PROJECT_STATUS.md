@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T3 v0.4.3 – Verantwortlichenpflege
+Stand: T3 v0.4.4 – Exemplarpflege
 
 ## Abgeschlossen
 
@@ -54,3 +54,13 @@ v0.4.3 macht die strukturierten Verantwortlichkeiten bedienbar:
 - Namensänderungen bearbeiten den zugrunde liegenden `Contributor` und wirken deshalb bei gemeinsam genutzten Datensätzen auf alle verknüpften Titel.
 - Eine identische Kombination aus Verantwortlichem und Rolle wird am selben Titel verhindert.
 - Beim Lösen einer Verknüpfung wird ein Contributor nur dann automatisch gelöscht, wenn er anschließend nirgends mehr verwendet wird.
+
+v0.4.4 ergänzt die physische Exemplarpflege:
+
+- Exemplare werden innerhalb einer Ausgabe angelegt und bearbeitet.
+- Barcode, Regalstandort und `CopyStatus` werden über eigene Actions und ein validiertes DTO gepflegt.
+- Barcode-Eindeutigkeit wird in der Catalog-Domäne abgesichert und als feldbezogener Fehler in der POS-Oberfläche zurückgegeben.
+- Ein Exemplar bleibt an seine Ausgabe gebunden; ein versehentliches Verschieben über manipulierte Routen wird verhindert.
+- Es gibt bewusst keine Hard-Delete-Funktion. Dauerhaft entfernte Bestände werden als `withdrawn` markiert.
+- Die vorhandenen Zustände `active`, `damaged`, `lost` und `withdrawn` sind in Oberfläche, Seed und Regressionstests abgedeckt.
+- Der Development-Seed wurde parallel erweitert und sein zuvor in SQLite sichtbarer Idempotenzfehler bei Schließtagen behoben.

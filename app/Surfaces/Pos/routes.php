@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Surfaces\Pos\Http\Controllers\CatalogContributionController;
+use App\Surfaces\Pos\Http\Controllers\CatalogCopyController;
 use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
@@ -53,6 +54,15 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::patch('/betrieb/katalog/ausgaben/{editionId}', [CatalogEditionController::class, 'update'])
             ->name('pos.catalog.editions.update');
+
+        Route::post('/betrieb/katalog/ausgaben/{editionId}/exemplare', [CatalogCopyController::class, 'store'])
+            ->name('pos.catalog.copies.store');
+
+        Route::get('/betrieb/katalog/ausgaben/{editionId}/exemplare/{copyId}/bearbeiten', [CatalogCopyController::class, 'edit'])
+            ->name('pos.catalog.copies.edit');
+
+        Route::patch('/betrieb/katalog/ausgaben/{editionId}/exemplare/{copyId}', [CatalogCopyController::class, 'update'])
+            ->name('pos.catalog.copies.update');
     });
 
     Route::get('/betrieb/ausleihkonten', PatronIndexController::class)

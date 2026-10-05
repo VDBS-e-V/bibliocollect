@@ -32,7 +32,9 @@ Die Query entfernt SQL-LIKE-Wildcards aus Benutzereingaben, verlangt mindestens 
 
 Ab v0.4.2 liegt die Katalogpflege im Surface `Bibliotheksbetrieb` und nicht in der Systemverwaltung. Das Fachrecht `catalog.manage` wird Schüler-AG Erweitert, Mitarbeiter:innen und Verwaltung zugewiesen. Schüler-AG Basis und technische Administration erhalten es nicht.
 
-Der erste Pflegeworkflow umfasst ausschließlich `Title` und `Edition`. Änderungen laufen über eigene Actions und DTOs; HTTP-Validierung bleibt in der POS-Surface. Es gibt in diesem Schritt keine Löschfunktionen und noch keinen Editor für Verantwortliche oder Exemplare.
+v0.4.2 hat die Pflege von `Title` und `Edition` eingeführt. v0.4.3 ergänzt die Verantwortlichenpflege. v0.4.4 ergänzt die Pflege physischer `Copy`-Datensätze. Änderungen laufen jeweils über eigene Catalog-Actions und validierte DTOs; die HTTP-Validierung bleibt in der POS-Surface.
+
+Löschfunktionen werden nicht pauschal angeboten. Bei Verantwortlichen wird nur die Titelverknüpfung gelöst und ein verwaister Contributor kontrolliert bereinigt. Physische Exemplare werden überhaupt nicht hart gelöscht.
 
 ## Verantwortlichenpflege
 
@@ -41,3 +43,19 @@ Ab v0.4.3 können Verantwortliche innerhalb der Titelpflege angelegt, bearbeitet
 `role_key` bleibt weiterhin ein offener technischer Schlüssel. Die Oberfläche normalisiert ihn auf Kleinbuchstaben und erlaubt Buchstaben, Ziffern, Punkt, Unterstrich und Bindestrich. Dadurch bleiben spätere Import-Mappings möglich, ohne früh ein starres Rollen-Enum einzuführen.
 
 Wird ein Contributor bearbeitet, ändern sich seine Namensdaten an allen Titeln, die denselben Datensatz verwenden. Das Bearbeitungsformular weist darauf hin, wenn der Contributor an mehreren Titeln genutzt wird. Beim Entfernen eines Verantwortlichen wird nur die Titelverknüpfung gelöst; ein danach verwaister Contributor wird automatisch bereinigt.
+
+## Exemplarpflege
+
+Ab v0.4.4 werden physische Exemplare innerhalb ihrer `Edition` gepflegt. Die editierbaren Felder sind:
+
+- `barcode`: katalogweit eindeutig und sichtbar, aber niemals Primärschlüssel,
+- `shelf_location`: optionaler Regal- oder Standortwert,
+- `status`: einer der vorhandenen Werte `active`, `damaged`, `lost` oder `withdrawn`.
+
+Ein `Copy` kann in diesem Workflow nicht auf eine andere Ausgabe verschoben werden. Das ist absichtlich keine Nebenwirkung eines normalen Bearbeitungsformulars. Sollte ein solcher Fachworkflow später benötigt werden, braucht er eine eigene Action mit expliziten Regeln.
+
+Es gibt keine Hard-Delete-Route für Exemplare. `withdrawn` repräsentiert dauerhaft ausgesonderten Bestand, ohne die Exemplaridentität zu verlieren. Das ist wichtig, weil spätere Circulation-, Inventur- und Schadenshistorien auf derselben internen Copy-ULID aufbauen sollen.
+
+Der aktuelle `CopyStatus` beschreibt den Katalog-/Bestandszustand. T4 Circulation muss zusätzlich den tatsächlichen Ausleihzustand berücksichtigen; ein Statuswert allein ist noch keine vollständige Verfügbarkeitsentscheidung.
+
+Barcode-Duplikate werden nicht nur durch den Datenbankindex verhindert. `CreateCopyAction` und `UpdateCopyAction` prüfen die Eindeutigkeit fachlich und liefern der Oberfläche einen verständlichen Fehler. Die Datenbank-Unique-Constraint bleibt die letzte technische Sicherung.

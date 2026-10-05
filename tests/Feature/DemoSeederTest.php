@@ -78,6 +78,16 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and(Copy::query()->where('status', CopyStatus::Lost->value)->count())->toBe(1)
         ->and(Copy::query()->where('status', CopyStatus::Withdrawn->value)->count())->toBe(1);
 
+    $damagedCopy = Copy::query()->where('barcode', 'BC-MOMO-002')->firstOrFail();
+    $lostCopy = Copy::query()->where('barcode', 'BC-UNEND-002')->firstOrFail();
+    $withdrawnCopy = Copy::query()->where('barcode', 'BC-KRAB-002')->firstOrFail();
+
+    expect($damagedCopy->status)->toBe(CopyStatus::Damaged)
+        ->and($damagedCopy->shelf_location)->toBe('J 5 ENDE')
+        ->and($lostCopy->status)->toBe(CopyStatus::Lost)
+        ->and($withdrawnCopy->status)->toBe(CopyStatus::Withdrawn)
+        ->and($withdrawnCopy->shelf_location)->toBe('MAG PREU');
+
     $michaelEnde = Contributor::query()->where('display_name', 'Michael Ende')->firstOrFail();
 
     expect($michaelEnde->contributions()->count())->toBe(2);

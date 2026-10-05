@@ -6,6 +6,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Modules\Catalog\Actions\CreateEditionAction;
 use App\Modules\Catalog\Actions\UpdateEditionAction;
+use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Surfaces\Pos\Http\Requests\CatalogEditionRequest;
@@ -29,10 +30,15 @@ final class CatalogEditionController
 
     public function edit(string $editionId): Response
     {
-        $edition = Edition::query()->with('title')->findOrFail($editionId);
+        $edition = Edition::query()
+            ->with(['title', 'copies'])
+            ->findOrFail($editionId);
 
         return response()
-            ->view('pages.surfaces.pos.catalog.edition-edit', ['edition' => $edition])
+            ->view('pages.surfaces.pos.catalog.edition-edit', [
+                'edition' => $edition,
+                'copyStatuses' => CopyStatus::cases(),
+            ])
             ->header('Cache-Control', 'private, no-store');
     }
 

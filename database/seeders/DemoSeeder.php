@@ -142,10 +142,16 @@ final class DemoSeeder extends Seeder
             '2026-12-24' => 'Weihnachtsferien',
             '2026-12-31' => 'Jahreswechsel',
         ] as $date => $reason) {
-            LibraryClosure::query()->updateOrCreate(
-                ['date' => $date],
-                ['reason' => $reason],
-            );
+            $closure = LibraryClosure::query()
+                ->whereDate('date', $date)
+                ->first();
+
+            $closure ??= new LibraryClosure;
+
+            $closure->forceFill([
+                'date' => $date,
+                'reason' => $reason,
+            ])->save();
         }
 
         return $classes;

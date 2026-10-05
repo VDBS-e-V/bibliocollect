@@ -1,10 +1,10 @@
 # Nächste Schritte — BiblioCollect
 
-1. T3 v0.4.3 mit Verantwortlichenpflege lokal und in GitHub Actions grün bestätigen.
-2. Anschließend Exemplarpflege für Barcode, Standort und Exemplarstatus ergänzen.
-3. Öffentliche Katalogsuche auf `SearchCatalogTitlesQuery` aufbauen; physische Verfügbarkeit bleibt `Copy`-bezogen.
-4. CSV/MARC21-Import erst danach mit Preview, Normalisierung und Konfliktbehandlung ergänzen.
-5. T4 `Circulation` anschließend mit zentralem Regel-Evaluator, Altersprüfung gegen Patron-Geburtsdatum und Edition-Mindestalter, Transaktionen und Row Locks umsetzen.
+1. T3 v0.4.4 mit Seed-Fix und Exemplarpflege lokal und in GitHub Actions grün bestätigen.
+2. Öffentliche Katalogsuche auf `SearchCatalogTitlesQuery` aufbauen; physische Verfügbarkeit bleibt `Copy`-bezogen.
+3. CSV/MARC21-Import danach mit Preview, Normalisierung und Konfliktbehandlung ergänzen.
+4. T4 `Circulation` anschließend mit zentralem Regel-Evaluator, Altersprüfung gegen Patron-Geburtsdatum und Edition-Mindestalter, Transaktionen und Row Locks umsetzen.
+5. Mit T4 die Wechselwirkungen zwischen Ausleihzustand und den Katalogstatuswerten `damaged`, `lost` und `withdrawn` explizit absichern.
 
 ## Qualitäts-Gate
 
