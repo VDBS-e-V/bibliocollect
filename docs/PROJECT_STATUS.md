@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T3 v0.4.2 – Interne Titel- und Editionspflege
+Stand: T3 v0.4.3 – Verantwortlichenpflege
 
 ## Abgeschlossen
 
@@ -46,3 +46,11 @@ v0.4.2 macht den ersten Teil der internen Katalogpflege bedienbar:
 - Schüler-AG Basis und technische Administration erhalten dieses Recht nicht.
 - Titel- und Editionsänderungen laufen über explizite Actions und validierte DTOs.
 - Verantwortliche, Exemplare und Importe bleiben bewusst separate Folgeschritte.
+
+v0.4.3 macht die strukturierten Verantwortlichkeiten bedienbar:
+
+- Verantwortliche können direkt an einem Titel angelegt, bearbeitet und vom Titel gelöst werden.
+- `role_key` bleibt bewusst offen und importfreundlich; die Reihenfolge wird über `position` gepflegt.
+- Namensänderungen bearbeiten den zugrunde liegenden `Contributor` und wirken deshalb bei gemeinsam genutzten Datensätzen auf alle verknüpften Titel.
+- Eine identische Kombination aus Verantwortlichem und Rolle wird am selben Titel verhindert.
+- Beim Lösen einer Verknüpfung wird ein Contributor nur dann automatisch gelöscht, wenn er anschließend nirgends mehr verwendet wird.

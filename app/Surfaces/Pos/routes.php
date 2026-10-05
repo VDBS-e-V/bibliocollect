@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Surfaces\Pos\Http\Controllers\CatalogContributionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
@@ -31,6 +32,18 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::patch('/betrieb/katalog/titel/{titleId}', [CatalogTitleController::class, 'update'])
             ->name('pos.catalog.titles.update');
+
+        Route::post('/betrieb/katalog/titel/{titleId}/verantwortliche', [CatalogContributionController::class, 'store'])
+            ->name('pos.catalog.contributions.store');
+
+        Route::get('/betrieb/katalog/titel/{titleId}/verantwortliche/{contributionId}/bearbeiten', [CatalogContributionController::class, 'edit'])
+            ->name('pos.catalog.contributions.edit');
+
+        Route::patch('/betrieb/katalog/titel/{titleId}/verantwortliche/{contributionId}', [CatalogContributionController::class, 'update'])
+            ->name('pos.catalog.contributions.update');
+
+        Route::delete('/betrieb/katalog/titel/{titleId}/verantwortliche/{contributionId}', [CatalogContributionController::class, 'destroy'])
+            ->name('pos.catalog.contributions.destroy');
 
         Route::post('/betrieb/katalog/titel/{titleId}/ausgaben', [CatalogEditionController::class, 'store'])
             ->name('pos.catalog.editions.store');

@@ -33,3 +33,11 @@ Die Query entfernt SQL-LIKE-Wildcards aus Benutzereingaben, verlangt mindestens 
 Ab v0.4.2 liegt die Katalogpflege im Surface `Bibliotheksbetrieb` und nicht in der Systemverwaltung. Das Fachrecht `catalog.manage` wird Schüler-AG Erweitert, Mitarbeiter:innen und Verwaltung zugewiesen. Schüler-AG Basis und technische Administration erhalten es nicht.
 
 Der erste Pflegeworkflow umfasst ausschließlich `Title` und `Edition`. Änderungen laufen über eigene Actions und DTOs; HTTP-Validierung bleibt in der POS-Surface. Es gibt in diesem Schritt keine Löschfunktionen und noch keinen Editor für Verantwortliche oder Exemplare.
+
+## Verantwortlichenpflege
+
+Ab v0.4.3 können Verantwortliche innerhalb der Titelpflege angelegt, bearbeitet und vom Titel gelöst werden. `display_name` und optional `sort_name` gehören zum wiederverwendbaren `Contributor`; `role_key` und `position` gehören zur konkreten `TitleContribution`.
+
+`role_key` bleibt weiterhin ein offener technischer Schlüssel. Die Oberfläche normalisiert ihn auf Kleinbuchstaben und erlaubt Buchstaben, Ziffern, Punkt, Unterstrich und Bindestrich. Dadurch bleiben spätere Import-Mappings möglich, ohne früh ein starres Rollen-Enum einzuführen.
+
+Wird ein Contributor bearbeitet, ändern sich seine Namensdaten an allen Titeln, die denselben Datensatz verwenden. Das Bearbeitungsformular weist darauf hin, wenn der Contributor an mehreren Titeln genutzt wird. Beim Entfernen eines Verantwortlichen wird nur die Titelverknüpfung gelöst; ein danach verwaister Contributor wird automatisch bereinigt.

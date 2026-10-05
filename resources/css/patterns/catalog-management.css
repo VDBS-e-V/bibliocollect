@@ -24,6 +24,19 @@
     font-size: var(--text-sm);
 }
 
+.bc-catalog-contribution-form {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--border-default);
+    padding-top: 1.25rem;
+}
+
+.bc-catalog-warning {
+    margin: 0 0 1rem;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+}
+
 .bc-catalog-editions {
     display: grid;
     gap: .8rem;

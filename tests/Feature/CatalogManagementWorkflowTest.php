@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use App\Modules\Catalog\Models\Contributor;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
+use App\Modules\Catalog\Models\TitleContribution;
 use App\Modules\Identity\Actions\AssignRoleAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -126,4 +128,77 @@ it('validates catalog title and edition input before persistence', function (): 
         ->assertSessionHasErrors(['publication_year', 'minimum_age']);
 
     $this->assertDatabaseCount('catalog_editions', 0);
+});
+
+it('lets catalog managers add update and remove title responsibilities', function (): void {
+    $agUser = catalogManagementUser('student_ag_extended');
+    $title = Title::query()->create(['preferred_title' => 'Momo']);
+
+    $this->actingAs($agUser)
+        ->post(route('pos.catalog.contributions.store', ['titleId' => $title->getKey()]), [
+            'display_name' => 'Michael Ende',
+            'sort_name' => 'Ende, Michael',
+            'role_key' => 'AUTHOR',
+            'position' => '1',
+        ])
+        ->assertRedirect(route('pos.catalog.titles.show', ['titleId' => $title->getKey()]));
+
+    $contribution = TitleContribution::query()->with('contributor')->firstOrFail();
+
+    expect($contribution->role_key)->toBe('author')
+        ->and($contribution->position)->toBe(1)
+        ->and($contribution->contributor->display_name)->toBe('Michael Ende');
+
+    $this->actingAs($agUser)
+        ->patch(route('pos.catalog.contributions.update', [
+            'titleId' => $title->getKey(),
+            'contributionId' => $contribution->getKey(),
+        ]), [
+            'display_name' => 'Michael Ende',
+            'sort_name' => 'Ende, Michael',
+            'role_key' => 'writer',
+            'position' => '2',
+        ])
+        ->assertRedirect(route('pos.catalog.titles.show', ['titleId' => $title->getKey()]));
+
+    $contribution->refresh();
+
+    expect($contribution->role_key)->toBe('writer')
+        ->and($contribution->position)->toBe(2);
+
+    $contributorId = $contribution->contributor_id;
+
+    $this->actingAs($agUser)
+        ->delete(route('pos.catalog.contributions.destroy', [
+            'titleId' => $title->getKey(),
+            'contributionId' => $contribution->getKey(),
+        ]))
+        ->assertRedirect(route('pos.catalog.titles.show', ['titleId' => $title->getKey()]));
+
+    $this->assertDatabaseMissing('catalog_title_contributions', ['id' => $contribution->getKey()]);
+    $this->assertDatabaseMissing('catalog_contributors', ['id' => $contributorId]);
+});
+
+it('rejects a duplicate named responsibility on the same title', function (): void {
+    $staff = catalogManagementUser('staff');
+    $title = Title::query()->create(['preferred_title' => 'Duplikat-Test']);
+
+    $payload = [
+        'display_name' => 'Beispiel Person',
+        'sort_name' => 'Person, Beispiel',
+        'role_key' => 'author',
+        'position' => '1',
+    ];
+
+    $this->actingAs($staff)
+        ->post(route('pos.catalog.contributions.store', ['titleId' => $title->getKey()]), $payload)
+        ->assertRedirect();
+
+    $this->actingAs($staff)
+        ->post(route('pos.catalog.contributions.store', ['titleId' => $title->getKey()]), $payload)
+        ->assertRedirect()
+        ->assertSessionHas('catalog_error');
+
+    expect(TitleContribution::query()->count())->toBe(1)
+        ->and(Contributor::query()->count())->toBe(1);
 });

@@ -13,6 +13,10 @@
         <x-ui.alert variant="success" title="Gespeichert">{{ session('catalog_success') }}</x-ui.alert>
     @endif
 
+    @if (session('catalog_error'))
+        <x-ui.alert variant="error" title="Nicht gespeichert">{{ session('catalog_error') }}</x-ui.alert>
+    @endif
+
     @if ($errors->any())
         <x-ui.alert variant="error" title="Fehler">Bitte prüfe die markierten Eingaben.</x-ui.alert>
     @endif
@@ -49,22 +53,85 @@
     </section>
 
     <section class="bc-content-section" aria-labelledby="catalog-contributors-heading">
-        <div class="bc-section-heading"><h2 id="catalog-contributors-heading">Verantwortliche</h2></div>
+        <div class="bc-section-heading bc-section-heading--with-meta">
+            <h2 id="catalog-contributors-heading">Verantwortliche</h2>
+            <span>{{ $title->contributions->count() }}</span>
+        </div>
+
         @if ($title->contributions->isEmpty())
-            <p class="bc-section-copy">Noch keine Verantwortlichen hinterlegt. Die Bearbeitung folgt im nächsten Catalog-Schritt.</p>
+            <x-ui.alert title="Noch keine Verantwortlichen">Lege unten die erste Person oder Körperschaft für diesen Titel an.</x-ui.alert>
         @else
             <x-ui.table>
-                <thead><tr><th scope="col">Name</th><th scope="col">Rolle</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th scope="col">Pos.</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Rolle</th>
+                        <th scope="col"><span class="sr-only">Aktion</span></th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach ($title->contributions as $contribution)
                         <tr>
-                            <td>{{ $contribution->contributor->display_name }}</td>
-                            <td>{{ $contribution->role_key }}</td>
+                            <td class="bc-tabular">{{ $contribution->position }}</td>
+                            <td>
+                                <strong>{{ $contribution->contributor->display_name }}</strong>
+                                @if ($contribution->contributor->sort_name)
+                                    <div class="bc-catalog-muted">{{ $contribution->contributor->sort_name }}</div>
+                                @endif
+                            </td>
+                            <td><code>{{ $contribution->role_key }}</code></td>
+                            <td>
+                                <a href="{{ route('pos.catalog.contributions.edit', [
+                                    'titleId' => $title->getKey(),
+                                    'contributionId' => $contribution->getKey(),
+                                ]) }}">Bearbeiten</a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </x-ui.table>
         @endif
+
+        <form method="post" action="{{ route('pos.catalog.contributions.store', ['titleId' => $title->getKey()]) }}" class="bc-catalog-form bc-catalog-contribution-form">
+            @csrf
+            <div class="bc-catalog-form__grid">
+                <x-ui.input
+                    label="Anzeigename"
+                    name="display_name"
+                    :value="old('display_name')"
+                    placeholder="z. B. Michael Ende"
+                    :error="$errors->first('display_name') ?: null"
+                    required
+                />
+                <x-ui.input
+                    label="Sortiername"
+                    name="sort_name"
+                    :value="old('sort_name')"
+                    placeholder="z. B. Ende, Michael"
+                    :error="$errors->first('sort_name') ?: null"
+                />
+                <x-ui.input
+                    label="Rollen-Schlüssel"
+                    name="role_key"
+                    :value="old('role_key', 'author')"
+                    hint="Offener technischer Schlüssel, z. B. author, illustrator oder translator."
+                    :error="$errors->first('role_key') ?: null"
+                    required
+                />
+                <x-ui.input
+                    label="Reihenfolge"
+                    name="position"
+                    type="number"
+                    min="0"
+                    max="9999"
+                    :value="old('position', $title->contributions->count() + 1)"
+                    :error="$errors->first('position') ?: null"
+                    required
+                />
+            </div>
+            <div class="bc-action-row"><x-ui.button type="submit">Verantwortliche:n hinzufügen</x-ui.button></div>
+        </form>
     </section>
 
     <section class="bc-content-section" aria-labelledby="catalog-editions-heading">
