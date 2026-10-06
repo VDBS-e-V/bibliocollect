@@ -14,6 +14,7 @@ final class QueueCatalogCoverRefreshCommand extends Command
 {
     protected $signature = 'catalog:covers:queue
         {--limit=100 : Maximale Zahl der Cover-Jobs pro Lauf}
+        {--retry-missing : Auch Ausgaben erneut einreihen, für die schon ergebnislos nach einem Cover gesucht wurde}
         {--force : Auch Ausgaben mit bereits lokal vorhandenem Cover erneut einreihen}';
 
     protected $description = 'Stellt Cover-Aktualisierungen in die Queue; die öffentliche Suche verwendet ausschließlich lokal gespeicherte Cover.';
@@ -28,6 +29,7 @@ final class QueueCatalogCoverRefreshCommand extends Command
 
         $limit = max(1, min((int) $this->option('limit'), 1000));
         $force = (bool) $this->option('force');
+        $retryMissing = (bool) $this->option('retry-missing');
         $query = Edition::query()
             ->where(function (Builder $identifierQuery): void {
                 $identifierQuery
@@ -38,6 +40,14 @@ final class QueueCatalogCoverRefreshCommand extends Command
 
         if (! $force) {
             $query->whereNull('cover_path');
+
+            if (! $retryMissing) {
+                $query->where(function (Builder $statusQuery): void {
+                    $statusQuery
+                        ->whereNull('cover_status')
+                        ->orWhere('cover_status', '!=', 'missing');
+                });
+            }
         }
 
         $editionIds = $query

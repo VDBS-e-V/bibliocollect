@@ -38,7 +38,7 @@ final class DnbRecordXml
     {
         $record += [
             'id' => '1000000001',
-            'isbns' => ['9783000000001'],
+            'isbns' => ['9783000000003'],
             'title' => 'Testtitel',
             'subtitle' => null,
             'responsibility' => null,

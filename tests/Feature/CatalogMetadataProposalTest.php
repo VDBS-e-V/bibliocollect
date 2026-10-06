@@ -47,7 +47,7 @@ function proposalEdition(array $title = [], array $edition = [], array $people =
 
     return Edition::query()->create($edition + [
         'title_id' => $titleModel->getKey(),
-        'isbn' => '9783000000001',
+        'isbn' => '9783000000003',
         'publisher_name' => 'Testverlag',
         'media_type' => 'book',
         'language_code' => 'de',
@@ -126,7 +126,7 @@ it('never preselects a different value and never proposes to replace an existing
     Http::fake(['services.dnb.de/*' => Http::response(DnbRecordXml::record([
         'title' => 'Momo',
         'publisher' => 'Thienemann Verlag',
-        'isbns' => ['9783000000001', '9783999999990'],
+        'isbns' => ['9783000000003', '9783999999990'],
     ]))]);
 
     $edition = proposalEdition(['preferred_title' => 'Momo'], [
@@ -193,7 +193,7 @@ it('falls back to the isbn when there is no DNB id', function (): void {
     $edition = proposalEdition(['preferred_title' => 'Momo'], ['publication_year' => null], withSourceId: false);
     $proposal = proposalFor(proposalReview($edition));
 
-    Http::assertSent(static fn (Request $request): bool => $request['query'] === 'num=9783000000001');
+    Http::assertSent(static fn (Request $request): bool => $request['query'] === 'num=9783000000003');
 
     expect($proposal->source)->toBe('dnb-isbn')
         ->and($proposal->change('edition.publication_year')?->proposed)->toBe('2020');
@@ -226,7 +226,7 @@ it('stays usable when the DNB cannot be reached', function (): void {
         ->and($proposal->change('title.preferred_title')?->kind)->toBe(MetadataChange::LOCAL)
         ->and($review->fresh()->proposal_state)->toBe('ready');
 
-    $clean = proposalEdition(['preferred_title' => 'Ganz sauber'], ['isbn' => '9783000000002', 'source_record_id' => '1000000002']);
+    $clean = proposalEdition(['preferred_title' => 'Ganz sauber'], ['isbn' => '9783000000010', 'source_record_id' => '1000000002']);
     $cleanReview = proposalReview($clean);
 
     expect(proposalFor($cleanReview)->changes)->toBe([])

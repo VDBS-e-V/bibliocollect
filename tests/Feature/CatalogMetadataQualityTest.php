@@ -104,6 +104,15 @@ it('flags each kind of metadata defect', function (): void {
         ->and(qualityIssueValues(qualityEdition([], ['isbn' => null])))->toContain('missing_isbn');
 });
 
+it('flags an isbn with a wrong check digit but accepts valid isbn-10 and isbn-13', function (): void {
+    expect(qualityIssueValues(qualityEdition([], ['isbn' => '9783522202803'])))->toContain('invalid_isbn')
+        ->and(qualityIssueValues(qualityEdition([], ['isbn' => 'ISBN abc'])))->toContain('invalid_isbn')
+        ->and(qualityIssueValues(qualityEdition([], ['isbn' => '9783522202800'])))->not->toContain('invalid_isbn')
+        ->and(qualityIssueValues(qualityEdition([], ['isbn' => '3522202805'])))->not->toContain('invalid_isbn')
+        ->and(qualityIssueValues(qualityEdition([], ['isbn' => '080442957X'])))->not->toContain('invalid_isbn')
+        ->and(qualityIssueValues(qualityEdition([], ['isbn' => null])))->not->toContain('invalid_isbn');
+});
+
 it('also checks the names of contributors and ignores a legitimate question mark', function (): void {
     $damaged = qualityEdition([], [], [['name' => 'Andreas Steinho?fel', 'sort' => 'Steinho?fel, Andreas']]);
 

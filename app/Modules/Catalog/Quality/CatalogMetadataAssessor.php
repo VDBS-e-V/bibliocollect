@@ -6,6 +6,7 @@ namespace App\Modules\Catalog\Quality;
 
 use App\Modules\Catalog\Enums\MetadataIssue;
 use App\Modules\Catalog\Models\Edition;
+use App\Modules\Catalog\Services\CatalogIsbnNormalizer;
 
 /**
  * Bewertet die Metadaten einer Ausgabe. Rein lesend und ohne Datenbankzugriff: Die Ausgabe muss mit ihrem
@@ -75,8 +76,12 @@ final class CatalogMetadataAssessor
             $issues[] = MetadataIssue::MissingMediaType;
         }
 
-        if (MetadataFields::value($edition, 'edition.isbn') === null) {
+        $isbn = MetadataFields::value($edition, 'edition.isbn');
+
+        if ($isbn === null) {
             $issues[] = MetadataIssue::MissingIsbn;
+        } elseif (! (new CatalogIsbnNormalizer)->hasValidChecksum($isbn)) {
+            $issues[] = MetadataIssue::InvalidIsbn;
         }
 
         if (MetadataFields::value($edition, 'edition.summary') === null) {

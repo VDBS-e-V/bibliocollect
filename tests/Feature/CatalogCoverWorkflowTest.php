@@ -97,6 +97,45 @@ it('queues cover refresh work instead of downloading during catalog requests', f
     );
 });
 
+it('skips editions already checked without a result unless asked to retry them', function (): void {
+    Queue::fake();
+
+    $title = Title::query()->create(['preferred_title' => 'Ohne Cover']);
+    $missing = Edition::query()->create([
+        'title_id' => $title->getKey(),
+        'isbn' => '9783000000124',
+    ]);
+    $missing->forceFill(['cover_status' => 'missing'])->save();
+
+    app()->instance(CatalogCoverProvider::class, new class implements CatalogCoverProvider
+    {
+        public function configured(): bool
+        {
+            return true;
+        }
+
+        public function fetch(Edition $edition): ?CatalogCoverImage
+        {
+            return null;
+        }
+    });
+
+    $this->artisan('catalog:covers:queue')
+        ->expectsOutput('0 Cover-Aktualisierung(en) wurden in die Queue gestellt.')
+        ->assertSuccessful();
+
+    Queue::assertNothingPushed();
+
+    $this->artisan('catalog:covers:queue', ['--retry-missing' => true])
+        ->expectsOutput('1 Cover-Aktualisierung(en) wurden in die Queue gestellt.')
+        ->assertSuccessful();
+
+    Queue::assertPushed(
+        RefreshEditionCoverJob::class,
+        static fn (RefreshEditionCoverJob $job): bool => $job->editionId === (string) $missing->getKey(),
+    );
+});
+
 it('keeps the cover cache migration rollback capable', function (): void {
     expect(Schema::hasColumn('catalog_editions', 'cover_path'))->toBeTrue()
         ->and(Schema::hasColumn('catalog_editions', 'cover_status'))->toBeTrue();

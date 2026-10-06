@@ -41,7 +41,7 @@ function qualityUiEdition(array $title, array $edition = [], bool $withPerson = 
 
     return Edition::query()->create($edition + [
         'title_id' => $titleModel->getKey(),
-        'isbn' => '9783000000001',
+        'isbn' => '9783000000003',
         'publisher_name' => 'Testverlag',
         'publication_year' => 2000,
         'media_type' => 'book',

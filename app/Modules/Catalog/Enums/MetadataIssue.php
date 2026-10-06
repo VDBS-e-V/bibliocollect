@@ -18,6 +18,7 @@ enum MetadataIssue: string
     case MissingPublisher = 'missing_publisher';
     case MissingMediaType = 'missing_media_type';
     case MissingIsbn = 'missing_isbn';
+    case InvalidIsbn = 'invalid_isbn';
     case MissingSummary = 'missing_summary';
     case MissingKeywords = 'missing_keywords';
 
@@ -32,6 +33,7 @@ enum MetadataIssue: string
             self::MissingPublisher => 'Kein Verlag',
             self::MissingMediaType => 'Kein Medientyp',
             self::MissingIsbn => 'Keine ISBN',
+            self::InvalidIsbn => 'ISBN mit falscher Prüfziffer',
             self::MissingSummary => 'Keine Zusammenfassung',
             self::MissingKeywords => 'Keine Schlagwörter',
         };
@@ -49,6 +51,7 @@ enum MetadataIssue: string
             self::MissingPublisher => 'Ohne Verlag',
             self::MissingMediaType => 'Ohne Medientyp',
             self::MissingIsbn => 'Ohne ISBN',
+            self::InvalidIsbn => 'ISBN ungültig',
             self::MissingSummary => 'Ohne Zusammenfassung',
             self::MissingKeywords => 'Ohne Schlagwörter',
         };
@@ -63,6 +66,7 @@ enum MetadataIssue: string
             self::MissingContributors => 25,
             self::MissingYear => 15,
             self::MissingPublisher, self::MissingMediaType => 10,
+            self::InvalidIsbn => 20,
             self::MissingIsbn => 8,
             self::MissingSummary, self::MissingKeywords => 0,
         };

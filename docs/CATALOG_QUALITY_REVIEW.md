@@ -12,6 +12,7 @@ Die Seite `/betrieb/katalog/qualitaet` (Link „Metadaten prüfen“ in der Kata
 | Keine Verantwortlichen | Titel ohne verknüpfte Person | 25 |
 | Kein Erscheinungsjahr | leer | 15 |
 | Kein Verlag / kein Medientyp | leer | 10 |
+| ISBN mit falscher Prüfziffer | ISBN-10 oder ISBN-13, deren Prüfziffer nicht stimmt, oder kein ISBN-Format | 20 |
 | Keine ISBN | leer | 8 |
 | Keine Zusammenfassung / Schlagwörter | leer | 0 |
 
@@ -74,7 +75,8 @@ Nach dem Übernehmen oder Abweisen springt die Seite zum nächsten offenen Fall.
 - Migration: `php artisan migrate`, danach einmal `php artisan catalog:quality:scan`.
 - Nach Importen oder größeren Änderungen den Scan erneut ausführen.
 - Die DNB-Abfrage braucht keinen Zugangsschlüssel. Bei Ausfall bleibt die Seite benutzbar (lokale Bereinigung).
-- Eine ISBN mit falscher Prüfziffer (z. B. die Demo-ISBN von „Momo“) führt dazu, dass die DNB keinen passenden Datensatz liefert; die Seite weist darauf hin.
+- Eine ISBN mit falscher Prüfziffer (z. B. die Demo-ISBN von „Momo“) führt dazu, dass die DNB keinen passenden Datensatz liefert; die Seite weist darauf hin. Seit v0.5.2 ist das ein eigenes Problem („ISBN mit falscher Prüfziffer“). Die ISBN wird nie automatisch ersetzt; sie muss anhand des Buchs von Hand korrigiert werden.
+- Eine gültige, aber falsch zugeordnete ISBN (Beispiel: eine „Matilda“-Ausgabe trägt die ISBN von „Der fantastische Mr. Fox“) erkennt der Scan nicht. Sie fällt auf, weil das Cover nicht zum Titel passt. Die ISBN der Ausgabe muss dann von Hand berichtigt werden.
 
 ## Tests
 

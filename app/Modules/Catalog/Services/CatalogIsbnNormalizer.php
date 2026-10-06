@@ -24,6 +24,32 @@ final class CatalogIsbnNormalizer
         return preg_match('/^(?:\d{13}|\d{9}[\dX])$/', $value) === 1;
     }
 
+    /** Stimmt die Prüfziffer? Werte, die keine Standard-ISBN sind, gelten als ungültig. */
+    public function hasValidChecksum(string $value): bool
+    {
+        $compact = $this->normalize($value);
+
+        if (! $this->isStandardFormat($compact)) {
+            return false;
+        }
+
+        $sum = 0;
+
+        if (strlen($compact) === 13) {
+            foreach (str_split($compact) as $index => $digit) {
+                $sum += (int) $digit * ($index % 2 === 0 ? 1 : 3);
+            }
+
+            return $sum % 10 === 0;
+        }
+
+        foreach (str_split($compact) as $index => $character) {
+            $sum += ($character === 'X' ? 10 : (int) $character) * (10 - $index);
+        }
+
+        return $sum % 11 === 0;
+    }
+
     /**
      * Vergleichbare ISBN-13: eine ISBN-10 wird umgerechnet (978-Präfix, neue Prüfziffer), eine ISBN-13 bleibt.
      * Null, wenn der Wert keine Standard-ISBN ist.
