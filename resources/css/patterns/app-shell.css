@@ -278,3 +278,28 @@
 .bc-section-copy--spaced {
     margin-top: 1.1rem;
 }
+
+.bc-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem 1.2rem;
+}
+
+.bc-footer-links a {
+    color: inherit;
+}
+
+.bc-content-page__body {
+    max-width: 68ch;
+    line-height: 1.7;
+}
+
+.bc-content-page__body h2 {
+    margin: 2rem 0 .5rem;
+    font-size: 1.25rem;
+}
+
+.bc-content-page__body p,
+.bc-content-page__body ul {
+    margin: .6rem 0;
+}

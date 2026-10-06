@@ -9,6 +9,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -32,12 +34,23 @@ final class LoginController extends Controller
 
         $credentials['disabled_at'] = null;
 
+        $throttleKey = Str::lower((string) $credentials['email']).'|'.$request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            throw ValidationException::withMessages([
+                'email' => 'Zu viele Anmeldeversuche. Bitte warte '.RateLimiter::availableIn($throttleKey).' Sekunden.',
+            ])->status(429);
+        }
+
         if (! Auth::attempt($credentials, $remember)) {
+            RateLimiter::hit($throttleKey, 60);
+
             throw ValidationException::withMessages([
                 'email' => 'E-Mail-Adresse oder Passwort sind nicht korrekt.',
             ]);
         }
 
+        RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
         $user = $request->user();
 

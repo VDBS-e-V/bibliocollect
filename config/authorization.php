@@ -60,6 +60,10 @@ return [
             'label' => 'Klassenlisten drucken',
             'description' => 'Erlaubt Sammellisten offener Ausleihen je Klasse für die Klassenleitungen.',
         ],
+        'content.manage' => [
+            'label' => 'Informationsseiten bearbeiten',
+            'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
+        ],
         'audit.view' => [
             'label' => 'Protokoll einsehen',
             'description' => 'Erlaubt die Einsicht in das Protokoll fachlicher Ereignisse (Ausleihe, Katalog, Schule).',
@@ -124,6 +128,7 @@ return [
                 'circulation.manage',
                 'school.manage',
                 'audit.view',
+                'content.manage',
                 'circulation.reports',
             ],
         ],

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
+use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
 use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'verified', 'permission:surface.administration.access'])->group(function (): void {
     Route::view('/verwaltung', 'pages.surfaces.administration', ['preview' => false])
         ->name('administration.home');
+
+    Route::middleware('permission:content.manage')->group(function (): void {
+        Route::get('/verwaltung/seiten', [ContentPageAdminController::class, 'index'])->name('administration.pages.index');
+        Route::get('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'edit'])->name('administration.pages.edit');
+        Route::patch('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'update'])->name('administration.pages.update');
+    });
 
     Route::get('/verwaltung/protokoll', AuditIndexController::class)
         ->middleware('permission:audit.view')

@@ -111,6 +111,11 @@
         <div class="bc-shell__footer-inner">
             <strong>BiblioCollect</strong>
             <span>Eine Anwendung des VDBS e. V.</span>
+            <nav class="bc-footer-links" aria-label="Rechtliches">
+                <a href="{{ route('public.page', ['slug' => 'impressum']) }}">Impressum</a>
+                <a href="{{ route('public.page', ['slug' => 'datenschutz']) }}">Datenschutz</a>
+                <a href="{{ route('public.page', ['slug' => 'barrierefreiheit']) }}">Barrierefreiheit</a>
+            </nav>
         </div>
     </footer>
 </div>

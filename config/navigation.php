@@ -94,6 +94,13 @@ return [
                     'order' => 20,
                 ],
                 [
+                    'label' => 'Seiten',
+                    'route' => 'administration.pages.index',
+                    'active' => 'administration.pages.*',
+                    'permission' => 'content.manage',
+                    'order' => 35,
+                ],
+                [
                     'label' => 'Protokoll',
                     'route' => 'administration.audit.index',
                     'active' => 'administration.audit.*',

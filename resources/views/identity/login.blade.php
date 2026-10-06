@@ -6,6 +6,10 @@
                 <h1 class="text-3xl font-black tracking-tight sm:text-4xl">Anmelden</h1>
                 <p class="mt-4 max-w-2xl text-lg text-app-text-muted">Melde dich mit deinem bereits aktivierten Onlinekonto an. Ausleihen ohne Onlinekonto bleiben weiterhin möglich.</p>
 
+                @if (session('status'))
+                    <x-ui.alert variant="success" title="Erledigt">{{ session('status') }}</x-ui.alert>
+                @endif
+
                 <form method="POST" action="{{ route('login.store') }}" class="mt-8 max-w-xl space-y-5">
                     @csrf
 
@@ -27,6 +31,7 @@
                     </label>
 
                     <button type="submit" class="bc-button bc-button--primary">Anmelden</button>
+                    <p><a href="{{ route('password.request') }}">Passwort vergessen?</a></p>
                 </form>
             </section>
 

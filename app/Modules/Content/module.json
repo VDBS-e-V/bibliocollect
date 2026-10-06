@@ -2,8 +2,11 @@
   "name": "Content",
   "description": "News, Empfehlungen und öffentliche Bibliotheksinformationen.",
   "dependencies": [
-    "Catalog"
+    "Catalog",
+    "Audit"
   ],
-  "providers": [],
+  "providers": [
+    "App\\Modules\\Content\\Providers\\ContentServiceProvider"
+  ],
   "enabled": true
 }
