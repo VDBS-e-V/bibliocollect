@@ -12,4 +12,9 @@ final class LoanStateConflict extends DomainException
     {
         return new self('Diese Ausleihe wurde bereits zurückgegeben.');
     }
+
+    public static function reservationClosed(): self
+    {
+        return new self('Diese Vormerkung ist bereits abgeschlossen.');
+    }
 }

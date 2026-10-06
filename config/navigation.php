@@ -53,6 +53,13 @@ return [
                     'order' => 20,
                 ],
                 [
+                    'label' => 'Vormerkungen',
+                    'route' => 'pos.reservations.index',
+                    'active' => 'pos.reservations.*',
+                    'permission' => 'circulation.manage',
+                    'order' => 25,
+                ],
+                [
                     'label' => 'Katalogpflege',
                     'route' => 'pos.catalog.index',
                     'active' => 'pos.catalog.*',

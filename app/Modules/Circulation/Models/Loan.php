@@ -21,6 +21,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $returned_at
  * @property int|null $checked_out_by_user_id
  * @property int|null $returned_by_user_id
+ * @property int $renewal_count
+ * @property Carbon|null $last_renewed_at
+ * @property int|null $last_renewed_by_user_id
  */
 final class Loan extends Model
 {
@@ -37,6 +40,9 @@ final class Loan extends Model
         'returned_at',
         'checked_out_by_user_id',
         'returned_by_user_id',
+        'renewal_count',
+        'last_renewed_at',
+        'last_renewed_by_user_id',
     ];
 
     /** @return BelongsTo<Patron, $this> */
@@ -75,6 +81,8 @@ final class Loan extends Model
             'checked_out_at' => 'datetime',
             'due_on' => 'date',
             'returned_at' => 'datetime',
+            'renewal_count' => 'integer',
+            'last_renewed_at' => 'datetime',
         ];
     }
 }

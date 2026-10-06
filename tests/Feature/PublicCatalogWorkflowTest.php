@@ -80,7 +80,7 @@ it('serves the public catalog without authentication and allows browsing all tit
         ->assertSee('Medien finden')
         ->assertSee('Momo')
         ->assertSee('Michael Ende')
-        ->assertSee('1 aktives Exemplar');
+        ->assertSee('Verfügbar');
 });
 
 it('searches public titles by bibliographic metadata but never by copy barcode', function (): void {
@@ -177,7 +177,7 @@ it('shows a public title detail with edition and active shelf information withou
         ->assertSee('Otfried Preußler')
         ->assertSee('9783522177669')
         ->assertSee('J 7 PREU')
-        ->assertSee('1 aktives Exemplar')
+        ->assertSee('Verfügbar')
         ->assertDontSee('BC-KRAB-PUBLIC-HIDDEN')
         ->assertDontSee((string) $copy->getKey());
 });

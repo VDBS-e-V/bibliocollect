@@ -198,9 +198,12 @@
                         </div>
 
                         <div class="bc-public-result__aside">
-                            <x-ui.badge :variant="$presenter->holdingVariant($holding)">
-                                {{ $presenter->holdingLabel($holding) }}
+                            <x-ui.badge :variant="$presenter->availabilityVariant($holding, $availabilities[$titleId])">
+                                {{ $presenter->availabilityLabel($holding, $availabilities[$titleId]) }}
                             </x-ui.badge>
+                            @if ($presenter->availabilityHint($availabilities[$titleId]))
+                                <span class="bc-public-result__hint">{{ $presenter->availabilityHint($availabilities[$titleId]) }}</span>
+                            @endif
 
                             @if ($holding->shelfLocations !== [])
                                 <div>

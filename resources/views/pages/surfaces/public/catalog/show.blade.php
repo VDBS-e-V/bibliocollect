@@ -25,9 +25,12 @@
         </div>
 
         <div class="bc-public-title-header__stock">
-            <x-ui.badge :variant="$presenter->holdingVariant($titleSummary)">
-                {{ $presenter->holdingLabel($titleSummary) }}
+            <x-ui.badge :variant="$presenter->availabilityVariant($titleSummary, $titleAvailability)">
+                {{ $presenter->availabilityLabel($titleSummary, $titleAvailability) }}
             </x-ui.badge>
+            @if ($presenter->availabilityHint($titleAvailability))
+                <p>{{ $presenter->availabilityHint($titleAvailability) }}</p>
+            @endif
             @if ($titleSummary->shelfLocations !== [])
                 <p><strong>Standorte:</strong> {{ implode(', ', $titleSummary->shelfLocations) }}</p>
             @endif
@@ -85,8 +88,9 @@
                                             · {{ $presenter->languageLabel($edition->language_code) }}
                                         </p>
                                     </div>
-                                    <x-ui.badge :variant="$presenter->holdingVariant($holding)">
-                                        {{ $presenter->holdingLabel($holding) }}
+                                    @php($editionAvailability = $editionAvailabilities[(string) $edition->getKey()])
+                                    <x-ui.badge :variant="$presenter->availabilityVariant($holding, $editionAvailability)">
+                                        {{ $presenter->availabilityLabel($holding, $editionAvailability) }}
                                     </x-ui.badge>
                                 </div>
 
@@ -206,8 +210,8 @@
                 <p>Bibliografische Angaben können aus DNB-/Normdaten und lokalen Kataloginformationen stammen. Quellen werden an der Ausgabe kenntlich gemacht, wenn sie bekannt sind.</p>
             </section>
             <section class="bc-side-panel">
-                <h2>Was bedeutet „aktiv“?</h2>
-                <p>Ein aktives Exemplar ist katalogseitig nutzbarer Bestand. BiblioCollect berücksichtigt an dieser Stelle noch keine laufenden Ausleihen.</p>
+                <h2>Verfügbarkeit</h2>
+                <p>„Verfügbar“ heißt: Mindestens ein nutzbares Exemplar ist gerade nicht ausgeliehen. Exemplare, die beschädigt, verloren oder ausgesondert sind, zählen nicht mit.</p>
             </section>
             <section class="bc-side-panel bc-side-panel--quiet">
                 <h2>Cover</h2>

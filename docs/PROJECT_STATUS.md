@@ -71,7 +71,7 @@ v0.4.5 öffnet den Katalog für die anonyme Recherche:
 - Die bestehende `SearchCatalogTitlesQuery` bleibt für bisherige Aufrufer kompatibel und erhält zusätzlich einen paginierten Kriterienpfad.
 - Öffentliche Filter werden aus den offenen Editionswerten für Medientyp und Sprache abgeleitet; es wird kein starres Vokabular in die Domäne gezwungen.
 - Der Filter „Nur Titel mit aktiven Exemplaren“ arbeitet bewusst nur mit `CopyStatus::Active`.
-- Die öffentliche Oberfläche nennt diesen Zustand nicht „verfügbar“, weil laufende Ausleihen erst mit T4 Circulation bekannt sind.
+- Seit v0.5.2 zeigt die öffentliche Oberfläche zusätzlich die Verfügbarkeit aus offenen Ausleihen (siehe T4 Circulation); der Katalogfilter bleibt „aktiv“, nicht „verfügbar“.
 - `/katalog/titel/{titleId}` zeigt Titel, Verantwortliche, Ausgaben, Altersangaben, aktive Regalstandorte und aggregierte Bestandszustände.
 - Copy-Barcodes und interne ULIDs werden in der öffentlichen Ausgabe nicht angezeigt.
 - `CatalogHoldingService` bündelt die wiederverwendbare Bestandsaggregation für Titel und Ausgaben.
@@ -175,5 +175,12 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Rückgaben überschreiben keinen `CopyStatus`; beschädigt/verloren/ausgesondert bleiben bewusste Catalog-Zustände.
 - Der Patron-Arbeitsbereich zeigt nur offene Ausleihen und bietet Barcode-Checkout sowie Rückgabe. Bereits zurückgegebene Titel werden dort bewusst nicht als allgemeine Lesehistorie dargestellt.
 - `CirculationDemoSeeder` liefert einen offenen und einen zurückgegebenen Demo-Loan reproduzierbar und idempotent.
-- Öffentliche Echtzeit-Verfügbarkeit, Verlängerungen, Vormerkungen, Pickups, Mahnungen und Gebühren bleiben Folgeschritte.
+- Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
+
+### Circulation v0.5.2
+
+- Öffentliche Verfügbarkeit aus offenen Ausleihen (`CopyAvailabilityService`): „Verfügbar“, „n von m Exemplaren verfügbar“, „Derzeit ausgeliehen“, frühestes Rückgabedatum und Zahl der Vormerkungen; ohne Barcodes oder Personen.
+- Verlängerungen mit zentralen Regeln: Höchstzahl, Fristberechnung ohne Verkürzung, Schließtage, Sperre bei überfälligen Ausleihen und bei wartenden Vormerkungen.
+- Titelbezogene Vormerkungen mit Warteschlange, Zurücklegen bei Rückgabe, Abholfrist, Storno, Fristablauf (`circulation:reservations:expire`) und Übersichtsseite `/betrieb/vormerkungen`.
+- Der Katalog-Scan erkennt zusätzlich ISBNs mit falscher Prüfziffer; `catalog:covers:queue` überspringt bereits ergebnislos geprüfte Ausgaben (`--retry-missing`); der Scheduler holt Cover und beendet Abholfristen täglich.

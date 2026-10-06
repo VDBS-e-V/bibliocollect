@@ -2,11 +2,11 @@
 
 1. Den Bestand über `/betrieb/katalog/qualitaet` abarbeiten (Fälle mit Mangel zuerst): Vorschläge der DNB bzw. lokale Bereinigungen prüfen und bestätigen, siehe `docs/CATALOG_QUALITY_REVIEW.md`. Die Seite löst die frühere Idee einer `--apply`-Neuanreicherung ab: schreibfrei bis zur Bestätigung, saubere Werte werden nie überschrieben, jede Änderung ist vorab sichtbar und protokolliert.
 2. Nach dem Abarbeiten `catalog:quality:scan` erneut laufen lassen und prüfen, ob noch Fälle ohne DNB-ID und ohne gültige ISBN übrig sind. Diese bleiben manuelle Prüffälle; aus Zeichenfolgen wie `Mu?nchen` wird niemals geraten.
-3. Optional: ISBNs mit falscher Prüfziffer als eigenes Problem in die Qualitätsprüfung aufnehmen (z. B. die Demo-ISBN von „Momo“), da sie die DNB-Abfrage ins Leere laufen lassen.
-4. Den Cover-Betrieb produktiv absichern: laufender Queue Worker, ein Scheduler-Eintrag für `catalog:covers:queue` (holt auch Cover für Bestandstitel nach), `php artisan storage:link` beim Standard-Disk `public` und ein kostenloser Google-Books-API-Key als Fallback für Titel, die Open Library nicht kennt.
-5. Danach die öffentliche Bestandsanzeige um den echten Ausleihzustand erweitern. Erst dann darf aus „aktives Exemplar“ eine belastbare Aussage wie „derzeit verfügbar“ werden.
-6. Anschließend Verlängerungen mit expliziten Regeln auf dem bestehenden Loan-Modell ergänzen.
-7. Danach Vormerkungen titelbezogen aufbauen und die öffentliche Titelansicht um den Vormerkungsstatus ergänzen, ohne Copy-Identitäten öffentlich zu machen.
+3. Die Qualitätsseite meldet jetzt auch ISBNs mit falscher Prüfziffer. Diese Fälle von Hand anhand des Buchs berichtigen; gültige, aber falsch zugeordnete ISBNs (z. B. eine „Matilda“-Ausgabe mit der ISBN von „Mr. Fox“) fallen nur über das Cover auf.
+4. Den Betrieb einrichten: dauerhaft laufender Queue Worker (`php artisan queue:work`), `php artisan schedule:run` jede Minute (Cover-Nachholung täglich 03:30, Ablauf von Abholfristen täglich 04:00), `php artisan storage:link` und ein kostenloser Google-Books-API-Key als Fallback (danach einmal `catalog:covers:queue --retry-missing`). Die Nutzungsbedingungen für das Speichern von Google-Bildern vorher prüfen.
+5. Vormerken im Portal (Selbstbedienung der Ausleihkonten mit Onlinekonto) und Benachrichtigungen „abholbereit“ bzw. „fällig“ über das Reminders-Modul; das Portal ist bisher ein Platzhalter.
+6. Entscheiden, ob Mahnungen und Gebühren fachlich gewollt sind; erst danach bauen.
+7. Schuljahreswechsel mit Vorschau, produktiver Schulimport und Verwaltungsmaske für Öffnungszeiten und Schließtage (Phase 3 der Roadmap).
 8. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden. Die DNB-/GND-/Quellenfelder und der Qualitätsaudit bilden dafür bereits eine fachliche Zielstruktur.
 9. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.
 
@@ -50,7 +50,11 @@ Zusätzlich für Änderungen an Circulation:
 - Rückgabe ohne automatische Änderung des CopyStatus prüfen,
 - nach Rückgabe eine erneute Ausleihe desselben Exemplars erlauben,
 - im Patron-Arbeitsbereich ausschließlich offene Ausleihen anzeigen,
-- Seed-Idempotenz und Migration-Rollback prüfen.
+- Seed-Idempotenz und Migration-Rollback prüfen,
+- öffentliche Verfügbarkeit nur aus Zählwerten und dem frühesten Rückgabedatum ableiten, nie Barcodes, Personen oder Ausleih-IDs ausgeben,
+- Verlängerungen nur über `CirculationRuleEvaluator::renewalViolations()` erlauben (Höchstzahl, Überfälligkeit, Sperre, wartende Vormerkung) und die Frist nie verkürzen,
+- Vormerkungen nur bei nicht verfügbarem Titel zulassen, Warteschlange nach `requested_at` abarbeiten, nicht berechtigte Personen überspringen und zurückgelegte Exemplare nur an die vorgemerkte Person ausleihen,
+- Storno und Fristablauf geben ein zurückgelegtes Exemplar an die nächste Person weiter.
 
 Zusätzlich für Änderungen am Erfassungsprozess und an externen Metadaten:
 

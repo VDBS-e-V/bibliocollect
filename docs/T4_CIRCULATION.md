@@ -4,7 +4,7 @@
 
 T4 v0.5.0 führt den ersten produktiven Circulation-Slice ein: physische Exemplare werden an aktive Ausleihkonten ausgeliehen und wieder zurückgegeben. Die Regeln liegen zentral im `Circulation`-Modul; Catalog und Patrons bleiben fachlich eigenständig.
 
-Nicht Teil dieses Schritts sind Verlängerungen, Vormerkungen, Gebühren, Mahnungen, öffentliche Verfügbarkeitsanzeigen oder ein Zugriff auf abgeschlossene Lesehistorien in der POS-Oberfläche.
+Nicht Teil des ersten Schritts waren Verlängerungen, Vormerkungen, Gebühren, Mahnungen, öffentliche Verfügbarkeitsanzeigen oder ein Zugriff auf abgeschlossene Lesehistorien in der POS-Oberfläche. Öffentliche Verfügbarkeit, Verlängerungen und Vormerkungen mit Abholung folgen in v0.5.2 (siehe unten); Mahnungen, Gebühren und Historieneinsicht bleiben offen.
 
 ## Berechtigung
 
@@ -102,13 +102,44 @@ Der T4-Slice deckt automatisiert ab:
 - Migration-Rollback,
 - Demo-Seed und Idempotenz.
 
+## Öffentliche Verfügbarkeit (v0.5.2)
+
+`CopyAvailabilityService` im Circulation-Modul leitet die Verfügbarkeit aus offenen Ausleihen ab; Catalog bleibt ohne Abhängigkeit zu Circulation, die Public-Oberfläche verbindet beide.
+
+- Gezählt werden nur Exemplare mit Status `active`. Eine offene Ausleihe eines beschädigten oder verlorenen Exemplars mindert die Verfügbarkeit nicht.
+- Verfügbar = aktiv − ausgeliehen − für eine Vormerkung zurückgelegt.
+- Die öffentliche Liste und die Titelseite zeigen „Verfügbar“, „n von m Exemplaren verfügbar“, „Derzeit ausgeliehen“ oder „Für Vormerkung zurückgelegt“. Ohne aktive Exemplare bleibt es bei der bisherigen Bestandsaussage.
+- Ist nichts verfügbar, steht dabei das früheste Rückgabedatum und die Zahl der Vormerkungen („Frühestens zurück am 24.12.2026 · 2 Vormerkungen“).
+- Öffentlich erscheinen nur Zählwerte und das früheste Datum, nie Barcodes, Personen, Ausleih-IDs oder Bibliotheksnummern.
+- Der Filter „Nur Titel mit aktiven Exemplaren“ bleibt ein Katalogfilter (aktiv, nicht verfügbar). Ein Filter „nur verfügbar“ würde eine Abhängigkeit des Katalogs zu Circulation brauchen und ist bewusst nicht Teil dieses Schritts.
+
+## Verlängerungen (v0.5.2)
+
+`RenewLoanAction` verlängert eine offene Ausleihe im Patron-Arbeitsbereich („Verlängern“). Die Regeln stehen zentral in `CirculationRuleEvaluator::renewalViolations()`, die Konfiguration in `config/circulation.php`.
+
+- Höchstzahl: `max_renewals` (Standard 2). Der Zähler steht in `renewal_count`, dazu `last_renewed_at` und `last_renewed_by_user_id`.
+- Dauer: `renewal_period_days`, sonst die Leihfrist. Die neue Fälligkeit zählt ab heute, aber nie vor der bisherigen Fälligkeit, damit eine frühe Verlängerung die Frist nicht verkürzt. Schließtage verschieben sie auf den nächsten Öffnungstag.
+- Blockiert wird bei: Rückgabe bereits erfolgt, Konto nicht aktiv oder gesperrt, Exemplar nicht `active`, Höchstzahl erreicht, überfällig (`allow_overdue_renewal`, Standard `false`) und wenn jemand auf den Titel wartet (`ReservationBlockChecker`).
+- Die Oberfläche nennt bei einer gesperrten Verlängerung den Grund. Transaktion, Sperrreihenfolge (Patron, Exemplar, Ausleihe) und Berechtigung `circulation.manage` wie bei Ausleihe und Rückgabe.
+
+## Vormerkungen und Abholung (v0.5.2)
+
+Vormerkungen sind titelbezogen (`circulation_reservations`, Status `waiting`, `ready`, `fulfilled`, `cancelled`, `expired`). Die Reihenfolge der Warteschlange ergibt sich aus `requested_at`.
+
+- Erfassen im Patron-Arbeitsbereich über Exemplar-Barcode oder ISBN (`PlaceReservationAction`). Vorgemerkt wird nur, wenn kein Exemplar des Titels verfügbar ist; sonst wird direkt ausgeliehen. Abgelehnt werden außerdem: Konto nicht aktiv oder gesperrt, derselbe Titel bereits vorgemerkt oder ausgeliehen, mehr als `max_open_reservations` (Standard 5) offene Vormerkungen, Mindestalter bei allen Ausgaben nicht erreicht.
+- Wird ein Exemplar zurückgegeben, rückt die erste wartende **berechtigte** Vormerkung nach (`ReservationQueueService`): Das Exemplar wird für sie zurückgelegt (`ready`), die Abholfrist beträgt `reservation_pickup_days` (Standard 7) und wird auf einen Öffnungstag gelegt. Gesperrte, ausgeschiedene oder zu junge Personen werden übersprungen und behalten ihren Platz.
+- Die Rückgabemeldung nennt, für wen das Exemplar zurückzulegen ist. Die Seite „Vormerkungen“ (`/betrieb/vormerkungen`, Navigation „Vormerkungen“) listet abholbereite Exemplare mit Barcode und Frist sowie die Warteschlangen je Titel.
+- Ein zurückgelegtes Exemplar kann nur die vorgemerkte Person ausleihen. Leiht sie stattdessen ein anderes Exemplar desselben Titels aus, wird die Vormerkung erfüllt und das zurückgelegte Exemplar geht an die nächste Person.
+- Stornieren (`CancelReservationAction`) gibt ein zurückgelegtes Exemplar an die Nächsten weiter.
+- `php artisan circulation:reservations:expire` (täglich 04:00 im Scheduler) beendet abgelaufene Abholfristen und gibt die Exemplare weiter. Ist das zurückgelegte Exemplar nicht mehr ausleihbar (beschädigt, verloren, ausgesondert), wartet die Person wieder in der Warteschlange.
+- Öffentlich sichtbar ist nur die Zahl der Vormerkungen je Titel.
+- Eine Selbstbedienung (Vormerken im Onlinekonto) gibt es noch nicht: Das Portal ist bisher ein Platzhalter. Benachrichtigungen („abholbereit“) folgen mit dem Reminders-Modul.
+
 ## Bewusst später
 
 Folgende Punkte bleiben nach v0.5.0 offen:
 
-- öffentliche Anzeige „derzeit verfügbar“ auf Basis offener Loans,
-- Verlängerung und Verlängerungsregeln,
-- titelbezogene Vormerkungen,
-- Pickups,
+- Selbstbedienung für Vormerkungen im Portal,
+- Benachrichtigungen bei Abholbereitschaft und Fälligkeit,
 - Mahnungen und Gebühren,
 - differenzierte Einsicht in historische Ausleihen.

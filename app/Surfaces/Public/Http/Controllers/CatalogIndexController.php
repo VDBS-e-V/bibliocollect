@@ -12,6 +12,7 @@ use App\Modules\Catalog\Queries\SearchCatalogTitlesQuery;
 use App\Modules\Catalog\Services\CatalogClassificationService;
 use App\Modules\Catalog\Services\CatalogCoverService;
 use App\Modules\Catalog\Services\CatalogHoldingService;
+use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Surfaces\Public\Http\Requests\CatalogSearchRequest;
 use App\Surfaces\Public\Support\PublicCatalogPresenter;
 use Illuminate\Http\Response;
@@ -25,6 +26,7 @@ final class CatalogIndexController
         CatalogHoldingService $holdings,
         CatalogClassificationService $classification,
         CatalogCoverService $covers,
+        CopyAvailabilityService $availability,
         PublicCatalogPresenter $presenter,
     ): Response {
         $criteria = $request->toCriteria();
@@ -35,6 +37,10 @@ final class CatalogIndexController
 
         /** @var array<string, HoldingSummary> $holdingSummaries */
         $holdingSummaries = [];
+        $availabilities = $availability->forTitles(array_map(
+            static fn (Title $title): string => (string) $title->getKey(),
+            $titles->items(),
+        ));
         /** @var array<string, string> $coverUrls */
         $coverUrls = [];
         /** @var array<string, list<string>> $topicNames */
@@ -64,6 +70,7 @@ final class CatalogIndexController
             'titles' => $titles,
             'filterOptions' => $filterOptions->execute(),
             'holdingSummaries' => $holdingSummaries,
+            'availabilities' => $availabilities,
             'coverUrls' => $coverUrls,
             'topicNames' => $topicNames,
             'queryParameters' => $validated,

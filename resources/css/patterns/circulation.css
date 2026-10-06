@@ -47,6 +47,12 @@
     gap: .35rem .9rem;
 }
 
+.bc-loan-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
 .bc-circulation-note {
     margin: 0;
     color: var(--text-secondary);

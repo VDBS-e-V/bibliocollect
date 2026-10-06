@@ -19,6 +19,8 @@ use App\Surfaces\Pos\Http\Controllers\PatronDepartureController;
 use App\Surfaces\Pos\Http\Controllers\PatronEditController;
 use App\Surfaces\Pos\Http\Controllers\PatronIndexController;
 use App\Surfaces\Pos\Http\Controllers\PatronShowController;
+use App\Surfaces\Pos\Http\Controllers\ReservationController;
+use App\Surfaces\Pos\Http\Controllers\ReservationIndexController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(function (): void {
@@ -121,6 +123,18 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen/{loanId}/rueckgabe', [CirculationController::class, 'return'])
             ->name('pos.circulation.return');
+
+        Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen/{loanId}/verlaengerung', [CirculationController::class, 'renew'])
+            ->name('pos.circulation.renew');
+
+        Route::get('/betrieb/vormerkungen', ReservationIndexController::class)
+            ->name('pos.reservations.index');
+
+        Route::post('/betrieb/ausleihkonten/{patronId}/vormerkungen', [ReservationController::class, 'store'])
+            ->name('pos.reservations.store');
+
+        Route::post('/betrieb/ausleihkonten/{patronId}/vormerkungen/{reservationId}/stornieren', [ReservationController::class, 'cancel'])
+            ->name('pos.reservations.cancel');
     });
 
     Route::get('/betrieb/ausleihkonten', PatronIndexController::class)

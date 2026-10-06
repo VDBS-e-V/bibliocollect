@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Public\Support;
 
 use App\Modules\Catalog\DTOs\HoldingSummary;
+use App\Modules\Circulation\DTOs\CopyAvailability;
 use Illuminate\Support\Str;
 
 final class PublicCatalogPresenter
@@ -74,5 +75,58 @@ final class PublicCatalogPresenter
     public function holdingVariant(HoldingSummary $summary): string
     {
         return $summary->hasActiveCopies() ? 'success' : 'neutral';
+    }
+
+    /** Verfügbarkeit aus offenen Ausleihen; ohne aktive Exemplare bleibt es bei der Bestandsaussage. */
+    public function availabilityLabel(HoldingSummary $summary, CopyAvailability $availability): string
+    {
+        if (! $availability->hasActiveCopies()) {
+            return $this->holdingLabel($summary);
+        }
+
+        if ($availability->isAvailable()) {
+            $available = $availability->availableCopies();
+
+            if ($availability->activeCopies === 1) {
+                return 'Verfügbar';
+            }
+
+            return $available.' von '.$availability->activeCopies.' Exemplaren verfügbar';
+        }
+
+        return $availability->loanedCopies === 0 && $availability->hasHeldCopies()
+            ? 'Für Vormerkung zurückgelegt'
+            : 'Derzeit ausgeliehen';
+    }
+
+    public function availabilityVariant(HoldingSummary $summary, CopyAvailability $availability): string
+    {
+        if (! $availability->hasActiveCopies()) {
+            return $this->holdingVariant($summary);
+        }
+
+        return $availability->isAvailable() ? 'success' : 'warning';
+    }
+
+    /** Hinweis auf die früheste Rückgabe, nur wenn aktuell kein Exemplar verfügbar ist. */
+    public function availabilityHint(CopyAvailability $availability): ?string
+    {
+        if (! $availability->hasActiveCopies() || $availability->isAvailable()) {
+            return null;
+        }
+
+        $parts = [];
+
+        if ($availability->earliestDueOn !== null) {
+            $parts[] = 'Frühestens zurück am '.$availability->earliestDueOn->format('d.m.Y');
+        }
+
+        if ($availability->waitingReservations > 0) {
+            $parts[] = $availability->waitingReservations === 1
+                ? '1 Vormerkung'
+                : $availability->waitingReservations.' Vormerkungen';
+        }
+
+        return $parts === [] ? null : implode(' · ', $parts);
     }
 }

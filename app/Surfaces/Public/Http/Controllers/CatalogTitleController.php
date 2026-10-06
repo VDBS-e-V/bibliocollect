@@ -10,6 +10,7 @@ use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Services\CatalogClassificationService;
 use App\Modules\Catalog\Services\CatalogCoverService;
 use App\Modules\Catalog\Services\CatalogHoldingService;
+use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Surfaces\Public\Support\PublicCatalogPresenter;
 use Illuminate\Http\Response;
 
@@ -20,6 +21,7 @@ final class CatalogTitleController
         CatalogHoldingService $holdings,
         CatalogClassificationService $classification,
         CatalogCoverService $covers,
+        CopyAvailabilityService $availability,
         PublicCatalogPresenter $presenter,
     ): Response {
         $title = Title::query()
@@ -37,10 +39,15 @@ final class CatalogTitleController
             $editionTopics[(string) $edition->getKey()] = $classification->topicNamesForEdition($edition);
         }
 
+        $editionAvailabilities = $availability->forEditions(array_keys($editionSummaries));
+        $titleAvailability = $availability->forTitles([(string) $title->getKey()])[(string) $title->getKey()];
+
         return response()->view('pages.surfaces.public.catalog.show', [
             'title' => $title,
             'titleSummary' => $holdings->summarizeTitle($title),
             'editionSummaries' => $editionSummaries,
+            'editionAvailabilities' => $editionAvailabilities,
+            'titleAvailability' => $titleAvailability,
             'editionTopics' => $editionTopics,
             'coverUrl' => $covers->localUrlForTitle($title) ?? asset('brand/vdbs/catalog-cover-placeholder.svg'),
             'presenter' => $presenter,

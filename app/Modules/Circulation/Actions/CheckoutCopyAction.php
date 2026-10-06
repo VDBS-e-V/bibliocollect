@@ -8,10 +8,13 @@ use App\Foundation\Support\BusinessClock;
 use App\Models\User;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
+use App\Modules\Circulation\Enums\ReservationStatus;
 use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Models\Loan;
+use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
 use App\Modules\Circulation\Services\LoanDueDateService;
+use App\Modules\Circulation\Services\ReservationQueueService;
 use App\Modules\Patrons\Models\Patron;
 use Illuminate\Support\Facades\DB;
 
@@ -21,6 +24,7 @@ final readonly class CheckoutCopyAction
         private BusinessClock $clock,
         private CirculationRuleEvaluator $rules,
         private LoanDueDateService $dueDates,
+        private ReservationQueueService $reservations,
     ) {}
 
     public function execute(Patron $patron, string $barcode, User $actor): Loan
@@ -57,11 +61,14 @@ final readonly class CheckoutCopyAction
                 ->lockForUpdate()
                 ->first();
 
+            $hold = $this->reservations->holdFor($copy);
+
             $violations = $this->rules->checkoutViolations(
                 $lockedPatron,
                 $copy,
                 $edition,
                 $openLoan instanceof Loan,
+                $hold instanceof Reservation && $hold->patron_id !== (string) $lockedPatron->getKey(),
             );
 
             if ($violations !== []) {
@@ -79,7 +86,46 @@ final readonly class CheckoutCopyAction
                 'checked_out_by_user_id' => $actor->getKey(),
             ]);
 
+            $this->fulfilReservation($lockedPatron, $edition->title_id, $copy, $loan, $actor);
+
             return $loan->load('copy.edition.title');
         });
+    }
+
+    /**
+     * Schließt eine offene Vormerkung der Person für diesen Titel ab. War für sie ein anderes Exemplar zurückgelegt,
+     * wird dieses wieder frei und geht an die nächste wartende Person.
+     */
+    private function fulfilReservation(Patron $patron, string $titleId, Copy $copy, Loan $loan, User $actor): void
+    {
+        $reservation = Reservation::query()
+            ->where('patron_id', $patron->getKey())
+            ->where('title_id', $titleId)
+            ->whereIn('status', ReservationStatus::openValues())
+            ->lockForUpdate()
+            ->first();
+
+        if (! $reservation instanceof Reservation) {
+            return;
+        }
+
+        $otherCopyId = $reservation->ready_copy_id !== null && $reservation->ready_copy_id !== (string) $copy->getKey()
+            ? $reservation->ready_copy_id
+            : null;
+
+        $reservation->forceFill([
+            'status' => ReservationStatus::Fulfilled,
+            'loan_id' => $loan->getKey(),
+            'closed_at' => $this->clock->now(),
+            'closed_by_user_id' => $actor->getKey(),
+        ])->save();
+
+        if ($otherCopyId !== null) {
+            $otherCopy = Copy::query()->whereKey($otherCopyId)->lockForUpdate()->first();
+
+            if ($otherCopy instanceof Copy) {
+                $this->reservations->promoteForCopy($otherCopy);
+            }
+        }
     }
 }

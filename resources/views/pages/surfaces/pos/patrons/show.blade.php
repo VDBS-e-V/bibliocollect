@@ -114,12 +114,27 @@
                                         @if ($edition->edition_statement)
                                             <span>{{ $edition->edition_statement }}</span>
                                         @endif
+                                        @if ($loan->renewal_count > 0)
+                                            <span>{{ $loan->renewal_count }}-mal verlängert</span>
+                                        @endif
                                     </div>
+                                    @php($blocks = $renewalBlocks[(string) $loan->getKey()] ?? [])
+                                    @if ($blocks !== [])
+                                        <p class="bc-circulation-note">Keine Verlängerung: {{ implode(' ', $blocks) }}</p>
+                                    @endif
                                 </div>
-                                <form method="post" action="{{ route('pos.circulation.return', ['patronId' => $patron->getKey(), 'loanId' => $loan->getKey()]) }}">
-                                    @csrf
-                                    <x-ui.button type="submit" variant="secondary">Zurückgeben</x-ui.button>
-                                </form>
+                                <div class="bc-loan-card__actions">
+                                    @if (($renewalBlocks[(string) $loan->getKey()] ?? []) === [])
+                                        <form method="post" action="{{ route('pos.circulation.renew', ['patronId' => $patron->getKey(), 'loanId' => $loan->getKey()]) }}">
+                                            @csrf
+                                            <x-ui.button type="submit" variant="secondary">Verlängern</x-ui.button>
+                                        </form>
+                                    @endif
+                                    <form method="post" action="{{ route('pos.circulation.return', ['patronId' => $patron->getKey(), 'loanId' => $loan->getKey()]) }}">
+                                        @csrf
+                                        <x-ui.button type="submit" variant="secondary">Zurückgeben</x-ui.button>
+                                    </form>
+                                </div>
                             </article>
                         @empty
                             <p class="bc-circulation-note">Derzeit sind keine Exemplare auf dieses Ausleihkonto ausgeliehen.</p>
@@ -127,6 +142,57 @@
                     </div>
 
                     <p class="bc-circulation-note">Angezeigt werden nur laufende Ausleihen. Bereits zurückgegebene Titel werden in diesem Arbeitsbereich nicht als Lesehistorie aufgeführt.</p>
+
+                    <div class="bc-section-heading">
+                        <h3 id="reservations-heading">Vormerkungen</h3>
+                        <x-ui.badge>{{ $openReservations->count() }} offen</x-ui.badge>
+                    </div>
+
+                    @if ($errors->has('reservation'))
+                        <x-ui.alert variant="error" title="Vormerkung nicht möglich">{{ $errors->first('reservation') }}</x-ui.alert>
+                    @endif
+
+                    @if ($patron->isActive() && $patron->blocked_at === null)
+                        <form method="post" action="{{ route('pos.reservations.store', ['patronId' => $patron->getKey()]) }}" class="bc-circulation-checkout">
+                            @csrf
+                            <x-ui.input
+                                label="Titel vormerken (Exemplar-Barcode oder ISBN)"
+                                name="identifier"
+                                :value="old('identifier')"
+                                autocomplete="off"
+                            />
+                            <x-ui.button type="submit" variant="secondary">Vormerken</x-ui.button>
+                        </form>
+                    @endif
+
+                    <div class="bc-loan-list" aria-label="Offene Vormerkungen">
+                        @forelse ($openReservations as $reservation)
+                            <article class="bc-loan-card">
+                                <div class="bc-loan-card__meta">
+                                    <strong>{{ $reservation->title->preferred_title }}</strong>
+                                    <div class="bc-loan-card__facts">
+                                        @if ($reservation->status->value === 'ready')
+                                            <x-ui.badge variant="success">Abholbereit</x-ui.badge>
+                                            <span>Exemplar: <span class="bc-tabular">{{ $reservation->readyCopy?->barcode ?? '—' }}</span></span>
+                                            <span>Abholung bis: <span class="bc-tabular">{{ $reservation->pickup_until?->format('d.m.Y') ?? '—' }}</span></span>
+                                        @else
+                                            <x-ui.badge>Wartet</x-ui.badge>
+                                            <span>Position <span class="bc-tabular">{{ $reservationPositions[(string) $reservation->getKey()] ?? '—' }}</span> in der Warteschlange</span>
+                                        @endif
+                                        <span>Vorgemerkt am <span class="bc-tabular">{{ $reservation->requested_at->format('d.m.Y') }}</span></span>
+                                    </div>
+                                </div>
+                                <div class="bc-loan-card__actions">
+                                    <form method="post" action="{{ route('pos.reservations.cancel', ['patronId' => $patron->getKey(), 'reservationId' => $reservation->getKey()]) }}">
+                                        @csrf
+                                        <x-ui.button type="submit" variant="secondary">Stornieren</x-ui.button>
+                                    </form>
+                                </div>
+                            </article>
+                        @empty
+                            <p class="bc-circulation-note">Keine offenen Vormerkungen. Vorgemerkt werden kann ein Titel, solange alle Exemplare ausgeliehen sind.</p>
+                        @endforelse
+                    </div>
                 </section>
             @endcan
         </div>
