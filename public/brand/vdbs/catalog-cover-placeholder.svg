@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600" fill="none" stroke="#1f2937" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <!-- Buchdeckel mit Rücken -->
+  <rect x="24" y="24" width="352" height="552" rx="18"/>
+  <path d="M84 24v552"/>
+  <!-- Titel- und Autorzeilen -->
+  <path d="M130 140h200M130 184h140"/>
+  <path d="M130 236h100" stroke-width="6"/>
+  <!-- aufgeschlagenes Buch -->
+  <path d="M230 430c-22-14-50-14-72-2v78c22-12 50-12 72 2z"/>
+  <path d="M230 430c22-14 50-14 72-2v78c-22-12-50-12-72 2z"/>
+</svg>

@@ -45,7 +45,7 @@ final class CatalogIndexController
             $titleId = (string) $title->getKey();
             $holdingSummaries[$titleId] = $holdings->summarizeTitle($title);
             $coverUrls[$titleId] = $covers->localUrlForTitle($title)
-                ?? asset('brand/vdbs/catalog-cover-placeholder.png');
+                ?? asset('brand/vdbs/catalog-cover-placeholder.svg');
 
             $names = [];
 

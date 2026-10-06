@@ -127,3 +127,20 @@ it('never exposes the cover source reference on public catalog pages', function 
         ->assertDontSee('covers.example.test')
         ->assertDontSee('geheim-123');
 });
+
+it('builds local cover URLs from the current request host instead of APP_URL', function (): void {
+    Storage::fake('public');
+    config()->set('catalog.covers.disk', 'public');
+    config()->set('app.url', 'http://localhost');
+
+    $title = Title::query()->create(['preferred_title' => 'Host-Test', 'sort_title' => 'Host-Test']);
+    $edition = Edition::query()->create(['title_id' => $title->getKey()]);
+    $edition->forceFill(['cover_path' => 'catalog/covers/host-test.png', 'cover_status' => 'ready'])->save();
+    Storage::disk('public')->put('catalog/covers/host-test.png', 'bild');
+
+    // `php artisan serve` oder ein anderer Port: Das Bild muss dort geladen werden, wo auch die Seite herkommt.
+    $this->get('http://127.0.0.1:8000/katalog')
+        ->assertOk()
+        ->assertSee('http://127.0.0.1:8000/storage/catalog/covers/host-test.png', false)
+        ->assertDontSee('http://localhost/storage/', false);
+});

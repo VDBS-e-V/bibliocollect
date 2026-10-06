@@ -42,7 +42,7 @@ final class CatalogTitleController
             'titleSummary' => $holdings->summarizeTitle($title),
             'editionSummaries' => $editionSummaries,
             'editionTopics' => $editionTopics,
-            'coverUrl' => $covers->localUrlForTitle($title) ?? asset('brand/vdbs/catalog-cover-placeholder.png'),
+            'coverUrl' => $covers->localUrlForTitle($title) ?? asset('brand/vdbs/catalog-cover-placeholder.svg'),
             'presenter' => $presenter,
         ]);
     }

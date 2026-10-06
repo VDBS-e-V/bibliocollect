@@ -107,7 +107,7 @@ it('renders locally cached covers and falls back to the bundled placeholder', fu
     $this->get(route('public.catalog.index'))
         ->assertOk()
         ->assertSee('catalog/covers/local-test.png', false)
-        ->assertSee('brand/vdbs/catalog-cover-placeholder.png', false);
+        ->assertSee('brand/vdbs/catalog-cover-placeholder.svg', false);
 });
 
 it('provides a more detailed internal catalog search for catalog managers', function (): void {
