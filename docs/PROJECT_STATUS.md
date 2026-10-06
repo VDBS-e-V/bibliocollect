@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: v0.7.0. Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
+Stand: v0.8.0 (offene Punkte siehe `docs/OFFENE_PUNKTE.md`). Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
 
 ## Abgeschlossen
 
@@ -177,6 +177,16 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - `CirculationDemoSeeder` liefert einen offenen und einen zurückgegebenen Demo-Loan reproduzierbar und idempotent.
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
+
+### Ausleihterminal, Etiketten, Rechtliches und Regeln (v0.8.0)
+
+- **Ausleihterminal** `/betrieb/ausleihe` (Navigation „Ausleihe“): Person per Ausweis oder Namenssuche wählen, Ausleihen, Verlängerungen und Rückgaben sammeln (jede Position wird sofort geprüft, gebucht wird nichts), gemeinsam bestätigen. Bestätigen läuft in einer Transaktion (erst Rückgaben, dann Verlängerungen, dann Ausleihen; scheitert eine Position, wird nichts gebucht). Danach Beleg `V-JJJJMMTT-NNN` zum Drucken oder per E-Mail (Adresse aus dem Konto oder frei eingegeben). Rückgaben gehen auch ohne Person.
+- **Leihfristen und Obergrenzen** je Art des Ausleihkontos, Frist zusätzlich je Medientyp (`config/circulation.php`, `LoanPolicy`).
+- **Problem melden** an der Ausleihe: beschädigt zurücknehmen oder als verloren melden.
+- **Etiketten** (`/betrieb/etiketten`) und **Bibliotheksausweise** (`/betrieb/ausweise`) mit Code-128-Strichcode zum Drucken.
+- **Passwort vergessen**, Begrenzung der Anmeldeversuche, Sicherheits-Header mit Content-Security-Policy im Produktivbetrieb.
+- **Informationsseiten** Impressum, Datenschutz, Barrierefreiheit mit Bearbeitung unter `/verwaltung/seiten`; Links im Fußbereich.
+- Belege werden mit den Ausleihen nach drei Jahren anonymisiert.
 
 ### Betrieb, Arbeitsplatz und Webspace (v0.7.0)
 

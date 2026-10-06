@@ -13,6 +13,7 @@
 |---|---|---|
 | Ausleihen (`circulation_loans`) | Rückgabe | Ausleihkonto und handelnde Konten entfallen (`patron_id` und `*_by_user_id` = null). Exemplar und Daten bleiben. Offene Ausleihen werden nie angefasst. |
 | Vormerkungen | Abschluss (erfüllt, storniert, abgelaufen) | wie Ausleihen. Offene Vormerkungen bleiben. |
+| Belege der Ausleihe (Vorgänge) | Erstellung | Person, handelndes Konto und die E-Mail-Adresse, an die der Beleg ging, entfallen; die Positionen bleiben. |
 | Ausleihkonten ausgeschiedener Personen | Austrittsdatum | Name „Anonymisiert“, Bibliotheksnummer `ANON-<ID>`, nur das Geburtsjahr bleibt (1. Januar), E-Mail, Sperrgrund und Klasse entfallen. |
 | Onlinekonten dieser Personen | wie das Ausleihkonto | Name „Anonymisiert“, Platzhalter-E-Mail, neues Zufallspasswort, Verknüpfung entfällt. |
 | Sperr- und Statusereignisse der Ausleihkonten | Ereigniszeitpunkt | Grund und handelndes Konto entfallen. |

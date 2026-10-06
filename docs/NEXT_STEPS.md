@@ -14,6 +14,9 @@
 10. Vor dem Betrieb auf einem Webspace die Voraussetzungen in `docs/HOSTING_SHARED.md` beim Anbieter prüfen (vor allem PHP 8.4). Ist PHP 8.4 dort nicht verfügbar, auf die VM warten.
 11. Nach dem Einrichten `php artisan app:doctor` (bzw. die Prüfung auf `/_setup`) ausführen und `mail:test` mit den echten SMTP-Daten.
 
+12. Die Platzhaltertexte unter `/verwaltung/seiten` (Impressum, Datenschutz, Barrierefreiheit) durch echte Texte ersetzen.
+13. Leihfristen und Obergrenzen in `config/circulation.php` mit der Schule abstimmen.
+
 ## Qualitäts-Gate
 
 Vor jedem Commit:

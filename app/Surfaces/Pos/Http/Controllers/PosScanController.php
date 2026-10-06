@@ -48,7 +48,9 @@ final class PosScanController
         $patron = Patron::query()->whereRaw('lower(library_number) = ?', [mb_strtolower($code)])->first();
 
         if ($patron instanceof Patron) {
-            return redirect()->route('pos.patrons.show', ['patronId' => $patron->getKey()]);
+            $request->session()->put('pos.terminal', ['patron_id' => (string) $patron->getKey(), 'mode' => 'checkout', 'items' => []]);
+
+            return redirect()->route('pos.terminal');
         }
 
         return redirect()->route('pos.home')->with('workspace_error', "Zu „{$code}“ gibt es kein Exemplar und kein Ausleihkonto.");

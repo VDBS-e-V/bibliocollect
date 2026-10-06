@@ -10,6 +10,7 @@ use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Circulation\Enums\ReservationStatus;
 use App\Modules\Circulation\Models\Loan;
+use App\Modules\Circulation\Models\LoanTransaction;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Enums\PatronStatus;
@@ -151,4 +152,29 @@ it('strips actors and patron references from old audit events and deletes old re
     $this->artisan('privacy:anonymize')->assertSuccessful();
 
     expect(AuditEvent::query()->where('action', 'privacy.anonymization.run')->count())->toBe(1);
+});
+
+it('strips person, actor and email address from old receipts', function (): void {
+    $patron = privacyPatron('S-PV-9');
+    $staff = User::factory()->create();
+
+    $old = LoanTransaction::query()->create([
+        'number' => 'V-20260101-001', 'patron_id' => $patron->getKey(), 'created_by_user_id' => $staff->getKey(),
+        'items' => [['type' => 'return', 'title' => 'Buch', 'barcode' => 'X-1', 'returned_on' => '2026-01-01']],
+        'returned_count' => 1, 'emailed_to' => 'eltern@example.org',
+    ]);
+    $old->forceFill(['created_at' => '2026-01-01 10:00:00'])->save();
+
+    $recent = LoanTransaction::query()->create([
+        'number' => 'V-20300101-001', 'patron_id' => $patron->getKey(), 'created_by_user_id' => $staff->getKey(),
+        'items' => [], 'emailed_to' => 'eltern@example.org',
+    ]);
+
+    $this->artisan('privacy:anonymize')->assertSuccessful();
+
+    expect($old->fresh()->patron_id)->toBeNull()
+        ->and($old->fresh()->emailed_to)->toBeNull()
+        ->and($old->fresh()->created_by_user_id)->toBeNull()
+        ->and($old->fresh()->items)->toHaveCount(1)
+        ->and($recent->fresh()->emailed_to)->toBe('eltern@example.org');
 });

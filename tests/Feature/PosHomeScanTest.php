@@ -90,14 +90,15 @@ it('hides what a role may not use', function (): void {
         ->assertDontSee('Klassenlisten');
 });
 
-it('opens the patron account for a library number and books a return for a loaned barcode', function (): void {
+it('opens the checkout terminal for a library number and books a return for a loaned barcode', function (): void {
     $staff = scanUser();
     $patron = scanPatron('S-SC-1');
     $copy = scanCopy();
     $loan = app(CheckoutCopyAction::class)->execute($patron, $copy->barcode, $staff);
 
     $this->actingAs($staff)->post(route('pos.scan'), ['code' => ' s-sc-1 '])
-        ->assertRedirect(route('pos.patrons.show', ['patronId' => $patron->getKey()]));
+        ->assertRedirect(route('pos.terminal'))
+        ->assertSessionHas('pos.terminal.patron_id', (string) $patron->getKey());
 
     $this->actingAs($staff)->post(route('pos.scan'), ['code' => 'SC-001'])
         ->assertRedirect(route('pos.home'))

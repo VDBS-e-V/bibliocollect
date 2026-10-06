@@ -26,6 +26,7 @@ use App\Surfaces\Pos\Http\Controllers\PatronIndexController;
 use App\Surfaces\Pos\Http\Controllers\PatronShowController;
 use App\Surfaces\Pos\Http\Controllers\PosHomeController;
 use App\Surfaces\Pos\Http\Controllers\PosScanController;
+use App\Surfaces\Pos\Http\Controllers\PosTerminalController;
 use App\Surfaces\Pos\Http\Controllers\ReservationController;
 use App\Surfaces\Pos\Http\Controllers\ReservationIndexController;
 use Illuminate\Support\Facades\Route;
@@ -143,6 +144,18 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::middleware('permission:circulation.manage')->group(function (): void {
         Route::post('/betrieb/scan', PosScanController::class)
             ->name('pos.scan');
+
+        Route::get('/betrieb/ausleihe', [PosTerminalController::class, 'show'])->name('pos.terminal');
+        Route::post('/betrieb/ausleihe/person', [PosTerminalController::class, 'selectPatron'])->name('pos.terminal.patron');
+        Route::post('/betrieb/ausleihe/person/loeschen', [PosTerminalController::class, 'clearPatron'])->name('pos.terminal.patron.clear');
+        Route::post('/betrieb/ausleihe/modus', [PosTerminalController::class, 'mode'])->name('pos.terminal.mode');
+        Route::post('/betrieb/ausleihe/scan', [PosTerminalController::class, 'scan'])->name('pos.terminal.scan');
+        Route::post('/betrieb/ausleihe/verlaengern/{loanId}', [PosTerminalController::class, 'renew'])->name('pos.terminal.renew');
+        Route::post('/betrieb/ausleihe/position/{index}/entfernen', [PosTerminalController::class, 'removeItem'])->whereNumber('index')->name('pos.terminal.item.remove');
+        Route::post('/betrieb/ausleihe/verwerfen', [PosTerminalController::class, 'discard'])->name('pos.terminal.discard');
+        Route::post('/betrieb/ausleihe/bestaetigen', [PosTerminalController::class, 'confirm'])->name('pos.terminal.confirm');
+        Route::get('/betrieb/ausleihe/beleg/{transactionId}', [PosTerminalController::class, 'receipt'])->name('pos.terminal.receipt');
+        Route::post('/betrieb/ausleihe/beleg/{transactionId}/mail', [PosTerminalController::class, 'mailReceipt'])->middleware('throttle:20,1')->name('pos.terminal.receipt.mail');
 
         Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen', [CirculationController::class, 'checkout'])
             ->name('pos.circulation.checkout');

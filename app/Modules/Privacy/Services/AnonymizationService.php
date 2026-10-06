@@ -10,6 +10,7 @@ use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Circulation\Enums\ReservationStatus;
 use App\Modules\Circulation\Models\Loan;
+use App\Modules\Circulation\Models\LoanTransaction;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
@@ -40,7 +41,7 @@ final readonly class AnonymizationService
     }
 
     /**
-     * @return array{loans: int, reservations: int, patrons: int, accounts: int, audit_events: int, status_events: int, reminders: int}
+     * @return array{loans: int, reservations: int, transactions: int, patrons: int, accounts: int, audit_events: int, status_events: int, reminders: int}
      */
     public function run(bool $dryRun = false): array
     {
@@ -50,6 +51,7 @@ final readonly class AnonymizationService
             $counts = [
                 'loans' => $this->loans($cutoff, $dryRun),
                 'reservations' => $this->reservations($cutoff, $dryRun),
+                'transactions' => $this->transactions($cutoff, $dryRun),
                 'patrons' => 0,
                 'accounts' => 0,
                 'audit_events' => $this->auditEvents($cutoff, $dryRun),
@@ -124,6 +126,24 @@ final readonly class AnonymizationService
 
         if (! $dryRun && $count > 0) {
             $query->update(['patron_id' => null, 'created_by_user_id' => null, 'closed_by_user_id' => null]);
+        }
+
+        return $count;
+    }
+
+    /** Belege verlieren Person, handelndes Konto und die E-Mail-Adresse, an die sie gingen. */
+    private function transactions(CarbonImmutable $cutoff, bool $dryRun): int
+    {
+        $query = LoanTransaction::query()
+            ->where('created_at', '<', $cutoff)
+            ->where(static function ($inner): void {
+                $inner->whereNotNull('patron_id')->orWhereNotNull('created_by_user_id')->orWhereNotNull('emailed_to');
+            });
+
+        $count = $query->count();
+
+        if (! $dryRun && $count > 0) {
+            $query->update(['patron_id' => null, 'created_by_user_id' => null, 'emailed_to' => null]);
         }
 
         return $count;

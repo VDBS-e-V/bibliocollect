@@ -22,6 +22,7 @@ final class AnonymizeExpiredDataCommand extends Command
         $this->table(['Bereich', 'Anzahl'], [
             ['Ausleihen', $counts['loans']],
             ['Vormerkungen', $counts['reservations']],
+            ['Belege', $counts['transactions']],
             ['Ausleihkonten', $counts['patrons']],
             ['Onlinekonten', $counts['accounts']],
             ['Protokolleinträge', $counts['audit_events']],

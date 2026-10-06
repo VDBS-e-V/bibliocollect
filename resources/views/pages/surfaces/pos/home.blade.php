@@ -26,7 +26,7 @@
                     <x-ui.input
                         label="Bibliotheksnummer oder Exemplar-Barcode"
                         name="code"
-                        hint="Bibliotheksnummer: öffnet das Ausleihkonto zum Ausleihen. Barcode eines ausgeliehenen Exemplars: bucht die Rückgabe."
+                        hint="Bibliotheksnummer: öffnet die Ausleihe für diese Person. Barcode eines ausgeliehenen Exemplars: bucht die Rückgabe sofort. Für mehrere Vorgänge mit Beleg die Seite „Ausleihe“ nutzen."
                         placeholder="Code scannen oder eingeben, dann Eingabetaste"
                         autocomplete="off"
                         autofocus

@@ -46,6 +46,13 @@ return [
                     'order' => 10,
                 ],
                 [
+                    'label' => 'Ausleihe',
+                    'route' => 'pos.terminal',
+                    'active' => 'pos.terminal*',
+                    'permission' => 'circulation.manage',
+                    'order' => 15,
+                ],
+                [
                     'label' => 'Ausleihkonten',
                     'route' => 'pos.patrons.index',
                     'active' => 'pos.patrons.*',
