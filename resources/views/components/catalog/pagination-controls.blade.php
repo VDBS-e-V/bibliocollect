@@ -28,12 +28,12 @@
             @endforeach
 
             <label for="{{ $idPrefix }}-per-page">Ergebnisse pro Seite</label>
-            <select id="{{ $idPrefix }}-per-page" name="per_page">
+            <select id="{{ $idPrefix }}-per-page" name="per_page" data-auto-submit>
                 @foreach ($perPageOptions as $option)
                     <option value="{{ $option }}" @selected($paginator->perPage() === $option)>{{ $option }}</option>
                 @endforeach
             </select>
-            <button type="submit">Anzeigen</button>
+            <noscript><button type="submit">Anzeigen</button></noscript>
         </form>
 
         <div class="bc-catalog-pagination__pager">

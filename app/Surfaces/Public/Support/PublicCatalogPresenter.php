@@ -6,6 +6,7 @@ namespace App\Surfaces\Public\Support;
 
 use App\Modules\Catalog\DTOs\HoldingSummary;
 use App\Modules\Circulation\DTOs\CopyAvailability;
+use App\Modules\Circulation\DTOs\CopyLoanState;
 use Illuminate\Support\Str;
 
 final class PublicCatalogPresenter
@@ -128,5 +129,29 @@ final class PublicCatalogPresenter
         }
 
         return $parts === [] ? null : implode(' · ', $parts);
+    }
+
+    public function copyStateLabel(CopyLoanState $state): string
+    {
+        if ($state->loaned) {
+            return $state->dueOn !== null
+                ? 'Ausgeliehen bis '.$state->dueOn->format('d.m.Y')
+                : 'Ausgeliehen';
+        }
+
+        return $state->held ? 'Für Vormerkung zurückgelegt' : 'Verfügbar';
+    }
+
+    public function copyStateVariant(CopyLoanState $state): string
+    {
+        return $state->loaned || $state->held ? 'warning' : 'success';
+    }
+
+    /** Zusammenfassung wie „2 Exemplare, 1 verfügbar“ für eine Ausgabe. */
+    public function copySummary(CopyAvailability $availability): string
+    {
+        $copies = $availability->activeCopies === 1 ? '1 Exemplar' : $availability->activeCopies.' Exemplare';
+
+        return $copies.', '.$availability->availableCopies().' verfügbar';
     }
 }

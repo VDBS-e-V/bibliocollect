@@ -712,3 +712,61 @@
     color: var(--text-secondary);
     font-size: var(--text-xs);
 }
+
+.bc-public-copies {
+    display: grid;
+    gap: .6rem;
+    margin-block: 1rem;
+}
+
+.bc-public-copies__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .25rem .9rem;
+}
+
+.bc-public-copies__heading h4 {
+    margin: 0;
+    font-weight: 800;
+}
+
+.bc-public-copies__heading span,
+.bc-public-copies__note {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+.bc-public-copies__table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.bc-public-copies__table th,
+.bc-public-copies__table td {
+    border-bottom: 1px solid var(--border-default);
+    padding: .5rem .6rem;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.bc-public-copies__table thead th {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    font-weight: 800;
+}
+
+.bc-public-copies__table td small {
+    display: block;
+    margin-top: .2rem;
+}
+
+@media (max-width: 42rem) {
+    .bc-public-copies__table th,
+    .bc-public-copies__table td {
+        padding-inline: .35rem;
+    }
+}

@@ -54,21 +54,21 @@
             <x-ui.input label="Jahr von" name="year_from" type="number" :value="$criteria->yearFrom" min="1000" max="2100" />
             <x-ui.input label="Jahr bis" name="year_to" type="number" :value="$criteria->yearTo" min="1000" max="2100" />
 
-            <x-ui.select label="Medientyp" name="media_type">
+            <x-ui.select label="Medientyp" name="media_type" data-auto-submit>
                 <option value="">Alle Medientypen</option>
                 @foreach ($filterOptions['mediaTypes'] as $mediaType)
                     <option value="{{ $mediaType }}" @selected($criteria->mediaType === $mediaType)>{{ $mediaType }}</option>
                 @endforeach
             </x-ui.select>
 
-            <x-ui.select label="Sprache" name="language_code">
+            <x-ui.select label="Sprache" name="language_code" data-auto-submit>
                 <option value="">Alle Sprachen</option>
                 @foreach ($filterOptions['languageCodes'] as $languageCode)
                     <option value="{{ $languageCode }}" @selected($criteria->languageCode === $languageCode)>{{ strtoupper($languageCode) }}</option>
                 @endforeach
             </x-ui.select>
 
-            <x-ui.select label="Sortierung" name="sort">
+            <x-ui.select label="Sortierung" name="sort" data-auto-submit>
                 <option value="title" @selected($criteria->sort === 'title')>Titel A–Z</option>
                 <option value="title_desc" @selected($criteria->sort === 'title_desc')>Titel Z–A</option>
                 <option value="year_desc" @selected($criteria->sort === 'year_desc')>Erscheinungsjahr neu → alt</option>

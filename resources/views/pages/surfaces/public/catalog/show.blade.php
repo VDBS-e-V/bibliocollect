@@ -88,7 +88,9 @@
                                             · {{ $presenter->languageLabel($edition->language_code) }}
                                         </p>
                                     </div>
-                                    @php($editionAvailability = $editionAvailabilities[(string) $edition->getKey()])
+                                    @php
+                                        $editionAvailability = $editionAvailabilities[(string) $edition->getKey()];
+                                    @endphp
                                     <x-ui.badge :variant="$presenter->availabilityVariant($holding, $editionAvailability)">
                                         {{ $presenter->availabilityLabel($holding, $editionAvailability) }}
                                     </x-ui.badge>
@@ -97,6 +99,61 @@
                                 @if ($edition->responsibility_statement)
                                     <p class="bc-public-edition__statement">{{ $edition->responsibility_statement }}</p>
                                 @endif
+
+                                @php
+                                    $activeCopies = $edition->copies
+                                        ->filter(static fn ($copy) => $copy->status->value === 'active')
+                                        ->sortBy(static fn ($copy) => [$copy->shelf_location ?? '', $copy->barcode])
+                                        ->values();
+                                @endphp
+                                <section class="bc-public-copies" aria-label="Exemplare dieser Ausgabe">
+                                    <div class="bc-public-copies__heading">
+                                        <h4>Exemplare</h4>
+                                        @if ($editionAvailability->hasActiveCopies())
+                                            <span>{{ $presenter->copySummary($editionAvailability) }}</span>
+                                        @endif
+                                    </div>
+                                    @if ($activeCopies->isEmpty())
+                                        <p class="bc-section-copy">Für diese Ausgabe gibt es derzeit kein ausleihbares Exemplar.</p>
+                                    @else
+                                        <table class="bc-public-copies__table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Exemplar</th>
+                                                    <th scope="col">Standort</th>
+                                                    <th scope="col">Signatur</th>
+                                                    <th scope="col">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($activeCopies as $copy)
+                                                    @php
+                                                        $state = $copyStates[(string) $copy->getKey()];
+                                                    @endphp
+                                                    <tr>
+                                                        <th scope="row">{{ $loop->iteration }}</th>
+                                                        <td>{{ $copy->shelf_location ?: '—' }}</td>
+                                                        <td>{{ $copy->signature?->signature ?: '—' }}</td>
+                                                        <td>
+                                                            <x-ui.badge :variant="$presenter->copyStateVariant($state)">{{ $presenter->copyStateLabel($state) }}</x-ui.badge>
+                                                            @if ($copy->access_status)
+                                                                <small class="bc-public-metadata-source">{{ $copy->access_status }}</small>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        @if ($titleAvailability->waitingReservations > 0)
+                                            <p class="bc-public-copies__note">
+                                                {{ $titleAvailability->waitingReservations === 1 ? '1 Vormerkung' : $titleAvailability->waitingReservations.' Vormerkungen' }} für diesen Titel.
+                                                Vormerken ist in der Bibliothek möglich, solange kein Exemplar verfügbar ist.
+                                            </p>
+                                        @elseif (! $editionAvailability->isAvailable() && $editionAvailability->hasActiveCopies())
+                                            <p class="bc-public-copies__note">Vormerken ist in der Bibliothek möglich, solange kein Exemplar verfügbar ist.</p>
+                                        @endif
+                                    @endif
+                                </section>
 
                                 <dl class="bc-public-edition__details">
                                     @if ($edition->series_statement)
@@ -152,9 +209,6 @@
                                     @endif
                                     @if ($topics !== [])
                                         <div><dt>Themen</dt><dd>{{ implode(', ', $topics) }}</dd></div>
-                                    @endif
-                                    @if ($holding->shelfLocations !== [])
-                                        <div><dt>Standort</dt><dd>{{ implode(', ', $holding->shelfLocations) }}</dd></div>
                                     @endif
                                 </dl>
 

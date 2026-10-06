@@ -6,6 +6,7 @@ namespace App\Modules\Circulation\Services;
 
 use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Circulation\DTOs\CopyAvailability;
+use App\Modules\Circulation\DTOs\CopyLoanState;
 use App\Modules\Circulation\Enums\ReservationStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,48 @@ final class CopyAvailabilityService
     public function forEditions(array $editionIds): array
     {
         return $this->summarize('catalog_copies.edition_id', $editionIds, false);
+    }
+
+    /**
+     * @param  list<string>  $copyIds
+     * @return array<string, CopyLoanState> je Exemplar-ID
+     */
+    public function forCopies(array $copyIds): array
+    {
+        $result = [];
+
+        foreach ($copyIds as $copyId) {
+            $result[$copyId] = new CopyLoanState(false, null, false);
+        }
+
+        if ($copyIds === []) {
+            return $result;
+        }
+
+        $dueDates = DB::table('circulation_loans')
+            ->whereIn('copy_id', $copyIds)
+            ->whereNull('returned_at')
+            ->groupBy('copy_id')
+            ->selectRaw('copy_id, min(due_on) as due_on')
+            ->pluck('due_on', 'copy_id');
+
+        $held = DB::table('circulation_reservations')
+            ->whereIn('ready_copy_id', $copyIds)
+            ->where('status', ReservationStatus::Ready->value)
+            ->pluck('ready_copy_id')
+            ->all();
+
+        foreach ($copyIds as $copyId) {
+            $due = $dueDates[$copyId] ?? null;
+
+            $result[$copyId] = new CopyLoanState(
+                $due !== null,
+                $due !== null ? CarbonImmutable::parse((string) $due) : null,
+                in_array($copyId, $held, true),
+            );
+        }
+
+        return $result;
     }
 
     /**

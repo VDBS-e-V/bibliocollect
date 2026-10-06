@@ -119,3 +119,21 @@ it('never exposes patrons, barcodes or loan ids on public pages', function (): v
         ->assertDontSee($loan->patron->library_number)
         ->assertDontSee('Test');
 });
+
+it('lists each active copy with location and loan state but without barcodes', function (): void {
+    [$title, , $copies] = availabilityTitle('Exemplarbuch', [CopyStatus::Active, CopyStatus::Active, CopyStatus::Lost]);
+
+    $copies[0]->forceFill(['shelf_location' => 'Regal A'])->save();
+    $copies[1]->forceFill(['shelf_location' => 'Regal B'])->save();
+    availabilityLoan($copies[0], '2026-11-20');
+
+    $this->get(route('public.catalog.show', $title->getKey()))
+        ->assertOk()
+        ->assertSee('2 Exemplare, 1 verfügbar')
+        ->assertSee('Regal A')
+        ->assertSee('Regal B')
+        ->assertSee('Ausgeliehen bis 20.11.2026')
+        ->assertSee('Verfügbar')
+        ->assertDontSee($copies[0]->barcode)
+        ->assertDontSee($copies[1]->barcode);
+});

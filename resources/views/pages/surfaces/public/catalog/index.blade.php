@@ -55,7 +55,7 @@
             @endif
 
             <div class="bc-public-catalog-filter__options">
-                <x-ui.select label="Medientyp" name="media_type">
+                <x-ui.select label="Medientyp" name="media_type" data-auto-submit>
                     <option value="">Alle Medientypen</option>
                     @foreach ($filterOptions['mediaTypes'] as $mediaType)
                         <option value="{{ $mediaType }}" @selected($criteria->mediaType === $mediaType)>
@@ -64,7 +64,7 @@
                     @endforeach
                 </x-ui.select>
 
-                <x-ui.select label="Sprache" name="language_code">
+                <x-ui.select label="Sprache" name="language_code" data-auto-submit>
                     <option value="">Alle Sprachen</option>
                     @foreach ($filterOptions['languageCodes'] as $languageCode)
                         <option value="{{ $languageCode }}" @selected($criteria->languageCode === $languageCode)>
@@ -73,7 +73,7 @@
                     @endforeach
                 </x-ui.select>
 
-                <x-ui.select label="Sortierung" name="sort">
+                <x-ui.select label="Sortierung" name="sort" data-auto-submit>
                     <option value="title" @selected($criteria->sort === 'title')>Titel A–Z</option>
                     <option value="title_desc" @selected($criteria->sort === 'title_desc')>Titel Z–A</option>
                     <option value="year_desc" @selected($criteria->sort === 'year_desc')>Neuere Erscheinungsjahre zuerst</option>
@@ -87,17 +87,18 @@
                     <input
                         id="active-only"
                         name="active_only"
+                        data-auto-submit
                         type="checkbox"
                         value="1"
                         @checked($criteria->activeCopiesOnly)
                     >
                     <span>
                         <strong>Nur Titel mit aktiven Exemplaren</strong>
-                        <small>Aktiv beschreibt den Katalogstatus; der aktuelle Ausleihstatus folgt später über Circulation.</small>
+                        <small>Aktiv beschreibt den Katalogstatus; ob ein Exemplar gerade ausleihbar ist, steht bei den Treffern.</small>
                     </span>
                 </label>
 
-                <x-ui.button type="submit" variant="secondary">Filter anwenden</x-ui.button>
+                <noscript><x-ui.button type="submit" variant="secondary">Filter anwenden</x-ui.button></noscript>
             </div>
         </form>
 

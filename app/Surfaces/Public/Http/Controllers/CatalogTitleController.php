@@ -42,10 +42,21 @@ final class CatalogTitleController
         $editionAvailabilities = $availability->forEditions(array_keys($editionSummaries));
         $titleAvailability = $availability->forTitles([(string) $title->getKey()])[(string) $title->getKey()];
 
+        $copyIds = [];
+
+        foreach ($title->editions as $edition) {
+            foreach ($edition->copies as $copy) {
+                $copyIds[] = (string) $copy->getKey();
+            }
+        }
+
+        $copyStates = $availability->forCopies($copyIds);
+
         return response()->view('pages.surfaces.public.catalog.show', [
             'title' => $title,
             'titleSummary' => $holdings->summarizeTitle($title),
             'editionSummaries' => $editionSummaries,
+            'copyStates' => $copyStates,
             'editionAvailabilities' => $editionAvailabilities,
             'titleAvailability' => $titleAvailability,
             'editionTopics' => $editionTopics,
