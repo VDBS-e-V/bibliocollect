@@ -55,6 +55,13 @@ final class DoctorCommand extends Command
             $pending = $this->pendingMigrations();
             $rows[] = $pending === 0 ? ['OK', 'Migrationen', 'alle ausgeführt'] : ['Fehler', 'Migrationen', "{$pending} offen (php artisan migrate --force)"];
 
+            if ($production && Schema::hasTable('users')) {
+                $demo = DB::table('users')->where('email', 'like', '%@demo.bibliocollect.test')->count();
+                $rows[] = $demo > 0
+                    ? ['Fehler', 'Demo-Konten', "{$demo} Konten mit Demo-Adresse und bekanntem Passwort vorhanden. Bitte löschen"]
+                    : ['OK', 'Demo-Konten', 'keine vorhanden'];
+            }
+
             if (Schema::hasTable('jobs')) {
                 $jobs = DB::table('jobs')->count();
                 $failed = Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->count() : 0;
