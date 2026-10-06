@@ -6,6 +6,7 @@ namespace App\Modules\Catalog\Queries;
 
 use App\Modules\Catalog\DTOs\CatalogSearchCriteria;
 use App\Modules\Catalog\Enums\CopyStatus;
+use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,65 +26,206 @@ final class SearchCatalogTitlesQuery
             return $empty;
         }
 
-        $query = Title::query()->with(['contributions.contributor', 'editions']);
-        $this->applyTerm($query, $normalized);
+        return $this->limited(
+            new CatalogSearchCriteria(term: $normalized),
+            $limit,
+        );
+    }
+
+    /** @return Collection<int, Title> */
+    public function limited(CatalogSearchCriteria $criteria, int $limit = 50): Collection
+    {
+        $query = $this->baseQuery();
+        $this->applyCriteria($query, $criteria);
+        $this->applySort($query, $criteria->sort);
 
         return $query
-            ->orderBy('preferred_title')
-            ->limit(max(1, min($limit, 50)))
+            ->limit(max(1, min($limit, 100)))
             ->get();
     }
 
     /** @return LengthAwarePaginator<int, Title> */
     public function paginate(CatalogSearchCriteria $criteria): LengthAwarePaginator
     {
-        $query = Title::query()->with([
-            'contributions.contributor',
-            'editions.copies',
-        ]);
-
-        $normalized = $this->normalizeTerm($criteria->term, true);
-
-        if ($normalized === null) {
-            $query->whereRaw('1 = 0');
-        } elseif ($normalized !== '') {
-            $this->applyTerm($query, $normalized);
-        }
-
-        if (
-            $criteria->mediaType !== null
-            || $criteria->languageCode !== null
-            || $criteria->activeCopiesOnly
-        ) {
-            $query->whereHas('editions', function (Builder $editionQuery) use ($criteria): void {
-                if ($criteria->mediaType !== null) {
-                    $editionQuery->whereRaw('LOWER(media_type) = ?', [mb_strtolower($criteria->mediaType)]);
-                }
-
-                if ($criteria->languageCode !== null) {
-                    $editionQuery->whereRaw('LOWER(language_code) = ?', [mb_strtolower($criteria->languageCode)]);
-                }
-
-                if ($criteria->activeCopiesOnly) {
-                    $editionQuery->whereHas('copies', function (Builder $copyQuery): void {
-                        $copyQuery->where('status', CopyStatus::Active->value);
-                    });
-                }
-            });
-        }
-
-        if ($criteria->sort === 'recent') {
-            $query->orderByDesc('created_at')->orderBy('preferred_title');
-        } else {
-            $query->orderBy('preferred_title');
-        }
+        $query = $this->baseQuery();
+        $this->applyCriteria($query, $criteria);
+        $this->applySort($query, $criteria->sort);
 
         return $query->paginate(
-            max(1, min($criteria->perPage, 50)),
+            max(1, min($criteria->perPage, 100)),
             ['*'],
             'page',
             max(1, $criteria->page),
         );
+    }
+
+    /** @return Builder<Title> */
+    private function baseQuery(): Builder
+    {
+        return Title::query()
+            ->with([
+                'contributions.contributor',
+                'editions.copies.signature.topics',
+            ])
+            ->withMax('editions', 'publication_year');
+    }
+
+    /** @param Builder<Title> $query */
+    private function applyCriteria(Builder $query, CatalogSearchCriteria $criteria): void
+    {
+        $rawTerm = trim($criteria->term ?? '');
+        $normalized = $this->normalizeTerm($criteria->term, true);
+
+        if ($rawTerm !== '' && $normalized === null) {
+            $query->whereRaw('1 = 0');
+        } elseif ($normalized !== null && $normalized !== '') {
+            $this->applyTerm($query, $normalized);
+        }
+
+        $this->applyTextFilter(
+            $query,
+            $criteria->title,
+            static function (Builder $titleQuery, string $like): void {
+                $titleQuery->whereAny(['preferred_title', 'subtitle', 'sort_title'], 'like', $like);
+            },
+        );
+
+        $this->applyTextFilter(
+            $query,
+            $criteria->contributor,
+            static function (Builder $titleQuery, string $like): void {
+                $titleQuery->whereHas('contributions.contributor', function (Builder $contributorQuery) use ($like): void {
+                    $contributorQuery->whereAny(['display_name', 'sort_name', 'gnd_id'], 'like', $like);
+                });
+            },
+        );
+
+        if (! $this->hasEditionFilters($criteria)) {
+            return;
+        }
+
+        $query->whereHas('editions', function (Builder $editionQuery) use ($criteria): void {
+            $this->applyEditionTextFilter($editionQuery, $criteria->subject, [
+                'subject_keywords',
+                'subject_keywords_system',
+                'summary',
+            ]);
+            $this->applyEditionTextFilter($editionQuery, $criteria->identifier, [
+                'isbn',
+                'issn',
+                'doi_handle',
+                'source_record_id',
+            ]);
+            $this->applyEditionTextFilter($editionQuery, $criteria->publisher, ['publisher_name']);
+            $this->applyEditionTextFilter($editionQuery, $criteria->publicationPlace, ['publication_place']);
+            $this->applyEditionTextFilter($editionQuery, $criteria->series, ['series_statement']);
+            $this->applyEditionTextFilter($editionQuery, $criteria->classification, ['local_classification']);
+            $this->applyEditionTextFilter($editionQuery, $criteria->targetAudience, ['target_audience']);
+            $this->applyEditionTextFilter($editionQuery, $criteria->sourceRecordId, ['source_record_id']);
+
+            if ($criteria->topic !== null) {
+                $topic = $this->normalizeFilter($criteria->topic);
+
+                if ($topic === null) {
+                    $editionQuery->whereRaw('1 = 0');
+                } else {
+                    $like = '%'.$topic.'%';
+                    $editionQuery->where(function (Builder $topicOrClassificationQuery) use ($like): void {
+                        $topicOrClassificationQuery
+                            ->where('local_classification', 'like', $like)
+                            ->orWhereHas('copies.signature.topics', function (Builder $topicQuery) use ($like): void {
+                                $topicQuery->where(function (Builder $nested) use ($like): void {
+                                    $nested
+                                        ->whereAny(['name', 'description'], 'like', $like)
+                                        ->orWhere('public_key', 'like', $like);
+                                });
+                            });
+                    });
+                }
+            }
+
+            if ($criteria->yearFrom !== null) {
+                $editionQuery->where('publication_year', '>=', $criteria->yearFrom);
+            }
+
+            if ($criteria->yearTo !== null) {
+                $editionQuery->where('publication_year', '<=', $criteria->yearTo);
+            }
+
+            if ($criteria->mediaType !== null) {
+                $editionQuery->whereRaw('LOWER(media_type) = ?', [mb_strtolower($criteria->mediaType)]);
+            }
+
+            if ($criteria->languageCode !== null) {
+                $editionQuery->whereRaw('LOWER(language_code) = ?', [mb_strtolower($criteria->languageCode)]);
+            }
+
+            if ($criteria->activeCopiesOnly) {
+                $editionQuery->whereHas('copies', function (Builder $copyQuery): void {
+                    $copyQuery->where('status', CopyStatus::Active->value);
+                });
+            }
+        });
+    }
+
+    private function hasEditionFilters(CatalogSearchCriteria $criteria): bool
+    {
+        return $criteria->subject !== null
+            || $criteria->identifier !== null
+            || $criteria->publisher !== null
+            || $criteria->publicationPlace !== null
+            || $criteria->series !== null
+            || $criteria->topic !== null
+            || $criteria->classification !== null
+            || $criteria->targetAudience !== null
+            || $criteria->sourceRecordId !== null
+            || $criteria->yearFrom !== null
+            || $criteria->yearTo !== null
+            || $criteria->mediaType !== null
+            || $criteria->languageCode !== null
+            || $criteria->activeCopiesOnly;
+    }
+
+    /**
+     * @param  Builder<Title>  $query
+     * @param  callable(Builder<Title>, string): void  $callback
+     */
+    private function applyTextFilter(Builder $query, ?string $value, callable $callback): void
+    {
+        if ($value === null) {
+            return;
+        }
+
+        $normalized = $this->normalizeFilter($value);
+
+        if ($normalized === null) {
+            $query->whereRaw('1 = 0');
+
+            return;
+        }
+
+        $callback($query, '%'.$normalized.'%');
+    }
+
+    /**
+     * @param  Builder<Edition>  $query
+     * @param  list<string>  $columns
+     */
+    private function applyEditionTextFilter(Builder $query, ?string $value, array $columns): void
+    {
+        if ($value === null) {
+            return;
+        }
+
+        $normalized = $this->normalizeFilter($value);
+
+        if ($normalized === null) {
+            $query->whereRaw('1 = 0');
+
+            return;
+        }
+
+        $query->whereAny($columns, 'like', '%'.$normalized.'%');
     }
 
     /** @param Builder<Title> $query */
@@ -101,34 +243,56 @@ final class SearchCatalogTitlesQuery
                         $contributorQuery->whereAny(['display_name', 'sort_name', 'gnd_id'], 'like', $like);
                     })
                     ->orWhereHas('editions', function (Builder $editionQuery) use ($like): void {
-                        $editionQuery->whereAny(
-                            [
-                                'isbn',
-                                'issn',
-                                'doi_handle',
-                                'publisher_name',
-                                'publication_place',
-                                'edition_statement',
-                                'edition_number',
-                                'series_statement',
-                                'responsibility_statement',
-                                'media_type',
-                                'language_code',
-                                'original_language_code',
-                                'physical_extent',
-                                'local_classification',
-                                'subject_keywords',
-                                'subject_keywords_system',
-                                'target_audience',
-                                'summary',
-                                'source_record_id',
-                            ],
-                            'like',
-                            $like,
-                        );
+                        $editionQuery
+                            ->whereAny(
+                                [
+                                    'isbn',
+                                    'issn',
+                                    'doi_handle',
+                                    'publisher_name',
+                                    'publication_place',
+                                    'edition_statement',
+                                    'edition_number',
+                                    'series_statement',
+                                    'responsibility_statement',
+                                    'media_type',
+                                    'language_code',
+                                    'original_language_code',
+                                    'physical_extent',
+                                    'local_classification',
+                                    'subject_keywords',
+                                    'subject_keywords_system',
+                                    'target_audience',
+                                    'summary',
+                                    'source_record_id',
+                                ],
+                                'like',
+                                $like,
+                            )
+                            ->orWhereHas('copies.signature.topics', function (Builder $topicQuery) use ($like): void {
+                                $topicQuery->whereAny(['name', 'description', 'public_key'], 'like', $like);
+                            });
                     });
             });
         }
+    }
+
+    /** @param Builder<Title> $query */
+    private function applySort(Builder $query, string $sort): void
+    {
+        match ($sort) {
+            'title_desc' => $query->orderByDesc('preferred_title'),
+            'year_desc' => $query
+                ->orderByRaw('CASE WHEN editions_max_publication_year IS NULL THEN 1 ELSE 0 END')
+                ->orderByDesc('editions_max_publication_year')
+                ->orderBy('preferred_title'),
+            'year_asc' => $query
+                ->orderByRaw('CASE WHEN editions_max_publication_year IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('editions_max_publication_year')
+                ->orderBy('preferred_title'),
+            'recent' => $query->orderByDesc('created_at')->orderBy('preferred_title'),
+            default => $query->orderBy('preferred_title'),
+        };
     }
 
     private function normalizeTerm(?string $term, bool $allowEmpty): ?string
@@ -147,5 +311,13 @@ final class SearchCatalogTitlesQuery
         }
 
         return $normalized;
+    }
+
+    private function normalizeFilter(string $value): ?string
+    {
+        $normalized = trim(str_replace(['%', '_'], '', $value));
+        $searchableCharacters = preg_replace('/[^\p{L}\p{N}]+/u', '', $normalized) ?? '';
+
+        return $searchableCharacters === '' ? null : $normalized;
     }
 }

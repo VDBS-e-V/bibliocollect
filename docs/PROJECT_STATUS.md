@@ -111,6 +111,30 @@ Auf Basis von T4 v0.5.0 erweitert ein eigener Zwischenblock den Catalog für den
 - die öffentliche Titelansicht kann die erweiterten bibliografischen Angaben und die aus Signaturen abgeleiteten Themen anzeigen, ohne interne Exemplaridentitäten oder interne Legacy-Felder offenzulegen.
 - die Details stehen in `docs/LEGACY_CATALOG_IMPORT.md`.
 
+## Eingeschobener Katalogrecherche-/Coverblock
+
+Der öffentliche Katalog erhält eine stärker coverorientierte Trefferliste und eine bewusst einfache erweiterte Suche für den Schulbetrieb. Die interne Katalogpflege erhält parallel eine wesentlich detailliertere bibliografische Recherche, bleibt aber unverändert hinter `catalog.manage`.
+
+Cover werden nicht live aus externen APIs geladen. `Edition` erhält einen lokalen Cover-Cache-Zustand, `CatalogCoverProvider` bildet die spätere externe Quelle ab und Queue-Jobs übernehmen das Herunterladen im Hintergrund. Öffentliche Views rendern ausschließlich lokal gespeicherte Cover oder den gebündelten Platzhalter.
+
+Der Block umfasst im Einzelnen:
+
+- `/katalog/erweiterte-suche` als reduzierte, schulgerechte Advanced Search ohne Login; aktive erweiterte Kriterien bleiben in der Trefferliste sichtbar und nachbearbeitbar.
+- eine deutlich ausführlichere interne Suchmaske unter `/betrieb/katalog`, die unverändert hinter `catalog.manage` bleibt und kein neues Recht einführt.
+- `catalog_editions` trägt `cover_path`, `cover_source`, `cover_source_reference`, `cover_status`, `cover_checked_at` und `cover_fetched_at`; `cover_source_reference` wird öffentlich nicht ausgegeben.
+- `catalog:covers:queue` stellt Editionen mit ISBN oder Quell-ID als `RefreshEditionCoverJob` in die Queue; der Job akzeptiert nur JPEG/PNG/WebP innerhalb des Größenlimits.
+- Der gebundene Standard ist bewusst `NullCatalogCoverProvider`. Es findet damit noch kein externer Request statt; ein konkreter API-Adapter bleibt Folgeschritt.
+- `CatalogCoverDemoSeeder` markiert eine Demo-Ausgabe als `pending` und hält den Development-Seed offline und reproduzierbar.
+
+Ergänzend erhielten öffentliche und interne Trefferliste eine gemeinsame Seitennavigation:
+
+- `resources/views/components/catalog/pagination-controls.blade.php` bündelt Trefferbereich, Seitengrößenwahl und direkte Seiteneingabe für beide Surfaces.
+- Wählbar sind 10, 20, 50 oder 100 Treffer pro Seite; die Standardgröße liegt bei 20, das Query-Limit bei 100.
+- Nicht unterstützte Seitengrößen werden als Validierungsfehler abgewiesen, nicht still korrigiert.
+- Die interne Trefferliste ist damit nicht mehr auf 50 Titel ohne Navigation begrenzt; aktive Filter bleiben beim Seitenwechsel erhalten.
+
+Die Details stehen in `docs/PUBLIC_CATALOG_SEARCH.md`.
+
 ## T4 Circulation
 
 v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:

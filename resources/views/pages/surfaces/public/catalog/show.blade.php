@@ -4,13 +4,26 @@
     </div>
 
     <header class="bc-public-title-header">
-        <div>
+        <div class="bc-public-title-header__cover">
+            <span class="bc-public-title-cover-frame">
+                <img src="{{ $coverUrl }}" alt="" class="bc-public-title-cover">
+            </span>
+        </div>
+
+        <div class="bc-public-title-header__main">
             <p class="bc-eyebrow">Katalogtitel</p>
             <h1>{{ $title->preferred_title }}</h1>
             @if ($title->subtitle)
                 <p class="bc-public-title-header__subtitle">{{ $title->subtitle }}</p>
             @endif
+
+            @if ($title->contributions->isNotEmpty())
+                <p class="bc-public-title-header__contributors">
+                    {{ $title->contributions->pluck('contributor.display_name')->filter()->join(', ') }}
+                </p>
+            @endif
         </div>
+
         <div class="bc-public-title-header__stock">
             <x-ui.badge :variant="$presenter->holdingVariant($titleSummary)">
                 {{ $presenter->holdingLabel($titleSummary) }}
@@ -197,8 +210,8 @@
                 <p>Ein aktives Exemplar ist katalogseitig nutzbarer Bestand. BiblioCollect berücksichtigt an dieser Stelle noch keine laufenden Ausleihen.</p>
             </section>
             <section class="bc-side-panel bc-side-panel--quiet">
-                <h2>Ausleihe</h2>
-                <p>Die Bibliothek bleibt auch ohne Onlinekonto nutzbar. Vormerkungen und persönliche Ausleihdaten folgen in späteren Modulen.</p>
+                <h2>Cover</h2>
+                <p>Die Katalogseiten verwenden nur lokal gespeicherte Cover. Fehlt ein Bild, erscheint der neutrale Platzhalter; spätere API-Abrufe laufen im Hintergrund.</p>
             </section>
         </aside>
     </div>

@@ -155,6 +155,12 @@ Zusätzlich liegen unter `database/seeders/fixtures/` drei realistische phpMyAdm
 
 Sie enthalten mehrere Exemplare derselben Ausgabe, DNB-/GND-artige Metadaten, Topic-Hierarchie, Signatur-Zuordnung, alte Verfügbarkeits-/Ausleihwerte, `0000`/`0000-00-00` und ein beschädigtes Exemplar. Sie werden von den Legacy-Importtests verwendet, aber nicht automatisch als zusätzlicher Katalogbestand in den normalen Demo-Seed übernommen.
 
+## Cover-Demo und lokale Coverdarstellung
+
+`CatalogCoverDemoSeeder` markiert die Demo-Ausgabe `The Giver` als ausstehend für einen späteren Cover-Refresh, lädt im Seed aber **keine** externen Bilder. Der öffentliche Katalog zeigt deshalb den mitgelieferten Platzhalter, solange für eine Ausgabe kein lokal gespeichertes Cover vorhanden ist.
+
+Die produktive Cover-Architektur ist bewusst zweistufig: Ein Hintergrundjob lädt ein Bild über einen konfigurierten `CatalogCoverProvider` und speichert es auf dem lokalen Cover-Disk. Öffentliche Katalogseiten verwenden ausschließlich `cover_path` und den lokalen Storage-URL; externe API-URLs werden nie während einer Suche oder Titeldetail-Anfrage aufgerufen.
+
 ## Katalogimport
 
 Ab v0.4.6 ruft der normale `DatabaseSeeder` nach dem bestehenden `DemoSeeder` zusätzlich `CatalogImportDemoSeeder` auf. Die Fixture `database/seeders/fixtures/catalog-import-demo.csv` enthält zwei Zeilen für `Der Hobbit` mit derselben normalisierten ISBN und zwei unterschiedlichen Demo-Barcodes.

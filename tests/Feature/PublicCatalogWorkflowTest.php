@@ -220,7 +220,7 @@ it('does not turn wildcard-only input into a public catalog directory', function
 });
 
 it('paginates public catalog browsing while preserving the filter contract', function (): void {
-    foreach (range(1, 13) as $number) {
+    foreach (range(1, 25) as $number) {
         createPublicCatalogFixture(
             titleName: sprintf('Katalogtitel %02d', $number),
             contributorName: sprintf('Person %02d', $number),
@@ -232,14 +232,14 @@ it('paginates public catalog browsing while preserving the filter contract', fun
     $this->get(route('public.catalog.index'))
         ->assertOk()
         ->assertSee('Katalogtitel 01')
-        ->assertDontSee('Katalogtitel 13')
-        ->assertSee('Seite 1 von 2');
+        ->assertDontSee('Katalogtitel 21')
+        ->assertSee('von 2');
 
     $this->get(route('public.catalog.index', ['page' => 2]))
         ->assertOk()
-        ->assertSee('Katalogtitel 13')
+        ->assertSee('Katalogtitel 21')
         ->assertDontSee('Katalogtitel 01')
-        ->assertSee('Seite 2 von 2');
+        ->assertSee('von 2');
 });
 
 it('rejects invalid public catalog filter values before they reach the query', function (): void {

@@ -8,6 +8,7 @@ use App\Modules\Catalog\DTOs\HoldingSummary;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Services\CatalogClassificationService;
+use App\Modules\Catalog\Services\CatalogCoverService;
 use App\Modules\Catalog\Services\CatalogHoldingService;
 use App\Surfaces\Public\Support\PublicCatalogPresenter;
 use Illuminate\Http\Response;
@@ -18,6 +19,7 @@ final class CatalogTitleController
         string $titleId,
         CatalogHoldingService $holdings,
         CatalogClassificationService $classification,
+        CatalogCoverService $covers,
         PublicCatalogPresenter $presenter,
     ): Response {
         $title = Title::query()
@@ -40,6 +42,7 @@ final class CatalogTitleController
             'titleSummary' => $holdings->summarizeTitle($title),
             'editionSummaries' => $editionSummaries,
             'editionTopics' => $editionTopics,
+            'coverUrl' => $covers->localUrlForTitle($title) ?? asset('brand/vdbs/catalog-cover-placeholder.png'),
             'presenter' => $presenter,
         ]);
     }

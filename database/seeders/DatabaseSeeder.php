@@ -18,6 +18,7 @@ final class DatabaseSeeder extends Seeder
 
         $this->call(DemoSeeder::class);
         $this->call(LegacyCatalogMetadataDemoSeeder::class);
+        $this->call(CatalogCoverDemoSeeder::class);
         $this->call(CatalogImportDemoSeeder::class);
         $this->call(CirculationDemoSeeder::class);
     }

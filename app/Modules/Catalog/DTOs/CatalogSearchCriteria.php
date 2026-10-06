@@ -8,11 +8,62 @@ final readonly class CatalogSearchCriteria
 {
     public function __construct(
         public ?string $term = null,
+        public ?string $title = null,
+        public ?string $contributor = null,
+        public ?string $subject = null,
+        public ?string $identifier = null,
+        public ?string $publisher = null,
+        public ?string $publicationPlace = null,
+        public ?string $series = null,
+        public ?string $topic = null,
+        public ?string $classification = null,
+        public ?string $targetAudience = null,
+        public ?string $sourceRecordId = null,
+        public ?int $yearFrom = null,
+        public ?int $yearTo = null,
         public ?string $mediaType = null,
         public ?string $languageCode = null,
         public bool $activeCopiesOnly = false,
         public string $sort = 'title',
-        public int $perPage = 12,
+        public int $perPage = 20,
         public int $page = 1,
     ) {}
+
+    public function hasSearchInput(): bool
+    {
+        return $this->term !== null
+            || $this->title !== null
+            || $this->contributor !== null
+            || $this->subject !== null
+            || $this->identifier !== null
+            || $this->publisher !== null
+            || $this->publicationPlace !== null
+            || $this->series !== null
+            || $this->topic !== null
+            || $this->classification !== null
+            || $this->targetAudience !== null
+            || $this->sourceRecordId !== null
+            || $this->yearFrom !== null
+            || $this->yearTo !== null
+            || $this->mediaType !== null
+            || $this->languageCode !== null
+            || $this->activeCopiesOnly;
+    }
+
+    public function hasAdvancedFilters(): bool
+    {
+        return $this->title !== null
+            || $this->contributor !== null
+            || $this->subject !== null
+            || $this->identifier !== null
+            || $this->publisher !== null
+            || $this->publicationPlace !== null
+            || $this->series !== null
+            || $this->topic !== null
+            || $this->classification !== null
+            || $this->targetAudience !== null
+            || $this->sourceRecordId !== null
+            || $this->yearFrom !== null
+            || $this->yearTo !== null;
+    }
 }

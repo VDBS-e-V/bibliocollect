@@ -1,31 +1,58 @@
 <x-app-shell surface="public" title="Katalog">
-    <x-ui.page-header
-        kicker="Öffentlicher Katalog"
-        title="Medien finden"
-        lead="Durchsuche Titel, Verantwortliche und Ausgaben. Filter helfen dir, den Bestand gezielt einzugrenzen."
-    />
-
-    <section class="bc-public-catalog-search" aria-labelledby="public-catalog-search-heading">
-        <div class="bc-public-catalog-search__heading">
-            <div>
-                <p class="bc-eyebrow">Recherche</p>
-                <h2 id="public-catalog-search-heading">Katalog durchsuchen</h2>
-            </div>
-            <a href="{{ route('public.catalog.index') }}">Filter zurücksetzen</a>
+    <header class="bc-public-catalog-hero">
+        <div>
+            <p class="bc-eyebrow">Öffentlicher Katalog</p>
+            <h1>Medien finden, die zu dir passen</h1>
+            <p>Finde Bücher und andere Medien unserer Schulbibliothek. Für eine genauere Recherche gibt es zusätzlich die erweiterte Suche.</p>
         </div>
 
-        <form method="get" action="{{ route('public.catalog.index') }}" class="bc-public-catalog-filter" role="search">
-            <div class="bc-public-catalog-filter__query">
-                <x-ui.input
-                    label="Suchbegriff"
+        <form method="get" action="{{ route('public.catalog.index') }}" class="bc-public-hero-search" role="search">
+            <label for="public-catalog-query">Im Katalog suchen</label>
+            <div class="bc-public-hero-search__row">
+                <input
+                    id="public-catalog-query"
                     name="q"
                     type="search"
-                    :value="$criteria->term"
-                    placeholder="Titel, Autor:in, ISBN, Verlag …"
-                    hint="Mindestens zwei Buchstaben oder Ziffern. Exemplar-Barcodes gehören bewusst nicht zur öffentlichen Titelsuche."
+                    value="{{ $criteria->term }}"
+                    placeholder="Titel, Autor:in, Thema oder ISBN"
                     autocomplete="off"
-                />
+                >
+                <x-ui.button type="submit">Suchen</x-ui.button>
             </div>
+            <div class="bc-public-hero-search__links">
+                <span>Mindestens zwei Buchstaben oder Ziffern.</span>
+                <a href="{{ route('public.catalog.advanced', $queryParameters) }}">Erweiterte Suche</a>
+            </div>
+        </form>
+    </header>
+
+    <section class="bc-public-catalog-search" aria-labelledby="public-catalog-filter-heading">
+        <div class="bc-public-catalog-search__heading">
+            <div>
+                <p class="bc-eyebrow">Schnell filtern</p>
+                <h2 id="public-catalog-filter-heading">Treffer eingrenzen</h2>
+            </div>
+            <a href="{{ route('public.catalog.index') }}">Alles zurücksetzen</a>
+        </div>
+
+        <form method="get" action="{{ route('public.catalog.index') }}" class="bc-public-catalog-filter">
+            @if ($criteria->term)
+                <input type="hidden" name="q" value="{{ $criteria->term }}">
+            @endif
+            @foreach (['title', 'contributor', 'subject', 'identifier', 'publisher', 'topic'] as $advancedField)
+                @php
+                    $advancedValue = $criteria->{$advancedField};
+                @endphp
+                @if ($advancedValue)
+                    <input type="hidden" name="{{ $advancedField }}" value="{{ $advancedValue }}">
+                @endif
+            @endforeach
+            @if ($criteria->yearFrom)
+                <input type="hidden" name="year_from" value="{{ $criteria->yearFrom }}">
+            @endif
+            @if ($criteria->yearTo)
+                <input type="hidden" name="year_to" value="{{ $criteria->yearTo }}">
+            @endif
 
             <div class="bc-public-catalog-filter__options">
                 <x-ui.select label="Medientyp" name="media_type">
@@ -48,29 +75,38 @@
 
                 <x-ui.select label="Sortierung" name="sort">
                     <option value="title" @selected($criteria->sort === 'title')>Titel A–Z</option>
-                    <option value="recent" @selected($criteria->sort === 'recent')>Zuletzt erfasst</option>
+                    <option value="title_desc" @selected($criteria->sort === 'title_desc')>Titel Z–A</option>
+                    <option value="year_desc" @selected($criteria->sort === 'year_desc')>Neuere Erscheinungsjahre zuerst</option>
+                    <option value="year_asc" @selected($criteria->sort === 'year_asc')>Ältere Erscheinungsjahre zuerst</option>
+                    <option value="recent" @selected($criteria->sort === 'recent')>Zuletzt im Katalog erfasst</option>
                 </x-ui.select>
             </div>
 
-            <label class="bc-public-catalog-filter__check" for="active-only">
-                <input
-                    id="active-only"
-                    name="active_only"
-                    type="checkbox"
-                    value="1"
-                    @checked($criteria->activeCopiesOnly)
-                >
-                <span>
-                    <strong>Nur Titel mit aktiven Exemplaren</strong>
-                    <small>„Aktiv“ beschreibt den Katalogstatus des Exemplars, noch nicht den späteren Ausleihstatus.</small>
-                </span>
-            </label>
+            <div class="bc-public-catalog-filter__footer">
+                <label class="bc-public-catalog-filter__check" for="active-only">
+                    <input
+                        id="active-only"
+                        name="active_only"
+                        type="checkbox"
+                        value="1"
+                        @checked($criteria->activeCopiesOnly)
+                    >
+                    <span>
+                        <strong>Nur Titel mit aktiven Exemplaren</strong>
+                        <small>Aktiv beschreibt den Katalogstatus; der aktuelle Ausleihstatus folgt später über Circulation.</small>
+                    </span>
+                </label>
 
-            <div class="bc-action-row">
-                <x-ui.button type="submit">Suchen und filtern</x-ui.button>
-                <x-ui.button href="{{ route('public.catalog.index') }}" variant="secondary">Alle Titel</x-ui.button>
+                <x-ui.button type="submit" variant="secondary">Filter anwenden</x-ui.button>
             </div>
         </form>
+
+        @if ($criteria->hasAdvancedFilters())
+            <div class="bc-public-advanced-active" role="status">
+                <strong>Erweiterte Suchkriterien sind aktiv.</strong>
+                <a href="{{ route('public.catalog.advanced', $queryParameters) }}">Kriterien bearbeiten</a>
+            </div>
+        @endif
     </section>
 
     <section class="bc-content-section" aria-labelledby="public-catalog-results-heading">
@@ -79,99 +115,119 @@
             <span>{{ $titles->total() }}</span>
         </div>
 
-        <p class="bc-public-catalog-note">
-            Die Bestandsanzeige zeigt derzeit katalogseitig aktive Exemplare. Ob ein aktives Exemplar gerade ausgeliehen ist,
-            kann erst das spätere Circulation-Modul beantworten.
-        </p>
-
         @if ($titles->count() === 0)
             <div class="bc-public-catalog-empty">
                 <strong>Keine passenden Titel gefunden.</strong>
-                <p>Versuche einen anderen Suchbegriff oder entferne einzelne Filter.</p>
-                <x-ui.button href="{{ route('public.catalog.index') }}" variant="secondary">Gesamten Katalog anzeigen</x-ui.button>
+                <p>Versuche einen allgemeineren Suchbegriff oder entferne einzelne Filter.</p>
+                <div class="bc-action-row">
+                    <x-ui.button href="{{ route('public.catalog.index') }}" variant="secondary">Gesamten Katalog anzeigen</x-ui.button>
+                    <x-ui.button href="{{ route('public.catalog.advanced') }}" variant="secondary">Erweiterte Suche</x-ui.button>
+                </div>
             </div>
         @else
+            <x-catalog.pagination-controls
+                :paginator="$titles"
+                :query-parameters="$queryParameters"
+                route-name="public.catalog.index"
+                id-prefix="public-catalog-top"
+            />
+
             <div class="bc-public-catalog-results">
                 @foreach ($titles as $title)
                     @php
-                        $holding = $holdingSummaries[(string) $title->getKey()];
+                        $titleId = (string) $title->getKey();
+                        $holding = $holdingSummaries[$titleId];
+                        $topics = $topicNames[$titleId] ?? [];
+                        $representativeEdition = $title->editions
+                            ->sortByDesc(fn ($edition) => $edition->publication_year ?? 0)
+                            ->first();
                     @endphp
                     <article class="bc-public-result">
+                        <a
+                            class="bc-public-result__cover-link"
+                            href="{{ route('public.catalog.show', ['titleId' => $title->getKey()]) }}"
+                            aria-label="{{ $title->preferred_title }} öffnen"
+                        >
+                            <span class="bc-public-result__cover-frame">
+                                <img class="bc-public-result__cover" src="{{ $coverUrls[$titleId] }}" alt="" loading="lazy">
+                            </span>
+                        </a>
+
                         <div class="bc-public-result__main">
-                            <div class="bc-public-result__heading">
-                                <div>
-                                    <h3>
-                                        <a href="{{ route('public.catalog.show', ['titleId' => $title->getKey()]) }}">
-                                            {{ $title->preferred_title }}
-                                        </a>
-                                    </h3>
-                                    @if ($title->subtitle)
-                                        <p class="bc-public-result__subtitle">{{ $title->subtitle }}</p>
-                                    @endif
-                                </div>
-                                <x-ui.badge :variant="$presenter->holdingVariant($holding)">
-                                    {{ $presenter->holdingLabel($holding) }}
-                                </x-ui.badge>
-                            </div>
+                            <p class="bc-public-result__type">
+                                {{ $representativeEdition ? $presenter->mediaTypeLabel($representativeEdition->media_type) : 'Medium' }}
+                            </p>
+                            <h3>
+                                <a href="{{ route('public.catalog.show', ['titleId' => $title->getKey()]) }}">
+                                    {{ $title->preferred_title }}
+                                </a>
+                            </h3>
+
+                            @if ($title->subtitle)
+                                <p class="bc-public-result__subtitle">{{ $title->subtitle }}</p>
+                            @endif
 
                             @if ($title->contributions->isNotEmpty())
                                 <p class="bc-public-result__contributors">
-                                    @foreach ($title->contributions as $contribution)
-                                        <span>
-                                            {{ $contribution->contributor->display_name }}
-                                            <small>{{ $presenter->roleLabel($contribution->role_key) }}</small>
-                                        </span>@if (! $loop->last)<span aria-hidden="true"> · </span>@endif
-                                    @endforeach
+                                    {{ $title->contributions->pluck('contributor.display_name')->filter()->join(', ') }}
                                 </p>
+                            @elseif ($representativeEdition?->responsibility_statement)
+                                <p class="bc-public-result__contributors">{{ $representativeEdition->responsibility_statement }}</p>
                             @endif
 
-                            <div class="bc-public-result__metadata" aria-label="Ausgabemerkmale">
-                                @foreach ($title->editions->pluck('media_type')->filter()->unique() as $mediaType)
-                                    <span>{{ $presenter->mediaTypeLabel($mediaType) }}</span>
-                                @endforeach
-                                @foreach ($title->editions->pluck('language_code')->filter()->unique() as $languageCode)
+                            <div class="bc-public-result__metadata" aria-label="Medienmerkmale">
+                                @foreach ($title->editions->pluck('language_code')->filter()->unique()->take(2) as $languageCode)
                                     <span>{{ $presenter->languageLabel($languageCode) }}</span>
                                 @endforeach
-                                @if ($title->editions->max('publication_year'))
-                                    <span>bis {{ $title->editions->max('publication_year') }}</span>
+                                @if ($representativeEdition?->publication_year)
+                                    <span>{{ $representativeEdition->publication_year }}</span>
+                                @endif
+                                @if ($representativeEdition?->publisher_name)
+                                    <span>{{ $representativeEdition->publisher_name }}</span>
+                                @endif
+                                @if ($representativeEdition?->local_classification)
+                                    <span>{{ $representativeEdition->local_classification }}</span>
                                 @endif
                             </div>
+
+                            @if ($topics !== [])
+                                <p class="bc-public-result__topics">
+                                    <strong>Themen:</strong> {{ implode(' · ', array_slice($topics, 0, 3)) }}
+                                </p>
+                            @endif
                         </div>
 
                         <div class="bc-public-result__aside">
+                            <x-ui.badge :variant="$presenter->holdingVariant($holding)">
+                                {{ $presenter->holdingLabel($holding) }}
+                            </x-ui.badge>
+
                             @if ($holding->shelfLocations !== [])
                                 <div>
-                                    <strong>Standorte</strong>
+                                    <strong>Standort</strong>
                                     <span>{{ implode(', ', $holding->shelfLocations) }}</span>
                                 </div>
                             @endif
+
                             <div>
                                 <strong>Ausgaben</strong>
                                 <span>{{ $title->editions->count() }}</span>
                             </div>
-                            <a href="{{ route('public.catalog.show', ['titleId' => $title->getKey()]) }}">Titeldetails ansehen →</a>
+
+                            <a class="bc-public-result__details-link" href="{{ route('public.catalog.show', ['titleId' => $title->getKey()]) }}">
+                                Mehr zum Titel →
+                            </a>
                         </div>
                     </article>
                 @endforeach
             </div>
 
-            @if ($titles->lastPage() > 1)
-                <nav class="bc-public-pagination" aria-label="Seitennavigation der Katalogtreffer">
-                    @if ($titles->onFirstPage())
-                        <span aria-disabled="true">← Zurück</span>
-                    @else
-                        <a href="{{ $titles->previousPageUrl() }}" rel="prev">← Zurück</a>
-                    @endif
-
-                    <span>Seite {{ $titles->currentPage() }} von {{ $titles->lastPage() }}</span>
-
-                    @if ($titles->hasMorePages())
-                        <a href="{{ $titles->nextPageUrl() }}" rel="next">Weiter →</a>
-                    @else
-                        <span aria-disabled="true">Weiter →</span>
-                    @endif
-                </nav>
-            @endif
+            <x-catalog.pagination-controls
+                :paginator="$titles"
+                :query-parameters="$queryParameters"
+                route-name="public.catalog.index"
+                id-prefix="public-catalog-bottom"
+            />
         @endif
     </section>
 </x-app-shell>

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Surfaces\Public\Http\Requests;
+namespace App\Surfaces\Pos\Http\Requests;
 
 use App\Modules\Catalog\DTOs\CatalogSearchCriteria;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-final class CatalogSearchRequest extends FormRequest
+final class CatalogStaffSearchRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -19,13 +19,18 @@ final class CatalogSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'q' => ['nullable', 'string', 'max:120'],
-            'title' => ['nullable', 'string', 'max:180'],
-            'contributor' => ['nullable', 'string', 'max:180'],
-            'subject' => ['nullable', 'string', 'max:180'],
-            'identifier' => ['nullable', 'string', 'max:120'],
-            'publisher' => ['nullable', 'string', 'max:180'],
-            'topic' => ['nullable', 'string', 'max:180'],
+            'q' => ['nullable', 'string', 'max:160'],
+            'title' => ['nullable', 'string', 'max:255'],
+            'contributor' => ['nullable', 'string', 'max:255'],
+            'subject' => ['nullable', 'string', 'max:255'],
+            'identifier' => ['nullable', 'string', 'max:160'],
+            'publisher' => ['nullable', 'string', 'max:255'],
+            'publication_place' => ['nullable', 'string', 'max:255'],
+            'series' => ['nullable', 'string', 'max:255'],
+            'topic' => ['nullable', 'string', 'max:255'],
+            'classification' => ['nullable', 'string', 'max:160'],
+            'target_audience' => ['nullable', 'string', 'max:255'],
+            'source_record_id' => ['nullable', 'string', 'max:120'],
             'year_from' => ['nullable', 'integer', 'min:1000', 'max:2100'],
             'year_to' => ['nullable', 'integer', 'min:1000', 'max:2100', Rule::when($this->filled('year_from'), ['gte:year_from'])],
             'media_type' => ['nullable', 'string', 'max:80'],
@@ -49,7 +54,12 @@ final class CatalogSearchRequest extends FormRequest
             subject: $this->nullableString($data['subject'] ?? null),
             identifier: $this->nullableString($data['identifier'] ?? null),
             publisher: $this->nullableString($data['publisher'] ?? null),
+            publicationPlace: $this->nullableString($data['publication_place'] ?? null),
+            series: $this->nullableString($data['series'] ?? null),
             topic: $this->nullableString($data['topic'] ?? null),
+            classification: $this->nullableString($data['classification'] ?? null),
+            targetAudience: $this->nullableString($data['target_audience'] ?? null),
+            sourceRecordId: $this->nullableString($data['source_record_id'] ?? null),
             yearFrom: isset($data['year_from']) ? (int) $data['year_from'] : null,
             yearTo: isset($data['year_to']) ? (int) $data['year_to'] : null,
             mediaType: $this->nullableString($data['media_type'] ?? null),
@@ -63,7 +73,21 @@ final class CatalogSearchRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        foreach (['q', 'title', 'contributor', 'subject', 'identifier', 'publisher', 'topic', 'sort'] as $field) {
+        foreach ([
+            'q',
+            'title',
+            'contributor',
+            'subject',
+            'identifier',
+            'publisher',
+            'publication_place',
+            'series',
+            'topic',
+            'classification',
+            'target_audience',
+            'source_record_id',
+            'sort',
+        ] as $field) {
             $this->merge([$field => $this->normalizeNullable($this->input($field))]);
         }
 

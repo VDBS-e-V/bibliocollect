@@ -6,5 +6,6 @@
 @import './catalog-management.css';
 @import './public-catalog.css';
 @import './legacy-catalog-metadata.css';
+@import './catalog-discovery.css';
 
 @import './school-management.css';

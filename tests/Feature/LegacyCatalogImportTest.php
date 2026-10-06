@@ -14,7 +14,6 @@ use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 uses(RefreshDatabase::class);
@@ -271,16 +270,24 @@ it('supports a direct row-array JSON export in addition to the phpMyAdmin envelo
 });
 
 it('keeps the legacy metadata migration rollback capable', function (): void {
+    $migration = require app_path('Modules/Catalog/database/migrations/2026_10_06_001000_extend_catalog_legacy_metadata.php');
+
     expect(Schema::hasTable('catalog_topics'))->toBeTrue()
         ->and(Schema::hasColumn('catalog_editions', 'source_record_id'))->toBeTrue()
         ->and(Schema::hasColumn('catalog_copies', 'legacy_media_id'))->toBeTrue();
 
-    Artisan::call('migrate:rollback', ['--step' => 1, '--force' => true]);
+    $migration->down();
 
     expect(Schema::hasTable('catalog_topics'))->toBeFalse()
         ->and(Schema::hasTable('catalog_signatures'))->toBeFalse()
         ->and(Schema::hasColumn('catalog_editions', 'source_record_id'))->toBeFalse()
         ->and(Schema::hasColumn('catalog_copies', 'legacy_media_id'))->toBeFalse();
+
+    $migration->up();
+
+    expect(Schema::hasTable('catalog_topics'))->toBeTrue()
+        ->and(Schema::hasColumn('catalog_editions', 'source_record_id'))->toBeTrue()
+        ->and(Schema::hasColumn('catalog_copies', 'legacy_media_id'))->toBeTrue();
 });
 
 it('registers analyze and import console commands', function (): void {

@@ -4,20 +4,31 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Pos\Http\Controllers;
 
+use App\Modules\Catalog\Queries\CatalogSearchFilterOptionsQuery;
 use App\Modules\Catalog\Queries\SearchCatalogTitlesQuery;
-use Illuminate\Http\Request;
+use App\Surfaces\Pos\Http\Requests\CatalogStaffSearchRequest;
 use Illuminate\Http\Response;
 
 final class CatalogIndexController
 {
-    public function __invoke(Request $request, SearchCatalogTitlesQuery $search): Response
-    {
-        $term = trim((string) $request->query('q', ''));
+    public function __invoke(
+        CatalogStaffSearchRequest $request,
+        SearchCatalogTitlesQuery $search,
+        CatalogSearchFilterOptionsQuery $filterOptions,
+    ): Response {
+        $criteria = $request->toCriteria();
+        $validated = $request->validated();
+        unset($validated['page']);
+
+        $titles = $criteria->hasSearchInput() ? $search->paginate($criteria) : null;
+        $titles?->appends($validated);
 
         return response()
             ->view('pages.surfaces.pos.catalog.index', [
-                'term' => $term,
-                'titles' => $search->execute($term),
+                'criteria' => $criteria,
+                'titles' => $titles,
+                'filterOptions' => $filterOptions->execute(),
+                'queryParameters' => $validated,
             ])
             ->header('Cache-Control', 'private, no-store');
     }

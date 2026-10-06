@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Surfaces\Public\Http\Controllers;
 
 use App\Modules\Catalog\DTOs\HoldingSummary;
+use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Queries\CatalogSearchFilterOptionsQuery;
 use App\Modules\Catalog\Queries\SearchCatalogTitlesQuery;
+use App\Modules\Catalog\Services\CatalogClassificationService;
+use App\Modules\Catalog\Services\CatalogCoverService;
 use App\Modules\Catalog\Services\CatalogHoldingService;
 use App\Surfaces\Public\Http\Requests\CatalogSearchRequest;
 use App\Surfaces\Public\Support\PublicCatalogPresenter;
@@ -20,6 +23,8 @@ final class CatalogIndexController
         SearchCatalogTitlesQuery $search,
         CatalogSearchFilterOptionsQuery $filterOptions,
         CatalogHoldingService $holdings,
+        CatalogClassificationService $classification,
+        CatalogCoverService $covers,
         PublicCatalogPresenter $presenter,
     ): Response {
         $criteria = $request->toCriteria();
@@ -30,10 +35,28 @@ final class CatalogIndexController
 
         /** @var array<string, HoldingSummary> $holdingSummaries */
         $holdingSummaries = [];
+        /** @var array<string, string> $coverUrls */
+        $coverUrls = [];
+        /** @var array<string, list<string>> $topicNames */
+        $topicNames = [];
 
         /** @var Title $title */
         foreach ($titles->items() as $title) {
-            $holdingSummaries[(string) $title->getKey()] = $holdings->summarizeTitle($title);
+            $titleId = (string) $title->getKey();
+            $holdingSummaries[$titleId] = $holdings->summarizeTitle($title);
+            $coverUrls[$titleId] = $covers->localUrlForTitle($title)
+                ?? asset('brand/vdbs/catalog-cover-placeholder.png');
+
+            $names = [];
+
+            /** @var Edition $edition */
+            foreach ($title->editions as $edition) {
+                $names = array_merge($names, $classification->topicNamesForEdition($edition));
+            }
+
+            $names = array_values(array_unique($names));
+            sort($names, SORT_NATURAL | SORT_FLAG_CASE);
+            $topicNames[$titleId] = $names;
         }
 
         return response()->view('pages.surfaces.public.catalog.index', [
@@ -41,6 +64,9 @@ final class CatalogIndexController
             'titles' => $titles,
             'filterOptions' => $filterOptions->execute(),
             'holdingSummaries' => $holdingSummaries,
+            'coverUrls' => $coverUrls,
+            'topicNames' => $topicNames,
+            'queryParameters' => $validated,
             'presenter' => $presenter,
         ]);
     }
