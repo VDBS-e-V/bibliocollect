@@ -7,6 +7,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 use App\Modules\Circulation\Queries\ListOpenLoansForPatronQuery;
 use App\Modules\Circulation\Queries\ListOpenReservationsQuery;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
+use App\Modules\Circulation\Services\LoanPolicy;
 use App\Modules\Circulation\Services\ReservationBlockChecker;
 use App\Modules\Identity\Queries\FindUserByPatronIdQuery;
 use App\Modules\Identity\Queries\HasUserByPatronIdQuery;
@@ -27,6 +28,7 @@ final class PatronShowController
         CirculationRuleEvaluator $rules,
         ReservationBlockChecker $reservations,
         ListOpenReservationsQuery $listReservations,
+        LoanPolicy $policy,
     ): Response {
         $patron = $findPatron->byId($patronId);
         $mayInspectOnlineAccount = Gate::allows('patrons.sensitive.view')
@@ -73,6 +75,7 @@ final class PatronShowController
                 'hasOnlineAccount' => $hasOnlineAccount,
                 'studentAgRoles' => $studentAgRoles->all(),
                 'openLoans' => $openLoans,
+                'maxOpenLoans' => $policy->maxOpenLoans($patron),
                 'renewalBlocks' => $renewalBlocks,
                 'openReservations' => $openReservations,
                 'reservationPositions' => $reservationPositions,

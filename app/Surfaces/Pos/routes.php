@@ -138,6 +138,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen/{loanId}/rueckgabe', [CirculationController::class, 'return'])
             ->name('pos.circulation.return');
 
+        Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen/{loanId}/problem', [CirculationController::class, 'problem'])
+            ->name('pos.circulation.problem');
+
         Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen/{loanId}/verlaengerung', [CirculationController::class, 'renew'])
             ->name('pos.circulation.renew');
 

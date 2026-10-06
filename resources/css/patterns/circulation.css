@@ -67,3 +67,20 @@
         align-items: stretch;
     }
 }
+
+.bc-loan-card__more {
+    flex-basis: 100%;
+    font-size: var(--text-sm);
+}
+
+.bc-loan-card__more summary {
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.bc-loan-card__more form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    margin-top: .4rem;
+}

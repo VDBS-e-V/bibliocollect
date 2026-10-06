@@ -7,6 +7,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 use App\Models\User;
 use App\Modules\Circulation\Actions\CheckoutCopyAction;
 use App\Modules\Circulation\Actions\RenewLoanAction;
+use App\Modules\Circulation\Actions\ReportLoanProblemAction;
 use App\Modules\Circulation\Actions\ReturnLoanAction;
 use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Exceptions\LoanStateConflict;
@@ -72,6 +73,37 @@ final class CirculationController
         return redirect()
             ->route('pos.patrons.show', ['patronId' => $patron->getKey()])
             ->with('workspace_success', $message);
+    }
+
+    public function problem(
+        Request $request,
+        string $patronId,
+        string $loanId,
+        FindPatronQuery $findPatron,
+        FindOpenLoanQuery $findLoan,
+        ReportLoanProblemAction $report,
+    ): RedirectResponse {
+        $patron = $findPatron->byId($patronId);
+        $loan = $findLoan->forPatron($loanId, $patron);
+        $actor = $request->user();
+
+        abort_unless($actor instanceof User, 403);
+
+        $problem = $request->validate(['problem' => ['required', 'in:damaged,lost']])['problem'];
+
+        try {
+            $result = $report->execute($loan, $problem, $actor);
+        } catch (LoanStateConflict $exception) {
+            return redirect()
+                ->route('pos.patrons.show', ['patronId' => $patron->getKey()])
+                ->with('workspace_error', $exception->getMessage());
+        }
+
+        return redirect()
+            ->route('pos.patrons.show', ['patronId' => $patron->getKey()])
+            ->with('workspace_success', $problem === 'lost'
+                ? "Das Exemplar {$result->copy->barcode} wurde als verloren gemeldet. Die Ausleihe ist beendet, das Exemplar nicht mehr ausleihbar."
+                : "Das Exemplar {$result->copy->barcode} wurde beschädigt zurückgenommen. Die Ausleihe ist beendet, das Exemplar nicht mehr ausleihbar.");
     }
 
     public function renew(

@@ -8,11 +8,13 @@ use App\Foundation\Support\BusinessClock;
 use App\Models\User;
 use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Models\Copy;
+use App\Modules\Catalog\Models\Edition;
 use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Exceptions\LoanStateConflict;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
 use App\Modules\Circulation\Services\LoanDueDateService;
+use App\Modules\Circulation\Services\LoanPolicy;
 use App\Modules\Circulation\Services\ReservationBlockChecker;
 use App\Modules\Patrons\Models\Patron;
 use Carbon\CarbonImmutable;
@@ -26,6 +28,7 @@ final readonly class RenewLoanAction
         private LoanDueDateService $dueDates,
         private ReservationBlockChecker $reservations,
         private AuditRecorder $audit,
+        private LoanPolicy $policy,
     ) {}
 
     public function execute(Loan $loan, User $actor): Loan
@@ -59,6 +62,7 @@ final readonly class RenewLoanAction
                 'due_on' => $this->dueDates->forRenewalAt(
                     $renewedAt,
                     CarbonImmutable::parse($lockedLoan->due_on->toDateString(), $this->clock->timezone()),
+                    $this->policy->periodDays($patron, Edition::query()->find($copy->edition_id)),
                 )->toDateString(),
                 'renewal_count' => $lockedLoan->renewal_count + 1,
                 'last_renewed_at' => $renewedAt,

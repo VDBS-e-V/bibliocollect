@@ -15,6 +15,7 @@ use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
 use App\Modules\Circulation\Services\LoanDueDateService;
+use App\Modules\Circulation\Services\LoanPolicy;
 use App\Modules\Circulation\Services\ReservationQueueService;
 use App\Modules\Patrons\Models\Patron;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,7 @@ final readonly class CheckoutCopyAction
         private LoanDueDateService $dueDates,
         private ReservationQueueService $reservations,
         private AuditRecorder $audit,
+        private LoanPolicy $policy,
     ) {}
 
     public function execute(Patron $patron, string $barcode, User $actor): Loan
@@ -71,6 +73,8 @@ final readonly class CheckoutCopyAction
                 $edition,
                 $openLoan instanceof Loan,
                 $hold instanceof Reservation && $hold->patron_id !== (string) $lockedPatron->getKey(),
+                $this->policy->openLoanCount($lockedPatron),
+                $this->policy->maxOpenLoans($lockedPatron),
             );
 
             if ($violations !== []) {
@@ -78,7 +82,7 @@ final readonly class CheckoutCopyAction
             }
 
             $checkedOutAt = $this->clock->now();
-            $dueOn = $this->dueDates->forCheckoutAt($checkedOutAt);
+            $dueOn = $this->dueDates->forCheckoutAt($checkedOutAt, $this->policy->periodDays($lockedPatron, $edition));
 
             $loan = Loan::query()->create([
                 'patron_id' => $lockedPatron->getKey(),

@@ -82,7 +82,7 @@
                 <section class="bc-content-section bc-circulation-workspace" aria-labelledby="circulation-heading">
                     <div class="bc-section-heading">
                         <h2 id="circulation-heading">Ausleihe und Rückgabe</h2>
-                        <x-ui.badge>{{ $openLoans->count() }} offen</x-ui.badge>
+                        <x-ui.badge>{{ $openLoans->count() }}{{ $maxOpenLoans > 0 ? ' von '.$maxOpenLoans : '' }} offen</x-ui.badge>
                     </div>
 
                     @if ($patron->isActive() && $patron->blocked_at === null)
@@ -138,6 +138,14 @@
                                         @csrf
                                         <x-ui.button type="submit" variant="secondary">Zurückgeben</x-ui.button>
                                     </form>
+                                    <details class="bc-loan-card__more">
+                                        <summary>Problem melden</summary>
+                                        <form method="post" action="{{ route('pos.circulation.problem', ['patronId' => $patron->getKey(), 'loanId' => $loan->getKey()]) }}">
+                                            @csrf
+                                            <button type="submit" name="problem" value="damaged" class="bc-intake-linkbutton">Beschädigt zurücknehmen</button>
+                                            <button type="submit" name="problem" value="lost" class="bc-intake-linkbutton">Als verloren melden</button>
+                                        </form>
+                                    </details>
                                 </div>
                             </article>
                         @empty

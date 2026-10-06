@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $checked_out_by_user_id
  * @property int|null $returned_by_user_id
  * @property int $renewal_count
+ * @property string|null $outcome
  * @property Carbon|null $last_renewed_at
  * @property int|null $last_renewed_by_user_id
  */
@@ -41,6 +42,7 @@ final class Loan extends Model
         'checked_out_by_user_id',
         'returned_by_user_id',
         'renewal_count',
+        'outcome',
         'last_renewed_at',
         'last_renewed_by_user_id',
     ];

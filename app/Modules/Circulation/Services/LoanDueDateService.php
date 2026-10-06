@@ -11,9 +11,9 @@ final readonly class LoanDueDateService
 {
     public function __construct(private SchoolCalendarService $calendar) {}
 
-    public function forCheckoutAt(CarbonImmutable $checkedOutAt): CarbonImmutable
+    public function forCheckoutAt(CarbonImmutable $checkedOutAt, ?int $periodDays = null): CarbonImmutable
     {
-        $loanPeriodDays = max(1, (int) config('circulation.default_loan_period_days', 14));
+        $loanPeriodDays = max(1, $periodDays ?? (int) config('circulation.default_loan_period_days', 14));
         $target = $checkedOutAt->startOfDay()->addDays($loanPeriodDays);
 
         if ($this->calendar->isOpeningDay($target)) {
@@ -27,10 +27,10 @@ final readonly class LoanDueDateService
      * Neue Fälligkeit bei Verlängerung: ab heute, aber nie vor der bisherigen Fälligkeit,
      * damit eine frühe Verlängerung die Leihfrist nicht verkürzt.
      */
-    public function forRenewalAt(CarbonImmutable $renewedAt, CarbonImmutable $currentDueOn): CarbonImmutable
+    public function forRenewalAt(CarbonImmutable $renewedAt, CarbonImmutable $currentDueOn, ?int $loanPeriodDays = null): CarbonImmutable
     {
         $configured = config('circulation.renewal_period_days');
-        $periodDays = max(1, (int) ($configured ?? config('circulation.default_loan_period_days', 14)));
+        $periodDays = max(1, (int) ($configured ?? $loanPeriodDays ?? config('circulation.default_loan_period_days', 14)));
         $today = $renewedAt->startOfDay();
         $current = $currentDueOn->startOfDay();
         $target = ($current->greaterThan($today) ? $current : $today)->addDays($periodDays);

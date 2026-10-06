@@ -25,6 +25,7 @@ final readonly class ReservationQueueService
         private CirculationRuleEvaluator $rules,
         private LoanDueDateService $dueDates,
         private AuditRecorder $audit,
+        private LoanPolicy $policy,
     ) {}
 
     /**
@@ -50,7 +51,15 @@ final readonly class ReservationQueueService
                 ->get();
 
             foreach ($waiting as $reservation) {
-                if ($this->rules->checkoutViolations($reservation->patron, $copy, $edition, false) !== []) {
+                if ($this->rules->checkoutViolations(
+                    $reservation->patron,
+                    $copy,
+                    $edition,
+                    false,
+                    false,
+                    $this->policy->openLoanCount($reservation->patron),
+                    $this->policy->maxOpenLoans($reservation->patron),
+                ) !== []) {
                     // Gesperrte, ausgeschiedene oder zu junge Personen überspringen; ihre Vormerkung bleibt bestehen.
                     continue;
                 }

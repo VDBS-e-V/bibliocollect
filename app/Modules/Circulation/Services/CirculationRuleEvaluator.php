@@ -26,6 +26,8 @@ final readonly class CirculationRuleEvaluator
         Edition $edition,
         bool $copyAlreadyLoaned,
         bool $copyHeldForOtherPatron = false,
+        int $openLoanCount = 0,
+        int $maxOpenLoans = 0,
     ): array {
         $violations = [];
 
@@ -49,6 +51,10 @@ final readonly class CirculationRuleEvaluator
 
         if ($ageViolation !== null) {
             $violations[] = $ageViolation;
+        }
+
+        if ($maxOpenLoans > 0 && $openLoanCount >= $maxOpenLoans) {
+            $violations[] = "Es sind bereits {$openLoanCount} Medien ausgeliehen (höchstens {$maxOpenLoans} gleichzeitig).";
         }
 
         if ($copyHeldForOtherPatron) {

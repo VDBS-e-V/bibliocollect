@@ -43,6 +43,7 @@ final readonly class ReturnLoanAction
             $lockedLoan->forceFill([
                 'returned_at' => $this->clock->now(),
                 'returned_by_user_id' => $actor->getKey(),
+                'outcome' => 'returned',
             ])->save();
 
             $this->audit->record(
