@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Modules\School\Actions;
 
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\School\Models\LibraryOpeningHour;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
-final class UpdateLibraryOpeningHoursAction
+final readonly class UpdateLibraryOpeningHoursAction
 {
+    public function __construct(private AuditRecorder $audit) {}
+
     /**
      * Speichert die Wochenübersicht. Schlüssel 1 (Montag) bis 7 (Sonntag); geschlossene Tage verlieren ihre Zeiten.
      *
@@ -24,7 +27,7 @@ final class UpdateLibraryOpeningHoursAction
             throw new InvalidArgumentException('Mindestens ein Wochentag muss geöffnet sein.');
         }
 
-        DB::transaction(static function () use ($days): void {
+        DB::transaction(function () use ($days): void {
             foreach (range(1, 7) as $dayOfWeek) {
                 $day = $days[$dayOfWeek] ?? ['is_open' => false, 'opens_at' => null, 'closes_at' => null];
 
@@ -37,6 +40,13 @@ final class UpdateLibraryOpeningHoursAction
                     ],
                 );
             }
+
+            $this->audit->record(
+                'school.opening_hours.updated',
+                'Öffnungszeiten geändert.',
+                null,
+                ['open_days' => implode(',', array_keys(array_filter($days, static fn (array $day): bool => $day['is_open'])))],
+            );
         });
     }
 }

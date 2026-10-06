@@ -87,6 +87,13 @@ return [
                     'order' => 20,
                 ],
                 [
+                    'label' => 'Protokoll',
+                    'route' => 'administration.audit.index',
+                    'active' => 'administration.audit.*',
+                    'permission' => 'audit.view',
+                    'order' => 40,
+                ],
+                [
                     'label' => 'Öffnungszeiten',
                     'route' => 'administration.calendar.index',
                     'active' => 'administration.calendar.*',

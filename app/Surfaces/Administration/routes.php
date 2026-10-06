@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
 use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
@@ -11,6 +12,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'verified', 'permission:surface.administration.access'])->group(function (): void {
     Route::view('/verwaltung', 'pages.surfaces.administration', ['preview' => false])
         ->name('administration.home');
+
+    Route::get('/verwaltung/protokoll', AuditIndexController::class)
+        ->middleware('permission:audit.view')
+        ->name('administration.audit.index');
 
     Route::middleware('permission:school.manage')->group(function (): void {
         Route::get('/verwaltung/schule', SchoolIndexController::class)

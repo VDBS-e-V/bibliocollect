@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Actions;
 
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Contracts\CatalogCoverProvider;
 use App\Modules\Catalog\DTOs\CatalogIntakeData;
 use App\Modules\Catalog\DTOs\CatalogIntakeDetails;
@@ -31,6 +32,7 @@ final readonly class RecordCatalogIntakeAction
         private CatalogIsbnNormalizer $isbns,
         private CatalogCoverProvider $covers,
         private ContributorResolver $contributors,
+        private AuditRecorder $audit,
     ) {}
 
     /**
@@ -45,6 +47,8 @@ final readonly class RecordCatalogIntakeAction
                 $edition = Edition::query()->with('title')->findOrFail($data->existingEditionId);
                 $copy = $this->createCopy->execute($edition, $data->copy);
 
+                $this->audit->record('catalog.copy.added', "Exemplar {$copy->barcode} zu vorhandener Ausgabe erfasst.", $copy, ['edition_id' => (string) $edition->getKey()]);
+
                 return new CatalogIntakeResult($edition->title, $edition, $copy, false);
             }
 
@@ -55,6 +59,8 @@ final readonly class RecordCatalogIntakeAction
             $this->attachContributors($title, $details->contributors);
             $edition = $this->createEdition($title, $details, $data->provenance);
             $copy = $this->createCopy->execute($edition, $data->copy);
+
+            $this->audit->record('catalog.intake.recorded', "Neues Medium erfasst, Exemplar {$copy->barcode}.", $edition, ['title_id' => (string) $title->getKey(), 'copy_id' => (string) $copy->getKey()]);
 
             return new CatalogIntakeResult($title, $edition, $copy, true);
         });

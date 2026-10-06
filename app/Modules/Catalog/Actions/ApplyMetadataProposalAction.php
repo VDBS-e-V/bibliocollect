@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Actions;
 
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\DTOs\MetadataChange;
 use App\Modules\Catalog\DTOs\MetadataProposal;
 use App\Modules\Catalog\Enums\MetadataReviewStatus;
@@ -32,6 +33,7 @@ final readonly class ApplyMetadataProposalAction
         private MetadataFingerprint $fingerprint,
         private CatalogMetadataAssessor $assessor,
         private ContributorResolver $contributors,
+        private AuditRecorder $audit,
     ) {}
 
     /**
@@ -101,6 +103,14 @@ final readonly class ApplyMetadataProposalAction
                     'changes' => $applied,
                 ]],
             ])->save();
+
+            $this->audit->record(
+                'catalog.metadata.applied',
+                count($applied).' Metadatenänderung(en) aus einem Vorschlag übernommen.',
+                $edition,
+                ['source' => $proposal->source, 'fields' => implode(',', array_column($applied, 'key'))],
+                $userId,
+            );
 
             return $locked;
         });

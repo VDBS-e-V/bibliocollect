@@ -32,11 +32,11 @@ it('defines circulation as a permission based operational capability', function 
         ->toBe(['surface.administration.access']);
 });
 
-it('keeps circulation dependent on patrons school and catalog without reversing module boundaries', function (): void {
+it('keeps circulation dependent on patrons school catalog and audit without reversing module boundaries', function (): void {
     $modules = app(ModuleRegistry::class)->all();
 
     expect($modules['Circulation']['dependencies'])
-        ->toBe(['Patrons', 'School', 'Catalog'])
+        ->toBe(['Patrons', 'School', 'Catalog', 'Audit'])
         ->and($modules['Circulation']['providers'])
         ->toBe(['App\\Modules\\Circulation\\Providers\\CirculationServiceProvider'])
         ->and($modules['Catalog']['dependencies'])

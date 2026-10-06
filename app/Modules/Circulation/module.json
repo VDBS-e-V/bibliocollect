@@ -4,7 +4,8 @@
   "dependencies": [
     "Patrons",
     "School",
-    "Catalog"
+    "Catalog",
+    "Audit"
   ],
   "providers": [
     "App\\Modules\\Circulation\\Providers\\CirculationServiceProvider"

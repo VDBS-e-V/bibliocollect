@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Foundation\Support\BusinessClock;
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\School\Actions\CreateLibraryClosuresAction;
 use App\Modules\School\Actions\UpdateLibraryOpeningHoursAction;
 use App\Modules\School\Models\LibraryClosure;
@@ -64,9 +65,12 @@ final class LibraryCalendarController
                 : ($created === 1 ? 'Ein Schließtag wurde eingetragen.' : $created.' Schließtage wurden eingetragen.'));
     }
 
-    public function destroyClosure(string $closureId): RedirectResponse
+    public function destroyClosure(string $closureId, AuditRecorder $audit): RedirectResponse
     {
-        LibraryClosure::query()->findOrFail($closureId)->delete();
+        $closure = LibraryClosure::query()->findOrFail($closureId);
+        $closure->delete();
+
+        $audit->record('school.closure.deleted', 'Schließtag '.$closure->date->format('d.m.Y').' entfernt.', null, ['date' => $closure->date->toDateString()]);
 
         return redirect()
             ->route('administration.calendar.index')

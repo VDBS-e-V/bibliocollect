@@ -6,7 +6,13 @@ namespace App\Modules\School\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property Carbon $date
+ * @property string|null $reason
+ */
 final class LibraryClosure extends Model
 {
     use HasUlids;

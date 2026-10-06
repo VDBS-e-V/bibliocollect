@@ -37,13 +37,13 @@ Bewusst aus dem T2-Gate ausgeklammert, im Alltag aber bald nötig:
 
 1. Schuljahreswechsel mit Vorschau, Mapping und Konfliktbehandlung.
 2. Produktiver Schulimport.
-3. Verwaltungsmaske für Öffnungszeiten und Schließtage (Fristen hängen daran).
+3. ✔ Verwaltungsmaske für Öffnungszeiten und Schließtage (siehe `docs/AUDIT_AND_CALENDAR.md`).
 
 ## Phase 4 — Querschnitt
 
 Die Module `Audit`, `Privacy`, `Reminders` sind im Gerüst vorhanden, aber leer. Ihre Reihenfolge hängt an Phase 2:
 
-1. `Audit`: nachvollziehbare Ausleih-, Sperr- und Katalogänderungen.
+1. ✔ `Audit`: Ausleihe, Vormerkungen, Katalogerfassung und Kalender sind protokolliert, Einsicht für die Verwaltung. Offen: weitere Ereignisarten.
 2. `Privacy`: Löschkonzept, Aufbewahrungsfristen und Einsicht in Historie.
 3. `Reminders`: Benachrichtigungen (Fälligkeit, Vormerkung bereit) auf Basis der Phase-2-Ereignisse.
 

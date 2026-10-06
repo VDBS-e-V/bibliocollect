@@ -6,6 +6,7 @@ namespace App\Modules\Circulation\Actions;
 
 use App\Foundation\Support\BusinessClock;
 use App\Models\User;
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Exceptions\LoanStateConflict;
@@ -24,6 +25,7 @@ final readonly class RenewLoanAction
         private CirculationRuleEvaluator $rules,
         private LoanDueDateService $dueDates,
         private ReservationBlockChecker $reservations,
+        private AuditRecorder $audit,
     ) {}
 
     public function execute(Loan $loan, User $actor): Loan
@@ -62,6 +64,14 @@ final readonly class RenewLoanAction
                 'last_renewed_at' => $renewedAt,
                 'last_renewed_by_user_id' => $actor->getKey(),
             ])->save();
+
+            $this->audit->record(
+                'circulation.loan.renewed',
+                "Ausleihe von Exemplar {$copy->barcode} verlängert, neu fällig am {$lockedLoan->due_on->format('d.m.Y')}.",
+                $lockedLoan,
+                ['patron_id' => (string) $lockedLoan->patron_id, 'copy_id' => (string) $copy->getKey(), 'renewal_count' => $lockedLoan->renewal_count, 'due_on' => $lockedLoan->due_on->toDateString()],
+                (int) $actor->getKey(),
+            );
 
             return $lockedLoan->load('copy.edition.title');
         });

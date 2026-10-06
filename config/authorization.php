@@ -56,6 +56,10 @@ return [
             'label' => 'Katalog importieren',
             'description' => 'Erlaubt vorbereitete Massenimporte in den Katalog mit Mapping, Vorschau, Konfliktprüfung und expliziter Übernahme.',
         ],
+        'audit.view' => [
+            'label' => 'Protokoll einsehen',
+            'description' => 'Erlaubt die Einsicht in das Protokoll fachlicher Ereignisse (Ausleihe, Katalog, Schule).',
+        ],
         'circulation.manage' => [
             'label' => 'Ausleihe und Rückgabe durchführen',
             'description' => 'Erlaubt das Ausleihen und Zurückgeben physischer Exemplare im Bibliotheksbetrieb.',
@@ -114,6 +118,7 @@ return [
                 'catalog.import',
                 'circulation.manage',
                 'school.manage',
+                'audit.view',
             ],
         ],
         'technical_admin' => [

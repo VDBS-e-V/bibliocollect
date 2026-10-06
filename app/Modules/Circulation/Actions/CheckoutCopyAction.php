@@ -6,6 +6,7 @@ namespace App\Modules\Circulation\Actions;
 
 use App\Foundation\Support\BusinessClock;
 use App\Models\User;
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Circulation\Enums\ReservationStatus;
@@ -25,6 +26,7 @@ final readonly class CheckoutCopyAction
         private CirculationRuleEvaluator $rules,
         private LoanDueDateService $dueDates,
         private ReservationQueueService $reservations,
+        private AuditRecorder $audit,
     ) {}
 
     public function execute(Patron $patron, string $barcode, User $actor): Loan
@@ -88,6 +90,14 @@ final readonly class CheckoutCopyAction
 
             $this->fulfilReservation($lockedPatron, $edition->title_id, $copy, $loan, $actor);
 
+            $this->audit->record(
+                'circulation.loan.checked_out',
+                "Exemplar {$copy->barcode} ausgeliehen, fällig am {$dueOn->format('d.m.Y')}.",
+                $loan,
+                ['patron_id' => (string) $lockedPatron->getKey(), 'copy_id' => (string) $copy->getKey(), 'due_on' => $dueOn->toDateString()],
+                (int) $actor->getKey(),
+            );
+
             return $loan->load('copy.edition.title');
         });
     }
@@ -119,6 +129,14 @@ final readonly class CheckoutCopyAction
             'closed_at' => $this->clock->now(),
             'closed_by_user_id' => $actor->getKey(),
         ])->save();
+
+        $this->audit->record(
+            'circulation.reservation.fulfilled',
+            'Vormerkung durch Ausleihe erfüllt.',
+            $reservation,
+            ['patron_id' => (string) $patron->getKey(), 'loan_id' => (string) $loan->getKey()],
+            (int) $actor->getKey(),
+        );
 
         if ($otherCopyId !== null) {
             $otherCopy = Copy::query()->whereKey($otherCopyId)->lockForUpdate()->first();

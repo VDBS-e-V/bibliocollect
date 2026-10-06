@@ -6,6 +6,7 @@ namespace App\Modules\Circulation\Actions;
 
 use App\Foundation\Support\BusinessClock;
 use App\Models\User;
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
@@ -31,6 +32,7 @@ final readonly class PlaceReservationAction
         private CirculationRuleEvaluator $rules,
         private CopyAvailabilityService $availability,
         private CatalogIsbnNormalizer $isbn,
+        private AuditRecorder $audit,
     ) {}
 
     public function execute(Patron $patron, string $identifier, User $actor): Reservation
@@ -61,13 +63,23 @@ final readonly class PlaceReservationAction
                 throw new CirculationRuleViolation($violations);
             }
 
-            return Reservation::query()->create([
+            $reservation = Reservation::query()->create([
                 'patron_id' => $lockedPatron->getKey(),
                 'title_id' => $titleId,
                 'status' => ReservationStatus::Waiting,
                 'requested_at' => $this->clock->now(),
                 'created_by_user_id' => $actor->getKey(),
-            ])->load('title');
+            ]);
+
+            $this->audit->record(
+                'circulation.reservation.placed',
+                'Titel vorgemerkt.',
+                $reservation,
+                ['patron_id' => (string) $lockedPatron->getKey(), 'title_id' => $titleId],
+                (int) $actor->getKey(),
+            );
+
+            return $reservation->load('title');
         });
     }
 

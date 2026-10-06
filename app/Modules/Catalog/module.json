@@ -1,7 +1,7 @@
 {
   "name": "Catalog",
   "description": "Titel, Ausgaben, physische Exemplare, Barcodes und bibliografische Daten.",
-  "dependencies": [],
+  "dependencies": ["Audit"],
   "providers": [
     "App\\Modules\\Catalog\\Providers\\CatalogServiceProvider"
   ],

@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\School\Actions;
 
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\School\Models\LibraryClosure;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
-final class CreateLibraryClosuresAction
+final readonly class CreateLibraryClosuresAction
 {
     public const MAX_DAYS = 400;
+
+    public function __construct(private AuditRecorder $audit) {}
 
     /**
      * Legt für jeden Tag des Zeitraums einen Schließtag an. Bereits eingetragene Tage bleiben unverändert.
@@ -33,7 +36,7 @@ final class CreateLibraryClosuresAction
 
         $reason = $reason !== null && trim($reason) !== '' ? trim($reason) : null;
 
-        return DB::transaction(static function () use ($start, $end, $reason): int {
+        return DB::transaction(function () use ($start, $end, $reason): int {
             $created = 0;
 
             for ($day = $start; $day->lessThanOrEqualTo($end); $day = $day->addDay()) {
@@ -45,6 +48,13 @@ final class CreateLibraryClosuresAction
                 LibraryClosure::query()->create(['date' => $day->toDateString(), 'reason' => $reason]);
                 $created++;
             }
+
+            $this->audit->record(
+                'school.closures.created',
+                "{$created} Schließtag(e) eingetragen.",
+                null,
+                ['from' => $start->toDateString(), 'to' => $end->toDateString()],
+            );
 
             return $created;
         });

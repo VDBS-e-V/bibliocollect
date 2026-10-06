@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Circulation\Services;
 
 use App\Foundation\Support\BusinessClock;
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
@@ -23,6 +24,7 @@ final readonly class ReservationQueueService
         private BusinessClock $clock,
         private CirculationRuleEvaluator $rules,
         private LoanDueDateService $dueDates,
+        private AuditRecorder $audit,
     ) {}
 
     /**
@@ -62,6 +64,13 @@ final readonly class ReservationQueueService
                     'pickup_until' => $this->dueDates->forPickupDeadline($now)->toDateString(),
                 ])->save();
 
+                $this->audit->record(
+                    'circulation.reservation.ready',
+                    "Exemplar {$copy->barcode} für Vormerkung zurückgelegt.",
+                    $reservation,
+                    ['patron_id' => (string) $reservation->patron_id, 'copy_id' => (string) $copy->getKey(), 'pickup_until' => $reservation->pickup_until?->toDateString()],
+                );
+
                 return $reservation;
             }
 
@@ -82,6 +91,16 @@ final readonly class ReservationQueueService
                 'closed_at' => $this->clock->now(),
                 'closed_by_user_id' => $actorId,
             ])->save();
+
+            if ($newStatus === ReservationStatus::Expired) {
+                $this->audit->record(
+                    'circulation.reservation.expired',
+                    'Abholfrist einer Vormerkung abgelaufen.',
+                    $reservation,
+                    ['patron_id' => (string) $reservation->patron_id, 'title_id' => (string) $reservation->title_id],
+                    $actorId,
+                );
+            }
 
             if ($copyId === null) {
                 return null;

@@ -178,6 +178,12 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Protokoll und Öffnungszeiten (v0.5.3)
+
+- Verwaltungsmaske für Öffnungszeiten und Schließtage (`/verwaltung/oeffnungszeiten`).
+- Modul `Audit` mit unveränderlichem Ereignisprotokoll für Ausleihe, Vormerkungen, Katalogerfassung, Metadatenübernahme und Kalender; Einsicht unter `/verwaltung/protokoll` mit dem Recht `audit.view` (nur Verwaltung).
+- Details in `docs/AUDIT_AND_CALENDAR.md`.
+
 ### Circulation v0.5.2
 
 - Öffentliche Verfügbarkeit aus offenen Ausleihen (`CopyAvailabilityService`): „Verfügbar“, „n von m Exemplaren verfügbar“, „Derzeit ausgeliehen“, frühestes Rückgabedatum und Zahl der Vormerkungen; ohne Barcodes oder Personen.

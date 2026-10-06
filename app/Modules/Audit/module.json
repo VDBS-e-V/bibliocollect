@@ -2,6 +2,8 @@
   "name": "Audit",
   "description": "Kritische fachliche und administrative Auditereignisse.",
   "dependencies": [],
-  "providers": [],
+  "providers": [
+    "App\\Modules\\Audit\\Providers\\AuditServiceProvider"
+  ],
   "enabled": true
 }
