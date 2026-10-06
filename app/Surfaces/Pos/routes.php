@@ -11,6 +11,7 @@ use App\Surfaces\Pos\Http\Controllers\CatalogIntakeController;
 use App\Surfaces\Pos\Http\Controllers\CatalogQualityController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
+use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
@@ -117,6 +118,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::patch('/betrieb/katalog/ausgaben/{editionId}/exemplare/{copyId}', [CatalogCopyController::class, 'update'])
             ->name('pos.catalog.copies.update');
     });
+
+    Route::get('/betrieb/klassenlisten', ClassLoanReportController::class)
+        ->middleware('permission:circulation.reports')
+        ->name('pos.reports.class-loans');
 
     Route::middleware('permission:circulation.manage')->group(function (): void {
         Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen', [CirculationController::class, 'checkout'])

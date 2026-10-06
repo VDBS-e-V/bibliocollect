@@ -3,3 +3,4 @@ function applyTheme(theme){const root=document.documentElement;const dark=theme=
 let initialTheme='light';try{initialTheme=localStorage.getItem(storageKey)==='dark'?'dark':'light'}catch(_){}applyTheme(initialTheme);
 document.addEventListener('click',(event)=>{const button=event.target.closest('[data-theme-toggle]');if(!button)return;const next=document.documentElement.hasAttribute('data-vdbs-theme')?'light':'dark';applyTheme(next);try{localStorage.setItem(storageKey,next)}catch(_){}});
 document.addEventListener('change',(event)=>{const field=event.target.closest('[data-auto-submit]');if(!field||!field.form)return;if(typeof field.form.requestSubmit==='function'){field.form.requestSubmit()}else{field.form.submit()}});
+document.addEventListener('click',(event)=>{if(event.target.closest('[data-print]')){window.print()}});

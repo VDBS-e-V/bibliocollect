@@ -1,0 +1,47 @@
+.bc-class-report {
+    margin-bottom: 2.5rem;
+}
+
+.bc-class-report h2 {
+    margin: 0;
+}
+
+.bc-class-report__meta,
+.bc-class-report__note {
+    margin: .3rem 0 .8rem;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+@media print {
+    .bc-shell__header,
+    .bc-shell__footer,
+    .bc-preview-banner,
+    .bc-skip-link,
+    .bc-class-report-screen {
+        display: none !important;
+    }
+
+    body,
+    .bc-shell,
+    .bc-shell__main {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    .bc-class-report {
+        break-after: page;
+        margin: 0;
+        padding: 0;
+    }
+
+    .bc-class-report:last-of-type {
+        break-after: auto;
+    }
+
+    .bc-class-report .bc-calendar-table th,
+    .bc-class-report .bc-calendar-table td {
+        border-bottom: 1px solid #000;
+        color: #000;
+    }
+}

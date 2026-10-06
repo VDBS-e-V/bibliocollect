@@ -5,7 +5,7 @@
 3. Die Qualitätsseite meldet jetzt auch ISBNs mit falscher Prüfziffer. Diese Fälle von Hand anhand des Buchs berichtigen; gültige, aber falsch zugeordnete ISBNs (z. B. eine „Matilda“-Ausgabe mit der ISBN von „Mr. Fox“) fallen nur über das Cover auf.
 4. Den Betrieb einrichten: dauerhaft laufender Queue Worker (`php artisan queue:work`), `php artisan schedule:run` jede Minute (Cover-Nachholung täglich 03:30, Ablauf von Abholfristen täglich 04:00), `php artisan storage:link` und ein kostenloser Google-Books-API-Key als Fallback (danach einmal `catalog:covers:queue --retry-missing`). Die Nutzungsbedingungen für das Speichern von Google-Bildern vorher prüfen.
 5. SMTP-Zugangsdaten für den Mailversand eintragen (bis dahin schreibt `MAIL_MAILER=log` die Erinnerungen ins Log) und prüfen, ob Erinnerungen abbestellbar sein sollen.
-6. Entscheiden, ob Mahnungen und Gebühren fachlich gewollt sind; erst danach bauen.
+6. Entschieden: keine Mahnungen und Gebühren. Erinnerungen per E-Mail und die Klassenlisten (`/betrieb/klassenlisten`) reichen; vor dem Betrieb einmal `privacy:anonymize --dry-run` ausführen und die Zahlen prüfen.
 7. Den Ausleihkonten-Import (`docs/PATRON_IMPORT.md`) mit der echten Schülerliste ausprobieren; dafür zuerst Schuljahr und Klassen anlegen und aktivieren.
 8. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden. Die DNB-/GND-/Quellenfelder und der Qualitätsaudit bilden dafür bereits eine fachliche Zielstruktur.
 9. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.

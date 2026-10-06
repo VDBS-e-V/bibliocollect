@@ -53,6 +53,13 @@ return [
                     'order' => 20,
                 ],
                 [
+                    'label' => 'Klassenlisten',
+                    'route' => 'pos.reports.class-loans',
+                    'active' => 'pos.reports.*',
+                    'permission' => 'circulation.reports',
+                    'order' => 27,
+                ],
+                [
                     'label' => 'Vormerkungen',
                     'route' => 'pos.reservations.index',
                     'active' => 'pos.reservations.*',

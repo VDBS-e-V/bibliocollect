@@ -11,6 +11,7 @@ use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Reminders\Models\ReminderLog;
 use App\Modules\Reminders\Notifications\LibraryReminder;
+use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Throwable;
@@ -42,7 +43,7 @@ final class SendRemindersCommand extends Command
                 continue;
             }
 
-            $due = $loan->due_on->copy()->startOfDay();
+            $due = CarbonImmutable::parse($loan->due_on->toDateString(), $today->getTimezone());
             $title = $loan->copy->edition->title->preferred_title;
 
             if ($due->lessThan($today)) {

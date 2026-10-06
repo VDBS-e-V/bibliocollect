@@ -25,3 +25,9 @@ Schedule::command('circulation:reservations:expire')
     ->dailyAt('04:00')
     ->withoutOverlapping()
     ->onOneServer();
+
+// Anonymisiert abgelaufene Daten nach der Aufbewahrungsfrist (config/privacy.php).
+Schedule::command('privacy:anonymize')
+    ->weeklyOn(7, '02:00')
+    ->withoutOverlapping()
+    ->onOneServer();

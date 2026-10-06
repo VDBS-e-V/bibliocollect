@@ -178,6 +178,13 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Datenschutz und Klassenlisten (v0.6.1)
+
+- `privacy:anonymize` anonymisiert Ausleihen, Vormerkungen, ausgeschiedene Ausleihkonten samt Onlinekonten, Ereignisse und Protokoll nach 3 Jahren; Erinnerungsprotokolle werden gelöscht. Wöchentlich im Scheduler, `--dry-run` zum Zählen.
+- Klassenlisten (`/betrieb/klassenlisten`) als Sammeldruck offener oder überfälliger Ausleihen je Klasse für die Klassenleitungen, Recht `circulation.reports`.
+- Entscheidung: keine Mahnungen und Gebühren.
+- Details in `docs/PRIVACY_AND_CLASS_LISTS.md`.
+
 ### Import von Ausleihkonten (v0.6.0)
 
 - `/betrieb/ausleihkonten/import`: CSV-Import für Schüler:innen, Lehrkräfte und Mitarbeiter:innen mit Vorlage, Vorschau, Fehlersperre und automatisch vergebenen Bibliotheksnummern.

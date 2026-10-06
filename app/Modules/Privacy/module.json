@@ -2,8 +2,14 @@
   "name": "Privacy",
   "description": "Datenauskunft, Anonymisierung und Retention-Orchestrierung.",
   "dependencies": [
-    "Patrons"
+    "Patrons",
+    "Circulation",
+    "Identity",
+    "Audit",
+    "Reminders"
   ],
-  "providers": [],
+  "providers": [
+    "App\\Modules\\Privacy\\Providers\\PrivacyServiceProvider"
+  ],
   "enabled": true
 }

@@ -26,7 +26,7 @@ Reihenfolge ist fachlich bedingt:
 1. ✔ **Öffentliche Verfügbarkeit** auf Basis offener Loans. Erst danach darf "aktiv" zu "derzeit verfügbar" werden. Sie bleibt titelbezogen, ohne Barcodes oder ULIDs.
 2. ✔ **Verlängerungen** mit expliziten Regeln auf dem bestehenden `Loan`-Modell (maximale Anzahl, Sperre bei Vormerkung, Schließtage über `SchoolCalendarService`).
 3. ✔ **Vormerkungen**, titelbezogen, mit Zahl der Vormerkungen in der öffentlichen Titelansicht und Abholung (zurücklegen, Abholfrist, Ablauf). Offen: Selbstbedienung im Portal und Benachrichtigungen.
-4. **Mahnungen und Gebühren** nur, wenn die Schule sie fachlich will. Vorher als Entscheidung klären.
+4. ✔ Entscheidung: **keine Mahnungen und Gebühren**. Stattdessen Erinnerungs-E-Mails und Sammeldrucke für die Klassenleitungen (`/betrieb/klassenlisten`).
 5. **Differenzierte Einsicht in Ausleihhistorie** zusammen mit dem Datenschutzkonzept (Phase 4).
 
 Gate pro Schritt: Regeln im `CirculationRuleEvaluator` zentral, Transaktionen mit `lockForUpdate()`, Rollen-Matrix getestet.
@@ -44,7 +44,7 @@ Bewusst aus dem T2-Gate ausgeklammert, im Alltag aber bald nötig:
 Die Module `Audit`, `Privacy`, `Reminders` sind im Gerüst vorhanden, aber leer. Ihre Reihenfolge hängt an Phase 2:
 
 1. ✔ `Audit`: Ausleihe, Vormerkungen, Katalogerfassung und Kalender sind protokolliert, Einsicht für die Verwaltung. Offen: weitere Ereignisarten.
-2. `Privacy`: Löschkonzept, Aufbewahrungsfristen und Einsicht in Historie.
+2. ✔ `Privacy`: Alles wird nach 3 Jahren anonymisiert (siehe `docs/PRIVACY_AND_CLASS_LISTS.md`). Offen: Datenauskunft einer Person.
 3. ✔ `Reminders`: E-Mail-Erinnerungen (bald fällig, überfällig, Vormerkung abholbereit), siehe `docs/PORTAL_AND_REMINDERS.md`. Offen: Mahnungen/Gebühren (fachliche Entscheidung), Abmeldung von Erinnerungen.
 
 ## Später / bei Bedarf

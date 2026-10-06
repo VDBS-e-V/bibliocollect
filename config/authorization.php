@@ -56,6 +56,10 @@ return [
             'label' => 'Katalog importieren',
             'description' => 'Erlaubt vorbereitete Massenimporte in den Katalog mit Mapping, Vorschau, Konfliktprüfung und expliziter Übernahme.',
         ],
+        'circulation.reports' => [
+            'label' => 'Klassenlisten drucken',
+            'description' => 'Erlaubt Sammellisten offener Ausleihen je Klasse für die Klassenleitungen.',
+        ],
         'audit.view' => [
             'label' => 'Protokoll einsehen',
             'description' => 'Erlaubt die Einsicht in das Protokoll fachlicher Ereignisse (Ausleihe, Katalog, Schule).',
@@ -99,6 +103,7 @@ return [
                 'catalog.manage',
                 'catalog.import',
                 'circulation.manage',
+                'circulation.reports',
             ],
         ],
         'management' => [
@@ -119,6 +124,7 @@ return [
                 'circulation.manage',
                 'school.manage',
                 'audit.view',
+                'circulation.reports',
             ],
         ],
         'technical_admin' => [
