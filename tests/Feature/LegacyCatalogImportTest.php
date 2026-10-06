@@ -159,6 +159,104 @@ it('does not silently merge conflicting editions that share title and isbn', fun
         ->and(Copy::query()->count())->toBe(2);
 });
 
+it('keeps legacy edition groups separate when one distinguishing field is null', function (): void {
+    $path = storage_path('framework/testing/legacy-null-edition-difference.json');
+    @mkdir(dirname($path), 0777, true);
+
+    file_put_contents($path, json_encode([
+        [
+            'media_id' => '1',
+            'inventory_number' => 'L-FLAG-1',
+            'main_title' => 'Flaggen der Welt',
+            'subtitle' => '[mit Stickern & riesigem Poster]',
+            'isbn_eans' => '9783905851953',
+            'edition_statement' => 'Dt. Lizenzausg.',
+            'edition_number' => 'Dt. Lizenzausg.',
+            'publisher' => 'Otus',
+            'publication_year' => '2011',
+            'dnb_rcn_id' => '1014097282',
+        ],
+        [
+            'media_id' => '2',
+            'inventory_number' => 'L-FLAG-2',
+            'main_title' => 'Flaggen der Welt',
+            'subtitle' => '[mit Stickern & riesigem Poster]',
+            'isbn_eans' => '9783905851953',
+            'edition_statement' => null,
+            'edition_number' => 'Dt. Lizenzausg.',
+            'publisher' => 'Otus',
+            'publication_year' => '2011',
+            'dnb_rcn_id' => '1014097282',
+        ],
+    ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+
+    $report = app(ImportLegacyCatalogAction::class)->execute($path);
+
+    expect($report->summary['planned_editions'])->toBe(2)
+        ->and($report->summary['created_editions'])->toBe(2)
+        ->and($report->summary['reused_editions'])->toBe(0)
+        ->and($report->summary['resolved_editions'])->toBe(2)
+        ->and(Copy::query()->whereIn('barcode', ['L-FLAG-1', 'L-FLAG-2'])->pluck('edition_id')->unique())->toHaveCount(2);
+});
+
+it('repairs a previously merged legacy copy without changing its identity', function (): void {
+    $path = storage_path('framework/testing/legacy-merged-edition-repair.json');
+    @mkdir(dirname($path), 0777, true);
+
+    $rows = [
+        [
+            'media_id' => '1',
+            'inventory_number' => 'L-REPAIR-1',
+            'main_title' => 'Flaggen der Welt',
+            'subtitle' => '[mit Stickern & riesigem Poster]',
+            'isbn_eans' => '9783905851953',
+            'edition_statement' => 'Dt. Lizenzausg.',
+            'edition_number' => 'Dt. Lizenzausg.',
+            'publisher' => 'Otus',
+            'publication_year' => '2011',
+            'dnb_rcn_id' => '1014097282',
+        ],
+        [
+            'media_id' => '2',
+            'inventory_number' => 'L-REPAIR-2',
+            'main_title' => 'Flaggen der Welt',
+            'subtitle' => '[mit Stickern & riesigem Poster]',
+            'isbn_eans' => '9783905851953',
+            'edition_statement' => null,
+            'edition_number' => 'Dt. Lizenzausg.',
+            'publisher' => 'Otus',
+            'publication_year' => '2011',
+            'dnb_rcn_id' => '1014097282',
+        ],
+    ];
+
+    file_put_contents($path, json_encode([$rows[0]], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+    app(ImportLegacyCatalogAction::class)->execute($path);
+
+    $mergedEdition = Edition::query()->sole();
+    $incorrectCopy = $mergedEdition->copies()->create([
+        'barcode' => 'L-REPAIR-2',
+        'status' => CopyStatus::Active,
+        'legacy_source' => 'vdbs-legacy',
+        'legacy_media_id' => '2',
+        'legacy_metadata' => $rows[1],
+    ]);
+    $copyId = (string) $incorrectCopy->getKey();
+
+    file_put_contents($path, json_encode($rows, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+    $report = app(ImportLegacyCatalogAction::class)->execute($path);
+
+    $repairedCopy = Copy::query()->where('barcode', 'L-REPAIR-2')->firstOrFail();
+
+    expect($report->summary['planned_editions'])->toBe(2)
+        ->and($report->summary['created_editions'])->toBe(1)
+        ->and($report->summary['resolved_editions'])->toBe(2)
+        ->and($report->summary['relinked_copies'])->toBe(1)
+        ->and(Edition::query()->count())->toBe(2)
+        ->and((string) $repairedCopy->getKey())->toBe($copyId)
+        ->and($repairedCopy->edition_id)->not->toBe($mergedEdition->getKey());
+});
+
 it('supports a direct row-array JSON export in addition to the phpMyAdmin envelope', function (): void {
     $path = storage_path('framework/testing/legacy-direct-array.json');
     @mkdir(dirname($path), 0777, true);

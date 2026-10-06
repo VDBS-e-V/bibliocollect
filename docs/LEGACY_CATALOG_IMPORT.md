@@ -160,6 +160,10 @@ Importierte Exemplare werden über `legacy_source + legacy_media_id` wiedererkan
 
 Ein erneuter Lauf erzeugt deshalb keine zweiten physischen Exemplare. Bereits vorhandene normale Katalogdatensätze werden nicht still überschrieben. Ein eindeutiger Titel/ISBN-Match wird nur wiederverwendet, wenn die vorhandenen Kernangaben mit dem Legacy-Datensatz kompatibel sind; dann werden ausschließlich bislang leere Editionsmetadaten ergänzt. Widersprüchliche Auflagen-/Verlags-/Jahres-/Quellenangaben werden nicht still zusammengeführt, sondern bleiben als getrennte Ausgabe erhalten.
 
+Eine bereits als `vdbs-legacy` markierte Edition darf nur für genau denselben `legacy_record_key` wiederverwendet werden. Ein bloßer ISBN-Match darf zwei unterschiedliche Legacy-Editionsgruppen nicht zusammenführen, auch dann nicht, wenn ein unterscheidendes Feld in einer Gruppe `null` ist. Nach jedem Import prüft der Workflow zusätzlich, dass die Zahl der geplanten Editionsgruppen der Zahl der tatsächlich aufgelösten Edition-IDs entspricht.
+
+Wurde ein Bestand mit einer älteren Importerversion bereits zu aggressiv zusammengeführt, repariert ein erneuter Import nach diesem Fix den Editionsbezug idempotent: Das vorhandene `Copy` behält seine ULID und seinen Barcode, wird aber auf die anhand seiner unveränderten `legacy_metadata` korrekt rekonstruierte Edition verschoben. `relinked_copies` weist solche Reparaturen im Importbericht aus.
+
 ## Cover
 
 `cover_image_path` wird nur als `legacy_cover_path` erhalten. Die alten Bilddateien werden nicht kopiert. Ein späterer Cover-Service soll Cover anhand ISBN/DNB-Identifier neu beziehen und unabhängig von der Legacy-Migration verwalten.

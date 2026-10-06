@@ -60,6 +60,8 @@ final readonly class ImportLegacyCatalogAction
                 'reused_contributions' => 0,
                 'created_copies' => 0,
                 'reused_copies' => 0,
+                'relinked_copies' => 0,
+                'resolved_editions' => 0,
             ];
 
             $topicsByLegacyId = $this->importTopics($topicRows, $counts);
@@ -70,6 +72,10 @@ final readonly class ImportLegacyCatalogAction
             $titlesByKey = [];
             /** @var array<string, Contributor> $contributorsByKey */
             $contributorsByKey = [];
+            /** @var array<string, true> $plannedEditionKeys */
+            $plannedEditionKeys = [];
+            /** @var array<string, true> $resolvedEditionIds */
+            $resolvedEditionIds = [];
 
             foreach ($mediaRows as $row) {
                 $record = $this->normalizer->media($row);
@@ -78,9 +84,21 @@ final readonly class ImportLegacyCatalogAction
                     throw new LegacyCatalogImportException(implode(' ', $record['errors']));
                 }
 
+                $plannedEditionKeys[(string) $record['edition_key']] = true;
                 $edition = $this->resolveEdition($record, $titlesByKey, $editionsByKey, $counts);
                 $this->resolveContributors($record, $edition->title, $contributorsByKey, $counts);
-                $this->resolveCopy($record, $edition, $signaturesByValue, $counts);
+                $copy = $this->resolveCopy($record, $edition, $signaturesByValue, $counts);
+                $resolvedEditionIds[(string) $copy->edition_id] = true;
+            }
+
+            $counts['resolved_editions'] = count($resolvedEditionIds);
+
+            if (count($plannedEditionKeys) !== count($resolvedEditionIds)) {
+                throw new LegacyCatalogImportException(sprintf(
+                    'Legacy-Import würde %d Editionsgruppen auf nur %d Editionen abbilden.',
+                    count($plannedEditionKeys),
+                    count($resolvedEditionIds),
+                ));
             }
 
             return $counts;
@@ -212,8 +230,6 @@ final readonly class ImportLegacyCatalogAction
         $key = (string) $record['edition_key'];
 
         if (isset($editionsByKey[$key])) {
-            $counts['reused_editions']++;
-
             return $editionsByKey[$key];
         }
 
@@ -238,7 +254,9 @@ final readonly class ImportLegacyCatalogAction
             $isbnMatches = Edition::query()
                 ->where('title_id', $title->getKey())
                 ->where('isbn', $isbn)
-                ->get();
+                ->get()
+                ->filter(fn (Edition $candidate): bool => $this->canReuseForLegacyRecordKey($candidate, $key))
+                ->values();
 
             if ($isbnMatches->count() === 1) {
                 /** @var Edition $matched */
@@ -367,6 +385,11 @@ final readonly class ImportLegacyCatalogAction
         }
 
         if ($copy !== null) {
+            if ((string) $copy->edition_id !== (string) $edition->getKey()) {
+                $copy->forceFill(['edition_id' => $edition->getKey()])->save();
+                $counts['relinked_copies']++;
+            }
+
             $counts['reused_copies']++;
 
             return $copy;
@@ -383,6 +406,15 @@ final readonly class ImportLegacyCatalogAction
         $counts['created_copies']++;
 
         return $copy;
+    }
+
+    private function canReuseForLegacyRecordKey(Edition $edition, string $key): bool
+    {
+        if ($edition->legacy_source !== LegacyCatalogNormalizer::SOURCE) {
+            return true;
+        }
+
+        return $edition->legacy_record_key === $key;
     }
 
     /** @param array<string, mixed> $data */
