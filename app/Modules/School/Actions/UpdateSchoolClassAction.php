@@ -36,6 +36,7 @@ final class UpdateSchoolClassAction
                 'name' => trim($data->name),
                 'grade_level' => $data->gradeLevel,
                 'is_active' => $data->isActive,
+                'homeroom_teacher' => $data->homeroomTeacher,
             ])->save();
 
             return $lockedClass->load('schoolYear');

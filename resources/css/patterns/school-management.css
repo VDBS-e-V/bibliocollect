@@ -52,7 +52,7 @@
 .bc-school-classes__heading span { color: var(--text-secondary); font-size: var(--text-xs); }
 
 .bc-school-class-row {
-    grid-template-columns: minmax(10rem, 1fr) minmax(7rem, .45fr) minmax(11rem, .75fr) auto;
+    grid-template-columns: minmax(8rem, .8fr) minmax(6rem, .4fr) minmax(10rem, .9fr) minmax(10rem, .7fr) auto;
     border-bottom: 1px solid var(--border-default);
     padding: .8rem 0;
 }
@@ -138,6 +138,18 @@
     background: var(--bg-surface);
     color: var(--text-primary);
     padding: .3rem .45rem;
+}
+
+.bc-calendar-ranges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.25rem;
+}
+
+.bc-calendar-range {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
 }
 
 .bc-visually-hidden {

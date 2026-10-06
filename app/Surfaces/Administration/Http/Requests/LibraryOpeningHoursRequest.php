@@ -21,8 +21,9 @@ final class LibraryOpeningHoursRequest extends FormRequest
 
         foreach (range(1, 7) as $day) {
             $rules["days.{$day}.is_open"] = ['sometimes', 'boolean'];
-            $rules["days.{$day}.opens_at"] = ['nullable', 'date_format:H:i'];
-            $rules["days.{$day}.closes_at"] = ['nullable', 'date_format:H:i'];
+            $rules["days.{$day}.ranges"] = ['nullable', 'array', 'max:6'];
+            $rules["days.{$day}.ranges.*.from"] = ['nullable', 'date_format:H:i'];
+            $rules["days.{$day}.ranges.*.to"] = ['nullable', 'date_format:H:i'];
         }
 
         return $rules;
@@ -39,13 +40,26 @@ final class LibraryOpeningHoursRequest extends FormRequest
                 }
 
                 $open++;
-                $opens = $this->input("days.{$day}.opens_at");
-                $closes = $this->input("days.{$day}.closes_at");
+                $ranges = $this->rangesFor($day);
 
-                if (! is_string($opens) || ! is_string($closes) || $opens === '' || $closes === '') {
-                    $validator->errors()->add("days.{$day}.opens_at", 'Für geöffnete Tage werden Beginn und Ende benötigt.');
-                } elseif ($closes <= $opens) {
-                    $validator->errors()->add("days.{$day}.closes_at", 'Das Ende muss nach dem Beginn liegen.');
+                if ($ranges === []) {
+                    $validator->errors()->add("days.{$day}.ranges", 'Für geöffnete Tage wird mindestens ein Zeitraum mit Beginn und Ende benötigt.');
+
+                    continue;
+                }
+
+                $previousEnd = null;
+
+                foreach ($ranges as $range) {
+                    if ($range['from'] === '' || $range['to'] === '') {
+                        $validator->errors()->add("days.{$day}.ranges", 'Jeder Zeitraum braucht Beginn und Ende.');
+                    } elseif ($range['to'] <= $range['from']) {
+                        $validator->errors()->add("days.{$day}.ranges", 'Das Ende muss nach dem Beginn liegen.');
+                    } elseif ($previousEnd !== null && $range['from'] < $previousEnd) {
+                        $validator->errors()->add("days.{$day}.ranges", 'Die Zeiträume eines Tages dürfen sich nicht überschneiden.');
+                    }
+
+                    $previousEnd = $range['to'];
                 }
             }
 
@@ -55,23 +69,43 @@ final class LibraryOpeningHoursRequest extends FormRequest
         });
     }
 
-    /** @return array<int, array{is_open: bool, opens_at: ?string, closes_at: ?string}> */
+    /** @return array<int, array{is_open: bool, ranges: list<array{from: string, to: string}>}> */
     public function days(): array
     {
         $days = [];
 
         foreach (range(1, 7) as $day) {
             $open = $this->boolean("days.{$day}.is_open");
-            $opens = $this->input("days.{$day}.opens_at");
-            $closes = $this->input("days.{$day}.closes_at");
-
-            $days[$day] = [
-                'is_open' => $open,
-                'opens_at' => $open && is_string($opens) ? $opens : null,
-                'closes_at' => $open && is_string($closes) ? $closes : null,
-            ];
+            $days[$day] = ['is_open' => $open, 'ranges' => $open ? $this->rangesFor($day) : []];
         }
 
         return $days;
+    }
+
+    /**
+     * Gefüllte Zeiträume eines Tages nach Beginn sortiert. Leere Zeilen (Reserveplätze im Formular) fallen weg;
+     * eine halb ausgefüllte Zeile zählt mit und wird bei der Prüfung beanstandet.
+     *
+     * @return list<array{from: string, to: string}>
+     */
+    private function rangesFor(int $day): array
+    {
+        $ranges = [];
+        $input = $this->input("days.{$day}.ranges", []);
+
+        foreach (is_array($input) ? $input : [] as $range) {
+            $from = is_array($range) && is_string($range['from'] ?? null) ? $range['from'] : '';
+            $to = is_array($range) && is_string($range['to'] ?? null) ? $range['to'] : '';
+
+            if ($from === '' && $to === '') {
+                continue;
+            }
+
+            $ranges[] = ['from' => $from, 'to' => $to];
+        }
+
+        usort($ranges, static fn (array $a, array $b): int => strcmp($a['from'], $b['from']));
+
+        return $ranges;
     }
 }

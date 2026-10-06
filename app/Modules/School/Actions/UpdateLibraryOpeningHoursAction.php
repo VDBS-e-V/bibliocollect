@@ -14,9 +14,10 @@ final readonly class UpdateLibraryOpeningHoursAction
     public function __construct(private AuditRecorder $audit) {}
 
     /**
-     * Speichert die Wochenübersicht. Schlüssel 1 (Montag) bis 7 (Sonntag); geschlossene Tage verlieren ihre Zeiten.
+     * Speichert die Wochenübersicht. Schlüssel 1 (Montag) bis 7 (Sonntag). Ein geöffneter Tag hat einen oder mehrere
+     * Zeiträume (`H:i`), die sich nicht überschneiden; ein geschlossener Tag hat keine.
      *
-     * @param  array<int, array{is_open: bool, opens_at: ?string, closes_at: ?string}>  $days
+     * @param  array<int, array{is_open: bool, ranges: list<array{from: string, to: string}>}>  $days
      */
     public function execute(array $days): void
     {
@@ -27,25 +28,39 @@ final readonly class UpdateLibraryOpeningHoursAction
             throw new InvalidArgumentException('Mindestens ein Wochentag muss geöffnet sein.');
         }
 
-        DB::transaction(function () use ($days): void {
-            foreach (range(1, 7) as $dayOfWeek) {
-                $day = $days[$dayOfWeek] ?? ['is_open' => false, 'opens_at' => null, 'closes_at' => null];
+        foreach ($open as $day) {
+            if ($day['ranges'] === []) {
+                throw new InvalidArgumentException('Für geöffnete Tage wird mindestens ein Zeitraum benötigt.');
+            }
+        }
 
-                LibraryOpeningHour::query()->updateOrCreate(
-                    ['day_of_week' => $dayOfWeek],
-                    [
-                        'is_open' => $day['is_open'],
-                        'opens_at' => $day['is_open'] ? $day['opens_at'] : null,
-                        'closes_at' => $day['is_open'] ? $day['closes_at'] : null,
-                    ],
-                );
+        DB::transaction(function () use ($days, $open): void {
+            foreach (range(1, 7) as $dayOfWeek) {
+                $day = $days[$dayOfWeek] ?? ['is_open' => false, 'ranges' => []];
+
+                LibraryOpeningHour::query()->where('day_of_week', $dayOfWeek)->delete();
+
+                if (! $day['is_open']) {
+                    LibraryOpeningHour::query()->create(['day_of_week' => $dayOfWeek, 'is_open' => false, 'opens_at' => null, 'closes_at' => null]);
+
+                    continue;
+                }
+
+                foreach ($day['ranges'] as $range) {
+                    LibraryOpeningHour::query()->create([
+                        'day_of_week' => $dayOfWeek,
+                        'is_open' => true,
+                        'opens_at' => $range['from'],
+                        'closes_at' => $range['to'],
+                    ]);
+                }
             }
 
             $this->audit->record(
                 'school.opening_hours.updated',
                 'Öffnungszeiten geändert.',
                 null,
-                ['open_days' => implode(',', array_keys(array_filter($days, static fn (array $day): bool => $day['is_open'])))],
+                ['open_days' => implode(',', array_keys($open))],
             );
         });
     }

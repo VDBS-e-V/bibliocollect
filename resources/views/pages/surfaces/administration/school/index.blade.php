@@ -99,6 +99,7 @@
                                     @method('PATCH')
                                     <x-ui.input label="Klasse" name="name" :value="$schoolClass->name" />
                                     <x-ui.input label="Jahrgang" name="grade_level" type="number" min="1" max="13" :value="$schoolClass->grade_level" />
+                                    <x-ui.input label="Klassenleitung" name="homeroom_teacher" :value="$schoolClass->homeroom_teacher" />
                                     <label class="bc-school-active-control">
                                         <input type="hidden" name="is_active" value="0">
                                         <input type="checkbox" name="is_active" value="1" @checked($schoolClass->is_active)>
@@ -114,6 +115,7 @@
                                 @csrf
                                 <x-ui.input label="Neue Klasse" name="name" placeholder="z. B. 8a" />
                                 <x-ui.input label="Jahrgang" name="grade_level" type="number" min="1" max="13" />
+                                <x-ui.input label="Klassenleitung" name="homeroom_teacher" />
                                 <label class="bc-school-active-control">
                                     <input type="hidden" name="is_active" value="0">
                                     <input type="checkbox" name="is_active" value="1" checked>

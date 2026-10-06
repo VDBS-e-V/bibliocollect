@@ -32,6 +32,14 @@ Technisch: `circulation_loans.patron_id` und `circulation_reservations.patron_id
 - Lehrkräfte, Mitarbeiter:innen und Konten mit Klasse aus einem älteren Schuljahr stehen unter „Ohne Klasse“ am Ende.
 - Der Knopf „Drucken“ öffnet den Druckdialog des Browsers. Beim Drucken verschwinden Navigation und Filter, jede Klasse beginnt auf einer neuen Seite und enthält einen kurzen Hinweis an die Klassenleitung.
 
+## Klassenleitung
+
+Jede Klasse hat ein Feld **Klassenleitung** (Freitext, unter „Schule und Schuljahre“). Die Klassenliste nennt sie über der Tabelle. Es ist bewusst kein Verweis auf ein Ausleihkonto, weil das Modul Schule keine Ausleihkonten kennt.
+
+## Beispieldaten
+
+`php artisan db:seed --class=SampleOperationsSeeder` legt (nur außerhalb der Produktion und nur einmal) Klassen mit Klassenleitung, 45 Schüler:innen und 3 Lehrkräfte (`S-10101…`, `L-20101…`), Schließtage (Herbst- und Weihnachtsferien), 16 Ausleihen auf vorhandenen Exemplaren (überfällig, bald fällig, laufend) sowie drei Vormerkungen an, davon eine abholbereit. Medien werden nicht erzeugt. Dazu bekommt das nächste Schuljahr passende Folgeklassen, damit sich der Schuljahreswechsel ausprobieren lässt.
+
 ## Offen
 
 - Eine Seite zur Einsicht der Fristen und eines Probelaufs in der Oberfläche gibt es nicht; `privacy:anonymize --dry-run` zeigt die Zahlen.

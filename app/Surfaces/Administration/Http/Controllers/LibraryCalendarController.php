@@ -31,7 +31,7 @@ final class LibraryCalendarController
 
         return response()
             ->view('pages.surfaces.administration.school.calendar', [
-                'hours' => LibraryOpeningHour::query()->get()->keyBy('day_of_week'),
+                'hours' => LibraryOpeningHour::query()->orderBy('opens_at')->get()->groupBy('day_of_week'),
                 'closures' => $closures,
                 'showPast' => $showPast,
             ])

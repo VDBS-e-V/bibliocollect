@@ -17,6 +17,7 @@ final class CreateSchoolClassAction
             'name' => trim($data->name),
             'grade_level' => $data->gradeLevel,
             'is_active' => $data->isActive,
+            'homeroom_teacher' => $data->homeroomTeacher,
         ]);
     }
 }

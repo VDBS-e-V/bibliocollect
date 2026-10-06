@@ -31,6 +31,7 @@ final class SchoolClassStoreRequest extends FormRequest
             ],
             'grade_level' => ['required', 'integer', 'between:1,13'],
             'is_active' => ['required', 'boolean'],
+            'homeroom_teacher' => ['nullable', 'string', 'max:120'],
         ];
     }
 
@@ -42,6 +43,7 @@ final class SchoolClassStoreRequest extends FormRequest
             name: (string) $data['name'],
             gradeLevel: (int) $data['grade_level'],
             isActive: (bool) $data['is_active'],
+            homeroomTeacher: is_string($data['homeroom_teacher'] ?? null) && trim($data['homeroom_teacher']) !== '' ? trim($data['homeroom_teacher']) : null,
         );
     }
 

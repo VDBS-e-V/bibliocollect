@@ -24,6 +24,9 @@
     @forelse ($groups as $group)
         <section class="bc-class-report" aria-labelledby="class-{{ $loop->index }}">
             <h2 id="class-{{ $loop->index }}">{{ $group['label'] === 'Ohne Klasse' ? 'Ohne Klasse (Lehrkräfte und Mitarbeiter:innen)' : 'Klasse '.$group['label'] }}</h2>
+            @if ($group['homeroom'])
+                <p class="bc-class-report__meta">Klassenleitung: <strong>{{ $group['homeroom'] }}</strong></p>
+            @endif
             <p class="bc-class-report__meta">
                 {{ $mode === 'ueberfaellig' ? 'Überfällige Ausleihen' : 'Offene Ausleihen' }} · Stand {{ $today->format('d.m.Y') }} · {{ count($group['rows']) }} {{ count($group['rows']) === 1 ? 'Medium' : 'Medien' }}
             </p>

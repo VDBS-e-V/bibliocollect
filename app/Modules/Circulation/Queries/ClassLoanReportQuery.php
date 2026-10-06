@@ -24,6 +24,7 @@ final class ClassLoanReportQuery
      * @return list<array{
      *     label: string,
      *     class_id: ?string,
+     *     homeroom: ?string,
      *     rows: list<array{patron: string, library_number: string, title: string, barcode: string, due_on: string, days_overdue: int}>
      * }>
      */
@@ -45,6 +46,7 @@ final class ClassLoanReportQuery
         /** @var Collection<string, list<array<string, mixed>>> $byClass */
         $byClass = collect();
         $classNames = [];
+        $homerooms = [];
 
         foreach ($loans as $loan) {
             $patron = $loan->patron;
@@ -56,6 +58,7 @@ final class ClassLoanReportQuery
             }
 
             $classNames[$key] = $key === '' ? 'Ohne Klasse' : $class->name;
+            $homerooms[$key] = $key === '' ? null : $class->homeroom_teacher;
             // In der Geschäftszeitzone rechnen, sonst wird aus 10 Tagen durch den UTC-Versatz 9.
             $due = CarbonImmutable::parse($loan->due_on->toDateString(), $today->getTimezone());
 
@@ -73,7 +76,7 @@ final class ClassLoanReportQuery
 
         foreach ($byClass as $key => $rows) {
             usort($rows, static fn (array $a, array $b): int => strcasecmp($a['patron'], $b['patron']) ?: strcmp($a['due_on'], $b['due_on']));
-            $groups[] = ['label' => $classNames[$key], 'class_id' => $key === '' ? null : (string) $key, 'rows' => $rows];
+            $groups[] = ['label' => $classNames[$key], 'class_id' => $key === '' ? null : (string) $key, 'homeroom' => $homerooms[$key], 'rows' => $rows];
         }
 
         usort($groups, static function (array $a, array $b): int {

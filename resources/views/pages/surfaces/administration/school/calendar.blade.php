@@ -32,17 +32,21 @@
                     <tr>
                         <th scope="col">Wochentag</th>
                         <th scope="col">Geöffnet</th>
-                        <th scope="col">Von</th>
-                        <th scope="col">Bis</th>
+                        <th scope="col">Zeiträume (von – bis)</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($dayNames as $number => $name)
                         @php
-                            $hour = $hours->get($number);
-                            $isOpen = old('days.'.$number.'.is_open', $hour?->is_open ?? false);
-                            $opens = old('days.'.$number.'.opens_at', $hour?->opens_at ? substr((string) $hour->opens_at, 0, 5) : '');
-                            $closes = old('days.'.$number.'.closes_at', $hour?->closes_at ? substr((string) $hour->closes_at, 0, 5) : '');
+                            $dayHours = $hours->get($number, collect());
+                            $isOpen = (bool) old('days.'.$number.'.is_open', $dayHours->contains('is_open', true));
+                            $saved = $dayHours->where('is_open', true)->map(fn ($hour) => [
+                                'from' => substr((string) $hour->opens_at, 0, 5),
+                                'to' => substr((string) $hour->closes_at, 0, 5),
+                            ])->values()->all();
+                            $ranges = old('days.'.$number.'.ranges', $saved);
+                            // Immer ein freier Platz mehr als belegt, mindestens zwei: So lässt sich ein weiterer Zeitraum ergänzen.
+                            $slots = max(2, count($ranges) + 1);
                         @endphp
                         <tr>
                             <th scope="row">{{ $name }}</th>
@@ -52,12 +56,25 @@
                                     <span class="bc-visually-hidden">{{ $name }} geöffnet</span>
                                 </label>
                             </td>
-                            <td><input type="time" name="days[{{ $number }}][opens_at]" value="{{ $opens }}" aria-label="{{ $name }} von"></td>
-                            <td><input type="time" name="days[{{ $number }}][closes_at]" value="{{ $closes }}" aria-label="{{ $name }} bis"></td>
+                            <td>
+                                @if ($errors->has('days.'.$number.'.ranges'))
+                                    <small class="bc-field__error">{{ $errors->first('days.'.$number.'.ranges') }}</small>
+                                @endif
+                                <div class="bc-calendar-ranges">
+                                    @for ($slot = 0; $slot < $slots; $slot++)
+                                        <span class="bc-calendar-range">
+                                            <input type="time" name="days[{{ $number }}][ranges][{{ $slot }}][from]" value="{{ $ranges[$slot]['from'] ?? '' }}" aria-label="{{ $name }}, Zeitraum {{ $slot + 1 }}, von">
+                                            –
+                                            <input type="time" name="days[{{ $number }}][ranges][{{ $slot }}][to]" value="{{ $ranges[$slot]['to'] ?? '' }}" aria-label="{{ $name }}, Zeitraum {{ $slot + 1 }}, bis">
+                                        </span>
+                                    @endfor
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            <p class="bc-section-copy">Mehrere Zeiträume je Tag sind möglich, z. B. 08:00–10:00 und 13:00–15:00. Leere Felder werden ignoriert; zum Entfernen eines Zeitraums beide Felder leeren. Nach dem Speichern steht wieder ein freier Platz bereit.</p>
             <x-ui.button type="submit">Öffnungszeiten speichern</x-ui.button>
         </form>
     </section>

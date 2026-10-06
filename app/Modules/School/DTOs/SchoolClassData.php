@@ -10,5 +10,6 @@ final readonly class SchoolClassData
         public string $name,
         public int $gradeLevel,
         public bool $isActive,
+        public ?string $homeroomTeacher = null,
     ) {}
 }

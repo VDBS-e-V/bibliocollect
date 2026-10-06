@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $name
  * @property int $grade_level
  * @property bool $is_active
+ * @property string|null $homeroom_teacher
  * @property-read SchoolYear|null $schoolYear
  */
 final class SchoolClass extends Model
@@ -21,7 +22,7 @@ final class SchoolClass extends Model
     use HasUlids;
 
     /** @var list<string> */
-    protected $fillable = ['school_year_id', 'name', 'grade_level', 'is_active'];
+    protected $fillable = ['school_year_id', 'name', 'grade_level', 'is_active', 'homeroom_teacher'];
 
     /** @return BelongsTo<SchoolYear, $this> */
     public function schoolYear(): BelongsTo

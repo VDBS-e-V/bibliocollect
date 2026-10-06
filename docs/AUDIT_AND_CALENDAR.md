@@ -4,7 +4,7 @@
 
 Unter `/verwaltung/oeffnungszeiten` (Navigation „Öffnungszeiten“, Recht `school.manage`, also Verwaltung) pflegt die Schule, wann die Bibliothek geöffnet hat. `SchoolCalendarService` liest diese Daten für Fälligkeiten, Verlängerungen und Abholfristen.
 
-- Wochenübersicht: je Wochentag geöffnet ja/nein, Beginn und Ende. Mindestens ein Tag muss geöffnet sein, sonst ließe sich keine Fälligkeit berechnen. Ende muss nach dem Beginn liegen. Geschlossene Tage verlieren ihre Zeiten.
+- Wochenübersicht: je Wochentag geöffnet ja/nein und **ein oder mehrere Zeiträume**, z. B. 08:00–10:00 und 13:00–15:00. Die Zeiträume eines Tages dürfen sich nicht überschneiden, das Ende muss nach dem Beginn liegen; leere Felder werden ignoriert, und nach dem Speichern steht wieder ein freier Platz für einen weiteren Zeitraum bereit. Mindestens ein Tag muss geöffnet sein, sonst ließe sich keine Fälligkeit berechnen. Für Fristen zählt nur, ob ein Tag überhaupt Öffnungszeiten hat.
 - Schließtage: Einzeltag oder Zeitraum (höchstens 400 Tage) mit optionalem Grund. Bereits eingetragene Tage bleiben unverändert, das Eintragen ist wiederholbar. Einzelne Tage lassen sich entfernen. Die Liste zeigt standardmäßig nur kommende Schließtage.
 - Bereits vergebene Fälligkeiten ändern sich nicht rückwirkend. Neue Ausleihen, Verlängerungen und Abholfristen berücksichtigen die Einträge sofort.
 

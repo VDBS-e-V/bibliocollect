@@ -57,7 +57,7 @@ afterEach(function (): void {
 it('lists overdue loans grouped by class with a page per class', function (): void {
     $year = SchoolYear::query()->create(['name' => '2026/27', 'starts_on' => '2026-08-01', 'ends_on' => '2027-07-31', 'is_active' => true]);
     $oldYear = SchoolYear::query()->create(['name' => '2025/26', 'starts_on' => '2025-08-01', 'ends_on' => '2026-07-31', 'is_active' => false]);
-    $a5 = SchoolClass::query()->create(['school_year_id' => $year->getKey(), 'name' => '5a', 'grade_level' => 5, 'is_active' => true]);
+    $a5 = SchoolClass::query()->create(['school_year_id' => $year->getKey(), 'name' => '5a', 'grade_level' => 5, 'is_active' => true, 'homeroom_teacher' => 'Frau Albrecht']);
     $b10 = SchoolClass::query()->create(['school_year_id' => $year->getKey(), 'name' => '10b', 'grade_level' => 10, 'is_active' => true]);
     $old = SchoolClass::query()->create(['school_year_id' => $oldYear->getKey(), 'name' => '4z', 'grade_level' => 4, 'is_active' => true]);
 
@@ -71,6 +71,8 @@ it('lists overdue loans grouped by class with a page per class', function (): vo
     $response = $this->actingAs(reportUser('staff'))->get(route('pos.reports.class-loans'))->assertOk();
 
     $response->assertSeeInOrder(['Klasse 5a', 'Adler, Ben', 'Zander, Mia', 'Klasse 10b', 'Mitte, Eva', 'Ohne Klasse'])
+        ->assertSee('Klassenleitung: ', false)
+        ->assertSee('Frau Albrecht')
         ->assertSee('10 Tage')
         ->assertDontSee('Buch Vier')
         ->assertSee('Buch Fünf')
