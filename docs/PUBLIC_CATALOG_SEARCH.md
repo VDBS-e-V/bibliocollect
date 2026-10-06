@@ -44,7 +44,7 @@ Die interne Suche schafft keine neue Berechtigung. Sie bleibt vollständig hinte
 Eine Webanfrage des öffentlichen Katalogs lädt **niemals** ein Cover von einem externen Dienst. Die Oberfläche verwendet ausschließlich:
 
 1. eine lokal auf dem konfigurierten Cover-Disk gespeicherte Datei oder
-2. den gebündelten Platzhalter `public/brand/vdbs/catalog-cover-placeholder.png`.
+2. den gebündelten Platzhalter `public/brand/vdbs/catalog-cover-placeholder.svg`.
 
 Damit hängen Antwortzeit und Verfügbarkeit der Suche nicht von einer Cover-API ab.
 
@@ -63,9 +63,14 @@ Die öffentliche Oberfläche gibt `cover_source_reference` nicht aus.
 
 ## Hintergrundprozess
 
-`CatalogCoverProvider` ist die formatunabhängige Schnittstelle für eine spätere konkrete Cover-API. Der aktuelle Standard ist absichtlich `NullCatalogCoverProvider`; es findet also noch kein externer Request statt.
+`CatalogCoverProvider` ist die formatunabhängige Schnittstelle zu Cover-Quellen. Gebunden ist eine Kette (`ChainedCatalogCoverProvider`), die nacheinander abfragt:
 
-Sobald ein konkreter Provider gebunden ist, kann
+1. **Open Library** – kostenlos, ohne API-Key, Abruf per ISBN. Die Abdeckung bei deutschsprachigen Titeln ist lückenhaft.
+2. **Google Books** – kostenlos, benötigt in der Praxis einen API-Key (`CATALOG_COVER_GOOGLE_BOOKS_KEY`). Ohne Key bleibt diese Quelle ausgeschaltet.
+
+Die erste Quelle mit Treffer gewinnt. Webrequests des Katalogs rufen weiterhin **nie** eine Quelle auf; abgefragt wird ausschließlich im Hintergrund (Queue-Job, beim Erfassen neuer Medien oder per Befehl). Details zu Konfiguration und Betrieb stehen in `docs/CATALOG_INTAKE.md`.
+
+Für Bestandstitel ohne Cover kann
 
 ```text
 php artisan catalog:covers:queue --limit=100

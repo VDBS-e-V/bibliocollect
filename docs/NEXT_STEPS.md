@@ -3,7 +3,7 @@
 1. Den realen Legacy-Bestand nach dem erfolgreichen Import mit `catalog:legacy:audit-quality` auf Zeichensatzartefakte und Contributor-Lücken klassifizieren und den vollständigen JSON-Bericht prüfen.
 2. Danach für Datensätze mit belastbarer DNB-Referenz eine separate, standardmäßig schreibfreie DNB-Neuanreicherung vorbereiten; sie darf saubere lokale Werte nicht still überschreiben und muss Änderungen vor `--apply` ausweisen.
 3. Nicht über DNB rekonstruierbare Zeichensatzverluste bleiben als manuelle Prüffälle markiert; aus Zeichenfolgen wie `Mu?nchen` wird niemals geraten.
-4. Für den Cover-Cache einen konkreten `CatalogCoverProvider`-Adapter binden. Bis dahin bleibt `NullCatalogCoverProvider` aktiv und es findet kein externer Request statt. Produktiv gehören dazu ein laufender Queue Worker, ein Scheduler-Eintrag für `catalog:covers:queue` und `php artisan storage:link` beim Standard-Disk `public`.
+4. Den Cover-Betrieb produktiv absichern: laufender Queue Worker, ein Scheduler-Eintrag für `catalog:covers:queue` (holt auch Cover für Bestandstitel nach), `php artisan storage:link` beim Standard-Disk `public` und ein kostenloser Google-Books-API-Key als Fallback für Titel, die Open Library nicht kennt.
 5. Danach die öffentliche Bestandsanzeige um den echten Ausleihzustand erweitern. Erst dann darf aus „aktives Exemplar“ eine belastbare Aussage wie „derzeit verfügbar“ werden.
 6. Anschließend Verlängerungen mit expliziten Regeln auf dem bestehenden Loan-Modell ergänzen.
 7. Danach Vormerkungen titelbezogen aufbauen und die öffentliche Titelansicht um den Vormerkungsstatus ergänzen, ohne Copy-Identitäten öffentlich zu machen.
@@ -51,6 +51,21 @@ Zusätzlich für Änderungen an Circulation:
 - nach Rückgabe eine erneute Ausleihe desselben Exemplars erlauben,
 - im Patron-Arbeitsbereich ausschließlich offene Ausleihen anzeigen,
 - Seed-Idempotenz und Migration-Rollback prüfen.
+
+Zusätzlich für Änderungen am Erfassungsprozess und an externen Metadaten:
+
+- `catalog.manage` prüfen; technische Administration und Schüler-AG Basis bleiben ausgeschlossen,
+- vor dem Speichern in Schritt 5 nachweislich nichts in `Title`, `Edition`, `Contributor` und `Copy` schreiben,
+- Barcode früh (Schritt 1) und beim Speichern prüfen; bei Konflikt vollständig zurückrollen,
+- Schritte nicht überspringbar halten (Guards), abgeschlossene Vorgänge nicht doppelt speichern,
+- zu vorhandener ISBN nur ein Exemplar ergänzen können,
+- Verantwortliche über GND-ID wiederverwenden (`gnd_id` ist eindeutig),
+- DNB-Ausfall, leere Treffer und SRU-Diagnosemeldungen als „nicht verfügbar“ behandeln, nie als Fehlerseite,
+- Nutzereingaben in der DNB-Abfrage auf Wörter reduzieren,
+- DNB-Daten auf NFC normalisieren (die DNB liefert zerlegte Umlaute),
+- das Mindestalter niemals aus externen Daten vorbelegen,
+- Cover nur über Queue-Jobs laden, Bildtyp am Inhalt prüfen, Google-Bildlinks nur von Google-Hosts akzeptieren,
+- Tests offline halten (`Http::fake`, kein externer Request aus `phpunit.xml`).
 
 Zusätzlich für Änderungen am Katalogimport:
 

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/"><version>1.1</version><numberOfRecords>1</numberOfRecords><records><record><recordSchema>MARC21-xml</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim" type="Bibliographic">
+    <leader>00000pam a2200000 c 4500</leader>
+    <controlfield tag="001">1244853364</controlfield>
+    <controlfield tag="003">DE-101</controlfield>
+    <controlfield tag="005">20221019030738.0</controlfield>
+    <controlfield tag="007">tu</controlfield>
+    <controlfield tag="008">211102s2022    gw ||||| |||| 00||||ger  </controlfield>
+    <datafield tag="015" ind1=" " ind2=" ">
+      <subfield code="a">22,A11</subfield>
+      <subfield code="z">21,N45</subfield>
+      <subfield code="2">dnb</subfield>
+    </datafield>
+    <datafield tag="016" ind1="7" ind2=" ">
+      <subfield code="2">DE-101</subfield>
+      <subfield code="a">1244853364</subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">9783522202800</subfield>
+      <subfield code="c">Festeinband : EUR 20.00 (DE), EUR 20.60 (AT), CHF 28.90 (freier Preis)</subfield>
+      <subfield code="9">978-3-522-20280-0</subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">3522202805</subfield>
+      <subfield code="9">3-522-20280-5</subfield>
+    </datafield>
+    <datafield tag="024" ind1="3" ind2=" ">
+      <subfield code="a">9783522202800</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">(DE-599)DNB1244853364</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">(OCoLC)1303704356</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">(OCoLC)1284992728</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">1245</subfield>
+      <subfield code="b">ger</subfield>
+      <subfield code="c">DE-101</subfield>
+      <subfield code="d">9999</subfield>
+      <subfield code="e">rda</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">ger</subfield>
+      <subfield code="h">ita</subfield>
+    </datafield>
+    <datafield tag="044" ind1=" " ind2=" ">
+      <subfield code="c">XA-DE-BW</subfield>
+    </datafield>
+    <datafield tag="082" ind1="7" ind2="4">
+      <subfield code="8">10\p</subfield>
+      <subfield code="a">K</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="2">23sdnb</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="8">1\p</subfield>
+      <subfield code="0">(DE-588)1015211690</subfield>
+      <subfield code="0">https://d-nb.info/gnd/1015211690</subfield>
+      <subfield code="0">(DE-101)1015211690</subfield>
+      <subfield code="0">(isni)0000000381800175</subfield>
+      <subfield code="a">Morosinotto, Davide</subfield>
+      <subfield code="d">1980-</subfield>
+      <subfield code="e">Verfasser</subfield>
+      <subfield code="4">aut</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="240" ind1="1" ind2="0">
+      <subfield code="a">&#152;La&#156; più grande</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Shi Yu</subfield>
+      <subfield code="b">die Unbezwingbare</subfield>
+      <subfield code="c">Davide Morosinotto ; aus dem Italienischen von Cornelia Panzacchi</subfield>
+    </datafield>
+    <datafield tag="264" ind1=" " ind2="1">
+      <subfield code="a">Stuttgart</subfield>
+      <subfield code="b">Thienemann</subfield>
+      <subfield code="c">[2022]</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">506 Seiten</subfield>
+      <subfield code="c">23 cm, 759 g</subfield>
+    </datafield>
+    <datafield tag="336" ind1=" " ind2=" ">
+      <subfield code="a">Text</subfield>
+      <subfield code="b">txt</subfield>
+      <subfield code="2">rdacontent</subfield>
+    </datafield>
+    <datafield tag="337" ind1=" " ind2=" ">
+      <subfield code="a">ohne Hilfsmittel zu benutzen</subfield>
+      <subfield code="b">n</subfield>
+      <subfield code="2">rdamedia</subfield>
+    </datafield>
+    <datafield tag="338" ind1=" " ind2=" ">
+      <subfield code="a">Band</subfield>
+      <subfield code="b">nc</subfield>
+      <subfield code="2">rdacarrier</subfield>
+    </datafield>
+    <datafield tag="385" ind1=" " ind2=" ">
+      <subfield code="0">(DE-588)4028859-6</subfield>
+      <subfield code="0">https://d-nb.info/gnd/4028859-6</subfield>
+      <subfield code="0">(DE-101)040288595</subfield>
+      <subfield code="a">Jugend</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="8">6\p</subfield>
+      <subfield code="0">(DE-588)4128014-3</subfield>
+      <subfield code="0">https://d-nb.info/gnd/4128014-3</subfield>
+      <subfield code="0">(DE-101)041280148</subfield>
+      <subfield code="a">Seeräuber</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="8">7\p</subfield>
+      <subfield code="0">(DE-588)4029630-1</subfield>
+      <subfield code="0">https://d-nb.info/gnd/4029630-1</subfield>
+      <subfield code="0">(DE-101)04029630X</subfield>
+      <subfield code="a">Karate</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="8">8\p</subfield>
+      <subfield code="0">(DE-588)4029448-1</subfield>
+      <subfield code="0">https://d-nb.info/gnd/4029448-1</subfield>
+      <subfield code="0">(DE-101)04029448X</subfield>
+      <subfield code="a">Kampfsport</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="8">9\p</subfield>
+      <subfield code="0">(DE-588)4167620-8</subfield>
+      <subfield code="0">https://d-nb.info/gnd/4167620-8</subfield>
+      <subfield code="0">(DE-101)041676203</subfield>
+      <subfield code="a">Liebesgeschichte</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="651" ind1=" " ind2="7">
+      <subfield code="8">5\p</subfield>
+      <subfield code="0">(DE-588)4009937-4</subfield>
+      <subfield code="0">https://d-nb.info/gnd/4009937-4</subfield>
+      <subfield code="0">(DE-101)040099377</subfield>
+      <subfield code="a">China</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(Produktform)Hardback</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(Zielgruppe)bis 99 Jahre</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(Zielgruppe)ab 13 Jahre</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(BISAC Subject Heading)JUV016000</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(BISAC Subject Heading)JUV001000: JUVENILE FICTION / Action &amp; Adventure / General</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Piraten</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Piratenschiff</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Karate Buch</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Abenteuerroman</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Jugendbücher ab 12</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">China Buch</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Abenteuer Geschenk</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Kampfkunst Buch</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Liebesgeschichte Bücher</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">martial arts</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Freundschaft</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Kungfu</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">Piraten Roman</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">martial arts book</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">spannend</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">mädchen</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">shang-chi</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(BISAC Subject Heading)JUV016000: JUVENILE FICTION / Historical / General</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(VLB-WN)1260: Hardcover, Softcover / Kinder- und Jugendbücher/Jugendbücher ab 12 Jahre</subfield>
+    </datafield>
+    <datafield tag="653" ind1=" " ind2=" ">
+      <subfield code="a">(BISAC Subject Heading)JUV001000</subfield>
+    </datafield>
+    <datafield tag="655" ind1=" " ind2="7">
+      <subfield code="0">(DE-588)4306252-0</subfield>
+      <subfield code="0">https://d-nb.info/gnd/4306252-0</subfield>
+      <subfield code="0">(DE-101)043062520</subfield>
+      <subfield code="a">Jugendbuch</subfield>
+      <subfield code="2">gnd-content</subfield>
+    </datafield>
+    <datafield tag="655" ind1=" " ind2="7">
+      <subfield code="0">(DE-101)101071841X</subfield>
+      <subfield code="a">Jugendbücher ab 12 Jahre</subfield>
+      <subfield code="2">gatbeg</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="8">2\p</subfield>
+      <subfield code="0">(DE-588)112058426</subfield>
+      <subfield code="0">https://d-nb.info/gnd/112058426</subfield>
+      <subfield code="0">(DE-101)112058426</subfield>
+      <subfield code="0">(isni)0000000140268309</subfield>
+      <subfield code="a">Panzacchi, Cornelia</subfield>
+      <subfield code="d">1959-</subfield>
+      <subfield code="e">Übersetzer</subfield>
+      <subfield code="4">trl</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="8">3\p</subfield>
+      <subfield code="0">(DE-588)1011472945</subfield>
+      <subfield code="0">https://d-nb.info/gnd/1011472945</subfield>
+      <subfield code="0">(DE-101)1011472945</subfield>
+      <subfield code="a">Dautremer, Rébecca</subfield>
+      <subfield code="d">1971-</subfield>
+      <subfield code="e">Illustrator</subfield>
+      <subfield code="4">ill</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="8">4\p</subfield>
+      <subfield code="0">(DE-588)1209068389</subfield>
+      <subfield code="0">https://d-nb.info/gnd/1209068389</subfield>
+      <subfield code="0">(DE-101)1209068389</subfield>
+      <subfield code="a">Kümmel, Timo</subfield>
+      <subfield code="d">1980-</subfield>
+      <subfield code="e">Illustrator</subfield>
+      <subfield code="4">ill</subfield>
+      <subfield code="2">gnd</subfield>
+    </datafield>
+    <datafield tag="776" ind1="0" ind2="8">
+      <subfield code="i">Erscheint auch als</subfield>
+      <subfield code="n">Online-Ausgabe</subfield>
+      <subfield code="a">Morosinotto, Davide, 1980-</subfield>
+      <subfield code="t">Shi Yu</subfield>
+      <subfield code="d">Stuttgart : Thienemann Verlag, 2022</subfield>
+      <subfield code="h">Online-Ressource, 512 Seiten</subfield>
+      <subfield code="w">(DE-101)125284400X</subfield>
+      <subfield code="b">1. Auflage</subfield>
+    </datafield>
+    <datafield tag="850" ind1=" " ind2=" ">
+      <subfield code="a">DE-101a</subfield>
+      <subfield code="a">DE-101b</subfield>
+    </datafield>
+    <datafield tag="856" ind1="4" ind2="2">
+      <subfield code="m">X:MVB</subfield>
+      <subfield code="q">text/html</subfield>
+      <subfield code="u">https://services.dnb.de/plus/idn/1244853364/blurb/</subfield>
+      <subfield code="3">Inhaltstext</subfield>
+    </datafield>
+    <datafield tag="883" ind1="2" ind2=" ">
+      <subfield code="8">1\p</subfield>
+      <subfield code="a">dnb</subfield>
+      <subfield code="d">20220308</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#dnb</subfield>
+    </datafield>
+    <datafield tag="883" ind1="2" ind2=" ">
+      <subfield code="8">2\p</subfield>
+      <subfield code="a">dnb</subfield>
+      <subfield code="d">20220308</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#dnb</subfield>
+    </datafield>
+    <datafield tag="883" ind1=" " ind2=" ">
+      <subfield code="8">3\p</subfield>
+      <subfield code="a">cgwrk</subfield>
+      <subfield code="d">20220812</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#cgwrk</subfield>
+    </datafield>
+    <datafield tag="883" ind1=" " ind2=" ">
+      <subfield code="8">4\p</subfield>
+      <subfield code="a">cgwrk</subfield>
+      <subfield code="d">20220812</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#cgwrk</subfield>
+    </datafield>
+    <datafield tag="883" ind1="0" ind2=" ">
+      <subfield code="8">5\p</subfield>
+      <subfield code="a">aepgnd</subfield>
+      <subfield code="c">0,16667</subfield>
+      <subfield code="d">20220311</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#aepgnd</subfield>
+    </datafield>
+    <datafield tag="883" ind1="0" ind2=" ">
+      <subfield code="8">6\p</subfield>
+      <subfield code="a">aepgnd</subfield>
+      <subfield code="c">0,14634</subfield>
+      <subfield code="d">20220311</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#aepgnd</subfield>
+    </datafield>
+    <datafield tag="883" ind1="0" ind2=" ">
+      <subfield code="8">7\p</subfield>
+      <subfield code="a">aepgnd</subfield>
+      <subfield code="c">0,09218</subfield>
+      <subfield code="d">20220311</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#aepgnd</subfield>
+    </datafield>
+    <datafield tag="883" ind1="0" ind2=" ">
+      <subfield code="8">8\p</subfield>
+      <subfield code="a">aepgnd</subfield>
+      <subfield code="c">0,08794</subfield>
+      <subfield code="d">20220311</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#aepgnd</subfield>
+    </datafield>
+    <datafield tag="883" ind1="0" ind2=" ">
+      <subfield code="8">9\p</subfield>
+      <subfield code="a">aepgnd</subfield>
+      <subfield code="c">0,08193</subfield>
+      <subfield code="d">20220311</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#aepgnd</subfield>
+    </datafield>
+    <datafield tag="883" ind1="2" ind2=" ">
+      <subfield code="8">10\p</subfield>
+      <subfield code="a">dnb</subfield>
+      <subfield code="d">20220311</subfield>
+      <subfield code="q">DE-101</subfield>
+      <subfield code="u">https://d-nb.info/provenance/plan#dnb</subfield>
+    </datafield>
+    <datafield tag="925" ind1="r" ind2=" ">
+      <subfield code="a">ra</subfield>
+    </datafield>
+    <datafield tag="926" ind1="1" ind2=" ">
+      <subfield code="a">YFT</subfield>
+      <subfield code="o">93</subfield>
+      <subfield code="q">Publisher</subfield>
+      <subfield code="v">1.4</subfield>
+      <subfield code="x">Kinder/Jugendliche: Historische Romane</subfield>
+    </datafield>
+    <datafield tag="926" ind1="2" ind2=" ">
+      <subfield code="a">YFC</subfield>
+      <subfield code="o">93</subfield>
+      <subfield code="q">Publisher</subfield>
+      <subfield code="v">1.4</subfield>
+      <subfield code="x">Kinder/Jugendliche: Action- und Abenteuergeschichten</subfield>
+    </datafield>
+    <datafield tag="926" ind1="2" ind2=" ">
+      <subfield code="a">5AP</subfield>
+      <subfield code="o">98</subfield>
+      <subfield code="q">Publisher</subfield>
+      <subfield code="v">1.4</subfield>
+      <subfield code="x">empfohlenes Alter: ab 13 Jahre</subfield>
+    </datafield>
+  </record></recordData><recordPosition>1</recordPosition></record></records><echoedSearchRetrieveRequest><version>1.1</version><query>num=9783522202803</query><xQuery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/><maximumRecords>3</maximumRecords><recordSchema>MARC21-xml</recordSchema></echoedSearchRetrieveRequest></searchRetrieveResponse>

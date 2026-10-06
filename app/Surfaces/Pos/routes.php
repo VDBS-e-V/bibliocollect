@@ -7,6 +7,7 @@ use App\Surfaces\Pos\Http\Controllers\CatalogCopyController;
 use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogImportController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
+use App\Surfaces\Pos\Http\Controllers\CatalogIntakeController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
@@ -43,6 +44,24 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::middleware('permission:catalog.manage')->group(function (): void {
         Route::get('/betrieb/katalog', CatalogIndexController::class)
             ->name('pos.catalog.index');
+
+        Route::prefix('/betrieb/katalog/erfassen')->group(function (): void {
+            Route::get('/', [CatalogIntakeController::class, 'identify'])->name('pos.catalog.intake.identify');
+            Route::post('/', [CatalogIntakeController::class, 'lookup'])->name('pos.catalog.intake.lookup');
+            Route::delete('/', [CatalogIntakeController::class, 'cancel'])->name('pos.catalog.intake.cancel');
+
+            Route::get('/treffer', [CatalogIntakeController::class, 'matches'])->name('pos.catalog.intake.matches');
+            Route::post('/treffer', [CatalogIntakeController::class, 'choose'])->name('pos.catalog.intake.choose');
+
+            Route::get('/daten', [CatalogIntakeController::class, 'details'])->name('pos.catalog.intake.details');
+            Route::post('/daten', [CatalogIntakeController::class, 'storeDetails'])->name('pos.catalog.intake.details.store');
+
+            Route::get('/exemplar', [CatalogIntakeController::class, 'copy'])->name('pos.catalog.intake.copy');
+            Route::post('/exemplar', [CatalogIntakeController::class, 'storeCopy'])->name('pos.catalog.intake.copy.store');
+
+            Route::get('/pruefen', [CatalogIntakeController::class, 'review'])->name('pos.catalog.intake.review');
+            Route::post('/speichern', [CatalogIntakeController::class, 'commit'])->name('pos.catalog.intake.commit');
+        });
 
         Route::post('/betrieb/katalog/titel', [CatalogTitleController::class, 'store'])
             ->name('pos.catalog.titles.store');

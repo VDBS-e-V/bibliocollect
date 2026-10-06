@@ -123,7 +123,7 @@ Der Block umfasst im Einzelnen:
 - eine deutlich ausführlichere interne Suchmaske unter `/betrieb/katalog`, die unverändert hinter `catalog.manage` bleibt und kein neues Recht einführt.
 - `catalog_editions` trägt `cover_path`, `cover_source`, `cover_source_reference`, `cover_status`, `cover_checked_at` und `cover_fetched_at`; `cover_source_reference` wird öffentlich nicht ausgegeben.
 - `catalog:covers:queue` stellt Editionen mit ISBN oder Quell-ID als `RefreshEditionCoverJob` in die Queue; der Job akzeptiert nur JPEG/PNG/WebP innerhalb des Größenlimits.
-- Der gebundene Standard ist bewusst `NullCatalogCoverProvider`. Es findet damit noch kein externer Request statt; ein konkreter API-Adapter bleibt Folgeschritt.
+- Gebunden ist eine Provider-Kette aus Open Library (ohne Key) und Google Books (nur mit Key); Cover werden ausschließlich im Hintergrund geladen und lokal gespeichert.
 - `CatalogCoverDemoSeeder` markiert eine Demo-Ausgabe als `pending` und hält den Development-Seed offline und reproduzierbar.
 
 Ergänzend erhielten öffentliche und interne Trefferliste eine gemeinsame Seitennavigation:
@@ -134,6 +134,20 @@ Ergänzend erhielten öffentliche und interne Trefferliste eine gemeinsame Seite
 - Die interne Trefferliste ist damit nicht mehr auf 50 Titel ohne Navigation begrenzt; aktive Filter bleiben beim Seitenwechsel erhalten.
 
 Die Details stehen in `docs/PUBLIC_CATALOG_SEARCH.md`.
+
+## Erfassungsprozess für neue Medien
+
+Neue Medien werden unter `/betrieb/katalog/erfassen` in einem geführten Prozess mit fünf Schritten aufgenommen (Identifizieren, Treffer prüfen, Titel & Ausgabe, Exemplar, Prüfen & speichern); das Vorbild ist der siebenstufige Ablauf des Altsystems, schlanker zusammengefasst.
+
+- Metadaten kommen aus der frei zugänglichen DNB-SRU-Schnittstelle (ISBN-Abfrage und Titel-/Autorsuche) und werden nur als Vorschlag vorbefüllt; bestätigt wird in Schritt 3.
+- Bis zum ausdrücklichen Speichern wird nichts in den Katalog geschrieben; gespeichert wird als eine Transaktion (Titel, Verantwortliche, Ausgabe, Exemplar).
+- Zu einer bereits vorhandenen ISBN wird nur ein weiteres Exemplar ergänzt, statt Titel doppelt anzulegen.
+- Verantwortliche werden über die GND-ID bzw. einen eindeutigen Namenstreffer wiederverwendet.
+- Eine ausgefallene DNB blockiert die Erfassung nicht; manuelle Erfassung steht immer offen.
+- Nach dem Speichern wird das Cover im Hintergrund über Open Library (ohne Key) und optional Google Books (mit Key) geladen.
+- Das Recht bleibt `catalog.manage`.
+
+Die Details stehen in `docs/CATALOG_INTAKE.md`.
 
 ## T4 Circulation
 
