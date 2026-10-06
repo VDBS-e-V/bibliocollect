@@ -45,7 +45,7 @@ Die Module `Audit`, `Privacy`, `Reminders` sind im Gerüst vorhanden, aber leer.
 
 1. ✔ `Audit`: Ausleihe, Vormerkungen, Katalogerfassung und Kalender sind protokolliert, Einsicht für die Verwaltung. Offen: weitere Ereignisarten.
 2. `Privacy`: Löschkonzept, Aufbewahrungsfristen und Einsicht in Historie.
-3. `Reminders`: Benachrichtigungen (Fälligkeit, Vormerkung bereit) auf Basis der Phase-2-Ereignisse.
+3. ✔ `Reminders`: E-Mail-Erinnerungen (bald fällig, überfällig, Vormerkung abholbereit), siehe `docs/PORTAL_AND_REMINDERS.md`. Offen: Mahnungen/Gebühren (fachliche Entscheidung), Abmeldung von Erinnerungen.
 
 ## Später / bei Bedarf
 

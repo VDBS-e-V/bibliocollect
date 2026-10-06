@@ -178,6 +178,12 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Portal und Erinnerungen (v0.5.4)
+
+- „Mein Konto“ zeigt eigene Ausleihen und Vormerkungen; Verlängern, Vormerken (von der Titelseite) und Stornieren in Selbstbedienung.
+- `reminders:send` verschickt täglich Erinnerungen (bald fällig, überfällig, abholbereit) an bestätigte, verknüpfte Onlinekonten.
+- Details in `docs/PORTAL_AND_REMINDERS.md`.
+
 ### Protokoll und Öffnungszeiten (v0.5.3)
 
 - Verwaltungsmaske für Öffnungszeiten und Schließtage (`/verwaltung/oeffnungszeiten`).

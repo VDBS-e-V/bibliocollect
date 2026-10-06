@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Public\Http\Controllers;
 
+use App\Models\User;
 use App\Modules\Catalog\DTOs\HoldingSummary;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Services\CatalogClassificationService;
 use App\Modules\Catalog\Services\CatalogCoverService;
 use App\Modules\Catalog\Services\CatalogHoldingService;
+use App\Modules\Circulation\Enums\ReservationStatus;
+use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Surfaces\Public\Support\PublicCatalogPresenter;
 use Illuminate\Http\Response;
@@ -52,11 +55,29 @@ final class CatalogTitleController
 
         $copyStates = $availability->forCopies($copyIds);
 
+        // Vormerken ist nur sinnvoll, solange kein Exemplar verfügbar ist.
+        $reserveState = null;
+
+        if ($titleAvailability->hasActiveCopies() && ! $titleAvailability->isAvailable()) {
+            $user = auth()->user();
+
+            if (! $user instanceof User) {
+                $reserveState = 'login';
+            } elseif ($user->patron_id !== null) {
+                $reserveState = Reservation::query()
+                    ->where('patron_id', $user->patron_id)
+                    ->where('title_id', (string) $title->getKey())
+                    ->whereIn('status', ReservationStatus::openValues())
+                    ->exists() ? 'reserved' : 'ready';
+            }
+        }
+
         return response()->view('pages.surfaces.public.catalog.show', [
             'title' => $title,
             'titleSummary' => $holdings->summarizeTitle($title),
             'editionSummaries' => $editionSummaries,
             'copyStates' => $copyStates,
+            'reserveState' => $reserveState,
             'editionAvailabilities' => $editionAvailabilities,
             'titleAvailability' => $titleAvailability,
             'editionTopics' => $editionTopics,

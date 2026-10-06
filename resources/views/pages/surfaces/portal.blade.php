@@ -1,4 +1,11 @@
-@php($preview = $preview ?? false)
+@php
+    $preview = $preview ?? false;
+    $patron = $patron ?? null;
+    $openLoans = $openLoans ?? collect();
+    $openReservations = $openReservations ?? collect();
+    $renewalBlocks = $renewalBlocks ?? [];
+    $reservationPositions = $reservationPositions ?? [];
+@endphp
 
 <x-app-shell surface="portal" title="Mein Konto" :preview="$preview">
     <x-ui.page-header
@@ -7,37 +14,100 @@
         lead="Eigene Ausleihen, Vormerkungen und Kontodaten auf einen Blick."
     />
 
+    @if (session('portal_success'))
+        <x-ui.alert variant="success" title="Erledigt">{{ session('portal_success') }}</x-ui.alert>
+    @endif
+
+    @if (session('portal_error'))
+        <x-ui.alert variant="error" title="Nicht möglich">{{ session('portal_error') }}</x-ui.alert>
+    @endif
+
     <div class="bc-work-layout">
         <aside class="bc-section-nav" aria-label="Kontobereiche">
             <strong>Mein Konto</strong>
-            <span aria-current="page">Übersicht</span>
-            <span>Ausleihen</span>
-            <span>Vormerkungen</span>
-            <span>Persönliche Daten</span>
+            <a href="#ausleihen">Ausleihen</a>
+            <a href="#vormerkungen">Vormerkungen</a>
         </aside>
 
         <div class="bc-work-layout__main">
-            <section class="bc-content-section" aria-labelledby="loan-heading">
+            @if (! $preview && $patron === null)
+                <x-ui.alert title="Noch nicht verknüpft">
+                    Dein Onlinekonto ist noch nicht mit einem Ausleihkonto verknüpft. Frag in der Bibliothek nach einem Verknüpfungscode, dann siehst du hier deine Ausleihen und Vormerkungen.
+                </x-ui.alert>
+            @endif
+
+            <section class="bc-content-section" id="ausleihen" aria-labelledby="loan-heading">
                 <div class="bc-section-heading bc-section-heading--with-meta">
                     <h2 id="loan-heading">Aktuelle Ausleihen</h2>
-                    <span>0 Medien</span>
+                    <span>{{ $openLoans->count() }} {{ $openLoans->count() === 1 ? 'Medium' : 'Medien' }}</span>
                 </div>
                 <x-ui.table>
                     <thead>
                         <tr><th scope="col">Titel</th><th scope="col">Fällig</th><th scope="col">Status</th><th scope="col">Aktion</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td colspan="4" class="bc-table__empty">Noch keine Fachdaten vorhanden. Die Ausleihübersicht folgt mit Circulation.</td></tr>
+                        @forelse ($openLoans as $loan)
+                            @php
+                                $blocks = $renewalBlocks[(string) $loan->getKey()] ?? [];
+                                $overdue = $loan->due_on->copy()->startOfDay()->lessThan(now()->startOfDay());
+                            @endphp
+                            <tr>
+                                <th scope="row">{{ $loan->copy->edition->title->preferred_title }}</th>
+                                <td class="bc-tabular">{{ $loan->due_on->format('d.m.Y') }}</td>
+                                <td>
+                                    <x-ui.badge :variant="$overdue ? 'danger' : 'success'">{{ $overdue ? 'Überfällig' : 'Ausgeliehen' }}</x-ui.badge>
+                                    @if ($loan->renewal_count > 0)
+                                        <small class="bc-public-metadata-source">{{ $loan->renewal_count }}-mal verlängert</small>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($blocks === [])
+                                        <form method="post" action="{{ route('portal.loans.renew', ['loanId' => $loan->getKey()]) }}">
+                                            @csrf
+                                            <x-ui.button type="submit" variant="secondary">Verlängern</x-ui.button>
+                                        </form>
+                                    @else
+                                        <small class="bc-public-metadata-source">{{ implode(' ', $blocks) }}</small>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="bc-table__empty">Du hast gerade nichts ausgeliehen.</td></tr>
+                        @endforelse
                     </tbody>
                 </x-ui.table>
             </section>
 
-            <section class="bc-content-section" aria-labelledby="reservation-heading">
+            <section class="bc-content-section" id="vormerkungen" aria-labelledby="reservation-heading">
                 <div class="bc-section-heading bc-section-heading--with-meta">
                     <h2 id="reservation-heading">Vormerkungen</h2>
-                    <span>0 Vormerkungen</span>
+                    <span>{{ $openReservations->count() }} {{ $openReservations->count() === 1 ? 'Vormerkung' : 'Vormerkungen' }}</span>
                 </div>
-                <p class="bc-section-copy">Zeitraumsvormerkungen und Click & Collect werden hier getrennt und nachvollziehbar angezeigt.</p>
+
+                @forelse ($openReservations as $reservation)
+                    <article class="bc-loan-card">
+                        <div class="bc-loan-card__meta">
+                            <strong>{{ $reservation->title->preferred_title }}</strong>
+                            <div class="bc-loan-card__facts">
+                                @if ($reservation->status->value === 'ready')
+                                    <x-ui.badge variant="success">Abholbereit</x-ui.badge>
+                                    <span>Abholung bis <span class="bc-tabular">{{ $reservation->pickup_until?->format('d.m.Y') ?? '—' }}</span></span>
+                                @else
+                                    <x-ui.badge>Wartet</x-ui.badge>
+                                    <span>Position <span class="bc-tabular">{{ $reservationPositions[(string) $reservation->getKey()] ?? '—' }}</span> in der Warteschlange</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="bc-loan-card__actions">
+                            <form method="post" action="{{ route('portal.reservations.cancel', ['reservationId' => $reservation->getKey()]) }}">
+                                @csrf
+                                <x-ui.button type="submit" variant="secondary">Stornieren</x-ui.button>
+                            </form>
+                        </div>
+                    </article>
+                @empty
+                    <p class="bc-section-copy">Keine offenen Vormerkungen. Ist ein Titel gerade ausgeliehen, kannst du ihn auf der Titelseite im Katalog vormerken.</p>
+                @endforelse
             </section>
 
             <x-ui.alert title="Datenschutz">

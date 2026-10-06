@@ -43,9 +43,25 @@ final readonly class PlaceReservationAction
             throw new CirculationRuleViolation(['Bitte Exemplar-Barcode oder ISBN angeben.']);
         }
 
-        return DB::transaction(function () use ($patron, $identifier, $actor): Reservation {
+        return $this->place($patron, fn (): Title => $this->resolveTitle($identifier), $actor);
+    }
+
+    /** Vormerken über die Titel-ID, z. B. von der Titelseite oder aus dem Portal. */
+    public function executeForTitle(Patron $patron, string $titleId, User $actor): Reservation
+    {
+        return $this->place($patron, static function () use ($titleId): Title {
+            $title = Title::query()->find($titleId);
+
+            return $title ?? throw new CirculationRuleViolation(['Der Titel wurde nicht gefunden.']);
+        }, $actor);
+    }
+
+    /** @param  \Closure(): Title  $resolveTitle */
+    private function place(Patron $patron, \Closure $resolveTitle, User $actor): Reservation
+    {
+        return DB::transaction(function () use ($patron, $resolveTitle, $actor): Reservation {
             $lockedPatron = Patron::query()->whereKey($patron->getKey())->lockForUpdate()->firstOrFail();
-            $title = $this->resolveTitle($identifier);
+            $title = $resolveTitle();
             $titleId = (string) $title->getKey();
 
             $editions = Edition::query()->where('title_id', $titleId)->get();

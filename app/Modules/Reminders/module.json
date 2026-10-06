@@ -6,6 +6,8 @@
     "Patrons",
     "School"
   ],
-  "providers": [],
+  "providers": [
+    "App\\Modules\\Reminders\\Providers\\RemindersServiceProvider"
+  ],
   "enabled": true
 }

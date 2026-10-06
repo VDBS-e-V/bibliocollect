@@ -103,6 +103,19 @@
                     <span>{{ $titleAvailability->activeCopies }}</span>
                 </div>
 
+                @if ($reserveState === 'ready')
+                    <form method="post" action="{{ route('portal.reservations.store') }}" class="bc-public-reserve">
+                        @csrf
+                        <input type="hidden" name="title_id" value="{{ $title->getKey() }}">
+                        <x-ui.button type="submit">Titel vormerken</x-ui.button>
+                        <span>Alle Exemplare sind ausgeliehen. Du wirst in der Warteschlange eingereiht.</span>
+                    </form>
+                @elseif ($reserveState === 'reserved')
+                    <p class="bc-public-reserve"><x-ui.badge variant="success">Vorgemerkt</x-ui.badge> <a href="{{ route('portal.home') }}#vormerkungen">Zu meinen Vormerkungen</a></p>
+                @elseif ($reserveState === 'login')
+                    <p class="bc-public-reserve">Alle Exemplare sind ausgeliehen. <a href="{{ route('login') }}">Melde dich an</a>, um den Titel vorzumerken.</p>
+                @endif
+
                 @if ($editions->isEmpty())
                     <x-ui.alert title="Noch keine Ausgaben">Für diesen Titel sind noch keine konkreten Ausgaben erfasst.</x-ui.alert>
                 @else
