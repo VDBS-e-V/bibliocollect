@@ -1,6 +1,6 @@
 # Offene Punkte vor dem Start
 
-Stand: v0.8.0. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
+Stand: v0.8.1. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
 
 ## A. Muss vor dem Start
 
@@ -20,7 +20,7 @@ Stand: v0.8.0. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: En
 | | Punkt | Stand |
 |---|---|---|
 | ✔ | Etiketten und Ausweise drucken | `/betrieb/etiketten` (21 je Bogen), `/betrieb/ausweise` (10 je Bogen), Code 128 |
-| ✔ | Ausleihe wie eine Kasse | `/betrieb/ausleihe`: Person wählen, Positionen sammeln, bestätigen, Beleg drucken oder per Mail senden |
+| ✔ | Ausleihe wie eine Kasse (zwei Bildschirme) | Start: Person oder Rückgabe scannen. Person: Übersicht der Ausleihen mit Verlängern/Zurückgeben, Ausleihe per Scan, gemeinsam bestätigen, Beleg drucken oder per Mail senden |
 | ☐ | Statistik (Ausleihen, Bestand, Beliebtes, Jahresbericht) | offen |
 | ☐ | Pflege von Signaturen und Themen, Inventur | offen |
 | ☐ | Filter „nur verfügbare Titel“ | offen |

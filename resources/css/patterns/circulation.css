@@ -169,8 +169,22 @@
     margin-top: 1rem;
 }
 
-.bc-pos-toolbar form {
-    display: contents;
+.bc-terminal__rowactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+}
+
+.bc-terminal__rowactions form {
+    margin: 0;
+}
+
+.bc-terminal__start {
+    max-width: 40rem;
+}
+
+.bc-work-panel + .bc-work-panel {
+    margin-top: 1.5rem;
 }
 
 .bc-receipt {

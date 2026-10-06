@@ -97,7 +97,7 @@ it('opens the checkout terminal for a library number and books a return for a lo
     $loan = app(CheckoutCopyAction::class)->execute($patron, $copy->barcode, $staff);
 
     $this->actingAs($staff)->post(route('pos.scan'), ['code' => ' s-sc-1 '])
-        ->assertRedirect(route('pos.terminal'))
+        ->assertRedirect(route('pos.terminal.person'))
         ->assertSessionHas('pos.terminal.patron_id', (string) $patron->getKey());
 
     $this->actingAs($staff)->post(route('pos.scan'), ['code' => 'SC-001'])

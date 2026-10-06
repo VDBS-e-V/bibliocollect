@@ -6,6 +6,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Audit\Services\AuditRecorder;
+use App\Modules\Catalog\Models\Copy;
 use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Exceptions\CounterTransactionFailed;
 use App\Modules\Circulation\Mail\TransactionReceiptMail;
@@ -24,41 +25,29 @@ use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /**
- * Ausleihterminal wie eine Kasse: Person wählen, Ausleihen, Verlängerungen und Rückgaben sammeln, dann in einem Schritt
- * bestätigen. Der Vorgang liegt bis dahin nur in der Sitzung; gebucht wird erst beim Bestätigen. Danach gibt es einen Beleg
- * zum Drucken oder Versenden.
+ * Ausleihterminal wie eine Kasse in zwei Bildschirmen.
+ *
+ * Start: eine Person scannen (weiter zum Personenbildschirm) oder Rückgaben scannen (ohne Person sammeln).
+ * Person: Übersicht aller ausgeliehenen Medien mit Verlängern und Zurückgeben, Scanfeld für weitere Ausleihen,
+ * gemeinsam bestätigen. Bis zum Bestätigen liegt der Vorgang nur in der Sitzung; danach gibt es einen Beleg.
  */
 final class PosTerminalController
 {
     private const SESSION_KEY = 'pos.terminal';
 
-    public function show(
-        Request $request,
-        LoanPolicy $policy,
-        CirculationRuleEvaluator $rules,
-        ReservationBlockChecker $blocks,
-    ): Response {
+    // ---- Bildschirm 1: Start -----------------------------------------------------------------------------------
+
+    public function start(Request $request): Response|RedirectResponse
+    {
         $draft = $this->draft($request);
-        $patron = $this->patron($draft);
-        $term = trim((string) $request->query('suche', ''));
 
-        $openLoans = collect();
-        $renewable = [];
-
-        if ($patron instanceof Patron) {
-            $openLoans = Loan::query()
-                ->where('patron_id', $patron->getKey())
-                ->whereNull('returned_at')
-                ->with('copy.edition.title')
-                ->orderBy('due_on')
-                ->get();
-
-            foreach ($openLoans as $loan) {
-                $renewable[(string) $loan->getKey()] = $rules->renewalViolations($loan, $patron, $loan->copy, $blocks->blocksRenewal($loan, $loan->copy));
-            }
+        if ($draft['patron_id'] !== null && $this->patron($draft) instanceof Patron) {
+            return redirect()->route('pos.terminal.person');
         }
 
-        $results = $term !== '' && ! $patron instanceof Patron
+        $term = trim((string) $request->query('suche', ''));
+
+        $results = $term !== ''
             ? Patron::query()
                 ->with('schoolClass')
                 ->where('status', PatronStatus::Active->value)
@@ -73,106 +62,117 @@ final class PosTerminalController
             : collect();
 
         return response()
-            ->view('pages.surfaces.pos.terminal.index', [
-                'patron' => $patron,
-                'mode' => $draft['mode'],
-                'items' => $draft['items'],
-                'openLoans' => $openLoans,
-                'renewable' => $renewable,
-                'results' => $results,
-                'term' => $term,
-                'maxOpenLoans' => $patron instanceof Patron ? $policy->maxOpenLoans($patron) : 0,
-                'inCart' => collect($draft['items'])->pluck('loan_id')->filter()->all(),
-            ])
+            ->view('pages.surfaces.pos.terminal.start', ['items' => $draft['items'], 'results' => $results, 'term' => $term])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Ein Scanfeld: Bibliotheksnummer (Person), Exemplar-Barcode (Rückgabe) oder ein Name zum Suchen. */
+    public function startScan(Request $request, CounterTransactionService $service): RedirectResponse
+    {
+        $code = trim((string) $request->validate(['code' => ['required', 'string', 'max:80']], ['code.required' => 'Bitte einen Ausweis oder Barcode scannen oder einen Namen eingeben.'])['code']);
+        $draft = $this->draft($request);
+
+        $byNumber = Patron::query()->whereRaw('lower(library_number) = ?', [mb_strtolower($code)])->first();
+
+        if ($byNumber instanceof Patron) {
+            return $this->activate($request, $draft, $byNumber);
+        }
+
+        if (Copy::query()->where('barcode', $code)->exists()) {
+            try {
+                $draft['items'][] = $service->returnItem(null, $code, $draft['items']);
+            } catch (CirculationRuleViolation $exception) {
+                return redirect()->route('pos.terminal')->with('terminal_error', $exception->getMessage());
+            }
+
+            $request->session()->put(self::SESSION_KEY, $draft);
+
+            return redirect()->route('pos.terminal');
+        }
+
+        return redirect()->route('pos.terminal', ['suche' => $code]);
     }
 
     public function selectPatron(Request $request): RedirectResponse
     {
-        $data = $request->validate(['code' => ['nullable', 'string', 'max:80'], 'patron_id' => ['nullable', 'string', 'max:40']]);
-        $draft = $this->draft($request);
-
-        $patron = null;
-
-        if (! empty($data['patron_id'])) {
-            $patron = Patron::query()->find($data['patron_id']);
-        } elseif (! empty($data['code'])) {
-            $patron = Patron::query()->whereRaw('lower(library_number) = ?', [mb_strtolower(trim((string) $data['code']))])->first();
-
-            if (! $patron instanceof Patron) {
-                return redirect()->route('pos.terminal', ['suche' => trim((string) $data['code'])]);
-            }
-        }
+        $id = (string) $request->validate(['patron_id' => ['required', 'string', 'max:40']])['patron_id'];
+        $patron = Patron::query()->find($id);
 
         if (! $patron instanceof Patron || $patron->status !== PatronStatus::Active) {
             return redirect()->route('pos.terminal')->with('terminal_error', 'Diese Person gibt es nicht oder ihr Ausleihkonto ist nicht aktiv.');
         }
 
-        return $this->activate($request, $draft, $patron);
+        return $this->activate($request, $this->draft($request), $patron);
     }
 
-    /** @param  array{patron_id: ?string, mode: string, items: list<array<string, mixed>>}  $draft */
-    private function activate(Request $request, array $draft, Patron $patron): RedirectResponse
-    {
-        if ($draft['patron_id'] !== (string) $patron->getKey()) {
-            // Positionen gehören zu einer Person; bei einem Wechsel beginnt ein neuer Vorgang.
-            $draft = ['patron_id' => (string) $patron->getKey(), 'mode' => $draft['mode'], 'items' => []];
+    // ---- Bildschirm 2: Person ----------------------------------------------------------------------------------
+
+    public function person(
+        Request $request,
+        LoanPolicy $policy,
+        CirculationRuleEvaluator $rules,
+        ReservationBlockChecker $blocks,
+    ): Response|RedirectResponse {
+        $draft = $this->draft($request);
+        $patron = $this->patron($draft);
+
+        if (! $patron instanceof Patron) {
+            return redirect()->route('pos.terminal');
         }
 
-        $request->session()->put(self::SESSION_KEY, $draft);
+        $openLoans = Loan::query()
+            ->where('patron_id', $patron->getKey())
+            ->whereNull('returned_at')
+            ->with('copy.edition.title')
+            ->orderBy('due_on')
+            ->get();
 
-        $notice = $patron->blocked_at !== null ? 'Achtung: Das Ausleihkonto ist gesperrt'.($patron->blocked_reason ? ' ('.$patron->blocked_reason.')' : '').'.' : null;
+        $renewable = [];
 
-        return redirect()->route('pos.terminal')->with('terminal_notice', $notice);
+        foreach ($openLoans as $loan) {
+            $renewable[(string) $loan->getKey()] = $rules->renewalViolations($loan, $patron, $loan->copy, $blocks->blocksRenewal($loan, $loan->copy));
+        }
+
+        $queued = [];
+
+        foreach ($draft['items'] as $item) {
+            if (isset($item['loan_id'])) {
+                $queued[(string) $item['loan_id']] = $item['type'];
+            }
+        }
+
+        return response()
+            ->view('pages.surfaces.pos.terminal.person', [
+                'patron' => $patron,
+                'items' => $draft['items'],
+                'openLoans' => $openLoans,
+                'renewable' => $renewable,
+                'queued' => $queued,
+                'maxOpenLoans' => $policy->maxOpenLoans($patron),
+            ])
+            ->header('Cache-Control', 'private, no-store');
     }
 
-    public function clearPatron(Request $request): RedirectResponse
-    {
-        $draft = $this->draft($request);
-        $request->session()->put(self::SESSION_KEY, ['patron_id' => null, 'mode' => $draft['mode'], 'items' => []]);
-
-        return redirect()->route('pos.terminal');
-    }
-
-    public function mode(Request $request): RedirectResponse
-    {
-        $mode = $request->validate(['mode' => ['required', 'in:checkout,renew,return']])['mode'];
-        $draft = $this->draft($request);
-        $draft['mode'] = $mode;
-        $request->session()->put(self::SESSION_KEY, $draft);
-
-        return redirect()->route('pos.terminal');
-    }
-
+    /** Scan auf dem Personenbildschirm: eigene Ausleihe → Rückgabe, freies Exemplar → Ausleihe. */
     public function scan(Request $request, CounterTransactionService $service): RedirectResponse
     {
         $code = trim((string) $request->validate(['code' => ['required', 'string', 'max:80']], ['code.required' => 'Bitte einen Barcode scannen oder eingeben.'])['code']);
         $draft = $this->draft($request);
         $patron = $this->patron($draft);
 
-        // Ein Bibliotheksausweis im Scanfeld wählt die Person, auch mitten im Vorgang.
-        if (! $patron instanceof Patron || $draft['items'] === []) {
-            $byNumber = Patron::query()->whereRaw('lower(library_number) = ?', [mb_strtolower($code)])->first();
-
-            if ($byNumber instanceof Patron && $byNumber->status === PatronStatus::Active) {
-                return $this->activate($request, $draft, $byNumber);
-            }
+        if (! $patron instanceof Patron) {
+            return redirect()->route('pos.terminal');
         }
 
         try {
-            $item = match ($draft['mode']) {
-                'return' => $service->returnItem($patron, $code, $draft['items']),
-                'renew' => $service->renewItemByBarcode($patron, $code, $draft['items']),
-                default => $service->checkoutItem($patron, $code, $draft['items']),
-            };
+            $draft['items'][] = $service->scanItem($patron, $code, $draft['items']);
         } catch (CirculationRuleViolation $exception) {
-            return redirect()->route('pos.terminal')->with('terminal_error', $exception->getMessage());
+            return redirect()->route('pos.terminal.person')->with('terminal_error', $exception->getMessage());
         }
 
-        $draft['items'][] = $item;
         $request->session()->put(self::SESSION_KEY, $draft);
 
-        return redirect()->route('pos.terminal');
+        return redirect()->route('pos.terminal.person');
     }
 
     public function renew(Request $request, string $loanId, CounterTransactionService $service): RedirectResponse
@@ -182,13 +182,38 @@ final class PosTerminalController
         try {
             $draft['items'][] = $service->renewItem($this->patron($draft), $loanId, $draft['items']);
         } catch (CirculationRuleViolation $exception) {
-            return redirect()->route('pos.terminal')->with('terminal_error', $exception->getMessage());
+            return redirect()->route('pos.terminal.person')->with('terminal_error', $exception->getMessage());
         }
 
         $request->session()->put(self::SESSION_KEY, $draft);
 
-        return redirect()->route('pos.terminal');
+        return redirect()->route('pos.terminal.person');
     }
+
+    public function returnLoan(Request $request, string $loanId, CounterTransactionService $service): RedirectResponse
+    {
+        $draft = $this->draft($request);
+        $patron = $this->patron($draft);
+        $loan = $patron instanceof Patron
+            ? Loan::query()->where('patron_id', $patron->getKey())->whereNull('returned_at')->with('copy')->find($loanId)
+            : null;
+
+        if (! $loan instanceof Loan) {
+            return redirect()->route('pos.terminal.person')->with('terminal_error', 'Diese Ausleihe gibt es für das gewählte Ausleihkonto nicht (mehr).');
+        }
+
+        try {
+            $draft['items'][] = $service->returnItem($patron, $loan->copy->barcode, $draft['items']);
+        } catch (CirculationRuleViolation $exception) {
+            return redirect()->route('pos.terminal.person')->with('terminal_error', $exception->getMessage());
+        }
+
+        $request->session()->put(self::SESSION_KEY, $draft);
+
+        return redirect()->route('pos.terminal.person');
+    }
+
+    // ---- gemeinsam --------------------------------------------------------------------------------------------
 
     public function removeItem(Request $request, int $index): RedirectResponse
     {
@@ -197,14 +222,16 @@ final class PosTerminalController
         $draft['items'] = array_values($draft['items']);
         $request->session()->put(self::SESSION_KEY, $draft);
 
-        return redirect()->route('pos.terminal');
+        return $this->back($draft);
     }
 
+    /** Verwirft den Vorgang und geht zurück zum Start. */
     public function discard(Request $request): RedirectResponse
     {
+        $hadItems = $this->draft($request)['items'] !== [];
         $request->session()->forget(self::SESSION_KEY);
 
-        return redirect()->route('pos.terminal')->with('terminal_notice', 'Der Vorgang wurde verworfen. Es wurde nichts gebucht.');
+        return redirect()->route('pos.terminal')->with('terminal_notice', $hadItems ? 'Der Vorgang wurde verworfen. Es wurde nichts gebucht.' : null);
     }
 
     public function confirm(Request $request, CounterTransactionService $service): RedirectResponse
@@ -217,7 +244,7 @@ final class PosTerminalController
         try {
             $transaction = $service->confirm($this->patron($draft), $draft['items'], $actor);
         } catch (CounterTransactionFailed $exception) {
-            return redirect()->route('pos.terminal')->with('terminal_error', $exception->getMessage());
+            return $this->back($draft)->with('terminal_error', $exception->getMessage());
         }
 
         $request->session()->forget(self::SESSION_KEY);
@@ -256,19 +283,48 @@ final class PosTerminalController
         return redirect()->route('pos.terminal.receipt', ['transactionId' => $transaction->getKey()])->with('terminal_notice', 'Der Beleg wurde an '.$address.' geschickt.');
     }
 
-    /** @return array{patron_id: ?string, mode: string, items: list<array<string, mixed>>} */
+    /** @param  array{patron_id: ?string, items: list<array<string, mixed>>}  $draft */
+    private function activate(Request $request, array $draft, Patron $patron): RedirectResponse
+    {
+        if ($patron->status !== PatronStatus::Active) {
+            return redirect()->route('pos.terminal')->with('terminal_error', 'Das Ausleihkonto ist nicht aktiv.');
+        }
+
+        // Schon gescannte Rückgaben gehen mit, wenn sie dieser Person gehören; sonst bleiben sie getrennt.
+        if ($draft['items'] !== []) {
+            $loanIds = array_filter(array_map(static fn (array $item): ?string => $item['loan_id'] ?? null, $draft['items']));
+            $own = Loan::query()->whereIn('id', $loanIds)->where('patron_id', $patron->getKey())->count();
+
+            if ($own !== count($draft['items'])) {
+                return redirect()->route('pos.terminal')->with('terminal_error', 'Im Vorgang liegen noch Rückgaben anderer Personen. Bitte zuerst bestätigen oder verwerfen.');
+            }
+        }
+
+        $request->session()->put(self::SESSION_KEY, ['patron_id' => (string) $patron->getKey(), 'items' => $draft['items']]);
+
+        $notice = $patron->blocked_at !== null ? 'Achtung: Das Ausleihkonto ist gesperrt'.($patron->blocked_reason ? ' ('.$patron->blocked_reason.')' : '').'.' : null;
+
+        return redirect()->route('pos.terminal.person')->with('terminal_notice', $notice);
+    }
+
+    /** @param  array{patron_id: ?string, items: list<array<string, mixed>>}  $draft */
+    private function back(array $draft): RedirectResponse
+    {
+        return redirect()->route($draft['patron_id'] !== null ? 'pos.terminal.person' : 'pos.terminal');
+    }
+
+    /** @return array{patron_id: ?string, items: list<array<string, mixed>>} */
     private function draft(Request $request): array
     {
         $draft = $request->session()->get(self::SESSION_KEY);
 
         return [
             'patron_id' => is_array($draft) && is_string($draft['patron_id'] ?? null) ? $draft['patron_id'] : null,
-            'mode' => is_array($draft) && in_array($draft['mode'] ?? null, ['checkout', 'renew', 'return'], true) ? $draft['mode'] : 'checkout',
             'items' => is_array($draft) && is_array($draft['items'] ?? null) ? array_values($draft['items']) : [],
         ];
     }
 
-    /** @param  array{patron_id: ?string, mode: string, items: list<array<string, mixed>>}  $draft */
+    /** @param  array{patron_id: ?string, items: list<array<string, mixed>>}  $draft */
     private function patron(array $draft): ?Patron
     {
         return $draft['patron_id'] !== null ? Patron::query()->with('schoolClass')->find($draft['patron_id']) : null;

@@ -91,6 +91,27 @@ final readonly class CounterTransactionService
     }
 
     /**
+     * Ein Scan auf dem Personenbildschirm: Ist das Exemplar auf dieses Ausleihkonto ausgeliehen, ist es eine Rückgabe,
+     * sonst eine Ausleihe (mit allen Prüfungen, auch „bereits an andere ausgeliehen“).
+     *
+     * @param  list<array<string, mixed>>  $items
+     * @return array<string, mixed>
+     *
+     * @throws CirculationRuleViolation
+     */
+    public function scanItem(Patron $patron, string $barcode, array $items): array
+    {
+        $copy = $this->copy($barcode);
+        $loan = Loan::query()->where('copy_id', $copy->getKey())->whereNull('returned_at')->first();
+
+        if ($loan instanceof Loan && $loan->patron_id === (string) $patron->getKey()) {
+            return $this->returnItem($patron, $barcode, $items);
+        }
+
+        return $this->checkoutItem($patron, $barcode, $items);
+    }
+
+    /**
      * @param  list<array<string, mixed>>  $items
      * @return array<string, mixed>
      *

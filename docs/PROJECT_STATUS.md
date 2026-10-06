@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: v0.8.0 (offene Punkte siehe `docs/OFFENE_PUNKTE.md`). Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
+Stand: v0.8.1 (offene Punkte siehe `docs/OFFENE_PUNKTE.md`). Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
 
 ## Abgeschlossen
 
@@ -180,7 +180,7 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 
 ### Ausleihterminal, Etiketten, Rechtliches und Regeln (v0.8.0)
 
-- **Ausleihterminal** `/betrieb/ausleihe` (Navigation „Ausleihe“): Person per Ausweis oder Namenssuche wählen, Ausleihen, Verlängerungen und Rückgaben sammeln (jede Position wird sofort geprüft, gebucht wird nichts), gemeinsam bestätigen. Bestätigen läuft in einer Transaktion (erst Rückgaben, dann Verlängerungen, dann Ausleihen; scheitert eine Position, wird nichts gebucht). Danach Beleg `V-JJJJMMTT-NNN` zum Drucken oder per E-Mail (Adresse aus dem Konto oder frei eingegeben). Rückgaben gehen auch ohne Person.
+- **Ausleihterminal** in zwei Bildschirmen (Navigation „Ausleihe“). *Start* (`/betrieb/ausleihe`): ein Scanfeld; ein Ausweis (Bibliotheksnummer) führt zur Person, der Barcode eines Exemplars sammelt eine Rückgabe ohne Person, ein Name startet die Personensuche. *Person* (`/betrieb/ausleihe/person`): Übersicht aller ausgeliehenen Medien mit „Verlängern“ und „Zurückgeben“, ein Scanfeld für weitere Medien (eigene Ausleihe → Rückgabe, freies Exemplar → Ausleihe) und der Vorgang mit allen Positionen. Jede Position wird sofort geprüft, gebucht wird nichts, bis gemeinsam bestätigt wird. Bestätigen läuft in einer Transaktion (erst Rückgaben, dann Verlängerungen, dann Ausleihen; scheitert eine Position, wird nichts gebucht). Danach Beleg `V-JJJJMMTT-NNN` zum Drucken oder per E-Mail (Adresse aus dem Konto oder frei eingegeben). Rückgaben gehen auch ohne Person.
 - **Leihfristen und Obergrenzen** je Art des Ausleihkontos, Frist zusätzlich je Medientyp (`config/circulation.php`, `LoanPolicy`).
 - **Problem melden** an der Ausleihe: beschädigt zurücknehmen oder als verloren melden.
 - **Etiketten** (`/betrieb/etiketten`) und **Bibliotheksausweise** (`/betrieb/ausweise`) mit Code-128-Strichcode zum Drucken.

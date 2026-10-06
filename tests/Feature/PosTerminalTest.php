@@ -66,67 +66,129 @@ afterEach(function (): void {
     CarbonImmutable::setTestNow();
 });
 
-it('selects a person by library number or by name search', function (): void {
+it('starts on a screen that only scans a person or returns', function (): void {
+    $user = terminalUser();
+
+    $this->actingAs($user)->get(route('pos.terminal'))
+        ->assertOk()
+        ->assertSee('Ausweis oder Exemplar-Barcode scannen')
+        ->assertDontSee('Ausgeliehene Medien');
+
+    // Ohne Person gibt es keinen Personenbildschirm.
+    $this->get(route('pos.terminal.person'))->assertRedirect(route('pos.terminal'));
+});
+
+it('moves to the person screen when a library number is scanned', function (): void {
     $user = terminalUser();
     $patron = terminalPatron('S-TM-1');
-    terminalPatron('S-TM-2', ['last_name' => 'Anders']);
+    $copy = terminalCopy('TM-OLD', 'Altes Buch');
+    app(CheckoutCopyAction::class)->execute($patron, $copy->barcode, $user);
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['code' => 's-tm-1'])->assertRedirect(route('pos.terminal'));
-    $this->actingAs($user)->get(route('pos.terminal'))->assertOk()->assertSee('Kasse PersonS-TM-1')->assertSee('Andere Person wählen');
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => ' s-tm-1 '])->assertRedirect(route('pos.terminal.person'));
 
-    $this->actingAs($user)->post(route('pos.terminal.patron.clear'));
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['code' => 'Anders'])->assertRedirect(route('pos.terminal', ['suche' => 'Anders']));
-    $this->actingAs($user)->get(route('pos.terminal', ['suche' => 'Anders']))->assertOk()->assertSee('Anders, Kasse');
+    $this->get(route('pos.terminal.person'))
+        ->assertOk()
+        ->assertSee('Kasse PersonS-TM-1')
+        ->assertSee('Ausgeliehene Medien')
+        ->assertSee('Altes Buch')
+        ->assertSee('Verlängern')
+        ->assertSee('Zurückgeben')
+        ->assertSee('1 von 5 Medien ausgeliehen');
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()])->assertRedirect(route('pos.terminal'));
+    // Der Start leitet bei gewählter Person auf deren Bildschirm.
+    $this->get(route('pos.terminal'))->assertRedirect(route('pos.terminal.person'));
+});
+
+it('finds people by name on the start screen and selects one', function (): void {
+    $user = terminalUser();
+    $patron = terminalPatron('S-TM-2', ['last_name' => 'Anders']);
+    terminalPatron('S-TM-3', ['last_name' => 'Weg', 'status' => PatronStatus::Departed, 'leaving_on' => '2026-01-01']);
+
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'Anders'])->assertRedirect(route('pos.terminal', ['suche' => 'Anders']));
+    $this->get(route('pos.terminal', ['suche' => 'Anders']))->assertOk()->assertSee('Anders, Kasse');
+    $this->get(route('pos.terminal', ['suche' => 'Weg']))->assertOk()->assertSee('Niemand gefunden');
+
+    $this->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()])->assertRedirect(route('pos.terminal.person'));
     expect(session('pos.terminal.patron_id'))->toBe((string) $patron->getKey());
 });
 
-it('collects checkouts, renewals and returns without booking and then confirms them together', function (): void {
+it('collects returns without a person on the start screen and books them on confirmation', function (): void {
+    $user = terminalUser();
+    $holder = terminalPatron('S-TM-1');
+    $copy = terminalCopy('TM-BOX');
+    $loan = app(CheckoutCopyAction::class)->execute($holder, $copy->barcode, $user);
+
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'TM-BOX'])->assertRedirect(route('pos.terminal'));
+
+    expect($loan->fresh()->returned_at)->toBeNull();
+
+    $this->get(route('pos.terminal'))->assertOk()->assertSee('Gescannte Rückgaben')->assertSee('Buch TM-BOX');
+
+    $this->post(route('pos.terminal.confirm'))->assertRedirect();
+
+    $transaction = LoanTransaction::query()->firstOrFail();
+
+    expect($loan->fresh()->returned_at)->not->toBeNull()
+        ->and($transaction->patron_id)->toBeNull()
+        ->and($transaction->returned_count)->toBe(1);
+
+    // Zweiter Scan desselben Exemplars: nicht ausgeliehen
+    $this->post(route('pos.terminal.start'), ['code' => 'TM-BOX'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'nicht ausgeliehen'));
+});
+
+it('carries scanned returns over to their owner and refuses a foreign person', function (): void {
+    $user = terminalUser();
+    $owner = terminalPatron('S-TM-1');
+    $other = terminalPatron('S-TM-2');
+    app(CheckoutCopyAction::class)->execute($owner, terminalCopy('TM-A')->barcode, $user);
+
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'TM-A']);
+
+    $this->post(route('pos.terminal.start'), ['code' => 'S-TM-2'])
+        ->assertRedirect(route('pos.terminal'))
+        ->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'Rückgaben anderer Personen'));
+
+    $this->post(route('pos.terminal.start'), ['code' => 'S-TM-1'])->assertRedirect(route('pos.terminal.person'));
+    $this->get(route('pos.terminal.person'))->assertOk()->assertSee('1 Position')->assertSee('Buch TM-A');
+
+    expect($other->fresh()->exists)->toBeTrue();
+});
+
+it('collects checkouts, renewals and returns on the person screen and confirms them together', function (): void {
     $user = terminalUser();
     $patron = terminalPatron('S-TM-1');
-    $old = terminalCopy('TM-OLD', 'Altes Buch');
-    $keep = terminalCopy('TM-KEEP', 'Behaltenes Buch');
+    $oldLoan = app(CheckoutCopyAction::class)->execute($patron, terminalCopy('TM-OLD', 'Altes Buch')->barcode, $user);
+    $keepLoan = app(CheckoutCopyAction::class)->execute($patron, terminalCopy('TM-KEEP', 'Behaltenes Buch')->barcode, $user);
     $new = terminalCopy('TM-NEW', 'Neues Buch');
 
-    $oldLoan = app(CheckoutCopyAction::class)->execute($patron, $old->barcode, $user);
-    $keepLoan = app(CheckoutCopyAction::class)->execute($patron, $keep->barcode, $user);
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-1']);
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()]);
+    $this->post(route('pos.terminal.return', ['loanId' => $oldLoan->getKey()]))->assertRedirect(route('pos.terminal.person'));
+    $this->post(route('pos.terminal.renew', ['loanId' => $keepLoan->getKey()]))->assertRedirect(route('pos.terminal.person'));
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-NEW'])->assertRedirect(route('pos.terminal.person'));
 
-    // Rückgabe, Verlängerung und Ausleihe in einem Vorgang
-    $this->post(route('pos.terminal.mode'), ['mode' => 'return']);
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-OLD'])->assertRedirect(route('pos.terminal'));
-    $this->post(route('pos.terminal.renew', ['loanId' => $keepLoan->getKey()]))->assertRedirect(route('pos.terminal'));
-    $this->post(route('pos.terminal.mode'), ['mode' => 'checkout']);
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-NEW'])->assertRedirect(route('pos.terminal'));
-
-    // Bis zum Bestätigen ist nichts gebucht.
     expect($oldLoan->fresh()->returned_at)->toBeNull()
         ->and($keepLoan->fresh()->renewal_count)->toBe(0)
         ->and(Loan::query()->where('copy_id', $new->getKey())->exists())->toBeFalse()
         ->and(LoanTransaction::query()->count())->toBe(0);
 
-    $this->get(route('pos.terminal'))
+    $this->get(route('pos.terminal.person'))
         ->assertOk()
         ->assertSee('3 Positionen')
         ->assertSee('1 ausleihen')
         ->assertSee('1 verlängern')
-        ->assertSee('1 zurücknehmen');
+        ->assertSee('1 zurücknehmen')
+        ->assertSee('wird zurückgegeben')
+        ->assertSee('wird verlängert');
 
-    $response = $this->post(route('pos.terminal.confirm'))->assertRedirect();
+    $this->post(route('pos.terminal.confirm'))->assertRedirect();
 
     $transaction = LoanTransaction::query()->firstOrFail();
-
-    $response->assertRedirect(route('pos.terminal.receipt', ['transactionId' => $transaction->getKey()]));
 
     expect($oldLoan->fresh()->returned_at)->not->toBeNull()
         ->and($keepLoan->fresh()->renewal_count)->toBe(1)
         ->and(Loan::query()->where('copy_id', $new->getKey())->whereNull('returned_at')->exists())->toBeTrue()
         ->and($transaction->number)->toBe('V-20261005-001')
-        ->and($transaction->checked_out_count)->toBe(1)
-        ->and($transaction->renewed_count)->toBe(1)
-        ->and($transaction->returned_count)->toBe(1)
         ->and($transaction->patron_id)->toBe((string) $patron->getKey())
         ->and(session('pos.terminal'))->toBeNull()
         ->and(AuditEvent::query()->where('action', 'circulation.transaction.confirmed')->count())->toBe(1);
@@ -139,48 +201,25 @@ it('collects checkouts, renewals and returns without booking and then confirms t
         ->assertSee('fällig am');
 });
 
-it('rejects invalid positions right away with the reason', function (): void {
+it('treats a scan of a loaned copy of this person as return and a free copy as checkout', function (): void {
     $user = terminalUser();
     $patron = terminalPatron('S-TM-1');
     $other = terminalPatron('S-TM-2');
-    $loaned = terminalCopy('TM-LOANED');
-    app(CheckoutCopyAction::class)->execute($other, $loaned->barcode, $user);
-    $free = terminalCopy('TM-FREE');
+    app(CheckoutCopyAction::class)->execute($patron, terminalCopy('TM-MINE')->barcode, $user);
+    app(CheckoutCopyAction::class)->execute($other, terminalCopy('TM-THEIRS')->barcode, $user);
+    terminalCopy('TM-FREE');
 
-    // Ohne Person keine Ausleihe
-    $this->actingAs($user)->post(route('pos.terminal.scan'), ['code' => 'TM-FREE'])->assertSessionHas('terminal_error', 'Bitte zuerst eine Person wählen.');
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-1']);
 
-    $this->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()]);
-
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-LOANED'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'bereits ausgeliehen'));
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-MINE']);
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-FREE']);
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-THEIRS'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'bereits ausgeliehen'));
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-FREE'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'schon im Vorgang'));
     $this->post(route('pos.terminal.scan'), ['code' => 'GIBT-ES-NICHT'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'Kein Exemplar'));
 
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-FREE']);
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-FREE'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'schon im Vorgang'));
-
-    // Rückgabe fremder Ausleihe in einem Vorgang mit Person
-    $this->post(route('pos.terminal.mode'), ['mode' => 'return']);
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-LOANED'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'anderes Ausleihkonto'));
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-FREE'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'schon im Vorgang'));
-
-    expect($free->fresh()->exists)->toBeTrue();
-});
-
-it('lets returns be booked without choosing a person and stores no person on the receipt', function (): void {
-    $user = terminalUser();
-    $holder = terminalPatron('S-TM-1');
-    $copy = terminalCopy('TM-BOX');
-    $loan = app(CheckoutCopyAction::class)->execute($holder, $copy->barcode, $user);
-
-    $this->actingAs($user)->post(route('pos.terminal.mode'), ['mode' => 'return']);
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-BOX']);
-    $this->post(route('pos.terminal.confirm'))->assertRedirect();
-
-    $transaction = LoanTransaction::query()->firstOrFail();
-
-    expect($loan->fresh()->returned_at)->not->toBeNull()
-        ->and($transaction->patron_id)->toBeNull()
-        ->and($transaction->returned_count)->toBe(1);
+    expect(session('pos.terminal.items'))->toHaveCount(2)
+        ->and(session('pos.terminal.items.0.type'))->toBe('return')
+        ->and(session('pos.terminal.items.1.type'))->toBe('checkout');
 });
 
 it('books nothing when one position fails on confirmation', function (): void {
@@ -189,7 +228,7 @@ it('books nothing when one position fails on confirmation', function (): void {
     $first = terminalCopy('TM-A');
     $second = terminalCopy('TM-B');
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()]);
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-1']);
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-A']);
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-B']);
 
@@ -197,30 +236,28 @@ it('books nothing when one position fails on confirmation', function (): void {
     app(CheckoutCopyAction::class)->execute(terminalPatron('S-TM-2'), $second->barcode, $user);
 
     $this->post(route('pos.terminal.confirm'))
-        ->assertRedirect(route('pos.terminal'))
+        ->assertRedirect(route('pos.terminal.person'))
         ->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'Position 2') && str_contains($m, 'Es wurde nichts gebucht'));
 
     expect(Loan::query()->where('copy_id', $first->getKey())->exists())->toBeFalse()
         ->and(LoanTransaction::query()->count())->toBe(0)
-        ->and(session('pos.terminal.items'))->toHaveCount(2);
+        ->and(session('pos.terminal.items'))->toHaveCount(2)
+        ->and($patron->fresh()->exists)->toBeTrue();
 });
 
-it('respects the loan limit across the whole transaction and frees slots by returns in the same transaction', function (): void {
+it('respects the loan limit and frees slots by returns in the same transaction', function (): void {
     config(['circulation.max_open_loans' => ['default' => 1, 'by_kind' => []]]);
     $user = terminalUser();
     $patron = terminalPatron('S-TM-1');
-    $held = terminalCopy('TM-HELD');
+    $held = app(CheckoutCopyAction::class)->execute($patron, terminalCopy('TM-HELD')->barcode, $user);
     terminalCopy('TM-X');
     terminalCopy('TM-Y');
-    app(CheckoutCopyAction::class)->execute($patron, $held->barcode, $user);
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()]);
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-1']);
 
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-X'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'höchstens 1'));
 
-    $this->post(route('pos.terminal.mode'), ['mode' => 'return']);
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-HELD']);
-    $this->post(route('pos.terminal.mode'), ['mode' => 'checkout']);
+    $this->post(route('pos.terminal.return', ['loanId' => $held->getKey()]));
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-X'])->assertSessionMissing('terminal_error');
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-Y'])->assertSessionHas('terminal_error', static fn (string $m): bool => str_contains($m, 'höchstens 1'));
 
@@ -235,8 +272,7 @@ it('shows who a returned copy is held for on the receipt', function (): void {
     app(CheckoutCopyAction::class)->execute(terminalPatron('S-TM-1'), $copy->barcode, $user);
     app(PlaceReservationAction::class)->execute(terminalPatron('S-TM-2'), $copy->barcode, $user);
 
-    $this->actingAs($user)->post(route('pos.terminal.mode'), ['mode' => 'return']);
-    $this->post(route('pos.terminal.scan'), ['code' => 'TM-HOLD']);
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'TM-HOLD']);
     $this->post(route('pos.terminal.confirm'));
 
     $this->get(route('pos.terminal.receipt', ['transactionId' => LoanTransaction::query()->firstOrFail()->getKey()]))
@@ -245,21 +281,21 @@ it('shows who a returned copy is held for on the receipt', function (): void {
         ->assertSee('S-TM-2');
 });
 
-it('can discard and remove positions', function (): void {
+it('can remove positions, discard and refuses an empty confirmation', function (): void {
     $user = terminalUser();
-    $patron = terminalPatron('S-TM-1');
+    terminalPatron('S-TM-1');
     terminalCopy('TM-A');
     terminalCopy('TM-B');
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()]);
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-1']);
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-A']);
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-B']);
 
-    $this->post(route('pos.terminal.item.remove', ['index' => 0]));
+    $this->post(route('pos.terminal.item.remove', ['index' => 0]))->assertRedirect(route('pos.terminal.person'));
     expect(session('pos.terminal.items'))->toHaveCount(1)
         ->and(session('pos.terminal.items.0.barcode'))->toBe('TM-B');
 
-    $this->post(route('pos.terminal.discard'))->assertSessionHas('terminal_notice');
+    $this->post(route('pos.terminal.discard'))->assertRedirect(route('pos.terminal'))->assertSessionHas('terminal_notice');
     expect(session('pos.terminal'))->toBeNull();
 
     $this->post(route('pos.terminal.confirm'))->assertSessionHas('terminal_error', 'Der Vorgang ist leer.');
@@ -268,10 +304,10 @@ it('can discard and remove positions', function (): void {
 it('mails the receipt to the address on the account or a typed one and remembers it', function (): void {
     Mail::fake();
     $user = terminalUser();
-    $patron = terminalPatron('S-TM-1');
+    terminalPatron('S-TM-1');
     terminalCopy('TM-MAIL');
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()]);
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-1']);
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-MAIL']);
     $this->post(route('pos.terminal.confirm'));
 
@@ -292,10 +328,10 @@ it('mails the receipt to the address on the account or a typed one and remembers
 
 it('renders the receipt mail with the booked positions', function (): void {
     $user = terminalUser();
-    $patron = terminalPatron('S-TM-1', ['first_name' => 'Mia']);
+    terminalPatron('S-TM-1', ['first_name' => 'Mia']);
     terminalCopy('TM-R', 'Das Lesebuch');
 
-    $this->actingAs($user)->post(route('pos.terminal.patron'), ['patron_id' => (string) $patron->getKey()]);
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-1']);
     $this->post(route('pos.terminal.scan'), ['code' => 'TM-R']);
     $this->post(route('pos.terminal.confirm'));
 
@@ -309,5 +345,6 @@ it('renders the receipt mail with the booked positions', function (): void {
 
 it('keeps the terminal away from roles without circulation rights', function (string $role): void {
     $this->actingAs(terminalUser($role))->get(route('pos.terminal'))->assertForbidden();
+    $this->actingAs(terminalUser($role))->get(route('pos.terminal.person'))->assertForbidden();
     $this->actingAs(terminalUser($role))->post(route('pos.terminal.confirm'))->assertForbidden();
 })->with(['technical_admin', 'student', 'teacher']);

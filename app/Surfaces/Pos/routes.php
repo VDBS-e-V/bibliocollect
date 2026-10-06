@@ -145,12 +145,13 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::post('/betrieb/scan', PosScanController::class)
             ->name('pos.scan');
 
-        Route::get('/betrieb/ausleihe', [PosTerminalController::class, 'show'])->name('pos.terminal');
+        Route::get('/betrieb/ausleihe', [PosTerminalController::class, 'start'])->name('pos.terminal');
+        Route::post('/betrieb/ausleihe', [PosTerminalController::class, 'startScan'])->name('pos.terminal.start');
         Route::post('/betrieb/ausleihe/person', [PosTerminalController::class, 'selectPatron'])->name('pos.terminal.patron');
-        Route::post('/betrieb/ausleihe/person/loeschen', [PosTerminalController::class, 'clearPatron'])->name('pos.terminal.patron.clear');
-        Route::post('/betrieb/ausleihe/modus', [PosTerminalController::class, 'mode'])->name('pos.terminal.mode');
+        Route::get('/betrieb/ausleihe/person', [PosTerminalController::class, 'person'])->name('pos.terminal.person');
         Route::post('/betrieb/ausleihe/scan', [PosTerminalController::class, 'scan'])->name('pos.terminal.scan');
         Route::post('/betrieb/ausleihe/verlaengern/{loanId}', [PosTerminalController::class, 'renew'])->name('pos.terminal.renew');
+        Route::post('/betrieb/ausleihe/zurueckgeben/{loanId}', [PosTerminalController::class, 'returnLoan'])->name('pos.terminal.return');
         Route::post('/betrieb/ausleihe/position/{index}/entfernen', [PosTerminalController::class, 'removeItem'])->whereNumber('index')->name('pos.terminal.item.remove');
         Route::post('/betrieb/ausleihe/verwerfen', [PosTerminalController::class, 'discard'])->name('pos.terminal.discard');
         Route::post('/betrieb/ausleihe/bestaetigen', [PosTerminalController::class, 'confirm'])->name('pos.terminal.confirm');
