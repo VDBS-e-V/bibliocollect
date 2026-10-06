@@ -6,6 +6,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Catalog\Actions\ApplyMetadataProposalAction;
+use App\Modules\Catalog\Actions\ApplySafeMetadataProposalsAction;
 use App\Modules\Catalog\Actions\DismissMetadataReviewAction;
 use App\Modules\Catalog\Actions\ReopenMetadataReviewAction;
 use App\Modules\Catalog\Actions\ScanCatalogMetadataQualityAction;
@@ -16,6 +17,7 @@ use App\Modules\Catalog\Exceptions\MetadataProposalOutdated;
 use App\Modules\Catalog\Models\CatalogMetadataReview;
 use App\Modules\Catalog\Quality\MetadataFingerprint;
 use App\Modules\Catalog\Queries\ListMetadataReviewsQuery;
+use App\Modules\Catalog\Queries\SafeMetadataProposalsQuery;
 use App\Modules\Catalog\Services\MetadataProposalService;
 use App\Surfaces\Pos\Http\Requests\CatalogQualityApplyRequest;
 use App\Surfaces\Pos\Http\Requests\CatalogQualityIndexRequest;
@@ -45,6 +47,31 @@ final class CatalogQualityController
             'defectIssues' => MetadataIssue::defects(),
             'enrichmentIssues' => array_values(array_filter(MetadataIssue::cases(), static fn (MetadataIssue $issue): bool => $issue->isEnrichment())),
         ]);
+    }
+
+    /** Vorschau aller eindeutigen Vorschläge, die man gesammelt übernehmen kann. */
+    public function safe(SafeMetadataProposalsQuery $safe): Response
+    {
+        return $this->view('safe', [
+            'entries' => $safe->execute(),
+            'counts' => $safe->counts(),
+        ]);
+    }
+
+    public function applySafe(Request $request, ApplySafeMetadataProposalsAction $apply): RedirectResponse
+    {
+        $request->validate(['confirm' => ['accepted']], ['confirm.accepted' => 'Bitte bestätige die gesammelte Übernahme.']);
+
+        $result = $apply->execute($this->userId($request));
+
+        return redirect()
+            ->route('pos.catalog.quality.index')
+            ->with('catalog_success', sprintf(
+                '%d Fälle mit %d Änderungen wurden übernommen%s.',
+                $result['applied'],
+                $result['changes'],
+                $result['skipped'] > 0 ? sprintf(', %d übersprungen (inzwischen geändert)', $result['skipped']) : '',
+            ));
     }
 
     public function scan(ScanCatalogMetadataQualityAction $scan): RedirectResponse

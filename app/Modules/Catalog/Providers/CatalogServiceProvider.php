@@ -6,6 +6,7 @@ namespace App\Modules\Catalog\Providers;
 
 use App\Modules\Catalog\Console\AnalyzeLegacyCatalogCommand;
 use App\Modules\Catalog\Console\AuditLegacyCatalogQualityCommand;
+use App\Modules\Catalog\Console\FetchMetadataProposalsCommand;
 use App\Modules\Catalog\Console\ImportLegacyCatalogCommand;
 use App\Modules\Catalog\Console\QueueCatalogCoverRefreshCommand;
 use App\Modules\Catalog\Console\ScanCatalogMetadataQualityCommand;
@@ -42,6 +43,7 @@ final class CatalogServiceProvider extends ServiceProvider
                 ImportLegacyCatalogCommand::class,
                 QueueCatalogCoverRefreshCommand::class,
                 ScanCatalogMetadataQualityCommand::class,
+                FetchMetadataProposalsCommand::class,
             ]);
         }
     }

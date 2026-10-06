@@ -71,6 +71,8 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::prefix('/betrieb/katalog/qualitaet')->group(function (): void {
             Route::get('/', [CatalogQualityController::class, 'index'])->name('pos.catalog.quality.index');
             Route::post('/scan', [CatalogQualityController::class, 'scan'])->name('pos.catalog.quality.scan');
+            Route::get('/sicher', [CatalogQualityController::class, 'safe'])->name('pos.catalog.quality.safe');
+            Route::post('/sicher', [CatalogQualityController::class, 'applySafe'])->name('pos.catalog.quality.safe.apply');
             Route::get('/{reviewId}', [CatalogQualityController::class, 'show'])->name('pos.catalog.quality.show');
             Route::get('/{reviewId}/weiter', [CatalogQualityController::class, 'skip'])->name('pos.catalog.quality.skip');
             Route::post('/{reviewId}/vorschlag', [CatalogQualityController::class, 'refresh'])->name('pos.catalog.quality.refresh');

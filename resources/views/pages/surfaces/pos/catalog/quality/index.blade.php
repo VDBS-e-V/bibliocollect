@@ -28,6 +28,7 @@
             @csrf
             <button type="submit" class="bc-intake-linkbutton">Bestand neu prüfen</button>
         </form>
+        <a href="{{ route('pos.catalog.quality.safe') }}">Eindeutige Vorschläge gesammelt prüfen</a>
     </div>
 
     @if (session('catalog_success'))

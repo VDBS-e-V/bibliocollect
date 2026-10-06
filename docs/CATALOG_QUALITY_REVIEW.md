@@ -58,6 +58,18 @@ Schutzregeln:
 - Verlage, Drucker und Vertrieb (`pbl`, `prt`, `dst`, …) werden nicht als Verantwortliche vorgeschlagen.
 - **Nie angefasst:** lokale Klassifikation, Mindestalter, Exemplare, Signaturen, interne Notizen, Cover und Legacy-Felder. Welche Felder vorgeschlagen werden dürfen, steht in `MetadataFields`.
 
+## Vorschläge vorab holen und eindeutige gesammelt übernehmen
+
+Bei mehreren hundert Fällen lohnt sich nicht, jeden einzeln zu öffnen:
+
+1. `php artisan catalog:quality:propose --limit=800` fragt die DNB für alle offenen Fälle ohne Vorschlag ab (Pause 400 ms zwischen zwei Abfragen, `--delay` ändert das; bricht ab, wenn die DNB nicht erreichbar ist). Das schreibt nur in die Prüftabelle, nie in den Katalog.
+2. Die Seite „Eindeutige Vorschläge gesammelt prüfen“ (`/betrieb/katalog/qualitaet/sicher`) zeigt alle Fälle, bei denen der Vorschlag **ohne Warnung** ist und **alle vorausgewählten Änderungen** nur
+   - ein leeres Feld füllen (`ergänzt`),
+   - einen beschädigten Wert mit belegtem Ursprung korrigieren (`korrigiert`) oder
+   - lokal bereinigen (`bereinigt`).
+   Mit einem Häkchen übernimmt „Alle eindeutigen Vorschläge übernehmen“ sie nacheinander, je Fall über dieselbe Übernahme wie die Einzelprüfung (Transaktion, Prüfsumme, Protokoll im Fall, Audit-Ereignis). Ein Fall, der sich zwischenzeitlich geändert hat, wird übersprungen und bleibt offen.
+3. **Nie gesammelt:** Person ergänzen, Namen umbenennen, abweichende Werte, Fälle mit Warnung (z. B. Titel der Quelle passt nicht) und Fälle ohne Treffer. Sie bleiben in der Einzelprüfung.
+
 ## Übernehmen
 
 Die Seite überträgt nur die Schlüssel der angehakten Zeilen. `ApplyMetadataProposalAction` schreibt ausschließlich die im Vorschlag **gespeicherten** Werte, nie Werte aus der Anfrage:

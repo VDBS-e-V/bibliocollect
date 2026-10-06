@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: T4 v0.5.0 – Circulation-Grundworkflow plus Legacy-Katalogmigration
+Stand: v0.6.3. Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
 
 ## Abgeschlossen
 
@@ -177,6 +177,13 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - `CirculationDemoSeeder` liefert einen offenen und einen zurückgegebenen Demo-Loan reproduzierbar und idempotent.
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
+
+### Mehrere Öffnungszeiträume, Klassenleitung, Beispieldaten, gesammelte Qualitätsübernahme (v0.6.2/v0.6.3)
+
+- Ein Wochentag kann mehrere Öffnungszeiträume haben (08:00–10:00 und 13:00–15:00).
+- Klassen haben eine Klassenleitung (Freitext), die auf den Klassenlisten steht.
+- `SampleOperationsSeeder` legt Beispielkonten, Klassen, Schließtage, Ausleihen und Vormerkungen auf vorhandenen Exemplaren an (keine Medien).
+- `catalog:quality:propose` holt DNB-Vorschläge vorab; die Seite `/betrieb/katalog/qualitaet/sicher` übernimmt eindeutige Vorschläge nach Bestätigung gesammelt.
 
 ### Datenschutz und Klassenlisten (v0.6.1)
 

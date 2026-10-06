@@ -1,5 +1,6 @@
 # Nächste Schritte — BiblioCollect
 
+0. Vorab `php artisan catalog:quality:propose --limit=800` ausführen und danach unter `/betrieb/katalog/qualitaet/sicher` die eindeutigen Vorschläge gesammelt prüfen und übernehmen; der Rest bleibt Einzelprüfung.
 1. Den Bestand über `/betrieb/katalog/qualitaet` abarbeiten (Fälle mit Mangel zuerst): Vorschläge der DNB bzw. lokale Bereinigungen prüfen und bestätigen, siehe `docs/CATALOG_QUALITY_REVIEW.md`. Die Seite löst die frühere Idee einer `--apply`-Neuanreicherung ab: schreibfrei bis zur Bestätigung, saubere Werte werden nie überschrieben, jede Änderung ist vorab sichtbar und protokolliert.
 2. Nach dem Abarbeiten `catalog:quality:scan` erneut laufen lassen und prüfen, ob noch Fälle ohne DNB-ID und ohne gültige ISBN übrig sind. Diese bleiben manuelle Prüffälle; aus Zeichenfolgen wie `Mu?nchen` wird niemals geraten.
 3. Die Qualitätsseite meldet jetzt auch ISBNs mit falscher Prüfziffer. Diese Fälle von Hand anhand des Buchs berichtigen; gültige, aber falsch zugeordnete ISBNs (z. B. eine „Matilda“-Ausgabe mit der ISBN von „Mr. Fox“) fallen nur über das Cover auf.
