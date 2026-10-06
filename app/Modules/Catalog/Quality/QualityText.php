@@ -18,6 +18,12 @@ final class QualityText
 {
     private const MOJIBAKE = ['Ã¤', 'Ã¶', 'Ã¼', 'Ã„', 'Ã–', 'Ãœ', 'ÃŸ', 'â€“', 'â€”', 'â€ž', 'â€œ', 'â€™', 'â€˜', 'Â '];
 
+    /** Platzhalter wie „Zu diesem Buch gibt es aktuell noch keine Inhaltsangabe“ sind keine Zusammenfassung. */
+    public static function isPlaceholderSummary(?string $value): bool
+    {
+        return $value !== null && preg_match('/keine\s+Inhaltsangabe/iu', $value) === 1;
+    }
+
     public static function hasControlCharacters(?string $value): bool
     {
         return $value !== null && preg_match('/[\x{0080}-\x{009F}]/u', $value) === 1;

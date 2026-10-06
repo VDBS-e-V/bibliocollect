@@ -84,7 +84,9 @@ final class CatalogMetadataAssessor
             $issues[] = MetadataIssue::InvalidIsbn;
         }
 
-        if (MetadataFields::value($edition, 'edition.summary') === null) {
+        $summary = MetadataFields::value($edition, 'edition.summary');
+
+        if ($summary === null || QualityText::isPlaceholderSummary($summary)) {
             $issues[] = MetadataIssue::MissingSummary;
         }
 

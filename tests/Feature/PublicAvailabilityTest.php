@@ -137,3 +137,33 @@ it('lists each active copy with location and loan state but without barcodes', f
         ->assertDontSee($copies[0]->barcode)
         ->assertDontSee($copies[1]->barcode);
 });
+
+it('shows the summary prominently and offers page navigation in the sidebar', function (): void {
+    [$title, $edition] = availabilityTitle('Zusammenfassungsbuch', [CopyStatus::Active]);
+    $edition->forceFill(['summary' => 'Eine spannende Geschichte über eine Bibliothek.', 'publisher_name' => 'Testverlag', 'publication_year' => 2020])->save();
+
+    $this->get(route('public.catalog.show', $title->getKey()))
+        ->assertOk()
+        ->assertSee('id="zusammenfassung"', false)
+        ->assertSee('Eine spannende Geschichte über eine Bibliothek.')
+        ->assertSee('Auf dieser Seite')
+        ->assertSee('href="#standorte"', false)
+        ->assertSee('Auf einen Blick')
+        ->assertSee('Testverlag');
+
+    [$bare] = availabilityTitle('Ohne Zusammenfassung', [CopyStatus::Active]);
+
+    $this->get(route('public.catalog.show', $bare->getKey()))
+        ->assertOk()
+        ->assertDontSee('id="zusammenfassung"', false);
+});
+
+it('does not show placeholder texts of the national library as summary', function (): void {
+    [$title, $edition] = availabilityTitle('Platzhalterbuch', [CopyStatus::Active]);
+    $edition->forceFill(['summary' => 'Zu diesem Buch gibt es aktuell noch keine Inhaltsangabe. Falls Sie eine haben, senden Sie sie uns.'])->save();
+
+    $this->get(route('public.catalog.show', $title->getKey()))
+        ->assertOk()
+        ->assertDontSee('id="zusammenfassung"', false)
+        ->assertDontSee('keine Inhaltsangabe');
+});
