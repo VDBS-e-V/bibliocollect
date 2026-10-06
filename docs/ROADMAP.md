@@ -47,6 +47,10 @@ Die Module `Audit`, `Privacy`, `Reminders` sind im Gerüst vorhanden, aber leer.
 2. ✔ `Privacy`: Alles wird nach 3 Jahren anonymisiert (siehe `docs/PRIVACY_AND_CLASS_LISTS.md`). Offen: Datenauskunft einer Person.
 3. ✔ `Reminders`: E-Mail-Erinnerungen (bald fällig, überfällig, Vormerkung abholbereit), siehe `docs/PORTAL_AND_REMINDERS.md`. Offen: Mahnungen/Gebühren (fachliche Entscheidung), Abmeldung von Erinnerungen.
 
+## Erledigt in v0.7.0
+
+Betriebsreife: Arbeitsplatz mit Scanfeld, `app:cron`, `app:doctor`, `mail:test`, `backup:database`, Webspace-Betrieb ohne SSH, DSGVO-Auskunft, Abmeldung von Erinnerungen (siehe `docs/OPERATIONS.md`, `docs/HOSTING_SHARED.md`).
+
 ## Später / bei Bedarf
 
 - MARC21 als weiterer Source-Adapter an der bestehenden Import-Pipeline.

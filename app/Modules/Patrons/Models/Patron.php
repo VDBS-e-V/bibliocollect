@@ -21,6 +21,9 @@ use Illuminate\Support\Carbon;
  * @property string $first_name
  * @property string $last_name
  * @property Carbon $birth_date
+ * @property string|null $email
+ * @property Carbon|null $leaving_on
+ * @property Carbon|null $created_at
  * @property Carbon|null $blocked_at
  * @property string|null $blocked_reason
  */

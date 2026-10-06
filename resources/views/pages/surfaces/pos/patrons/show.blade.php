@@ -26,6 +26,9 @@
         @can('patrons.manage')
             <x-ui.button href="{{ route('pos.patrons.edit', ['patronId' => $patron->getKey()]) }}" variant="secondary">Stammdaten bearbeiten</x-ui.button>
         @endcan
+        @can('patrons.sensitive.view')
+            <a href="{{ route('pos.patrons.data-export', ['patronId' => $patron->getKey()]) }}">Auskunft über gespeicherte Daten</a>
+        @endcan
     </div>
 
     @if (session('workspace_success'))

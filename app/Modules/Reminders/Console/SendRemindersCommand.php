@@ -83,6 +83,7 @@ final class SendRemindersCommand extends Command
         return User::query()
             ->where('patron_id', $patronId)
             ->whereNotNull('email_verified_at')
+            ->where('reminders_enabled', true)
             ->first();
     }
 

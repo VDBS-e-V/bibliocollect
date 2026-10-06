@@ -110,6 +110,27 @@
                 @endforelse
             </section>
 
+            <section class="bc-content-section" id="einstellungen" aria-labelledby="settings-heading">
+                <div class="bc-section-heading"><h2 id="settings-heading">Einstellungen und Daten</h2></div>
+                @if (! $preview && auth()->user())
+                    <form method="post" action="{{ route('portal.settings') }}" class="bc-calendar-form">
+                        @csrf
+                        <label class="bc-public-catalog-filter__check" for="reminders_enabled">
+                            <input type="hidden" name="reminders_enabled" value="0">
+                            <input id="reminders_enabled" type="checkbox" name="reminders_enabled" value="1" @checked(auth()->user()->reminders_enabled)>
+                            <span>
+                                <strong>Erinnerungen per E-Mail</strong>
+                                <small>Rückgabe bald fällig, überfällig und „vorgemerkter Titel liegt bereit“.</small>
+                            </span>
+                        </label>
+                        <x-ui.button type="submit" variant="secondary">Speichern</x-ui.button>
+                    </form>
+                    @if ($patron)
+                        <p class="bc-section-copy bc-section-copy--spaced"><a href="{{ route('portal.my-data') }}">Meine gespeicherten Daten herunterladen</a> (JSON). Ausleihen und Vormerkungen werden drei Jahre nach Abschluss anonymisiert.</p>
+                    @endif
+                @endif
+            </section>
+
             <x-ui.alert title="Datenschutz">
                 Dieses Portal zeigt nur die eigenen Bibliotheksvorgänge. Eine Lehrerrolle erhält dadurch keinen Zugriff auf Ausleihen von Schüler:innen.
             </x-ui.alert>

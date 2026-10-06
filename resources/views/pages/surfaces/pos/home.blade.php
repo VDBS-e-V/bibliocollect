@@ -57,13 +57,15 @@
                 @foreach ($tiles as $tile)
                     <li class="bc-pos-tile {{ $tile['warn'] && $tile['value'] > 0 ? 'bc-pos-tile--warn' : '' }}">
                         @if ($tile['url'])
-                            <a href="{{ $tile['url'] }}">
+                            <a href="{{ $tile['url'] }}" class="bc-pos-tile__body">
                                 <strong>{{ $tile['value'] }}</strong>
                                 <span>{{ $tile['label'] }}</span>
                             </a>
                         @else
-                            <strong>{{ $tile['value'] }}</strong>
-                            <span>{{ $tile['label'] }}</span>
+                            <div class="bc-pos-tile__body">
+                                <strong>{{ $tile['value'] }}</strong>
+                                <span>{{ $tile['label'] }}</span>
+                            </div>
                         @endif
                     </li>
                 @endforeach
@@ -71,7 +73,7 @@
         </section>
     @endif
 
-    <div class="bc-context-actions" aria-label="Schnellzugriff">
+    <div class="bc-context-actions bc-pos-quicklinks" aria-label="Schnellzugriff">
         @can('patrons.lookup')
             <x-ui.button href="{{ route('pos.patrons.index') }}" variant="secondary">Ausleihkonto suchen</x-ui.button>
         @endcan

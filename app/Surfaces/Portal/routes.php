@@ -12,6 +12,12 @@ Route::middleware(['auth', 'verified', 'permission:surface.portal.access'])->gro
     Route::post('/konto/ausleihen/{loanId}/verlaengern', [PortalCirculationController::class, 'renew'])
         ->name('portal.loans.renew');
 
+    Route::post('/konto/einstellungen', [PortalCirculationController::class, 'settings'])
+        ->name('portal.settings');
+
+    Route::get('/konto/meine-daten', [PortalCirculationController::class, 'myData'])
+        ->name('portal.my-data');
+
     Route::post('/konto/vormerkungen', [PortalCirculationController::class, 'reserve'])
         ->name('portal.reservations.store');
 

@@ -24,8 +24,10 @@ use Illuminate\Support\Str;
  * @property string|null $patron_id
  * @property string $name
  * @property string $email
+ * @property Carbon|null $email_verified_at
  * @property Carbon|null $disabled_at
  * @property string|null $disabled_reason
+ * @property bool $reminders_enabled
  */
 #[Fillable(['name', 'email', 'password', 'patron_id'])]
 #[Hidden(['password', 'remember_token'])]
@@ -84,6 +86,7 @@ class User extends Authenticatable implements AuthorizesPermissions, MustVerifyE
         return [
             'email_verified_at' => 'datetime',
             'disabled_at' => 'datetime',
+            'reminders_enabled' => 'boolean',
             'password' => 'hashed',
         ];
     }

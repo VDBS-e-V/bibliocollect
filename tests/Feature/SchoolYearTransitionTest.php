@@ -219,3 +219,14 @@ it('keeps the transition away from users without school management rights', func
     $this->actingAs(transitionAdmin($role))->get(route('administration.transition.show'))->assertForbidden();
     $this->actingAs(transitionAdmin($role))->post(route('administration.transition.commit'), [])->assertForbidden();
 })->with(['staff', 'technical_admin', 'student']);
+
+it('offers only school years that start after the running one as target', function (): void {
+    $set = transitionYears();
+    SchoolYear::query()->create(['name' => '2025/26', 'starts_on' => '2025-08-01', 'ends_on' => '2026-07-31', 'is_active' => false]);
+
+    $this->actingAs(transitionAdmin())
+        ->get(route('administration.transition.show'))
+        ->assertOk()
+        ->assertSee('2026/27 → 2027/28')
+        ->assertDontSee('2025/26');
+});

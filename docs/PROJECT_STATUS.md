@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: v0.6.3. Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
+Stand: v0.7.0. Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
 
 ## Abgeschlossen
 
@@ -177,6 +177,14 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - `CirculationDemoSeeder` liefert einen offenen und einen zurückgegebenen Demo-Loan reproduzierbar und idempotent.
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
+
+### Betrieb, Arbeitsplatz und Webspace (v0.7.0)
+
+- Arbeitsplatz `/betrieb` mit Scanfeld (Bibliotheksnummer öffnet das Konto, Barcode bucht die Rückgabe) und Tagesübersicht.
+- `app:cron` (ein Cronjob für Zeitplan und Warteschlange), `app:doctor` (Einrichtungsprüfung), `mail:test`, `backup:database`.
+- Betrieb auf Webspace ohne SSH: Release-Paket (`scripts/build-release.ps1`), Einrichtungsseite `/_setup`, Web-Cron `/_cron/<Token>`, Cover ohne Symlink (`CATALOG_COVER_DISK=covers`). Siehe `docs/HOSTING_SHARED.md` und `docs/OPERATIONS.md`.
+- DSGVO-Auskunft (Mitarbeiter:innen und Selbstauskunft im Portal) und Abmeldung von Erinnerungs-Mails.
+- Schuljahreswechsel bietet nur noch Zieljahre nach dem laufenden an.
 
 ### Mehrere Öffnungszeiträume, Klassenleitung, Beispieldaten, gesammelte Qualitätsübernahme (v0.6.2/v0.6.3)
 

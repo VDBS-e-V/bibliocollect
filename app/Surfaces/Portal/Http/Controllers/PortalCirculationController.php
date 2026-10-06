@@ -13,8 +13,10 @@ use App\Modules\Circulation\Exceptions\LoanStateConflict;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Patrons\Models\Patron;
+use App\Modules\Privacy\Services\PatronDataExport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /** Selbstbedienung: Jede Aktion wirkt ausschließlich auf das mit dem Onlinekonto verknüpfte Ausleihkonto. */
 final class PortalCirculationController
@@ -69,6 +71,29 @@ final class PortalCirculationController
         }
 
         return redirect()->route('portal.home')->with('portal_success', 'Die Vormerkung wurde storniert.');
+    }
+
+    public function settings(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($user instanceof User, 403);
+
+        $user->forceFill(['reminders_enabled' => $request->boolean('reminders_enabled')])->save();
+
+        return redirect()->route('portal.home')->with('portal_success', $user->reminders_enabled
+            ? 'Du bekommst wieder Erinnerungen per E-Mail.'
+            : 'Du bekommst keine Erinnerungen mehr per E-Mail.');
+    }
+
+    /** Eigene Daten als Download (Auskunft nach Art. 15 DSGVO). */
+    public function myData(Request $request, PatronDataExport $export): StreamedResponse
+    {
+        [, $patron] = $this->identity($request);
+
+        return response()->streamDownload(static function () use ($export, $patron): void {
+            echo json_encode($export->export($patron), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }, 'meine-daten.json', ['Content-Type' => 'application/json; charset=UTF-8']);
     }
 
     /** @return array{0: User, 1: Patron} */

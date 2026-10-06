@@ -244,8 +244,7 @@
     background: var(--bg-surface);
 }
 
-.bc-pos-tile > *,
-.bc-pos-tile a {
+.bc-pos-tile__body {
     display: grid;
     gap: .15rem;
     padding: .8rem 1rem;
@@ -270,4 +269,12 @@
 .bc-pos-tile a:hover,
 .bc-pos-tile a:focus-visible {
     background: var(--bg-surface-muted);
+}
+
+.bc-context-actions.bc-pos-quicklinks {
+    margin-top: 1.5rem;
+}
+
+.bc-section-copy--spaced {
+    margin-top: 1.1rem;
 }

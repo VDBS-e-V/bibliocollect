@@ -19,7 +19,12 @@ final class SchoolYearTransitionController
     public function show(Request $request, SchoolYearTransitionPlanner $planner): Response
     {
         $from = SchoolYear::query()->where('is_active', true)->first();
-        $candidates = SchoolYear::query()->where('is_active', false)->orderBy('starts_on')->get();
+        // Ziel kann nur ein noch nicht aktives Schuljahr sein, das nach dem laufenden beginnt.
+        $candidates = SchoolYear::query()
+            ->where('is_active', false)
+            ->when($from !== null, static fn ($query) => $query->where('starts_on', '>', $from->starts_on))
+            ->orderBy('starts_on')
+            ->get();
 
         $targetId = $request->query('target');
         $target = is_string($targetId) ? $candidates->firstWhere('id', $targetId) : $candidates->first();

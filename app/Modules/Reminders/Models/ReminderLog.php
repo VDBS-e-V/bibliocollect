@@ -6,6 +6,7 @@ namespace App\Modules\Reminders\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Merkt sich, welche Erinnerung bereits verschickt wurde, damit jede nur einmal ankommt.
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $kind
  * @property string $subject_id
  * @property string $stage
+ * @property Carbon $sent_at
  */
 final class ReminderLog extends Model
 {

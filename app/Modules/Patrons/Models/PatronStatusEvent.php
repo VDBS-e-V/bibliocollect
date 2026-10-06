@@ -8,7 +8,17 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $patron_id
+ * @property string $from_status
+ * @property string $to_status
+ * @property Carbon|null $effective_on
+ * @property int|null $actor_user_id
+ * @property Carbon|null $created_at
+ */
 final class PatronStatusEvent extends Model
 {
     use HasUlids;

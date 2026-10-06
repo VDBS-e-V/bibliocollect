@@ -11,6 +11,9 @@
 8. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden. Die DNB-/GND-/Quellenfelder und der Qualitätsaudit bilden dafür bereits eine fachliche Zielstruktur.
 9. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.
 
+10. Vor dem Betrieb auf einem Webspace die Voraussetzungen in `docs/HOSTING_SHARED.md` beim Anbieter prüfen (vor allem PHP 8.4). Ist PHP 8.4 dort nicht verfügbar, auf die VM warten.
+11. Nach dem Einrichten `php artisan app:doctor` (bzw. die Prüfung auf `/_setup`) ausführen und `mail:test` mit den echten SMTP-Daten.
+
 ## Qualitäts-Gate
 
 Vor jedem Commit:

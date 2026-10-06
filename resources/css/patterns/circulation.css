@@ -63,7 +63,7 @@
 @media (max-width: 42rem) {
     .bc-circulation-checkout,
     .bc-loan-card {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         align-items: stretch;
     }
 }

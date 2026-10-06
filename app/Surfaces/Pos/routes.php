@@ -16,6 +16,7 @@ use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
 use App\Surfaces\Pos\Http\Controllers\PatronCreateController;
+use App\Surfaces\Pos\Http\Controllers\PatronDataExportController;
 use App\Surfaces\Pos\Http\Controllers\PatronDepartureController;
 use App\Surfaces\Pos\Http\Controllers\PatronEditController;
 use App\Surfaces\Pos\Http\Controllers\PatronImportController;
@@ -178,6 +179,14 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::post('/betrieb/ausleihkonten', [PatronCreateController::class, 'store'])
         ->middleware('permission:patrons.manage')
         ->name('pos.patrons.store');
+
+    Route::get('/betrieb/ausleihkonten/{patronId}/auskunft', [PatronDataExportController::class, 'show'])
+        ->middleware('permission:patrons.sensitive.view')
+        ->name('pos.patrons.data-export');
+
+    Route::get('/betrieb/ausleihkonten/{patronId}/auskunft.json', [PatronDataExportController::class, 'download'])
+        ->middleware('permission:patrons.sensitive.view')
+        ->name('pos.patrons.data-export.download');
 
     Route::get('/betrieb/ausleihkonten/{patronId}', PatronShowController::class)
         ->middleware('permission:patrons.lookup')

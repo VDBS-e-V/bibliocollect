@@ -414,7 +414,7 @@
 .bc-tabular { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 58rem) {
-    .bc-patron-detail-layout { grid-template-columns: 1fr; }
+    .bc-patron-detail-layout { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 42rem) {
