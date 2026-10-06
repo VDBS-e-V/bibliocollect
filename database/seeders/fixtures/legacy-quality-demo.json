@@ -1,0 +1,39 @@
+[
+  {"type":"header","version":"demo","comment":"BiblioCollect Legacy-Qualitätsaudit-Demo"},
+  {"type":"database","name":"legacy_demo"},
+  {"type":"table","name":"mediaList","database":"legacy_demo","data":[
+    {
+      "media_id":"quality-1",
+      "inventory_number":"QUALITY-001",
+      "dnb_rcn_id":"1014097282",
+      "dnb_rcn_permalink":"https://d-nb.info/1014097282",
+      "main_title":"M?nchner Stadtgeschichten",
+      "authors_statement":"Anna Müller ; illustriert von Kim Demo",
+      "main_author_name":"Müller, Anna",
+      "main_author_gnd_id":"(DE-588)123456789",
+      "additional_contributors_json":"[{\"name\":\"Demo, Kim\",\"role\":\"Illustratorin\",\"gnd_id\":\"(DE-588)987654321\"}]"
+    },
+    {
+      "media_id":"quality-2",
+      "inventory_number":"QUALITY-002",
+      "dnb_rcn_id":null,
+      "dnb_rcn_permalink":null,
+      "main_title":"Stra?enatlas für Schulen",
+      "authors_statement":"Beispiel Person",
+      "main_author_name":null,
+      "main_author_gnd_id":null,
+      "additional_contributors_json":"[]"
+    },
+    {
+      "media_id":"quality-3",
+      "inventory_number":"QUALITY-003",
+      "dnb_rcn_id":null,
+      "dnb_rcn_permalink":"https://d-nb.info/9999999999",
+      "main_title":"Saubere Metadaten",
+      "authors_statement":"Clara Beispiel ; Übersetzung: Nora Demo",
+      "main_author_name":"Beispiel, Clara",
+      "main_author_gnd_id":null,
+      "additional_contributors_json":"{kaputt"
+    }
+  ]}
+]

@@ -1,12 +1,13 @@
 # Nächste Schritte — BiblioCollect
 
-1. Den eingeschobenen Legacy-Katalogmigrationsblock lokal grün bestätigen und anschließend den realen Altbestand über `catalog:legacy:analyze` vorprüfen.
-2. Nach Lieferung der drei phpMyAdmin-JSON-Exporte (`mediaList`, `mediaTopicList`, `mediaSignatures`) zuerst den Analysebericht prüfen und erst danach den transaktionalen Console-Import ausführen.
-3. Danach die öffentliche Bestandsanzeige um den echten Ausleihzustand erweitern. Erst dann darf aus „aktives Exemplar“ eine belastbare Aussage wie „derzeit verfügbar“ werden.
-4. Anschließend Verlängerungen mit expliziten Regeln auf dem bestehenden Loan-Modell ergänzen.
-5. Danach Vormerkungen titelbezogen aufbauen und die öffentliche Titelansicht um den Vormerkungsstatus ergänzen, ohne Copy-Identitäten öffentlich zu machen.
-6. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden; MARC21 selbst bleibt außerhalb von T4. Die jetzt eingeführten DNB-/GND-/Quellenfelder bilden dafür bereits eine fachliche Zielstruktur.
-7. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.
+1. Den realen Legacy-Bestand nach dem erfolgreichen Import mit `catalog:legacy:audit-quality` auf Zeichensatzartefakte und Contributor-Lücken klassifizieren und den vollständigen JSON-Bericht prüfen.
+2. Danach für Datensätze mit belastbarer DNB-Referenz eine separate, standardmäßig schreibfreie DNB-Neuanreicherung vorbereiten; sie darf saubere lokale Werte nicht still überschreiben und muss Änderungen vor `--apply` ausweisen.
+3. Nicht über DNB rekonstruierbare Zeichensatzverluste bleiben als manuelle Prüffälle markiert; aus Zeichenfolgen wie `Mu?nchen` wird niemals geraten.
+4. Danach die öffentliche Bestandsanzeige um den echten Ausleihzustand erweitern. Erst dann darf aus „aktives Exemplar“ eine belastbare Aussage wie „derzeit verfügbar“ werden.
+5. Anschließend Verlängerungen mit expliziten Regeln auf dem bestehenden Loan-Modell ergänzen.
+6. Danach Vormerkungen titelbezogen aufbauen und die öffentliche Titelansicht um den Vormerkungsstatus ergänzen, ohne Copy-Identitäten öffentlich zu machen.
+7. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden. Die DNB-/GND-/Quellenfelder und der Qualitätsaudit bilden dafür bereits eine fachliche Zielstruktur.
+8. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.
 
 ## Qualitäts-Gate
 

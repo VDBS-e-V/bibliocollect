@@ -164,10 +164,31 @@ Eine bereits als `vdbs-legacy` markierte Edition darf nur für genau denselben `
 
 Wurde ein Bestand mit einer älteren Importerversion bereits zu aggressiv zusammengeführt, repariert ein erneuter Import nach diesem Fix den Editionsbezug idempotent: Das vorhandene `Copy` behält seine ULID und seinen Barcode, wird aber auf die anhand seiner unveränderten `legacy_metadata` korrekt rekonstruierte Edition verschoben. `relinked_copies` weist solche Reparaturen im Importbericht aus.
 
+## Qualitätsaudit vor DNB-Neuanreicherung
+
+Nach dem eigentlichen Import kann der originale `mediaList`-Export zusätzlich schreibfrei auf Metadatenqualität geprüft werden:
+
+```text
+php artisan catalog:legacy:audit-quality storage\app\private\legacy\mediaList.json --output=storage\app\private\legacy\legacy-quality-report.json
+```
+
+Der Audit verändert weder Katalog- noch Legacy-Daten. Er klassifiziert insbesondere:
+
+- mögliche verlorene Zeichen wie `Mu?nchen`, Unicode-Ersatzzeichen und typische Mojibake-Sequenzen,
+- betroffene konkrete Quellfelder statt nur den gesamten Datensatz zu markieren,
+- Fälle mit DNB-RCN/Permalink als Kandidaten für eine spätere Neuabfrage,
+- Fälle ohne DNB-Referenz als manuelle Prüffälle,
+- vorhandene Hauptautor:innen mit/ohne GND,
+- gültige zusätzliche strukturierte Contributors,
+- ungültiges `additional_contributors_json`,
+- Verantwortlichkeitsangaben, für die gar kein strukturierter Contributor vorliegt.
+
+Der optionale JSON-Bericht enthält alle auffälligen Barcodes mit DNB-ID, betroffenen Feldern und Qualitätskennzeichen. Eine spätere DNB-Neuanreicherung muss daraus einen separaten Dry-Run/Apply-Workflow bilden; der Audit selbst korrigiert bewusst nichts.
+
 ## Cover
 
 `cover_image_path` wird nur als `legacy_cover_path` erhalten. Die alten Bilddateien werden nicht kopiert. Ein späterer Cover-Service soll Cover anhand ISBN/DNB-Identifier neu beziehen und unabhängig von der Legacy-Migration verwalten.
 
 ## Testbetrieb
 
-Der Development-Seed enthält eine ausführlich angereicherte bestehende Demo-Ausgabe sowie Topic-/Signaturdaten, ohne die bisherigen Titel-/Exemplarzählwerte zu verändern. Zusätzlich liegen drei realistische phpMyAdmin-JSON-Fixtures unter `database/seeders/fixtures/`, mit denen Analyse, Import, Mehrfachexemplare, Klassifikation, Legacy-Verfügbarkeit und Warnungen automatisiert getestet werden.
+Der Development-Seed enthält eine ausführlich angereicherte bestehende Demo-Ausgabe sowie Topic-/Signaturdaten, ohne die bisherigen Titel-/Exemplarzählwerte zu verändern. Zusätzlich liegen die realistischen phpMyAdmin-JSON-Fixtures unter `database/seeders/fixtures/`, mit denen Analyse, Import, Mehrfachexemplare, Klassifikation, Legacy-Verfügbarkeit, Warnungen sowie der Metadaten-Qualitätsaudit automatisiert getestet werden.
