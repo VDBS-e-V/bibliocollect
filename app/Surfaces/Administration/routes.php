@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
 use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
@@ -14,6 +15,18 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
     Route::middleware('permission:school.manage')->group(function (): void {
         Route::get('/verwaltung/schule', SchoolIndexController::class)
             ->name('administration.school.index');
+
+        Route::get('/verwaltung/oeffnungszeiten', [LibraryCalendarController::class, 'index'])
+            ->name('administration.calendar.index');
+
+        Route::put('/verwaltung/oeffnungszeiten', [LibraryCalendarController::class, 'updateHours'])
+            ->name('administration.calendar.hours');
+
+        Route::post('/verwaltung/schliesstage', [LibraryCalendarController::class, 'storeClosure'])
+            ->name('administration.calendar.closures.store');
+
+        Route::delete('/verwaltung/schliesstage/{closureId}', [LibraryCalendarController::class, 'destroyClosure'])
+            ->name('administration.calendar.closures.destroy');
 
         Route::post('/verwaltung/schuljahre', [SchoolYearController::class, 'store'])
             ->name('administration.school-years.store');

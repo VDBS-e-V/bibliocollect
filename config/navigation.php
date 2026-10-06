@@ -86,6 +86,13 @@ return [
                     'permission' => 'school.manage',
                     'order' => 20,
                 ],
+                [
+                    'label' => 'Öffnungszeiten',
+                    'route' => 'administration.calendar.index',
+                    'active' => 'administration.calendar.*',
+                    'permission' => 'school.manage',
+                    'order' => 30,
+                ],
             ],
         ],
     ],

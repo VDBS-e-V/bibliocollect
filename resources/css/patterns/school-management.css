@@ -97,3 +97,60 @@
     .bc-school-year-form,
     .bc-school-class-row { grid-template-columns: 1fr; }
 }
+
+.bc-calendar-form {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+}
+
+.bc-calendar-closure-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(9rem, .7fr)) minmax(10rem, 1.2fr) auto;
+    gap: .75rem;
+    align-items: end;
+    margin: 1rem 0;
+}
+
+.bc-calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.bc-calendar-table th,
+.bc-calendar-table td {
+    border-bottom: 1px solid var(--border-default);
+    padding: .5rem .6rem;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.bc-calendar-table thead th {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    font-weight: 800;
+}
+
+.bc-calendar-table input[type="time"] {
+    border: 1px solid var(--border-strong);
+    border-radius: .15rem;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    padding: .3rem .45rem;
+}
+
+.bc-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@media (max-width: 44rem) {
+    .bc-calendar-closure-form {
+        grid-template-columns: 1fr;
+    }
+}
