@@ -31,6 +31,15 @@
 .bc-button--secondary:visited { color: var(--action-secondary); }
 .bc-button--secondary:hover { background: var(--bg-surface-muted); }
 
+/* Das VDBS-Violett ist auf dunklem Grund kaum lesbar; im dunklen Design gilt die normale Textfarbe. */
+:root[data-vdbs-theme="dark"] .bc-button--secondary,
+:root[data-vdbs-theme="dark"] .bc-button--secondary:visited {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+:root[data-vdbs-theme="dark"] .bc-button--secondary:hover { background: var(--bg-brand-soft); }
+
 .bc-button:disabled {
     cursor: not-allowed;
     opacity: .58;
