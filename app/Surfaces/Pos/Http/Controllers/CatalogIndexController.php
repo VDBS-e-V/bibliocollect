@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Pos\Http\Controllers;
 
+use App\Modules\Catalog\Enums\MetadataReviewStatus;
+use App\Modules\Catalog\Models\CatalogMetadataReview;
 use App\Modules\Catalog\Queries\CatalogSearchFilterOptionsQuery;
 use App\Modules\Catalog\Queries\SearchCatalogTitlesQuery;
 use App\Surfaces\Pos\Http\Requests\CatalogStaffSearchRequest;
@@ -29,6 +31,10 @@ final class CatalogIndexController
                 'titles' => $titles,
                 'filterOptions' => $filterOptions->execute(),
                 'queryParameters' => $validated,
+                'openQualityCases' => CatalogMetadataReview::query()
+                    ->where('status', MetadataReviewStatus::Open->value)
+                    ->where('severity', '>', 0)
+                    ->count(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }

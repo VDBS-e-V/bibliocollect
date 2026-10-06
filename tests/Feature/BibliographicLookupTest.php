@@ -7,9 +7,11 @@ use App\Modules\Catalog\Exceptions\BibliographicLookupUnavailable;
 use App\Modules\Catalog\Lookup\Dnb\DnbLookupProvider;
 use App\Modules\Catalog\Lookup\Dnb\DnbMarcMapper;
 use App\Modules\Catalog\Services\BibliographicLookupService;
+use App\Modules\Catalog\Services\CatalogIsbnNormalizer;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Tests\Support\DnbRecordXml;
 
 function dnbFixture(string $name): string
 {
@@ -140,4 +142,56 @@ it('returns no records for an empty SRU result and rejects SRU diagnostics', fun
 it('exposes the DNB provider behind the lookup contract', function (): void {
     expect(app(BibliographicLookupProvider::class))
         ->toBeInstanceOf(DnbLookupProvider::class);
+});
+
+it('finds a record by its DNB id and rejects values that are not an id', function (): void {
+    Http::fake(['services.dnb.de/*' => Http::response(DnbRecordXml::record(['id' => '1244853364', 'title' => 'Shi Yu']))]);
+
+    $result = app(BibliographicLookupService::class)->byRecordId('1244853364');
+
+    expect($result->records)->toHaveCount(1)
+        ->and($result->records[0]->title)->toBe('Shi Yu');
+
+    Http::assertSent(static fn (Request $request): bool => $request['query'] === 'idn=1244853364');
+
+    Http::fake();
+
+    expect(app(BibliographicLookupService::class)->byRecordId('abc" or tit=x')->records)->toBe([])
+        ->and(app(BibliographicLookupService::class)->byRecordId('')->records)->toBe([]);
+});
+
+it('drops DNB hits whose isbn does not match the searched isbn', function (): void {
+    // Die DNB liefert bei vertippter Prüfziffer einen anderen Titel; der darf nicht vorbefüllt werden.
+    Http::fake(['services.dnb.de/*' => Http::response(DnbRecordXml::record(['isbns' => ['9783522202800'], 'title' => 'Shi Yu']))]);
+
+    expect(app(BibliographicLookupService::class)->byIsbn('9783522202803')->records)->toBe([])
+        ->and(app(BibliographicLookupService::class)->byIsbn('9783522202800')->records)->toHaveCount(1);
+});
+
+it('matches an isbn-10 against the isbn-13 of a record', function (): void {
+    Http::fake(['services.dnb.de/*' => Http::response(DnbRecordXml::record(['isbns' => ['9783522202800'], 'title' => 'Shi Yu']))]);
+
+    expect(app(BibliographicLookupService::class)->byIsbn('3522202805')->records)->toHaveCount(1);
+
+    $normalizer = app(CatalogIsbnNormalizer::class);
+
+    expect($normalizer->toIsbn13('3-522-20280-5'))->toBe('9783522202800')
+        ->and($normalizer->toIsbn13('978-3-522-20280-0'))->toBe('9783522202800')
+        ->and($normalizer->toIsbn13('080442957X'))->toBe('9780804429573')
+        ->and($normalizer->toIsbn13('keine isbn'))->toBeNull();
+});
+
+it('does not treat publishers or printers as contributors', function (): void {
+    Http::fake(['services.dnb.de/*' => Http::response(DnbRecordXml::record([
+        'isbns' => ['9783522202800'],
+        'contributors' => [
+            ['name' => 'Ende, Michael', 'code' => 'aut', 'gnd' => '118530518'],
+            ['name' => 'Thienemann Verlag', 'code' => 'pbl'],
+            ['name' => 'Druckerei Muster', 'code' => 'prt'],
+        ],
+    ]))]);
+
+    $record = app(BibliographicLookupService::class)->byIsbn('9783522202800')->records[0];
+
+    expect(array_column($record->contributors, 'name'))->toBe(['Ende, Michael']);
 });

@@ -101,10 +101,18 @@ it('keeps the cover cache migration rollback capable', function (): void {
     expect(Schema::hasColumn('catalog_editions', 'cover_path'))->toBeTrue()
         ->and(Schema::hasColumn('catalog_editions', 'cover_status'))->toBeTrue();
 
-    $this->artisan('migrate:rollback', ['--step' => 1, '--force' => true])->assertSuccessful();
+    // Die Migration wird direkt aufgerufen, damit der Test nicht davon abhängt, welche Migration die jüngste ist.
+    $migration = require app_path('Modules/Catalog/database/migrations/2026_10_06_002000_add_catalog_cover_cache.php');
+
+    $migration->down();
 
     expect(Schema::hasColumn('catalog_editions', 'cover_path'))->toBeFalse()
         ->and(Schema::hasColumn('catalog_editions', 'cover_status'))->toBeFalse();
+
+    $migration->up();
+
+    expect(Schema::hasColumn('catalog_editions', 'cover_path'))->toBeTrue()
+        ->and(Schema::hasColumn('catalog_editions', 'cover_status'))->toBeTrue();
 });
 
 it('never exposes the cover source reference on public catalog pages', function (): void {

@@ -8,6 +8,7 @@
     <div class="bc-context-actions">
         <a href="{{ route('pos.home') }}">← Zurück zum Arbeitsplatz</a>
         <a href="{{ route('pos.catalog.intake.identify', ['neu' => 1]) }}"><strong>Medium erfassen</strong></a>
+        <a href="{{ route('pos.catalog.quality.index') }}">Metadaten prüfen @if ($openQualityCases > 0)({{ $openQualityCases }} offen) @endif</a>
         @can('catalog.import')
             <a href="{{ route('pos.catalog.import.create') }}">Import</a>
         @endcan

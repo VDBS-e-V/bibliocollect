@@ -1,0 +1,122 @@
+/* Katalogqualität: Prüfliste und Prüfansicht für Metadaten-Vorschläge. */
+
+.bc-quality-inline-form { display: inline; margin: 0; }
+
+.bc-quality-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1.25rem;
+    margin: 0 0 1.5rem;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.bc-quality-tab {
+    margin-bottom: -1px;
+    border-bottom: 3px solid transparent;
+    padding: .55rem .1rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.bc-quality-tab--active {
+    border-bottom-color: var(--action-primary);
+    color: var(--text-primary);
+}
+
+.bc-quality-count {
+    display: inline-block;
+    min-width: 1.6rem;
+    margin-left: .25rem;
+    border-radius: 1rem;
+    background: var(--bg-surface-muted);
+    padding: 0 .45rem;
+    color: var(--text-primary);
+    font-size: var(--text-xs);
+    text-align: center;
+}
+
+.bc-quality-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 0 0 .9rem;
+    padding: 0;
+    list-style: none;
+}
+
+.bc-quality-chip {
+    display: inline-block;
+    border: 1px solid var(--border-strong);
+    border-radius: 1.5rem;
+    background: var(--bg-surface);
+    padding: .3rem .8rem;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    text-decoration: none;
+}
+
+.bc-quality-chip--active {
+    border-color: var(--action-primary);
+    background: var(--action-primary);
+    color: var(--text-on-action);
+}
+
+.bc-quality-chip--active .bc-quality-count {
+    background: rgb(255 255 255 / 25%);
+    color: inherit;
+}
+
+.bc-quality-search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .75rem 1rem;
+    max-width: 40rem;
+    margin-top: 1rem;
+}
+
+.bc-quality-search .bc-field { flex: 1 1 18rem; }
+
+.bc-quality-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.bc-quality-changes th[scope='row'] { text-align: left; font-weight: 700; }
+.bc-quality-changes td { overflow-wrap: anywhere; }
+
+.bc-quality-check {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+}
+
+.bc-quality-check input { width: 1.2rem; height: 1.2rem; }
+
+.bc-quality-mark {
+    border-radius: .15rem;
+    background: color-mix(in srgb, var(--action-danger) 28%, transparent);
+    color: inherit;
+    padding: 0 .1rem;
+    font-weight: 800;
+}
+
+.bc-quality-differences {
+    border: 1px solid var(--border-default);
+    padding: .75rem 1rem;
+}
+
+.bc-quality-differences > summary { cursor: pointer; font-weight: 700; }
+
+.bc-quality-secondary-actions { margin-top: 1.25rem; }
+.bc-quality-secondary-actions form { margin: 0; }
+
+.bc-quality-history { margin: 0; padding-left: 1.1rem; }
+.bc-quality-history ul { margin: .25rem 0 .6rem; padding-left: 1.1rem; font-size: var(--text-sm); }

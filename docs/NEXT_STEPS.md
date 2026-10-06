@@ -1,8 +1,8 @@
 # Nächste Schritte — BiblioCollect
 
-1. Den realen Legacy-Bestand nach dem erfolgreichen Import mit `catalog:legacy:audit-quality` auf Zeichensatzartefakte und Contributor-Lücken klassifizieren und den vollständigen JSON-Bericht prüfen.
-2. Danach für Datensätze mit belastbarer DNB-Referenz eine separate, standardmäßig schreibfreie DNB-Neuanreicherung vorbereiten; sie darf saubere lokale Werte nicht still überschreiben und muss Änderungen vor `--apply` ausweisen.
-3. Nicht über DNB rekonstruierbare Zeichensatzverluste bleiben als manuelle Prüffälle markiert; aus Zeichenfolgen wie `Mu?nchen` wird niemals geraten.
+1. Den Bestand über `/betrieb/katalog/qualitaet` abarbeiten (Fälle mit Mangel zuerst): Vorschläge der DNB bzw. lokale Bereinigungen prüfen und bestätigen, siehe `docs/CATALOG_QUALITY_REVIEW.md`. Die Seite löst die frühere Idee einer `--apply`-Neuanreicherung ab: schreibfrei bis zur Bestätigung, saubere Werte werden nie überschrieben, jede Änderung ist vorab sichtbar und protokolliert.
+2. Nach dem Abarbeiten `catalog:quality:scan` erneut laufen lassen und prüfen, ob noch Fälle ohne DNB-ID und ohne gültige ISBN übrig sind. Diese bleiben manuelle Prüffälle; aus Zeichenfolgen wie `Mu?nchen` wird niemals geraten.
+3. Optional: ISBNs mit falscher Prüfziffer als eigenes Problem in die Qualitätsprüfung aufnehmen (z. B. die Demo-ISBN von „Momo“), da sie die DNB-Abfrage ins Leere laufen lassen.
 4. Den Cover-Betrieb produktiv absichern: laufender Queue Worker, ein Scheduler-Eintrag für `catalog:covers:queue` (holt auch Cover für Bestandstitel nach), `php artisan storage:link` beim Standard-Disk `public` und ein kostenloser Google-Books-API-Key als Fallback für Titel, die Open Library nicht kennt.
 5. Danach die öffentliche Bestandsanzeige um den echten Ausleihzustand erweitern. Erst dann darf aus „aktives Exemplar“ eine belastbare Aussage wie „derzeit verfügbar“ werden.
 6. Anschließend Verlängerungen mit expliziten Regeln auf dem bestehenden Loan-Modell ergänzen.
@@ -92,3 +92,15 @@ Zusätzlich für Änderungen am öffentlichen Katalog:
 - Erhalt der aktiven Filter beim Seitenwechsel prüfen,
 - sicherstellen, dass öffentliche Seiten ausschließlich lokal gespeicherte Cover oder den gebündelten Platzhalter laden und `cover_source_reference` nicht ausgeben,
 - sicherstellen, dass Copy-Barcodes, interne ULIDs, interne Notizen, Erwerbungspreise und Legacy-Historie nicht in öffentlichen Seiten ausgegeben werden.
+
+Zusätzlich für Änderungen an der Katalogqualität:
+
+- `catalog.manage` prüfen; technische Administration, Schüler:innen und Schüler-AG Basis bleiben ausgeschlossen,
+- Scan, Ansehen und Vorschlagen schreiben nie in Katalogdaten, nur in `catalog_metadata_reviews`,
+- nur Schlüssel aus dem gespeicherten Vorschlag übernehmen, nie Werte aus der Anfrage; Felder außerhalb von `MetadataFields` (Mindestalter, Klassifikation, Exemplare, Cover) bleiben unantastbar,
+- Übernahme nur bei unverändertem Datenstand (Prüfsumme), vollständig in einer Transaktion und protokolliert,
+- gefüllte, unbeschädigte Werte nie vorauswählen oder überschreiben; Abweichungen nur anzeigen,
+- bei unpassendem Datensatz (Titel oder ISBN weicht ab) nichts vorauswählen,
+- DNB-Treffer zur ISBN verwerfen, wenn ihre ISBN nicht zur gesuchten passt,
+- „kein Handlungsbedarf“ gilt nur für den geprüften Stand und öffnet sich bei Änderungen wieder,
+- Verlage, Drucker und Vertrieb nicht als Verantwortliche übernehmen.

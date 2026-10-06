@@ -149,6 +149,19 @@ Neue Medien werden unter `/betrieb/katalog/erfassen` in einem geführten Prozess
 
 Die Details stehen in `docs/CATALOG_INTAKE.md`.
 
+## Katalogqualität: Metadaten prüfen und Vorschläge bestätigen
+
+Unter `/betrieb/katalog/qualitaet` listet eine Prüfliste alle Ausgaben mit unvollständigen oder fehlerhaften Metadaten (verlorene Umlaute, Steuerzeichen, fehlende Verantwortliche, Jahr, Verlag, Medientyp, ISBN). Zu jedem Fall gibt es einen Vorschlag, den eine Person Feld für Feld bestätigt.
+
+- Der Scan (`catalog:quality:scan` bzw. „Bestand neu prüfen“) schreibt nur in die Prüftabelle `catalog_metadata_reviews`, nie in den Katalog, und ist wiederholbar.
+- Vorschläge kommen aus der DNB (per gespeicherter DNB-ID, sonst per ISBN) oder als lokale Bereinigung ohne Quelle. Ein beschädigter Wert wird nur korrigiert, wenn der Quellwert nachweislich sein Ursprung ist.
+- Gefüllte, unbeschädigte Werte werden nie überschrieben; Abweichungen sind nur sichtbar und nicht vorausgewählt. Passt der Datensatz nicht zur Ausgabe, wird nichts vorausgewählt.
+- Die Übernahme läuft in einer Transaktion, nur für angehakte Felder und nur bei unverändertem Datenstand; jede Änderung wird protokolliert (wer, wann, alt, neu).
+- „Kein Handlungsbedarf“ gilt für den geprüften Stand und öffnet sich bei späteren Änderungen wieder.
+- Recht: `catalog.manage`.
+
+Die Details stehen in `docs/CATALOG_QUALITY_REVIEW.md`.
+
 ## T4 Circulation
 
 v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:

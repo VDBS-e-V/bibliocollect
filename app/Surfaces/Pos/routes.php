@@ -8,6 +8,7 @@ use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogImportController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIntakeController;
+use App\Surfaces\Pos\Http\Controllers\CatalogQualityController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
@@ -61,6 +62,17 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
             Route::get('/pruefen', [CatalogIntakeController::class, 'review'])->name('pos.catalog.intake.review');
             Route::post('/speichern', [CatalogIntakeController::class, 'commit'])->name('pos.catalog.intake.commit');
+        });
+
+        Route::prefix('/betrieb/katalog/qualitaet')->group(function (): void {
+            Route::get('/', [CatalogQualityController::class, 'index'])->name('pos.catalog.quality.index');
+            Route::post('/scan', [CatalogQualityController::class, 'scan'])->name('pos.catalog.quality.scan');
+            Route::get('/{reviewId}', [CatalogQualityController::class, 'show'])->name('pos.catalog.quality.show');
+            Route::get('/{reviewId}/weiter', [CatalogQualityController::class, 'skip'])->name('pos.catalog.quality.skip');
+            Route::post('/{reviewId}/vorschlag', [CatalogQualityController::class, 'refresh'])->name('pos.catalog.quality.refresh');
+            Route::post('/{reviewId}/uebernehmen', [CatalogQualityController::class, 'apply'])->name('pos.catalog.quality.apply');
+            Route::post('/{reviewId}/abweisen', [CatalogQualityController::class, 'dismiss'])->name('pos.catalog.quality.dismiss');
+            Route::post('/{reviewId}/oeffnen', [CatalogQualityController::class, 'reopen'])->name('pos.catalog.quality.reopen');
         });
 
         Route::post('/betrieb/katalog/titel', [CatalogTitleController::class, 'store'])

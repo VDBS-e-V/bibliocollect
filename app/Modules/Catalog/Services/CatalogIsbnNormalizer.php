@@ -23,4 +23,30 @@ final class CatalogIsbnNormalizer
     {
         return preg_match('/^(?:\d{13}|\d{9}[\dX])$/', $value) === 1;
     }
+
+    /**
+     * Vergleichbare ISBN-13: eine ISBN-10 wird umgerechnet (978-Präfix, neue Prüfziffer), eine ISBN-13 bleibt.
+     * Null, wenn der Wert keine Standard-ISBN ist.
+     */
+    public function toIsbn13(string $value): ?string
+    {
+        $compact = $this->normalize($value);
+
+        if (! $this->isStandardFormat($compact)) {
+            return null;
+        }
+
+        if (strlen($compact) === 13) {
+            return $compact;
+        }
+
+        $base = '978'.substr($compact, 0, 9);
+        $sum = 0;
+
+        foreach (str_split($base) as $index => $digit) {
+            $sum += (int) $digit * ($index % 2 === 0 ? 1 : 3);
+        }
+
+        return $base.((10 - $sum % 10) % 10);
+    }
 }

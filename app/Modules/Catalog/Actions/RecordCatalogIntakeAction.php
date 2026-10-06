@@ -11,11 +11,11 @@ use App\Modules\Catalog\DTOs\CatalogIntakeProvenance;
 use App\Modules\Catalog\DTOs\CatalogIntakeResult;
 use App\Modules\Catalog\Exceptions\DuplicateCopyBarcode;
 use App\Modules\Catalog\Jobs\RefreshEditionCoverJob;
-use App\Modules\Catalog\Models\Contributor;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Models\TitleContribution;
 use App\Modules\Catalog\Services\CatalogIsbnNormalizer;
+use App\Modules\Catalog\Services\ContributorResolver;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -30,6 +30,7 @@ final readonly class RecordCatalogIntakeAction
         private CreateCopyAction $createCopy,
         private CatalogIsbnNormalizer $isbns,
         private CatalogCoverProvider $covers,
+        private ContributorResolver $contributors,
     ) {}
 
     /**
@@ -108,7 +109,7 @@ final readonly class RecordCatalogIntakeAction
         $position = 0;
 
         foreach ($contributors as $entry) {
-            $contributor = $this->contributorFor($entry['name'], $entry['gnd_id']);
+            $contributor = $this->contributors->resolve($entry['name'], $entry['gnd_id']);
 
             $alreadyLinked = TitleContribution::query()
                 ->where('title_id', $title->getKey())
@@ -127,62 +128,6 @@ final readonly class RecordCatalogIntakeAction
                 'position' => $position,
             ]);
         }
-    }
-
-    /**
-     * Verantwortliche werden wiederverwendet, statt Dubletten zu erzeugen: zuerst über die GND-ID
-     * (eindeutig), sonst nur bei genau einem exakten Namenstreffer ohne widersprüchliche GND-ID.
-     */
-    private function contributorFor(string $name, ?string $gndId): Contributor
-    {
-        if ($gndId !== null) {
-            $byGnd = Contributor::query()->where('gnd_id', $gndId)->first();
-
-            if ($byGnd !== null) {
-                return $byGnd;
-            }
-        }
-
-        $sortName = str_contains($name, ',') ? $name : null;
-        $displayName = $this->displayName($name);
-
-        $candidates = Contributor::query()
-            ->where('display_name', $displayName)
-            ->where('sort_name', $sortName)
-            ->get()
-            ->filter(static fn (Contributor $candidate): bool => $candidate->gnd_id === null || $candidate->gnd_id === $gndId);
-
-        if ($candidates->count() === 1) {
-            /** @var Contributor $existing */
-            $existing = $candidates->first();
-
-            if ($existing->gnd_id === null && $gndId !== null) {
-                $existing->forceFill(['gnd_id' => $gndId])->save();
-            }
-
-            return $existing;
-        }
-
-        /** @var Contributor $contributor */
-        $contributor = Contributor::query()->create([
-            'display_name' => $displayName,
-            'sort_name' => $sortName,
-            'gnd_id' => $gndId,
-        ]);
-
-        return $contributor;
-    }
-
-    /** "Nachname, Vorname" wird zur Anzeigeform "Vorname Nachname"; alles andere bleibt unverändert. */
-    private function displayName(string $name): string
-    {
-        $parts = array_map('trim', explode(',', $name));
-
-        if (count($parts) === 2 && $parts[0] !== '' && $parts[1] !== '') {
-            return $parts[1].' '.$parts[0];
-        }
-
-        return trim($name);
     }
 
     private function queueCoverDownload(Edition $edition): void

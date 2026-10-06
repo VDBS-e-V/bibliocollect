@@ -33,6 +33,9 @@ final class DnbMarcMapper
         'rum' => 'ro', 'bul' => 'bg', 'hrv' => 'hr', 'srp' => 'sr', 'per' => 'fa',
     ];
 
+    /** @var list<string> Relatorcodes für Verlag, Drucker, Vertrieb, Hersteller: keine Verantwortlichen am Werk */
+    private const NON_CREATOR_ROLES = ['pbl', 'prt', 'dst', 'mfr', 'dpc'];
+
     /** @var array<string, string> MARC-Relatorcode => role_key des Katalogs */
     private const ROLES = [
         'aut' => 'author',
@@ -224,8 +227,9 @@ final class DnbMarcMapper
                 }
 
                 $name = $this->clean($marc->subfield($field, 'a'));
+                $relatorCode = mb_strtolower(trim((string) $marc->subfield($field, '4')));
 
-                if ($name === null) {
+                if ($name === null || in_array($relatorCode, self::NON_CREATOR_ROLES, true)) {
                     continue;
                 }
 

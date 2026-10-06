@@ -22,4 +22,13 @@ interface BibliographicLookupProvider
      * @throws BibliographicLookupUnavailable
      */
     public function search(?string $title, ?string $person): array;
+
+    /**
+     * Datensatz anhand der Kennung der Quelle (bei der DNB die IDN/RCN, z. B. "1244853364").
+     *
+     * @return list<BibliographicRecord>
+     *
+     * @throws BibliographicLookupUnavailable
+     */
+    public function findByRecordId(string $recordId): array;
 }

@@ -28,6 +28,17 @@ final readonly class BibliographicLookupService
         }
     }
 
+    public function byRecordId(string $recordId): BibliographicLookupResult
+    {
+        try {
+            return new BibliographicLookupResult($this->provider->findByRecordId($recordId));
+        } catch (BibliographicLookupUnavailable $exception) {
+            Log::warning('Bibliografische Abfrage per Datensatz-ID fehlgeschlagen.', ['reason' => $exception->getMessage()]);
+
+            return BibliographicLookupResult::unavailable();
+        }
+    }
+
     public function search(?string $title, ?string $person): BibliographicLookupResult
     {
         try {

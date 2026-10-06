@@ -6,16 +6,16 @@ Stand: nach T4 v0.5.0, Legacy-Katalogmigration, Katalogrecherche, Cover-Cache un
 
 Der aktuelle Arbeitsbaum auf `feature/public-catalog-redesign` enthält drei Blöcke ungetrennt, ist nicht committet und grün (158 Tests).
 
-1. Arbeitsbaum in logische Commits teilen: Legacy-Katalog, Recherche/Cover, Seitennavigation.
-2. Die ca. 25 `*.patch`-Dateien im Repo-Root sind Übergabeartefakte. Sie gehören nicht ins Repo (`.gitignore` oder in ein eigenes Verzeichnis außerhalb).
-3. Branch mergen, Tag setzen (z. B. v0.5.1).
+1. Der Arbeitsbaum ist in thematische Commits aufgeteilt (Recherche/Cover/Seitennavigation, Erfassung mit DNB, Cover-Darstellung, Katalogqualität).
+2. Die `*.patch`-Dateien im Repo-Root sind per `.gitignore` ausgeschlossen.
+3. Offen: Branch `feature/public-catalog-redesign` mergen und einen Tag setzen (z. B. v0.5.1).
 
 ## Phase 1 — Realdaten absichern (Katalog abschließen)
 
 1. `catalog:legacy:import` auf dem realen Altbestand ausführen, danach `catalog:legacy:audit-quality` und den JSON-Bericht prüfen.
-2. Schreibfreie DNB-Neuanreicherung für Datensätze mit belastbarer DNB-Referenz: Diff vor `--apply`, kein stilles Überschreiben sauberer lokaler Werte.
-3. Zeichensatzverluste (`Mu?nchen`) bleiben manuelle Prüffälle. Dafür eine Prüfliste in der POS-Oberfläche anbieten.
-4. Konkreten `CatalogCoverProvider` binden. Betrieb: Queue Worker, Scheduler für `catalog:covers:queue`, `storage:link`.
+2. Metadaten-Prüfung mit Vorschlägen (`/betrieb/katalog/qualitaet`): **umgesetzt**, siehe `docs/CATALOG_QUALITY_REVIEW.md`. Jetzt den Bestand damit abarbeiten.
+3. Zeichensatzverluste (`Mu?nchen`) werden dort gefunden und, wo die DNB den Ursprung belegt, zur Bestätigung vorgeschlagen; ohne Beleg bleiben sie manuelle Prüffälle.
+4. Cover-Betrieb absichern: Queue Worker, Scheduler für `catalog:covers:queue`, `storage:link`, Google-Books-Key (die Provider-Kette ist umgesetzt).
 
 Gate: Audit ohne ungeklärte Contributor-Lücken, Cover-Job idempotent, kein externer Request in Webrequests.
 
