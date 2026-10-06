@@ -3,7 +3,8 @@
   "description": "Ausleihkonten, Bibliotheksnummern, Karten, Sperren und Schulzugehörigkeit.",
   "dependencies": [
     "Identity",
-    "School"
+    "School",
+    "Audit"
   ],
   "providers": [
     "App\\Modules\\Patrons\\Providers\\PatronsServiceProvider"

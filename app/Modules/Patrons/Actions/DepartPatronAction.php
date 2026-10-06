@@ -13,6 +13,7 @@ use App\Modules\Patrons\Exceptions\PatronStatusStateConflict;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\Patrons\Models\PatronAccountLinkToken;
 use App\Modules\Patrons\Models\PatronStatusEvent;
+use App\Modules\Patrons\Services\PatronDepartureGuards;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -21,6 +22,7 @@ final readonly class DepartPatronAction
     public function __construct(
         private BusinessClock $clock,
         private DisablePatronOnlineAccountAction $disableOnlineAccount,
+        private PatronDepartureGuards $guards,
     ) {}
 
     public function execute(Patron $patron, string $effectiveOn, User $actor): Patron
@@ -40,6 +42,12 @@ final readonly class DepartPatronAction
 
             if ($lockedPatron->status !== PatronStatus::Active) {
                 throw PatronStatusStateConflict::cannotDepart();
+            }
+
+            $reasons = $this->guards->blockReasons($lockedPatron);
+
+            if ($reasons !== []) {
+                throw PatronStatusStateConflict::openCirculation($reasons);
             }
 
             $fromStatus = $lockedPatron->status;

@@ -13,6 +13,12 @@ final class PatronStatusStateConflict extends RuntimeException
         return new self('Nur aktive Ausleihkonten können als ausgeschieden markiert werden.');
     }
 
+    /** @param  list<string>  $reasons */
+    public static function openCirculation(array $reasons): self
+    {
+        return new self('Das Ausleihkonto kann noch nicht ausscheiden: '.implode(' ', $reasons));
+    }
+
     public static function futureEffectiveDate(): self
     {
         return new self('Das Austrittsdatum darf nicht in der Zukunft liegen.');

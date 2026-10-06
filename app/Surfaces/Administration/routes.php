@@ -7,6 +7,7 @@ use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
 use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
+use App\Surfaces\Administration\Http\Controllers\SchoolYearTransitionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.administration.access'])->group(function (): void {
@@ -32,6 +33,12 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
 
         Route::delete('/verwaltung/schliesstage/{closureId}', [LibraryCalendarController::class, 'destroyClosure'])
             ->name('administration.calendar.closures.destroy');
+
+        Route::get('/verwaltung/schuljahreswechsel', [SchoolYearTransitionController::class, 'show'])
+            ->name('administration.transition.show');
+
+        Route::post('/verwaltung/schuljahreswechsel', [SchoolYearTransitionController::class, 'commit'])
+            ->name('administration.transition.commit');
 
         Route::post('/verwaltung/schuljahre', [SchoolYearController::class, 'store'])
             ->name('administration.school-years.store');

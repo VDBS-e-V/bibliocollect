@@ -7,6 +7,7 @@
 
     <div class="bc-context-actions">
         <a href="{{ route('administration.home') }}">← Zurück zur Verwaltung</a>
+        <a href="{{ route('administration.transition.show') }}">Schuljahreswechsel vorbereiten</a>
     </div>
 
     @if (session('school_success'))

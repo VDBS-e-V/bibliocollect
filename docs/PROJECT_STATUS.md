@@ -178,6 +178,12 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Schuljahreswechsel (v0.5.5)
+
+- `/verwaltung/schuljahreswechsel`: Vorschau mit Vorschlägen je Klasse, Zuordnung, Bestätigung, Ausführung ganz oder gar nicht samt Aktivierung des neuen Jahres.
+- Ausleihkonten mit offenen Ausleihen oder Vormerkungen dürfen nicht mehr ausscheiden (einzeln und beim Wechsel).
+- Details in `docs/SCHOOL_YEAR_TRANSITION.md`.
+
 ### Portal und Erinnerungen (v0.5.4)
 
 - „Mein Konto“ zeigt eigene Ausleihen und Vormerkungen; Verlängern, Vormerken (von der Titelseite) und Stornieren in Selbstbedienung.
