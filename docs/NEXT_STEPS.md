@@ -3,11 +3,12 @@
 1. Den realen Legacy-Bestand nach dem erfolgreichen Import mit `catalog:legacy:audit-quality` auf Zeichensatzartefakte und Contributor-Lücken klassifizieren und den vollständigen JSON-Bericht prüfen.
 2. Danach für Datensätze mit belastbarer DNB-Referenz eine separate, standardmäßig schreibfreie DNB-Neuanreicherung vorbereiten; sie darf saubere lokale Werte nicht still überschreiben und muss Änderungen vor `--apply` ausweisen.
 3. Nicht über DNB rekonstruierbare Zeichensatzverluste bleiben als manuelle Prüffälle markiert; aus Zeichenfolgen wie `Mu?nchen` wird niemals geraten.
-4. Danach die öffentliche Bestandsanzeige um den echten Ausleihzustand erweitern. Erst dann darf aus „aktives Exemplar“ eine belastbare Aussage wie „derzeit verfügbar“ werden.
-5. Anschließend Verlängerungen mit expliziten Regeln auf dem bestehenden Loan-Modell ergänzen.
-6. Danach Vormerkungen titelbezogen aufbauen und die öffentliche Titelansicht um den Vormerkungsstatus ergänzen, ohne Copy-Identitäten öffentlich zu machen.
-7. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden. Die DNB-/GND-/Quellenfelder und der Qualitätsaudit bilden dafür bereits eine fachliche Zielstruktur.
-8. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.
+4. Für den Cover-Cache einen konkreten `CatalogCoverProvider`-Adapter binden. Bis dahin bleibt `NullCatalogCoverProvider` aktiv und es findet kein externer Request statt. Produktiv gehören dazu ein laufender Queue Worker, ein Scheduler-Eintrag für `catalog:covers:queue` und `php artisan storage:link` beim Standard-Disk `public`.
+5. Danach die öffentliche Bestandsanzeige um den echten Ausleihzustand erweitern. Erst dann darf aus „aktives Exemplar“ eine belastbare Aussage wie „derzeit verfügbar“ werden.
+6. Anschließend Verlängerungen mit expliziten Regeln auf dem bestehenden Loan-Modell ergänzen.
+7. Danach Vormerkungen titelbezogen aufbauen und die öffentliche Titelansicht um den Vormerkungsstatus ergänzen, ohne Copy-Identitäten öffentlich zu machen.
+8. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden. Die DNB-/GND-/Quellenfelder und der Qualitätsaudit bilden dafür bereits eine fachliche Zielstruktur.
+9. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.
 
 ## Qualitäts-Gate
 
@@ -71,4 +72,8 @@ Zusätzlich für Änderungen am öffentlichen Katalog:
 - erweiterte bibliografische Suchfelder (z. B. Reihe, GND, DNB-RCN, Schlagwörter) prüfen,
 - Medientyp-/Sprachfilter und Bestandsfilter prüfen,
 - einen Titel ohne Exemplare sowie einen Titel ohne aktive Exemplare prüfen,
+- Seitengrößen 10, 20, 50 und 100 sowie die direkte Seiteneingabe in öffentlicher und interner Trefferliste prüfen,
+- eine nicht unterstützte Seitengröße als Validierungsfehler prüfen, nicht als stille Korrektur,
+- Erhalt der aktiven Filter beim Seitenwechsel prüfen,
+- sicherstellen, dass öffentliche Seiten ausschließlich lokal gespeicherte Cover oder den gebündelten Platzhalter laden und `cover_source_reference` nicht ausgeben,
 - sicherstellen, dass Copy-Barcodes, interne ULIDs, interne Notizen, Erwerbungspreise und Legacy-Historie nicht in öffentlichen Seiten ausgegeben werden.
