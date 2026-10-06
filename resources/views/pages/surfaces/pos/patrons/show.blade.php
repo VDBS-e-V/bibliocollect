@@ -91,6 +91,7 @@
                                 :value="old('barcode')"
                                 :error="$errors->first('barcode') ?: null"
                                 autocomplete="off"
+                                autofocus
                             />
                             <x-ui.button type="submit">Ausleihen</x-ui.button>
                         </form>

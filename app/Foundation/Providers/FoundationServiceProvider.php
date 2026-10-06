@@ -6,7 +6,11 @@ namespace App\Foundation\Providers;
 
 use App\Foundation\Auth\PermissionRegistry;
 use App\Foundation\Auth\RoleRegistry;
+use App\Foundation\Console\BackupDatabaseCommand;
+use App\Foundation\Console\CronCommand;
+use App\Foundation\Console\DoctorCommand;
 use App\Foundation\Console\FoundationCheckCommand;
+use App\Foundation\Console\MailTestCommand;
 use App\Foundation\Contracts\AuthorizesPermissions;
 use App\Foundation\Navigation\NavigationRegistry;
 use App\Foundation\Support\BusinessClock;
@@ -50,6 +54,10 @@ final class FoundationServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 FoundationCheckCommand::class,
+                CronCommand::class,
+                DoctorCommand::class,
+                BackupDatabaseCommand::class,
+                MailTestCommand::class,
             ]);
         }
     }

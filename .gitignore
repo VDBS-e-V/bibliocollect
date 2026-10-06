@@ -31,3 +31,5 @@ yarn-error.log
 /APPLY.md
 /SHA256SUMS.txt
 /TEST_FLOW.md
+/public/covers
+/dist

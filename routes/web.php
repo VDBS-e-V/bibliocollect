@@ -12,3 +12,5 @@ foreach ($surfaceRouteFiles as $surfaceRouteFile) {
 
     require $surfaceRouteFile;
 }
+
+require __DIR__.'/maintenance.php';

@@ -21,12 +21,14 @@ use App\Surfaces\Pos\Http\Controllers\PatronEditController;
 use App\Surfaces\Pos\Http\Controllers\PatronImportController;
 use App\Surfaces\Pos\Http\Controllers\PatronIndexController;
 use App\Surfaces\Pos\Http\Controllers\PatronShowController;
+use App\Surfaces\Pos\Http\Controllers\PosHomeController;
+use App\Surfaces\Pos\Http\Controllers\PosScanController;
 use App\Surfaces\Pos\Http\Controllers\ReservationController;
 use App\Surfaces\Pos\Http\Controllers\ReservationIndexController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(function (): void {
-    Route::view('/betrieb', 'pages.surfaces.pos', ['preview' => false])
+    Route::get('/betrieb', PosHomeController::class)
         ->name('pos.home');
 
     Route::middleware('permission:catalog.import')->group(function (): void {
@@ -126,6 +128,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         ->name('pos.reports.class-loans');
 
     Route::middleware('permission:circulation.manage')->group(function (): void {
+        Route::post('/betrieb/scan', PosScanController::class)
+            ->name('pos.scan');
+
         Route::post('/betrieb/ausleihkonten/{patronId}/ausleihen', [CirculationController::class, 'checkout'])
             ->name('pos.circulation.checkout');
 

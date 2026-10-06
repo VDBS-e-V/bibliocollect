@@ -26,6 +26,12 @@ Schedule::command('circulation:reservations:expire')
     ->withoutOverlapping()
     ->onOneServer();
 
+// Tägliche Datensicherung nach storage/app/backups.
+Schedule::command('backup:database')
+    ->dailyAt('01:30')
+    ->withoutOverlapping()
+    ->onOneServer();
+
 // Anonymisiert abgelaufene Daten nach der Aufbewahrungsfrist (config/privacy.php).
 Schedule::command('privacy:anonymize')
     ->weeklyOn(7, '02:00')

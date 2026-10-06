@@ -112,6 +112,23 @@ final readonly class ReservationQueueService
         });
     }
 
+    /** Hinweis für die Rückgabe: für wen das Exemplar zurückzulegen ist (leer, wenn niemand wartet). */
+    public function holdNotice(Copy $copy): string
+    {
+        $hold = Reservation::query()
+            ->where('ready_copy_id', $copy->getKey())
+            ->where('status', ReservationStatus::Ready->value)
+            ->with('patron')
+            ->first();
+
+        if (! $hold instanceof Reservation || $hold->patron === null) {
+            return '';
+        }
+
+        return ' Das Exemplar bitte für '.$hold->patron->displayName().' ('.$hold->patron->library_number.') zurücklegen, Abholung bis '
+            .($hold->pickup_until?->format('d.m.Y') ?? '—').'.';
+    }
+
     public function isHeld(Copy $copy): bool
     {
         return Reservation::query()

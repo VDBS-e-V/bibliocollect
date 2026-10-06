@@ -47,6 +47,16 @@ return [
             'report' => false,
         ],
 
+        // Für Hosting ohne Symlinks: Cover liegen direkt in public/covers (CATALOG_COVER_DISK=covers).
+        'covers' => [
+            'driver' => 'local',
+            'root' => public_path('covers'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/covers',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

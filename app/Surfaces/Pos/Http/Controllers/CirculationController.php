@@ -8,11 +8,10 @@ use App\Models\User;
 use App\Modules\Circulation\Actions\CheckoutCopyAction;
 use App\Modules\Circulation\Actions\RenewLoanAction;
 use App\Modules\Circulation\Actions\ReturnLoanAction;
-use App\Modules\Circulation\Enums\ReservationStatus;
 use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Exceptions\LoanStateConflict;
-use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Queries\FindOpenLoanQuery;
+use App\Modules\Circulation\Services\ReservationQueueService;
 use App\Modules\Patrons\Queries\FindPatronQuery;
 use App\Surfaces\Pos\Http\Requests\CirculationCheckoutRequest;
 use Illuminate\Http\RedirectResponse;
@@ -52,6 +51,7 @@ final class CirculationController
         FindPatronQuery $findPatron,
         FindOpenLoanQuery $findLoan,
         ReturnLoanAction $returnLoan,
+        ReservationQueueService $queue,
     ): RedirectResponse {
         $patron = $findPatron->byId($patronId);
         $loan = $findLoan->forPatron($loanId, $patron);
@@ -67,19 +67,7 @@ final class CirculationController
                 ->with('workspace_error', $exception->getMessage());
         }
 
-        $hold = Reservation::query()
-            ->where('ready_copy_id', $loan->copy_id)
-            ->where('status', ReservationStatus::Ready->value)
-            ->with('patron')
-            ->first();
-
-        $message = 'Rückgabe wurde erfasst.';
-
-        if ($hold instanceof Reservation) {
-            $message .= ' Das Exemplar bitte für '.$hold->patron->displayName()
-                .' ('.$hold->patron->library_number.') zurücklegen, Abholung bis '
-                .($hold->pickup_until?->format('d.m.Y') ?? '—').'.';
-        }
+        $message = 'Rückgabe wurde erfasst.'.$queue->holdNotice($loan->copy);
 
         return redirect()
             ->route('pos.patrons.show', ['patronId' => $patron->getKey()])
