@@ -13,6 +13,15 @@
     $navigationItems = $preview
         ? $navigation->allForSurface($surface)
         : $navigation->visibleForSurface($surface, static fn (string $permission): bool => Gate::allows($permission));
+
+    // Bereiche, zwischen denen man wechseln kann: nur die, auf die die Person Zugriff hat.
+    $areas = collect([
+        ['label' => 'Startseite', 'url' => route('public.home'), 'permission' => null, 'current' => request()->routeIs('public.home')],
+        ['label' => 'Katalog', 'url' => route('public.catalog.index'), 'permission' => null, 'current' => $surface === 'public' && ! request()->routeIs('public.home')],
+        ['label' => 'Mein Konto', 'url' => route('portal.home'), 'permission' => 'surface.portal.access', 'current' => $surface === 'portal'],
+        ['label' => 'Bibliotheksbetrieb', 'url' => route('pos.home'), 'permission' => 'surface.pos.access', 'current' => $surface === 'pos'],
+        ['label' => 'Verwaltung', 'url' => route('administration.home'), 'permission' => 'surface.administration.access', 'current' => $surface === 'administration'],
+    ])->filter(static fn (array $area): bool => $area['permission'] === null || Gate::allows($area['permission']))->values();
 @endphp
 
 <!DOCTYPE html>
@@ -32,15 +41,11 @@
             <div class="bc-utility-bar__inner">
                 <span>VDBS e. V.</span>
                 <div class="bc-utility-bar__actions">
-                    <a href="{{ route('public.home') }}">Startseite</a>
-                    <span aria-hidden="true">·</span>
-                    <span>{{ $surfaceLabel }}</span>
-                    <span aria-hidden="true">·</span>
+                    @foreach ($areas as $area)
+                        <a href="{{ $area['url'] }}" @if ($area['current']) aria-current="page" class="bc-utility-link--current" @endif>{{ $area['label'] }}</a>
+                        <span aria-hidden="true">·</span>
+                    @endforeach
                     @auth
-                        @can('surface.portal.access')
-                            <a href="{{ route('portal.home') }}">Mein Konto</a>
-                            <span aria-hidden="true">·</span>
-                        @endcan
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
                             <button type="submit" class="bc-utility-link">Abmelden</button>

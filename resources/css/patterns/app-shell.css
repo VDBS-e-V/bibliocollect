@@ -217,3 +217,9 @@
     .bc-shell__main,
     .bc-shell__footer-inner { width: min(100% - 1.5rem, 88rem); }
 }
+
+.bc-utility-bar a[aria-current="page"] {
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
