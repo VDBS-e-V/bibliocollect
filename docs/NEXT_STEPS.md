@@ -6,7 +6,7 @@
 4. Den Betrieb einrichten: dauerhaft laufender Queue Worker (`php artisan queue:work`), `php artisan schedule:run` jede Minute (Cover-Nachholung täglich 03:30, Ablauf von Abholfristen täglich 04:00), `php artisan storage:link` und ein kostenloser Google-Books-API-Key als Fallback (danach einmal `catalog:covers:queue --retry-missing`). Die Nutzungsbedingungen für das Speichern von Google-Bildern vorher prüfen.
 5. SMTP-Zugangsdaten für den Mailversand eintragen (bis dahin schreibt `MAIL_MAILER=log` die Erinnerungen ins Log) und prüfen, ob Erinnerungen abbestellbar sein sollen.
 6. Entscheiden, ob Mahnungen und Gebühren fachlich gewollt sind; erst danach bauen.
-7. Produktiver Import von Schüler:innen und Klassen aus der Schulverwaltung (Dateiformat klären).
+7. Den Ausleihkonten-Import (`docs/PATRON_IMPORT.md`) mit der echten Schülerliste ausprobieren; dafür zuerst Schuljahr und Klassen anlegen und aktivieren.
 8. Die formatunabhängige Import-Pipeline bei einem späteren MARC21-Schritt über einen weiteren Source-Adapter wiederverwenden. Die DNB-/GND-/Quellenfelder und der Qualitätsaudit bilden dafür bereits eine fachliche Zielstruktur.
 9. Import-Mappings und spätere Quellen müssen weiterhin das offene `role_key`-Modell respektieren; Medientyp und Sprachcode bleiben offene Vokabulare mit schonender Normalisierung.
 

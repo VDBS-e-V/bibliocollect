@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property PatronStatus $status
  * @property string $first_name
  * @property string $last_name
+ * @property Carbon $birth_date
  * @property Carbon|null $blocked_at
  * @property string|null $blocked_reason
  */

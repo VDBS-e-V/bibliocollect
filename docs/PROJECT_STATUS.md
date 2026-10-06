@@ -178,6 +178,11 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Import von Ausleihkonten (v0.6.0)
+
+- `/betrieb/ausleihkonten/import`: CSV-Import für Schüler:innen, Lehrkräfte und Mitarbeiter:innen mit Vorlage, Vorschau, Fehlersperre und automatisch vergebenen Bibliotheksnummern.
+- Details und Dateiformat in `docs/PATRON_IMPORT.md`.
+
 ### Schuljahreswechsel (v0.5.5)
 
 - `/verwaltung/schuljahreswechsel`: Vorschau mit Vorschlägen je Klasse, Zuordnung, Bestätigung, Ausführung ganz oder gar nicht samt Aktivierung des neuen Jahres.

@@ -17,6 +17,7 @@ use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
 use App\Surfaces\Pos\Http\Controllers\PatronCreateController;
 use App\Surfaces\Pos\Http\Controllers\PatronDepartureController;
 use App\Surfaces\Pos\Http\Controllers\PatronEditController;
+use App\Surfaces\Pos\Http\Controllers\PatronImportController;
 use App\Surfaces\Pos\Http\Controllers\PatronIndexController;
 use App\Surfaces\Pos\Http\Controllers\PatronShowController;
 use App\Surfaces\Pos\Http\Controllers\ReservationController;
@@ -140,6 +141,23 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::get('/betrieb/ausleihkonten', PatronIndexController::class)
         ->middleware('permission:patrons.lookup')
         ->name('pos.patrons.index');
+
+    Route::middleware('permission:patrons.manage')->group(function (): void {
+        Route::get('/betrieb/ausleihkonten/import', [PatronImportController::class, 'create'])
+            ->name('pos.patrons.import.create');
+
+        Route::get('/betrieb/ausleihkonten/import/vorlage', [PatronImportController::class, 'template'])
+            ->name('pos.patrons.import.template');
+
+        Route::post('/betrieb/ausleihkonten/import', [PatronImportController::class, 'store'])
+            ->name('pos.patrons.import.store');
+
+        Route::get('/betrieb/ausleihkonten/import/{token}', [PatronImportController::class, 'show'])
+            ->name('pos.patrons.import.show');
+
+        Route::post('/betrieb/ausleihkonten/import/{token}', [PatronImportController::class, 'commit'])
+            ->name('pos.patrons.import.commit');
+    });
 
     Route::get('/betrieb/ausleihkonten/neu', [PatronCreateController::class, 'create'])
         ->middleware('permission:patrons.manage')

@@ -36,7 +36,7 @@ Gate pro Schritt: Regeln im `CirculationRuleEvaluator` zentral, Transaktionen mi
 Bewusst aus dem T2-Gate ausgeklammert, im Alltag aber bald nötig:
 
 1. ✔ Schuljahreswechsel mit Vorschau, Zuordnung und Konfliktbehandlung (siehe `docs/SCHOOL_YEAR_TRANSITION.md`).
-2. Produktiver Schulimport.
+2. ✔ Import von Ausleihkonten per CSV mit Vorschau (siehe `docs/PATRON_IMPORT.md`). Offen: Abgleich vorhandener Konten.
 3. ✔ Verwaltungsmaske für Öffnungszeiten und Schließtage (siehe `docs/AUDIT_AND_CALENDAR.md`).
 
 ## Phase 4 — Querschnitt
