@@ -65,7 +65,7 @@ Danach `SETUP_TOKEN` in der `.env` **leeren** (die Seite verschwindet), `SESSION
 Eine Zeile reicht, sie erledigt Zeitplan (Erinnerungen, Fristen, Sicherung, Anonymisierung) und Warteschlange (Cover-Downloads):
 
 - **Cronjob mit Befehl** (wenn der Anbieter das erlaubt): `php /pfad/zu/bibliocollect/artisan app:cron`, jede Minute oder alle 5 Minuten. Den PHP-Pfad nennt der Anbieter (er muss PHP 8.4 sein).
-- **Cronjob nur mit URL**: `https://deine-domain/_cron/<CRON_TOKEN>` regelmäßig aufrufen, z. B. durch einen kostenlosen externen Cron-Dienst. Die Antwort zeigt kurz, was gelaufen ist.
+- **Externer Cron-Dienst (nur URL)**: `https://deine-domain/_cron` jede Minute oder alle 5 Minuten aufrufen und den `CRON_TOKEN` als Header **`X-Api-Key: <CRON_TOKEN>`** (oder `Authorization: Bearer <CRON_TOKEN>`) mitschicken. GET und POST gehen. Das ist die bessere Wahl, weil der Key nicht in Server-Logs landet. Kann der Dienst keine Header, geht auch `https://deine-domain/_cron/<CRON_TOKEN>`. Ohne oder mit falschem Key antwortet die Adresse mit 404. Die Antwort zeigt kurz, was gelaufen ist.
 
 Ob alles läuft, zeigt `app:doctor` bzw. die Einrichtungsseite („Cronjob: zuletzt …“).
 

@@ -54,6 +54,20 @@ it('runs migrations, creates the first management account once and checks the in
     expect(User::query()->where('email', 'zweite@example.org')->exists())->toBeFalse();
 });
 
+it('accepts the cron key in a header as well', function (): void {
+    withHostingTokens();
+
+    $this->get('/_cron')->assertNotFound();
+    $this->withHeader('X-Api-Key', 'falsch-falsch-falsch-falsch-falsch')->get('/_cron')->assertNotFound();
+
+    $this->withHeader('X-Api-Key', 'ein-ausreichend-langes-cron-token')->get('/_cron')
+        ->assertOk()
+        ->assertSee('Warteschlange abgearbeitet');
+
+    $this->withHeader('Authorization', 'Bearer ein-ausreichend-langes-cron-token')->post('/_cron')
+        ->assertOk();
+});
+
 it('runs the cron job through the web address only with the right token', function (): void {
     withHostingTokens();
 

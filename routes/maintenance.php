@@ -17,5 +17,6 @@ if ($usable(config('hosting.setup_token'))) {
 }
 
 if ($usable(config('hosting.cron_token'))) {
-    Route::get('/_cron/{token}', WebCronController::class)->middleware('throttle:30,1');
+    // Der Key kommt im Header (X-Api-Key oder Authorization: Bearer) oder, wenn der Dienst keine Header kann, im Pfad.
+    Route::match(['GET', 'POST'], '/_cron/{token?}', WebCronController::class)->middleware('throttle:30,1');
 }
