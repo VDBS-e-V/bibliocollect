@@ -116,6 +116,7 @@
     <section class="bc-content-section" aria-labelledby="catalog-copies-heading">
         <div class="bc-section-heading bc-section-heading--with-meta">
             <h2 id="catalog-copies-heading">Exemplare</h2>
+            <a href="{{ route('pos.labels.copies', ['ausgabe' => $edition->getKey()]) }}">Etiketten drucken</a>
             <span>{{ $edition->copies->count() }}</span>
         </div>
 

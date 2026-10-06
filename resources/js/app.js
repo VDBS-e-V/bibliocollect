@@ -4,3 +4,4 @@ let initialTheme='light';try{initialTheme=localStorage.getItem(storageKey)==='da
 document.addEventListener('click',(event)=>{const button=event.target.closest('[data-theme-toggle]');if(!button)return;const next=document.documentElement.hasAttribute('data-vdbs-theme')?'light':'dark';applyTheme(next);try{localStorage.setItem(storageKey,next)}catch(_){}});
 document.addEventListener('change',(event)=>{const field=event.target.closest('[data-auto-submit]');if(!field||!field.form)return;if(typeof field.form.requestSubmit==='function'){field.form.requestSubmit()}else{field.form.submit()}});
 document.addEventListener('click',(event)=>{if(event.target.closest('[data-print]')){window.print()}});
+document.addEventListener('change',(event)=>{const all=event.target.closest('[data-select-all]');if(!all||!all.form)return;all.form.querySelectorAll('input[type="checkbox"][name="'+all.dataset.selectAll+'"]').forEach((box)=>{box.checked=all.checked});});

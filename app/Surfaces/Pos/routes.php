@@ -12,9 +12,11 @@ use App\Surfaces\Pos\Http\Controllers\CatalogQualityController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
+use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
+use App\Surfaces\Pos\Http\Controllers\PatronCardController;
 use App\Surfaces\Pos\Http\Controllers\PatronCreateController;
 use App\Surfaces\Pos\Http\Controllers\PatronDataExportController;
 use App\Surfaces\Pos\Http\Controllers\PatronDepartureController;
@@ -122,6 +124,16 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::patch('/betrieb/katalog/ausgaben/{editionId}/exemplare/{copyId}', [CatalogCopyController::class, 'update'])
             ->name('pos.catalog.copies.update');
+    });
+
+    Route::middleware('permission:catalog.manage')->group(function (): void {
+        Route::get('/betrieb/etiketten', [CopyLabelController::class, 'index'])->name('pos.labels.copies');
+        Route::post('/betrieb/etiketten', [CopyLabelController::class, 'print'])->name('pos.labels.copies.print');
+    });
+
+    Route::middleware('permission:patrons.manage')->group(function (): void {
+        Route::get('/betrieb/ausweise', [PatronCardController::class, 'index'])->name('pos.labels.cards');
+        Route::post('/betrieb/ausweise', [PatronCardController::class, 'print'])->name('pos.labels.cards.print');
     });
 
     Route::get('/betrieb/klassenlisten', ClassLoanReportController::class)

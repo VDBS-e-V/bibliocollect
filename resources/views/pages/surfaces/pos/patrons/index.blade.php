@@ -10,6 +10,7 @@
         @can('patrons.manage')
             <x-ui.button href="{{ route('pos.patrons.create') }}">Neues Ausleihkonto</x-ui.button>
             <a href="{{ route('pos.patrons.import.create') }}">Aus CSV importieren</a>
+            <a href="{{ route('pos.labels.cards') }}">Ausweise drucken</a>
         @endcan
     </div>
 
