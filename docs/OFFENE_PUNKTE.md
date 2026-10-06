@@ -1,6 +1,6 @@
 # Offene Punkte vor dem Start
 
-Stand: v0.8.1. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
+Stand: v0.9.0. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
 
 ## A. Muss vor dem Start
 
@@ -21,7 +21,7 @@ Stand: v0.8.1. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: En
 |---|---|---|
 | ✔ | Etiketten und Ausweise drucken | `/betrieb/etiketten` (21 je Bogen), `/betrieb/ausweise` (10 je Bogen), Code 128 |
 | ✔ | Ausleihe wie eine Kasse (zwei Bildschirme) | Start: Person oder Rückgabe scannen. Person: Übersicht der Ausleihen mit Verlängern/Zurückgeben, Ausleihe per Scan, gemeinsam bestätigen, Beleg drucken oder per Mail senden |
-| ☐ | Statistik (Ausleihen, Bestand, Beliebtes, Jahresbericht) | offen |
+| ✔ | Statistik | `/betrieb/statistik`: Kennzahlen, Ausleihen je Monat, beliebteste Titel, nach Klasse und Medientyp, Bestand; Zeitraum je Schuljahr, letzte 12 Monate oder gesamt; CSV-Download und Druck. Ein fertiger „Jahresbericht“ als Text fehlt |
 | ☐ | Pflege von Signaturen und Themen, Inventur | offen |
 | ☐ | Filter „nur verfügbare Titel“ | offen |
 | ☐ | Buchwünsche, Merkliste/Favoriten | offen |
@@ -41,12 +41,12 @@ Stand: v0.8.1. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: En
 
 | | Punkt | Stand |
 |---|---|---|
-| ☐ | Barrierefreiheit prüfen (Screenreader, Tastatur, Kontraste) | offen |
+| ◐ | Barrierefreiheit | Automatische Prüfung aller Hauptseiten im Test (Sprache, eine Hauptüberschrift, beschriftete Felder, Tabellenköpfe, alt-Texte, eindeutige IDs); dabei wurden doppelte IDs auf der Seite „Schule“ behoben. **Du:** Prüfung mit Screenreader, Tastatur und Kontrasten; dann Erklärung ausfüllen |
 | ☐ | Mobilansicht auf dem Handy ansehen | **Du** |
 | ☐ | Ende-zu-Ende-Browsertests | offen |
 | ☐ | Fehlerüberwachung | offen (nur Logdateien) |
 | ☐ | Git: pushen, Branches aufräumen, CI prüfen | **Du**, nichts wurde gepusht |
-| ☐ | Anleitung für Schüler-AG und Mitarbeiter:innen | offen |
+| ✔ | Anleitung für Schüler-AG und Mitarbeiter:innen | In der Anwendung unter „Hilfe“ (`/betrieb/hilfe`): Ausleihe, Katalog und Ausleihkonten, Verwaltung (`resources/help/*.md`). **Du:** lesen und an die Praxis anpassen; eine Schulung ersetzt das nicht |
 
 ## E. Betrieb
 

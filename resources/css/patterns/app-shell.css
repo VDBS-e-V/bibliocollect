@@ -303,3 +303,20 @@
 .bc-content-page__body ul {
     margin: .6rem 0;
 }
+
+.bc-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 0 2.5rem;
+}
+
+.bc-stat-bar-cell {
+    width: 55%;
+}
+
+.bc-stat-bar {
+    display: block;
+    min-width: 1px;
+    height: .8rem;
+    background: var(--action-secondary, var(--border-strong));
+}

@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'statistics.view' => [
+            'label' => 'Statistik einsehen',
+            'description' => 'Erlaubt Kennzahlen zur Ausleihe und zum Bestand (nur Zählwerte, keine Personen).',
+        ],
         'audit.view' => [
             'label' => 'Protokoll einsehen',
             'description' => 'Erlaubt die Einsicht in das Protokoll fachlicher Ereignisse (Ausleihe, Katalog, Schule).',
@@ -108,6 +112,7 @@ return [
                 'catalog.import',
                 'circulation.manage',
                 'circulation.reports',
+                'statistics.view',
             ],
         ],
         'management' => [
@@ -130,6 +135,7 @@ return [
                 'audit.view',
                 'content.manage',
                 'circulation.reports',
+                'statistics.view',
             ],
         ],
         'technical_admin' => [

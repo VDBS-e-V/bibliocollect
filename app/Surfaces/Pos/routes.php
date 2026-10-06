@@ -13,6 +13,7 @@ use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
 use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
+use App\Surfaces\Pos\Http\Controllers\HelpController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
@@ -29,6 +30,7 @@ use App\Surfaces\Pos\Http\Controllers\PosScanController;
 use App\Surfaces\Pos\Http\Controllers\PosTerminalController;
 use App\Surfaces\Pos\Http\Controllers\ReservationController;
 use App\Surfaces\Pos\Http\Controllers\ReservationIndexController;
+use App\Surfaces\Pos\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(function (): void {
@@ -136,6 +138,14 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::get('/betrieb/ausweise', [PatronCardController::class, 'index'])->name('pos.labels.cards');
         Route::post('/betrieb/ausweise', [PatronCardController::class, 'print'])->name('pos.labels.cards.print');
     });
+
+    Route::middleware('permission:statistics.view')->group(function (): void {
+        Route::get('/betrieb/statistik', [StatisticsController::class, 'show'])->name('pos.statistics');
+        Route::get('/betrieb/statistik.csv', [StatisticsController::class, 'download'])->name('pos.statistics.download');
+    });
+
+    Route::get('/betrieb/hilfe', [HelpController::class, 'index'])->name('pos.help');
+    Route::get('/betrieb/hilfe/{topic}', [HelpController::class, 'show'])->name('pos.help.show');
 
     Route::get('/betrieb/klassenlisten', ClassLoanReportController::class)
         ->middleware('permission:circulation.reports')

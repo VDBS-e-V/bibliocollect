@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: v0.8.1 (offene Punkte siehe `docs/OFFENE_PUNKTE.md`). Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
+Stand: v0.9.0 (offene Punkte siehe `docs/OFFENE_PUNKTE.md`). Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
 
 ## Abgeschlossen
 
@@ -177,6 +177,12 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - `CirculationDemoSeeder` liefert einen offenen und einen zurückgegebenen Demo-Loan reproduzierbar und idempotent.
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
+
+### Statistik, Hilfe und Barrierefreiheit (v0.9.0)
+
+- **Statistik** unter `/betrieb/statistik` (Recht `statistics.view`, Mitarbeiter:innen und Verwaltung): Ausleihen, Rückgaben, Verlängerungen, aktive Leser:innen, offene und überfällige Ausleihen, Verlauf je Monat, beliebteste Titel, Klassen, Medientypen und Bestand; nur Zählwerte. CSV-Download und Druckansicht.
+- **Hilfe** unter `/betrieb/hilfe` mit Anleitungen aus `resources/help/*.md` (Ausleihe, Katalog und Ausleihkonten, Verwaltung).
+- **Automatische Barrierefreiheitsprüfung** (`tests/Feature/AccessibilityTest.php`) über alle Hauptseiten; sie fängt Rückschritte ab, ersetzt aber keine Prüfung mit Screenreader und Tastatur.
 
 ### Ausleihterminal, Etiketten, Rechtliches und Regeln (v0.8.0)
 

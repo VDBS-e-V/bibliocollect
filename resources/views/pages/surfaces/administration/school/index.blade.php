@@ -81,9 +81,9 @@
                         <form method="post" action="{{ route('administration.school-years.update', ['schoolYearId' => $schoolYear->getKey()]) }}" class="bc-school-year-form">
                             @csrf
                             @method('PATCH')
-                            <x-ui.input label="Bezeichnung" name="name" :value="$schoolYear->name" />
-                            <x-ui.input label="Beginn" name="starts_on" type="date" :value="$schoolYear->starts_on->toDateString()" />
-                            <x-ui.input label="Ende" name="ends_on" type="date" :value="$schoolYear->ends_on->toDateString()" />
+                            <x-ui.input label="Bezeichnung" name="name" :id="'year-'.$schoolYear->getKey().'-name'" :value="$schoolYear->name" />
+                            <x-ui.input label="Beginn" name="starts_on" type="date" :id="'year-'.$schoolYear->getKey().'-starts_on'" :value="$schoolYear->starts_on->toDateString()" />
+                            <x-ui.input label="Ende" name="ends_on" type="date" :id="'year-'.$schoolYear->getKey().'-ends_on'" :value="$schoolYear->ends_on->toDateString()" />
                             <div class="bc-school-form-action"><x-ui.button type="submit" variant="secondary">Schuljahr speichern</x-ui.button></div>
                         </form>
 
@@ -97,9 +97,9 @@
                                 <form method="post" action="{{ route('administration.school-classes.update', ['schoolClassId' => $schoolClass->getKey()]) }}" class="bc-school-class-row">
                                     @csrf
                                     @method('PATCH')
-                                    <x-ui.input label="Klasse" name="name" :value="$schoolClass->name" />
-                                    <x-ui.input label="Jahrgang" name="grade_level" type="number" min="1" max="13" :value="$schoolClass->grade_level" />
-                                    <x-ui.input label="Klassenleitung" name="homeroom_teacher" :value="$schoolClass->homeroom_teacher" />
+                                    <x-ui.input label="Klasse" name="name" :id="'class-'.$schoolClass->getKey().'-name'" :value="$schoolClass->name" />
+                                    <x-ui.input label="Jahrgang" name="grade_level" type="number" min="1" max="13" :id="'class-'.$schoolClass->getKey().'-grade'" :value="$schoolClass->grade_level" />
+                                    <x-ui.input label="Klassenleitung" name="homeroom_teacher" :id="'class-'.$schoolClass->getKey().'-homeroom'" :value="$schoolClass->homeroom_teacher" />
                                     <label class="bc-school-active-control">
                                         <input type="hidden" name="is_active" value="0">
                                         <input type="checkbox" name="is_active" value="1" @checked($schoolClass->is_active)>
@@ -113,9 +113,9 @@
 
                             <form method="post" action="{{ route('administration.school-classes.store', ['schoolYearId' => $schoolYear->getKey()]) }}" class="bc-school-class-row bc-school-class-row--new">
                                 @csrf
-                                <x-ui.input label="Neue Klasse" name="name" placeholder="z. B. 8a" />
-                                <x-ui.input label="Jahrgang" name="grade_level" type="number" min="1" max="13" />
-                                <x-ui.input label="Klassenleitung" name="homeroom_teacher" />
+                                <x-ui.input label="Neue Klasse" name="name" :id="'new-class-'.$schoolYear->getKey().'-name'" placeholder="z. B. 8a" />
+                                <x-ui.input label="Jahrgang" name="grade_level" type="number" min="1" max="13" :id="'new-class-'.$schoolYear->getKey().'-grade'" />
+                                <x-ui.input label="Klassenleitung" name="homeroom_teacher" :id="'new-class-'.$schoolYear->getKey().'-homeroom'" />
                                 <label class="bc-school-active-control">
                                     <input type="hidden" name="is_active" value="0">
                                     <input type="checkbox" name="is_active" value="1" checked>

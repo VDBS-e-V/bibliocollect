@@ -67,11 +67,25 @@ return [
                     'order' => 27,
                 ],
                 [
+                    'label' => 'Statistik',
+                    'route' => 'pos.statistics',
+                    'active' => 'pos.statistics*',
+                    'permission' => 'statistics.view',
+                    'order' => 28,
+                ],
+                [
                     'label' => 'Vormerkungen',
                     'route' => 'pos.reservations.index',
                     'active' => 'pos.reservations.*',
                     'permission' => 'circulation.manage',
                     'order' => 25,
+                ],
+                [
+                    'label' => 'Hilfe',
+                    'route' => 'pos.help',
+                    'active' => 'pos.help*',
+                    'permission' => 'surface.pos.access',
+                    'order' => 90,
                 ],
                 [
                     'label' => 'Katalogpflege',
