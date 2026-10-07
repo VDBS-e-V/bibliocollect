@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'inventory.count' => [
+            'label' => 'Inventur durchführen',
+            'description' => 'Erlaubt, Bücher am Regal zu zählen und den Bestand mit dem Regal abzugleichen.',
+        ],
         'catalog.withdraw' => [
             'label' => 'Bücher aussondern',
             'description' => 'Erlaubt, Exemplare aus dem Bestand auszusondern und Aussonderungen zurückzuholen.',
@@ -118,7 +122,7 @@ return [
         ],
         'student_ag_extended' => [
             'label' => 'Schüler-AG Erweitert',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage', 'circulation.manage'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage', 'circulation.manage', 'inventory.count'],
         ],
         'staff' => [
             'label' => 'Mitarbeiter:in',
@@ -140,6 +144,7 @@ return [
                 'wishes.manage',
                 'shelves.manage',
                 'catalog.withdraw',
+                'inventory.count',
                 'inventory.renumber',
             ],
         ],
@@ -170,6 +175,7 @@ return [
                 'system.view',
                 'users.manage',
                 'catalog.withdraw',
+                'inventory.count',
             ],
         ],
         'technical_admin' => [

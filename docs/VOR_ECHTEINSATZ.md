@@ -20,7 +20,7 @@ Alle Punkte der früheren „Muss“-Liste sind umgesetzt bis auf den Notbetrieb
 
 | Funktion | Warum | Aufwand |
 |---|---|---|
-| **Inventur** | Bestand gegen Regal prüfen: Regal scannen, fehlende und falsch einsortierte Exemplare als Liste, Abschluss mit Protokoll. | mittel |
+| ~~Inventur~~ | ✔ umgesetzt (v0.22.0) | |
 | **Schuljahreswechsel: Teilwechsel und Rückgängig** | Der erste Wechsel im Sommer ist riskant. Gebraucht: Klassen einzeln umstellen und einen Wechsel innerhalb einiger Tage zurücknehmen können. | mittel |
 | **Ausleihkonten-Import: vorhandene Konten aktualisieren** | Heute werden nur neue Konten angelegt. Für Nachmeldungen und Korrekturen muss ein erneuter Import Klasse, Name und Mail ändern können. | mittel |
 | ~~Filter „nur verfügbare Titel“~~ | ✔ umgesetzt (v0.21.0) | |

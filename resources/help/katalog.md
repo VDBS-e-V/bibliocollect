@@ -10,6 +10,10 @@ Für Mitarbeiter:innen und die Schüler-AG „Erweitert“.
 4. Prüfe die Vorschläge und ergänze fehlende Angaben.
 5. Im letzten Schritt prüfst du alles und speicherst. **Erst jetzt** wird etwas angelegt. Den Standort legst du hier **nicht** fest: Das Buch kommt auf den Stapel „Einsortieren“. Dort liegt jedes Buch ohne Standort, auch der Altbestand.
 
+## Inventur
+
+**Inventur** unter „Alle Vorgänge“: eine Inventur beginnen, das **Regalbrett wählen**, die **Inventarnummern der Bücher scannen**, die dort stehen, dann das nächste Brett. Jeder Scan zeigt gleich, ob das Buch richtig steht. Zum Schluss **Inventur abschließen**: Der Bericht nennt, was fehlt, falsch einsortiert ist oder unbekannt ist. Mit „Standorte korrigieren“ übernimmst du die gefundenen Regalbretter. Geprüft sind nur die Bretter, an denen du gescannt hast.
+
 ## Bücher aussondern (Mitarbeiter:innen und Verwaltung)
 
 **Bücher aussondern** unter „Alle Vorgänge“: Inventarnummern scannen oder eintippen, prüfen lassen, Grund und Verbleib wählen, bestätigen. Ausgeliehene Bücher werden nicht ausgesondert. Die **Liste der Aussonderungen** zeigt, was wann und warum ausgesondert wurde, und lässt sich als CSV für den Jahresbericht herunterladen. Aus Versehen Ausgesondertes holst du dort mit „Zurückholen“ zurück.

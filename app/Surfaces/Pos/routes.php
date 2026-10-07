@@ -14,6 +14,7 @@ use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
 use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
 use App\Surfaces\Pos\Http\Controllers\HelpController;
+use App\Surfaces\Pos\Http\Controllers\InventoryCountController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\PatronAccountCardController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
@@ -156,6 +157,17 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::post('/betrieb/ausweise/charge/{batch}/export', [PatronCardController::class, 'export'])->whereNumber('batch')->name('pos.labels.cards.export');
         Route::post('/betrieb/ausweise/charge/{batch}/verfuegbar', [PatronCardController::class, 'available'])->whereNumber('batch')->name('pos.labels.cards.available');
         Route::post('/betrieb/ausweise/{cardId}/sperren', [PatronCardController::class, 'block'])->name('pos.labels.cards.block');
+    });
+
+    Route::middleware('permission:inventory.count')->group(function (): void {
+        Route::get('/betrieb/inventur', [InventoryCountController::class, 'index'])->name('pos.inventory');
+        Route::post('/betrieb/inventur', [InventoryCountController::class, 'start'])->name('pos.inventory.start');
+        Route::get('/betrieb/inventur/{countId}', [InventoryCountController::class, 'show'])->name('pos.inventory.show');
+        Route::post('/betrieb/inventur/{countId}/scan', [InventoryCountController::class, 'scan'])->name('pos.inventory.scan');
+        Route::post('/betrieb/inventur/{countId}/abschliessen', [InventoryCountController::class, 'close'])->name('pos.inventory.close');
+        Route::get('/betrieb/inventur/{countId}/bericht', [InventoryCountController::class, 'report'])->name('pos.inventory.report');
+        Route::get('/betrieb/inventur/{countId}/bericht.csv', [InventoryCountController::class, 'export'])->name('pos.inventory.export');
+        Route::post('/betrieb/inventur/{countId}/korrigieren', [InventoryCountController::class, 'apply'])->name('pos.inventory.apply');
     });
 
     Route::middleware('permission:catalog.withdraw')->group(function (): void {

@@ -178,6 +178,10 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Inventur (v0.22.0)
+
+`/betrieb/inventur` (Recht `inventory.count`: Mitarbeiter:innen, Verwaltung, Schüler-AG Erweitert): Eine Inventur beginnen (immer nur eine laufende), Regalbrett wählen und die Inventarnummern der dort stehenden Bücher scannen. Jeder Scan zeigt sofort: richtig einsortiert, steht laut System woanders, hat noch keinen Standort, gilt als verloren oder ausgesondert, oder Nummer unbekannt. Beim Abschließen entsteht der Bericht (auch als Zwischenstand, Druck und CSV): **Fehlt** (laut System am geprüften Regalbrett, nicht gescannt, ausgeliehene zählen nicht), **Falsch einsortiert**, **Ohne Standort**, **Verloren oder ausgesondert, aber im Regal**, **Unbekannt**. Geprüft sind nur Regalbretter, an denen gescannt wurde. „Standorte korrigieren“ setzt falsch eingetragene Standorte und fehlende auf das gefundene Regalbrett (protokolliert); mit Fehlendem passiert nichts automatisch.
+
 ### Filter „nur jetzt verfügbare Titel“ (v0.21.0)
 
 Im öffentlichen Katalog (Suche und erweiterte Suche) und in der Katalogpflege gibt es das Kästchen „Nur jetzt verfügbare Titel“: Es bleiben Titel mit mindestens einem aktiven Exemplar, das weder ausgeliehen noch für eine Vormerkung zurückgelegt ist (`available_only`). Das Kästchen „Nur Titel mit aktiven Exemplaren“ bleibt als Katalogfilter bestehen.
