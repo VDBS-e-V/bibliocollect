@@ -44,6 +44,7 @@ return [
                         ['label' => 'Medien einsortieren', 'text' => 'Neu erfasste Bücher vom Stapel ins Regal stellen: Regalbrett wählen, Bücher scannen, Standort wird vermerkt.', 'route' => 'pos.shelving', 'permission' => 'circulation.manage'],
                         ['label' => 'Inventur', 'text' => 'Bestand und Regal abgleichen: Regalbrett wählen, Bücher scannen, Bericht über Fehlendes, falsch Einsortiertes und Unbekanntes.', 'route' => 'pos.inventory', 'permission' => 'inventory.count'],
                         ['label' => 'Bücher aussondern', 'text' => 'Alte, beschädigte oder doppelte Bücher mit Grund und Verbleib aus dem Bestand nehmen; Liste für den Jahresbericht.', 'route' => 'pos.withdrawal', 'permission' => 'catalog.withdraw'],
+                        ['label' => 'Etiketten auf Vorrat drucken', 'text' => 'Inventarnummern im Voraus drucken (Vorlauf). Das System überspringt vergebene Nummern; einmalig lassen sich die Lücken der laufenden Reihe füllen.', 'route' => 'pos.labels.stock', 'permission' => 'catalog.manage'],
                         ['label' => 'Etiketten drucken', 'text' => 'Exemplar-Etiketten mit Strichcode und Signatur auf Etikettenbögen.', 'route' => 'pos.labels.copies', 'permission' => 'catalog.manage'],
                         ['label' => 'Öffentlichen Katalog öffnen', 'text' => 'So sehen Leser:innen den Katalog.', 'route' => 'public.catalog.index', 'permission' => null],
                     ],

@@ -16,6 +16,7 @@ use App\Surfaces\Pos\Http\Controllers\CopyFoundController;
 use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
 use App\Surfaces\Pos\Http\Controllers\HelpController;
 use App\Surfaces\Pos\Http\Controllers\InventoryCountController;
+use App\Surfaces\Pos\Http\Controllers\InventoryLabelController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
 use App\Surfaces\Pos\Http\Controllers\OverdueController;
 use App\Surfaces\Pos\Http\Controllers\PatronAccountCardController;
@@ -146,6 +147,8 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::middleware('permission:catalog.manage')->group(function (): void {
         Route::get('/betrieb/etiketten', [CopyLabelController::class, 'index'])->name('pos.labels.copies');
         Route::post('/betrieb/etiketten', [CopyLabelController::class, 'print'])->name('pos.labels.copies.print');
+        Route::get('/betrieb/etiketten/vorrat', [InventoryLabelController::class, 'index'])->name('pos.labels.stock');
+        Route::post('/betrieb/etiketten/vorrat', [InventoryLabelController::class, 'print'])->middleware('throttle:30,1')->name('pos.labels.stock.print');
     });
 
     Route::middleware('permission:patrons.manage')->group(function (): void {

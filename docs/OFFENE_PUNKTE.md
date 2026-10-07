@@ -19,7 +19,7 @@ Stand: v0.37.0. Ablauf der Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`. 
 
 | | Punkt | Stand |
 |---|---|---|
-| ✔ | Etiketten und Ausweise drucken | `/betrieb/etiketten` (21 je Bogen), Code 128. Ausweise: nicht personalisiert, Zufallsnummer, Avery Zweckform C32016 (85 × 54 mm, 10 je Bogen) mit Vereinslogo, Name zum Selbsteintragen, Rückseite mit Logo, Stapeldruck und CSV-Export; Zuordnung am Tresen (siehe `docs/PROJECT_STATUS.md`). **Du:** Probedruck auf Normalpapier gegen einen Kartenbogen halten |
+| ✔ | Etiketten und Ausweise drucken | `/betrieb/etiketten` (24 je Bogen, 70 × 36 mm), Etiketten auf Vorrat unter `/betrieb/etiketten/vorrat`, Code 128. Ausweise: nicht personalisiert, Zufallsnummer, Avery Zweckform C32016 (85 × 54 mm, 10 je Bogen) mit Vereinslogo, Name zum Selbsteintragen, Rückseite mit Logo, Stapeldruck und CSV-Export; Zuordnung am Tresen (siehe `docs/PROJECT_STATUS.md`). **Du:** Probedruck auf Normalpapier gegen einen Kartenbogen halten |
 | ✔ | Ausleihe wie eine Kasse (zwei Bildschirme) | Start: Person oder Rückgabe scannen. Person: Übersicht der Ausleihen mit Verlängern/Zurückgeben, Ausleihe per Scan, gemeinsam bestätigen, Beleg drucken oder per Mail senden |
 | ✔ | Statistik | `/betrieb/statistik`: Kennzahlen, Ausleihen je Monat, beliebteste Titel, nach Klasse und Medientyp, Bestand; Zeitraum je Schuljahr, letzte 12 Monate oder gesamt; CSV-Download und Druck. Ein fertiger „Jahresbericht“ als Text fehlt |
 | ✔ | Pflege von Signaturen und Themen, Inventur | Signaturen und Themen (v0.19.0), Inventur (v0.22.0) |

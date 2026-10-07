@@ -2,12 +2,13 @@
     <x-ui.page-header
         kicker="Katalogpflege"
         title="Exemplar-Etiketten drucken"
-        :lead="'Strichcode, Signatur und Kurztitel auf Bögen mit '.$perSheet.' Etiketten (63,5 × 38,1 mm, z. B. Avery L7160). Auf „Tatsächliche Größe“ drucken, ohne Seitenanpassung.'"
+        :lead="'Strichcode, Signatur und Kurztitel auf Bögen mit '.$perSheet.' Etiketten (70 × 36 mm, z. B. Avery Zweckform 3490). Auf „Tatsächliche Größe“ drucken, ohne Seitenanpassung.'"
     />
 
     <div class="bc-context-actions">
         <a href="{{ route('pos.catalog.index') }}">← Zurück zur Katalogpflege</a>
         <a href="{{ route('pos.labels.copies', ['neu' => 1]) }}">Zuletzt erfasste Exemplare</a>
+        <a href="{{ route('pos.labels.stock') }}"><strong>Etiketten auf Vorrat drucken</strong></a>
     </div>
 
     @if ($errors->any())

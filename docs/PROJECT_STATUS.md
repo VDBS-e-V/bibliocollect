@@ -205,6 +205,12 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Etiketten auf Vorrat, Format 70 × 36 mm (v0.39.0, Issue 9)
+
+- **Format:** Alle Exemplar-Etiketten gehen jetzt auf Bögen mit 3 × 8 = **24 Etiketten (70 × 36 mm)**, weißer Hintergrund (Avery Zweckform 3490 oder gleichwertig), vorher 21 je Bogen. Auf der Druckseite gibt es einen Feinabgleich (rechts/unten in Millimetern) und die Wahl des ersten freien Platzes.
+- **Etiketten auf Vorrat** (`/betrieb/etiketten/vorrat`, Recht `catalog.manage`): Inventarnummern im Voraus drucken (Vorlauf), mit Strichcode und Nummer. **Prüfung:** Nummern, die schon einem Exemplar gehören, werden nie gedruckt; Nummern, die schon einmal auf Vorrat gedruckt wurden, werden übersprungen (Neudruck nur auf ausdrücklichen Wunsch). Die Reihe läuft dadurch lückenlos weiter, die Seite zeigt vor dem Druck, was übersprungen wird. Gedruckte Nummern merkt sich `catalog_printed_labels`; höchstens 480 (20 Bögen) je Druck.
+- **Einmalige Option „Lücken der laufenden Reihe füllen“:** Zwischen zwei Nummern (Vorschlag: niedrigste bis höchste vergebene) findet das System alle Nummern, die noch keinem Exemplar gehören, und druckt dafür Etiketten. Die Grenzen muss man auf die echte laufende Reihe stellen, ein Ausreißer wie `1234567` im Bestand verfälscht sonst den Bereich.
+
 ### GitHub-Issues 3 bis 8 (v0.38.0)
 
 - **#5 Interne Suche lädt direkt:** Die Katalogpflege zeigt ohne Suchbegriff gleich die Titel (A–Z, mit Seitenwahl); Suchen und Filter schränken ein.

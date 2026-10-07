@@ -8,10 +8,10 @@ use App\Modules\Catalog\Models\Copy;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-/** Etiketten für Exemplare: Strichcode, Signatur und Kurztitel auf Bögen mit 3 × 7 Etiketten (63,5 × 38,1 mm). */
+/** Etiketten für Exemplare: Strichcode, Signatur und Kurztitel auf Bögen mit 3 × 8 Etiketten (70 × 36 mm). */
 final class CopyLabelController
 {
-    public const PER_SHEET = 21;
+    public const PER_SHEET = 24;
 
     public function index(Request $request): Response
     {
