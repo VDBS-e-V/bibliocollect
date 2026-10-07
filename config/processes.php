@@ -3,65 +3,95 @@
 declare(strict_types=1);
 
 /*
- * Alle Vorgänge des Bibliotheksbetriebs, nach Aufgaben gruppiert. Die Seite „Alle Vorgänge“ zeigt nur, was die
- * angemeldete Person darf. Die Hauptnavigation enthält die wichtigsten davon (config/navigation.php).
+ * Alle Vorgänge der Bibliothek in zwei getrennten Bereichen: „Betrieb“ ist das, was am Ausleihplatz täglich passiert,
+ * „Verwaltung“ ist Einrichten, Pflegen und Auswerten. Die Seite „Alle Vorgänge“ zeigt nur, was die angemeldete Person
+ * darf. Die Hauptnavigation enthält die wichtigsten Vorgänge (config/navigation.php).
  */
 return [
-    'groups' => [
+    'areas' => [
         [
-            'title' => 'Täglicher Betrieb',
-            'items' => [
-                ['label' => 'Ausleihe und Rückgabe', 'text' => 'Person oder Ausweis scannen, Medien ausleihen, verlängern und zurücknehmen, Beleg drucken oder mailen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
-                ['label' => 'Rückgabe ohne Person', 'text' => 'Zurückgebrachte Medien nacheinander scannen und gemeinsam bestätigen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
-                ['label' => 'Vormerkungen bearbeiten', 'text' => 'Zurückgelegte Medien zur Abholung und die Warteschlangen im Blick.', 'route' => 'pos.reservations.index', 'permission' => 'circulation.manage'],
-                ['label' => 'Buchwünsche bearbeiten', 'text' => 'Wünsche von Leser:innen ansehen, annehmen, bestellen oder ablehnen.', 'route' => 'pos.wishes.index', 'permission' => 'wishes.manage'],
-                ['label' => 'Überfällige Medien', 'text' => 'Klassenlisten mit überfälligen Ausleihen zum Weitergeben an die Klassenleitungen.', 'route' => 'pos.reports.class-loans', 'permission' => 'circulation.reports'],
+            'key' => 'betrieb',
+            'title' => 'Betrieb',
+            'lead' => 'Was am Ausleihplatz und im Katalog täglich gebraucht wird.',
+            'groups' => [
+                [
+                    'title' => 'Ausleihe',
+                    'items' => [
+                        ['label' => 'Ausleihe und Rückgabe', 'text' => 'Person oder Ausweis scannen, Medien ausleihen, verlängern und zurücknehmen, Beleg drucken oder mailen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
+                        ['label' => 'Rückgabe ohne Person', 'text' => 'Zurückgebrachte Medien nacheinander scannen und gemeinsam bestätigen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
+                        ['label' => 'Vormerkungen bearbeiten', 'text' => 'Zurückgelegte Medien zur Abholung und die Warteschlangen im Blick.', 'route' => 'pos.reservations.index', 'permission' => 'circulation.manage'],
+                        ['label' => 'Buchwünsche bearbeiten', 'text' => 'Wünsche von Leser:innen ansehen, annehmen, bestellen oder ablehnen.', 'route' => 'pos.wishes.index', 'permission' => 'wishes.manage'],
+                        ['label' => 'Überfällige Medien', 'text' => 'Klassenlisten mit überfälligen Ausleihen zum Weitergeben an die Klassenleitungen.', 'route' => 'pos.reports.class-loans', 'permission' => 'circulation.reports'],
+                    ],
+                ],
+                [
+                    'title' => 'Ausweise und Personen',
+                    'items' => [
+                        ['label' => 'Ausweis registrieren', 'text' => 'Einen neuen Ausweis am Ausleihplatz scannen und einer Person zuordnen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
+                        ['label' => 'Ausweise klassenweise ausgeben', 'text' => 'Klasse wählen und die Ausweise nacheinander neben den Namen scannen; zeigt auch, wer noch keinen hat.', 'route' => 'pos.labels.cards.issue', 'permission' => 'circulation.manage'],
+                        ['label' => 'Ausweis verloren oder ersetzen', 'text' => 'Ausleihkonto öffnen und im Abschnitt „Ausweise“ sperren oder einen neuen ausstellen.', 'route' => 'pos.patrons.index', 'permission' => 'patrons.lookup'],
+                        ['label' => 'Ausleihkonto suchen', 'text' => 'Personen nach Name, Klasse oder Bibliotheksnummer finden.', 'route' => 'pos.patrons.index', 'permission' => 'patrons.lookup'],
+                    ],
+                ],
+                [
+                    'title' => 'Katalog',
+                    'items' => [
+                        ['label' => 'Medium erfassen', 'text' => 'Neuzugang per ISBN oder Titel aufnehmen, Exemplar anlegen, Etikett drucken.', 'route' => 'pos.catalog.intake.identify', 'permission' => 'catalog.manage'],
+                        ['label' => 'Katalog suchen und pflegen', 'text' => 'Titel, Ausgaben und Exemplare ausführlich recherchieren und bearbeiten.', 'route' => 'pos.catalog.index', 'permission' => 'catalog.manage'],
+                        ['label' => 'Metadaten prüfen', 'text' => 'Fehlerhafte und lückenhafte Katalogdaten mit Vorschlägen durchgehen.', 'route' => 'pos.catalog.quality.index', 'permission' => 'catalog.manage'],
+                        ['label' => 'Etiketten drucken', 'text' => 'Exemplar-Etiketten mit Strichcode und Signatur auf Etikettenbögen.', 'route' => 'pos.labels.copies', 'permission' => 'catalog.manage'],
+                        ['label' => 'Öffentlichen Katalog öffnen', 'text' => 'So sehen Leser:innen den Katalog.', 'route' => 'public.catalog.index', 'permission' => null],
+                    ],
+                ],
+                [
+                    'title' => 'Hilfe',
+                    'items' => [
+                        ['label' => 'Anleitungen', 'text' => 'Schritt-für-Schritt-Hinweise für Ausleihe, Katalog und Verwaltung.', 'route' => 'pos.help', 'permission' => 'surface.pos.access'],
+                    ],
+                ],
             ],
         ],
         [
-            'title' => 'Ausweise und Ausleihkonten',
-            'items' => [
-                ['label' => 'Ausweis registrieren', 'text' => 'Einen neuen Ausweis am Ausleihplatz scannen und einer Person zuordnen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
-                ['label' => 'Ausweise klassenweise ausgeben', 'text' => 'Klasse wählen und die Ausweise nacheinander neben den Namen scannen; zeigt auch, wer noch keinen hat.', 'route' => 'pos.labels.cards.issue', 'permission' => 'circulation.manage'],
-                ['label' => 'Ausweis verloren oder ersetzen', 'text' => 'Ausleihkonto öffnen und im Abschnitt „Ausweise“ sperren oder einen neuen ausstellen.', 'route' => 'pos.patrons.index', 'permission' => 'patrons.lookup'],
-                ['label' => 'Ausleihkonto suchen', 'text' => 'Personen nach Name, Klasse oder Bibliotheksnummer finden.', 'route' => 'pos.patrons.index', 'permission' => 'patrons.lookup'],
-                ['label' => 'Ausleihkonto anlegen', 'text' => 'Eine einzelne Person neu aufnehmen.', 'route' => 'pos.patrons.create', 'permission' => 'patrons.manage'],
-                ['label' => 'Ausleihkonten importieren', 'text' => 'Schüler- und Lehrerlisten aus einer Datei einlesen und vor dem Übernehmen prüfen.', 'route' => 'pos.patrons.import.create', 'permission' => 'patrons.manage'],
-                ['label' => 'Ausweise erzeugen und drucken', 'text' => 'Chargen mit Zufallsnummern anlegen, Bögen drucken, Nummern als Liste exportieren.', 'route' => 'pos.labels.cards', 'permission' => 'patrons.manage'],
-                ['label' => 'Motive der Ausweise', 'text' => 'Gestaltung der Vorder- und Rückseiten hochladen und ein- oder ausschalten.', 'route' => 'pos.labels.cards.designs', 'permission' => 'patrons.manage'],
-            ],
-        ],
-        [
-            'title' => 'Katalog und Bestand',
-            'items' => [
-                ['label' => 'Medium erfassen', 'text' => 'Neuzugang per ISBN oder Titel aufnehmen, Exemplar anlegen, Etikett drucken.', 'route' => 'pos.catalog.intake.identify', 'permission' => 'catalog.manage'],
-                ['label' => 'Katalog suchen und pflegen', 'text' => 'Titel, Ausgaben und Exemplare ausführlich recherchieren und bearbeiten.', 'route' => 'pos.catalog.index', 'permission' => 'catalog.manage'],
-                ['label' => 'Metadaten prüfen', 'text' => 'Fehlerhafte und lückenhafte Katalogdaten mit Vorschlägen durchgehen.', 'route' => 'pos.catalog.quality.index', 'permission' => 'catalog.manage'],
-                ['label' => 'Katalog importieren', 'text' => 'Bestandsdaten aus einer Datei einlesen.', 'route' => 'pos.catalog.import.create', 'permission' => 'catalog.import'],
-                ['label' => 'Etiketten drucken', 'text' => 'Exemplar-Etiketten mit Strichcode und Signatur auf Etikettenbögen.', 'route' => 'pos.labels.copies', 'permission' => 'catalog.manage'],
-                ['label' => 'Öffentlichen Katalog öffnen', 'text' => 'So sehen Leser:innen den Katalog.', 'route' => 'public.catalog.index', 'permission' => null],
-            ],
-        ],
-        [
-            'title' => 'Auswertungen',
-            'items' => [
-                ['label' => 'Statistik', 'text' => 'Ausleihen, beliebte Titel, Klassen, Medientypen und Bestand für einen Zeitraum; Export und Druck.', 'route' => 'pos.statistics', 'permission' => 'statistics.view'],
-            ],
-        ],
-        [
+            'key' => 'verwaltung',
             'title' => 'Verwaltung',
-            'items' => [
-                ['label' => 'Schuljahreswechsel', 'text' => 'Klassen weiterführen, Abgänge beenden, neues Schuljahr aktivieren.', 'route' => 'administration.transition.show', 'permission' => 'school.manage'],
-                ['label' => 'Schuljahre und Klassen', 'text' => 'Schuljahre, Klassen und Klassenleitungen pflegen.', 'route' => 'administration.school.index', 'permission' => 'school.manage'],
-                ['label' => 'Öffnungszeiten und Schließtage', 'text' => 'Öffnungszeiten je Wochentag und Ferien oder Schließtage.', 'route' => 'administration.calendar.index', 'permission' => 'school.manage'],
-                ['label' => 'Informationsseiten', 'text' => 'Impressum, Datenschutz und Barrierefreiheit bearbeiten.', 'route' => 'administration.pages.index', 'permission' => 'content.manage'],
-                ['label' => 'Protokoll', 'text' => 'Wer hat wann was geändert.', 'route' => 'administration.audit.index', 'permission' => 'audit.view'],
-            ],
-        ],
-        [
-            'title' => 'Hilfe',
-            'items' => [
-                ['label' => 'Anleitungen', 'text' => 'Schritt-für-Schritt-Hinweise für Ausleihe, Katalog und Verwaltung.', 'route' => 'pos.help', 'permission' => 'surface.pos.access'],
+            'lead' => 'Einrichten, Pflegen, Auswerten und Nachweisen. Wird seltener gebraucht und ist nur für Mitarbeiter:innen und Verwaltung.',
+            'groups' => [
+                [
+                    'title' => 'Ausleihkonten und Ausweise',
+                    'items' => [
+                        ['label' => 'Ausleihkonto anlegen', 'text' => 'Eine einzelne Person neu aufnehmen.', 'route' => 'pos.patrons.create', 'permission' => 'patrons.manage'],
+                        ['label' => 'Ausleihkonten importieren', 'text' => 'Schüler- und Lehrerlisten aus einer Datei einlesen und vor dem Übernehmen prüfen.', 'route' => 'pos.patrons.import.create', 'permission' => 'patrons.manage'],
+                        ['label' => 'Ausweise erzeugen und drucken', 'text' => 'Chargen mit Zufallsnummern anlegen, Bögen drucken, Nummern als Liste exportieren.', 'route' => 'pos.labels.cards', 'permission' => 'patrons.manage'],
+                        ['label' => 'Motive der Ausweise', 'text' => 'Gestaltung der Vorder- und Rückseiten hochladen und ein- oder ausschalten.', 'route' => 'pos.labels.cards.designs', 'permission' => 'patrons.manage'],
+                    ],
+                ],
+                [
+                    'title' => 'Bestand',
+                    'items' => [
+                        ['label' => 'Katalog importieren', 'text' => 'Bestandsdaten aus einer Datei einlesen.', 'route' => 'pos.catalog.import.create', 'permission' => 'catalog.import'],
+                    ],
+                ],
+                [
+                    'title' => 'Auswertungen',
+                    'items' => [
+                        ['label' => 'Statistik', 'text' => 'Ausleihen, beliebte Titel, Klassen, Medientypen und Bestand für einen Zeitraum; Export und Druck.', 'route' => 'pos.statistics', 'permission' => 'statistics.view'],
+                        ['label' => 'Protokoll', 'text' => 'Wer hat wann was geändert.', 'route' => 'administration.audit.index', 'permission' => 'audit.view'],
+                    ],
+                ],
+                [
+                    'title' => 'Schule und Öffnungszeiten',
+                    'items' => [
+                        ['label' => 'Schuljahreswechsel', 'text' => 'Klassen weiterführen, Abgänge beenden, neues Schuljahr aktivieren.', 'route' => 'administration.transition.show', 'permission' => 'school.manage'],
+                        ['label' => 'Schuljahre und Klassen', 'text' => 'Schuljahre, Klassen und Klassenleitungen pflegen.', 'route' => 'administration.school.index', 'permission' => 'school.manage'],
+                        ['label' => 'Öffnungszeiten und Schließtage', 'text' => 'Öffnungszeiten je Wochentag und Ferien oder Schließtage.', 'route' => 'administration.calendar.index', 'permission' => 'school.manage'],
+                    ],
+                ],
+                [
+                    'title' => 'Inhalte',
+                    'items' => [
+                        ['label' => 'Informationsseiten', 'text' => 'Impressum, Datenschutz und Barrierefreiheit bearbeiten.', 'route' => 'administration.pages.index', 'permission' => 'content.manage'],
+                    ],
+                ],
             ],
         ],
     ],

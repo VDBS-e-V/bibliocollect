@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Surfaces\Portal\Http\Controllers;
 
 use App\Models\User;
+use App\Modules\Circulation\Enums\WishStatus;
+use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Circulation\Queries\ListOpenLoansForPatronQuery;
 use App\Modules\Circulation\Queries\ListOpenReservationsQuery;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
@@ -56,6 +58,10 @@ final class PortalHomeController
                 'openReservations' => $openReservations,
                 'renewalBlocks' => $renewalBlocks,
                 'reservationPositions' => $positions,
+                // Wünsche, die in den letzten 30 Tagen erfüllt wurden: ein freundlicher Hinweis auf der Übersicht.
+                'fulfilledWishes' => $patron instanceof Patron
+                    ? BookWish::query()->where('patron_id', $patron->getKey())->where('status', WishStatus::Fulfilled->value)->where('decided_at', '>=', now()->subDays(30))->orderByDesc('decided_at')->get()
+                    : collect(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }

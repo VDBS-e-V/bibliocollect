@@ -5,6 +5,7 @@
     $openReservations = $openReservations ?? collect();
     $renewalBlocks = $renewalBlocks ?? [];
     $reservationPositions = $reservationPositions ?? [];
+    $fulfilledWishes = $fulfilledWishes ?? collect();
 @endphp
 
 <x-app-shell surface="portal" title="Mein Konto" :preview="$preview">
@@ -17,6 +18,14 @@
     @if (session('portal_success'))
         <x-ui.alert variant="success" title="Erledigt">{{ session('portal_success') }}</x-ui.alert>
     @endif
+
+    @foreach ($fulfilledWishes as $wish)
+        <x-ui.alert variant="success" title="Dein Buchwunsch ist da">
+            „{{ $wish->title }}“ ist jetzt in der Bibliothek.
+            <a href="{{ route('public.catalog.index', ['q' => $wish->isbn ?: $wish->title]) }}">Im Katalog ansehen</a>
+            @if ($wish->answer) <span>Anmerkung: {{ $wish->answer }}</span> @endif
+        </x-ui.alert>
+    @endforeach
 
     @if (session('portal_error'))
         <x-ui.alert variant="error" title="Nicht möglich">{{ session('portal_error') }}</x-ui.alert>

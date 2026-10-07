@@ -130,3 +130,18 @@
         grid-template-columns: 1fr;
     }
 }
+
+.bc-process-area {
+    margin-bottom: 2.5rem;
+    scroll-margin-top: 1rem;
+}
+
+.bc-process-area + .bc-process-area {
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border-strong);
+}
+
+.bc-process-group-title {
+    margin: 1.25rem 0 0.5rem;
+    font-size: 1.0625rem;
+}

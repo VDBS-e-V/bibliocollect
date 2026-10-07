@@ -170,10 +170,22 @@ it('shows a process oriented menu and a page with all processes', function (): v
     $home->assertSee('Ausleihe und Rückgabe')->assertSee('Ausweise ausgeben')->assertSee('Buchwünsche')->assertSee('Medium erfassen')->assertSee('Alle Vorgänge');
 
     $all = $this->actingAs($staff)->get(route('pos.processes'))->assertOk();
-    $all->assertSee('Täglicher Betrieb')->assertSee('Rückgabe ohne Person')->assertSee('Ausweise klassenweise ausgeben')->assertSee('Statistik')->assertSee('Metadaten prüfen')->assertDontSee('Schuljahreswechsel');
+    $all->assertSeeInOrder(['id="area-betrieb-heading"', 'Ausleihe und Rückgabe', 'Rückgabe ohne Person', 'Ausleihkonto suchen', 'id="area-verwaltung-heading"', 'Ausleihkonten importieren', 'Ausweise erzeugen und drucken', 'Statistik'], false);
+    $all->assertSee('Rückgabe ohne Person')->assertSee('Ausweise klassenweise ausgeben')->assertSee('Statistik')->assertSee('Metadaten prüfen')->assertDontSee('Schuljahreswechsel');
 
     $this->actingAs(wishUser('management'))->get(route('pos.processes'))->assertSee('Schuljahreswechsel')->assertSee('Informationsseiten');
 
     $basic = $this->actingAs(wishUser('student_ag_basic'))->get(route('pos.processes'))->assertOk();
+    $basic->assertDontSee('area-verwaltung-heading', false);
     $basic->assertSee('Hilfe')->assertDontSee('Metadaten prüfen')->assertDontSee('Ausweise erzeugen')->assertDontSee('Buchwünsche bearbeiten');
+});
+
+it('points readers to fulfilled wishes on their overview', function (): void {
+    $patron = wishPatron('W-9');
+    $user = wishUser('student', $patron);
+    BookWish::query()->create(['patron_id' => $patron->getKey(), 'title' => 'Endlich da', 'status' => WishStatus::Fulfilled, 'decided_at' => now()->subDays(2)]);
+    BookWish::query()->create(['patron_id' => $patron->getKey(), 'title' => 'Schon lange her', 'status' => WishStatus::Fulfilled, 'decided_at' => now()->subDays(60)]);
+    BookWish::query()->create(['patron_id' => $patron->getKey(), 'title' => 'Noch offen', 'status' => WishStatus::Ordered, 'decided_at' => now()]);
+
+    $this->actingAs($user)->get(route('portal.home'))->assertOk()->assertSee('Dein Buchwunsch ist da')->assertSee('Endlich da')->assertDontSee('Schon lange her')->assertDontSee('Noch offen');
 });
