@@ -8,6 +8,7 @@ use App\Foundation\Models\SystemErrorEvent;
 use App\Foundation\Support\SystemErrorLog;
 use App\Foundation\Support\SystemHealth;
 use App\Models\User;
+use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Identity\Actions\AssignRoleAction;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\QueryException;
@@ -205,4 +206,50 @@ it('prunes old error entries', function (): void {
     SystemErrorEvent::query()->create(['fingerprint' => 'b', 'class' => 'Y', 'message' => 'neu', 'first_seen_at' => now()->subDays(2), 'last_seen_at' => now()->subDays(2)]);
 
     expect(app(SystemErrorLog::class)->prune(30))->toBe(1)->and(SystemErrorEvent::query()->pluck('message')->all())->toBe(['neu']);
+});
+
+it('lists the scheduled tasks on the system page and runs one of them once on demand', function (): void {
+    $admin = healthUser('technical_admin');
+    SystemErrorEvent::query()->create([
+        'fingerprint' => str_repeat('b', 64), 'kind' => 'request', 'class' => RuntimeException::class, 'message' => 'Alt',
+        'occurrences' => 1, 'first_seen_at' => now()->subDays(40), 'last_seen_at' => now()->subDays(40),
+    ]);
+
+    $this->actingAs($admin)->get(route('administration.system.index'))
+        ->assertOk()
+        ->assertSee('Zeitplan-Aufgaben')
+        ->assertSee('reminders:send')
+        ->assertSee('backup:database')
+        ->assertSee('Cron-Lauf jetzt auslösen');
+
+    $this->post(route('administration.system.run-job', ['job' => 'system:prune-errors']))
+        ->assertRedirect(route('administration.system.index'))
+        ->assertSessionHas('system_success', static fn (string $text): bool => str_contains($text, 'system:prune-errors') && str_contains($text, 'durchgelaufen'));
+
+    // Die Aufgabe hat wirklich gearbeitet und der Lauf steht im Protokoll.
+    expect(SystemErrorEvent::query()->where('message', 'Alt')->exists())->toBeFalse();
+    expect(AuditEvent::query()->where('action', 'system.job.run')->count())->toBe(1);
+});
+
+it('runs a cron pass from the system page and leaves the heartbeat', function (): void {
+    $admin = healthUser('technical_admin');
+
+    $this->actingAs($admin)->post(route('administration.system.run-cron'))
+        ->assertRedirect(route('administration.system.index'))
+        ->assertSessionHas('system_success');
+
+    expect(Cache::get(CronCommand::HEARTBEAT_KEY))->not->toBeNull();
+    expect(AuditEvent::query()->where('action', 'system.cron.run')->count())->toBe(1);
+});
+
+it('rejects unknown tasks and keeps the task buttons away from other roles', function (): void {
+    $admin = healthUser('technical_admin');
+
+    $this->actingAs($admin)->post(route('administration.system.run-job', ['job' => 'gibt:es-nicht']))->assertNotFound();
+    $this->post(route('administration.system.run-job', ['job' => 'rm -rf']))->assertNotFound();
+
+    foreach (['staff', 'student_ag_basic', 'teacher'] as $role) {
+        $this->actingAs(healthUser($role))->post(route('administration.system.run-job', ['job' => 'reminders:send']))->assertForbidden();
+        $this->actingAs(healthUser($role))->post(route('administration.system.run-cron'))->assertForbidden();
+    }
 });

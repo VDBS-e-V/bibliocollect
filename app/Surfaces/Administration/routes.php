@@ -40,6 +40,8 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
 
     Route::middleware('permission:system.view')->group(function (): void {
         Route::get('/verwaltung/systemzustand', [SystemHealthController::class, 'index'])->name('administration.system.index');
+        Route::post('/verwaltung/systemzustand/cron', [SystemHealthController::class, 'runCron'])->middleware('throttle:6,1')->name('administration.system.run-cron');
+        Route::post('/verwaltung/systemzustand/aufgaben/{job}', [SystemHealthController::class, 'runJob'])->where('job', '[a-z0-9:_\-]+')->middleware('throttle:10,1')->name('administration.system.run-job');
         Route::post('/verwaltung/systemzustand/testmeldung', [SystemHealthController::class, 'testAlert'])->middleware('throttle:5,1')->name('administration.system.test-alert');
     });
 

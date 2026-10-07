@@ -42,6 +42,34 @@
         </table>
     </section>
 
+    <section class="bc-content-section" aria-labelledby="jobs-heading">
+        <div class="bc-section-heading"><h2 id="jobs-heading">Zeitplan-Aufgaben</h2></div>
+        <p class="bc-section-copy">Diese Aufgaben laufen automatisch über den Cron. Hier kannst du jede einzelne <strong>einmalig sofort</strong> ausführen, zum Beispiel wenn der Cron nicht läuft. Das ändert den Zeitplan nicht. Das Ergebnis erscheint oben, ein Eintrag im Protokoll hält fest, wer es ausgelöst hat.</p>
+        <table class="bc-calendar-table">
+            <thead><tr><th scope="col">Aufgabe</th><th scope="col">Was sie tut</th><th scope="col">Nächster Lauf</th><th scope="col">Jetzt</th></tr></thead>
+            <tbody>
+                @foreach ($jobs as $job)
+                    <tr>
+                        <th scope="row"><code>{{ $job['name'] }}</code></th>
+                        <td>{{ $job['description'] }}</td>
+                        <td class="bc-tabular">{{ $job['next_run'] }}</td>
+                        <td>
+                            <form method="post" action="{{ route('administration.system.run-job', ['job' => $job['name']]) }}">
+                                @csrf
+                                <x-ui.button type="submit" variant="secondary" data-confirm="Die Aufgabe „{{ $job['name'] }}“ jetzt einmal ausführen?" aria-label="Aufgabe {{ $job['name'] }} jetzt einmal ausführen">Einmal ausführen</x-ui.button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <form method="post" action="{{ route('administration.system.run-cron') }}">
+            @csrf
+            <x-ui.button type="submit" variant="secondary" data-confirm="Einen Cron-Lauf jetzt auslösen (fällige Aufgaben und Warteschlange)?">Cron-Lauf jetzt auslösen</x-ui.button>
+        </form>
+        <p class="bc-section-copy">Der Cron-Lauf macht dasselbe wie der Cronjob: Er führt die gerade fälligen Aufgaben aus und arbeitet danach etwa 10 Sekunden lang die Warteschlange ab.</p>
+    </section>
+
     <section class="bc-content-section" aria-labelledby="alerts-heading">
         <div class="bc-section-heading"><h2 id="alerts-heading">Meldungen</h2></div>
         @if ($alertAddress)
