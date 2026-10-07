@@ -1,0 +1,47 @@
+.bc-card-designs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.bc-card-design {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+}
+
+.bc-card-design img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 85 / 54;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+}
+
+.bc-card-design div {
+    display: grid;
+    gap: 0.125rem;
+}
+
+.bc-card-design div span {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.bc-card-design--off img {
+    opacity: 0.4;
+}
+
+.bc-card-number {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+}

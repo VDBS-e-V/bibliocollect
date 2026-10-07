@@ -25,7 +25,7 @@
                 label="Ausweis oder Exemplar-Barcode scannen, oder Namen eingeben"
                 name="code"
                 :value="$term"
-                hint="Ausweis (Bibliotheksnummer): weiter zur Person. Barcode eines Exemplars: Rückgabe. Name: Personensuche."
+                hint="Ausweis: weiter zur Person (ein neuer Ausweis wird danach einer Person zugeordnet). Barcode eines Exemplars: Rückgabe. Name oder Bibliotheksnummer: Personensuche."
                 autocomplete="off"
                 autofocus
             />

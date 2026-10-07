@@ -7,11 +7,14 @@ namespace App\Modules\Patrons\Actions;
 use App\Foundation\Support\BusinessClock;
 use App\Models\User;
 use App\Modules\Identity\Actions\DisablePatronOnlineAccountAction;
+use App\Modules\Patrons\Enums\CardBlockReason;
+use App\Modules\Patrons\Enums\CardStatus;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Events\PatronDeparted;
 use App\Modules\Patrons\Exceptions\PatronStatusStateConflict;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\Patrons\Models\PatronAccountLinkToken;
+use App\Modules\Patrons\Models\PatronCard;
 use App\Modules\Patrons\Models\PatronStatusEvent;
 use App\Modules\Patrons\Services\PatronDepartureGuards;
 use Carbon\CarbonImmutable;
@@ -57,6 +60,11 @@ final readonly class DepartPatronAction
                 'leaving_on' => $effectiveDate->toDateString(),
                 'school_class_id' => null,
             ])->save();
+
+            PatronCard::query()
+                ->where('patron_id', $lockedPatron->getKey())
+                ->where('status', CardStatus::Assigned->value)
+                ->update(['status' => CardStatus::Blocked->value, 'block_reason' => CardBlockReason::Withdrawn->value, 'blocked_at' => $now]);
 
             PatronAccountLinkToken::query()
                 ->where('patron_id', $lockedPatron->getKey())

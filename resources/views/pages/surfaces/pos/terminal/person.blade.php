@@ -33,6 +33,26 @@
         <span>{{ $openLoans->count() }}{{ $maxOpenLoans > 0 ? ' von '.$maxOpenLoans : '' }} Medien ausgeliehen</span>
     </div>
 
+    <section class="bc-work-panel" aria-labelledby="terminal-card-heading">
+        <div class="bc-section-heading"><h2 id="terminal-card-heading">Ausweis</h2></div>
+        @if ($card)
+            <p class="bc-section-copy">Zugeordnet: <span class="bc-tabular">{{ $card->number }}</span>@if ($card->assigned_at) (seit {{ $card->assigned_at->format('d.m.Y') }})@endif</p>
+        @else
+            <p class="bc-section-copy">Dieser Person ist noch kein Ausweis zugeordnet.</p>
+        @endif
+        <form method="post" action="{{ route('pos.terminal.card.assign') }}" class="bc-pos-scan">
+            @csrf
+            :label="$card ? 'Neuen Ausweis zuordnen (der alte wird gesperrt)' : 'Ausweis zuordnen'" name="code" id="card-code" autocomplete="off" hint="Ausweis scannen oder die Nummer eingeben." />
+            <x-ui.button type="submit" variant="secondary">Zuordnen</x-ui.button>
+        </form>
+        @if ($card)
+            <form method="post" action="{{ route('pos.terminal.card.lost') }}">
+                @csrf
+                <button type="submit" class="bc-intake-linkbutton">Ausweis ist verloren: sperren</button>
+            </form>
+        @endif
+    </section>
+
     <div class="bc-terminal">
         <section class="bc-work-panel" aria-labelledby="terminal-loans-heading">
             <div class="bc-section-heading bc-section-heading--with-meta">

@@ -9,6 +9,7 @@ use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\Patrons\Models\PatronBlockEvent;
+use App\Modules\Patrons\Models\PatronCard;
 use App\Modules\Patrons\Models\PatronStatusEvent;
 use App\Modules\Reminders\Models\ReminderLog;
 
@@ -72,6 +73,16 @@ final class PatronDataExport
                     'status' => $reservation->status->value,
                     'vorgemerkt_am' => $reservation->requested_at->toIso8601String(),
                     'abgeschlossen_am' => $reservation->closed_at?->toIso8601String(),
+                ])->all(),
+            'ausweise' => PatronCard::query()
+                ->where('patron_id', $patron->getKey())
+                ->orderBy('assigned_at')
+                ->get()
+                ->map(static fn (PatronCard $card): array => [
+                    'nummer' => $card->number,
+                    'status' => $card->status->value,
+                    'zugeordnet_am' => $card->assigned_at?->toIso8601String(),
+                    'gesperrt_am' => $card->blocked_at?->toIso8601String(),
                 ])->all(),
             'sperren' => PatronBlockEvent::query()
                 ->where('patron_id', $patron->getKey())

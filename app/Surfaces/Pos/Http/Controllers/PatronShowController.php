@@ -12,6 +12,7 @@ use App\Modules\Circulation\Services\ReservationBlockChecker;
 use App\Modules\Identity\Queries\FindUserByPatronIdQuery;
 use App\Modules\Identity\Queries\HasUserByPatronIdQuery;
 use App\Modules\Identity\Services\StudentAgRoleRegistry;
+use App\Modules\Patrons\Models\PatronCard;
 use App\Modules\Patrons\Queries\FindPatronQuery;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
@@ -79,6 +80,7 @@ final class PatronShowController
                 'renewalBlocks' => $renewalBlocks,
                 'openReservations' => $openReservations,
                 'reservationPositions' => $reservationPositions,
+                'cards' => PatronCard::query()->where('patron_id', $patron->getKey())->orderByDesc('assigned_at')->limit(20)->get(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }

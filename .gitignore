@@ -4,6 +4,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/card-designs
 /storage/*.key
 /storage/pail
 /vendor

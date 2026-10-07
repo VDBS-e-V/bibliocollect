@@ -10,7 +10,10 @@ use App\Modules\Circulation\Actions\ReturnLoanAction;
 use App\Modules\Circulation\Exceptions\LoanStateConflict;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Services\ReservationQueueService;
+use App\Modules\Patrons\Enums\CardStatus;
 use App\Modules\Patrons\Models\Patron;
+use App\Modules\Patrons\Models\PatronCard;
+use App\Modules\Patrons\Services\PatronCardLookup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -20,7 +23,7 @@ use Illuminate\Http\Request;
  */
 final class PosScanController
 {
-    public function __invoke(Request $request, ReturnLoanAction $return, ReservationQueueService $queue): RedirectResponse
+    public function __invoke(Request $request, ReturnLoanAction $return, ReservationQueueService $queue, PatronCardLookup $cards): RedirectResponse
     {
         $code = trim((string) $request->validate(['code' => ['required', 'string', 'max:80']], ['code.required' => 'Bitte einen Code scannen oder eingeben.'])['code']);
         $actor = $request->user();
@@ -43,6 +46,25 @@ final class PosScanController
             }
 
             return redirect()->route('pos.home')->with('workspace_success', "Rückgabe von {$copy->barcode} erfasst.".$queue->holdNotice($copy));
+        }
+
+        $card = $cards->find($code);
+
+        if ($card instanceof PatronCard) {
+            if ($card->status === CardStatus::Blocked) {
+                return redirect()->route('pos.home')->with('workspace_error', 'Dieser Ausweis ist gesperrt'.($card->block_reason ? ' ('.$card->block_reason->label().')' : '').'.');
+            }
+
+            if ($card->status === CardStatus::Assigned && $card->patron instanceof Patron && $card->patron->isActive()) {
+                $request->session()->forget('pos.pending_card');
+                $request->session()->put('pos.terminal', ['patron_id' => (string) $card->patron->getKey(), 'items' => []]);
+
+                return redirect()->route('pos.terminal.person');
+            }
+
+            $request->session()->put('pos.pending_card', $card->number);
+
+            return redirect()->route('pos.terminal.card.register');
         }
 
         $patron = Patron::query()->whereRaw('lower(library_number) = ?', [mb_strtolower($code)])->first();

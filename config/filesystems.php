@@ -57,6 +57,16 @@ return [
             'report' => false,
         ],
 
+        // Hochgeladene Ausweismotive liegen direkt in public/card-designs (ohne Symlink).
+        'card_designs' => [
+            'driver' => 'local',
+            'root' => public_path('card-designs'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/card-designs',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

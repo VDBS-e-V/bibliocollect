@@ -33,7 +33,7 @@ New-Item -ItemType Directory -Path $stage | Out-Null
 
 $excludeDirs = @('.git', '.github', '.idea', '.vscode', 'node_modules', 'vendor', 'tests', 'dist', 'docs\altsystem',
     'storage\logs', 'storage\app\backups', 'storage\app\public', 'storage\app\private', 'storage\framework',
-    'public\covers', 'public\storage', 'bootstrap\cache')
+    'public\covers', 'public\card-designs', 'public\storage', 'bootstrap\cache')
 $excludeFiles = @('.env', '*.sqlite', '*.patch', '.phpunit.result.cache', 'auth.json')
 
 robocopy $root $stage /E /NFL /NDL /NJH /NJS /NP `

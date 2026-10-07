@@ -9,9 +9,6 @@ use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Identity\Actions\AssignRoleAction;
-use App\Modules\Patrons\Enums\PatronKind;
-use App\Modules\Patrons\Enums\PatronStatus;
-use App\Modules\Patrons\Models\Patron;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -77,22 +74,6 @@ it('lists copies and prints a label sheet that respects the first free position'
         ->and($html)->toContain('Strichcode LB-001');
 
     $this->actingAs($staff)->post(route('pos.labels.copies.print'), ['copies' => []])->assertSessionHasErrors('copies');
-});
-
-it('prints library cards for active patrons only', function (): void {
-    $staff = labelUser('staff');
-
-    $active = Patron::query()->create(['library_number' => 'S-LB-1', 'kind' => PatronKind::Student, 'status' => PatronStatus::Active, 'first_name' => 'Ausweis', 'last_name' => 'Aktiv', 'birth_date' => '2012-01-01']);
-    $departed = Patron::query()->create(['library_number' => 'S-LB-2', 'kind' => PatronKind::Student, 'status' => PatronStatus::Departed, 'first_name' => 'Ausweis', 'last_name' => 'Weg', 'birth_date' => '2012-01-01', 'leaving_on' => '2026-01-01']);
-
-    $this->actingAs($staff)->get(route('pos.labels.cards'))->assertOk()->assertSee('Aktiv')->assertDontSee('Weg,');
-
-    $html = $this->actingAs($staff)
-        ->post(route('pos.labels.cards.print'), ['patrons' => [(string) $active->getKey(), (string) $departed->getKey()]])
-        ->assertOk()
-        ->getContent();
-
-    expect($html)->toContain('Ausweis Aktiv')->not->toContain('Ausweis Weg')->toContain('Strichcode S-LB-1');
 });
 
 it('keeps labels and cards away from roles without the matching permission', function (): void {

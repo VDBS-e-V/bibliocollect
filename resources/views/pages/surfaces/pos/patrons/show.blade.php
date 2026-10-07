@@ -63,6 +63,70 @@
                 </dl>
             </section>
 
+            <section class="bc-content-section" aria-labelledby="cards-heading">
+                <div class="bc-section-heading bc-section-heading--with-meta">
+                    <h2 id="cards-heading">Ausweise</h2>
+                    <span>{{ $cards->where('status', \App\Modules\Patrons\Enums\CardStatus::Assigned)->count() }} aktiv</span>
+                </div>
+
+                @if ($cards->isEmpty())
+                    <p class="bc-section-copy">Dieser Person wurde noch kein Ausweis zugeordnet. Ausgeliehen werden kann trotzdem über den Namen oder die Bibliotheksnummer.</p>
+                @else
+                    <table class="bc-calendar-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nummer</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Zugeordnet</th>
+                                @can('circulation.manage')
+                                    <th scope="col"><span class="bc-visually-hidden">Sperren</span></th>
+                                @endcan
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($cards as $card)
+                                <tr>
+                                    <th scope="row" class="bc-tabular">{{ $card->number }}</th>
+                                    <td>{{ $card->status->label() }}@if ($card->block_reason) ({{ $card->block_reason->label() }}, {{ $card->blocked_at?->format('d.m.Y') }})@endif</td>
+                                    <td class="bc-tabular">{{ $card->assigned_at?->format('d.m.Y') ?? '—' }}</td>
+                                    @can('circulation.manage')
+                                        <td>
+                                            @if ($card->status === \App\Modules\Patrons\Enums\CardStatus::Assigned)
+                                                <form method="post" action="{{ route('pos.patrons.cards.block', ['patronId' => $patron->getKey(), 'cardId' => $card->getKey()]) }}" class="bc-audit-filter">
+                                                    @csrf
+                                                    <x-ui.select label="Grund" name="reason" id="block-reason-{{ $card->getKey() }}">
+                                                        <option value="lost">Verloren</option>
+                                                        <option value="defective">Defekt</option>
+                                                        <option value="withdrawn">Eingezogen</option>
+                                                    </x-ui.select>
+                                                    <x-ui.button type="submit" variant="secondary">Sperren</x-ui.button>
+                                                </form>
+                                            @endif
+                                        </td>
+                                    @endcan
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+
+                @can('circulation.manage')
+                    @if ($patron->isActive())
+                        <form method="post" action="{{ route('pos.patrons.cards.assign', ['patronId' => $patron->getKey()]) }}" class="bc-audit-filter">
+                            @csrf
+                            <x-ui.input label="Neuen Ausweis ausstellen (scannen oder Nummer eingeben)" name="number" id="new-card-number" autocomplete="off" />
+                            <x-ui.select label="Der bisherige Ausweis war" name="old_reason" id="old-card-reason">
+                                <option value="replaced">ersetzt (Normalfall)</option>
+                                <option value="lost">verloren</option>
+                                <option value="defective">defekt</option>
+                            </x-ui.select>
+                            <x-ui.button type="submit">Ausweis ausstellen</x-ui.button>
+                        </form>
+                        <p class="bc-section-copy">Der neue Ausweis ersetzt alle bisherigen aktiven Ausweise der Person; sie werden gesperrt. Nicht zugeordnete Ausweise stammen aus einer Charge (Ausleihkonten → Ausweise drucken).</p>
+                    @endif
+                @endcan
+            </section>
+
             @can('patrons.sensitive.view')
                 <section class="bc-content-section" aria-labelledby="sensitive-heading">
                     <div class="bc-section-heading">

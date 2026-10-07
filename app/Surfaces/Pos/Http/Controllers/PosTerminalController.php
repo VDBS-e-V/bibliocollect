@@ -16,8 +16,15 @@ use App\Modules\Circulation\Services\CirculationRuleEvaluator;
 use App\Modules\Circulation\Services\CounterTransactionService;
 use App\Modules\Circulation\Services\LoanPolicy;
 use App\Modules\Circulation\Services\ReservationBlockChecker;
+use App\Modules\Patrons\Actions\AssignPatronCardAction;
+use App\Modules\Patrons\Actions\BlockPatronCardAction;
+use App\Modules\Patrons\Enums\CardBlockReason;
+use App\Modules\Patrons\Enums\CardStatus;
 use App\Modules\Patrons\Enums\PatronStatus;
+use App\Modules\Patrons\Exceptions\PatronCardConflict;
 use App\Modules\Patrons\Models\Patron;
+use App\Modules\Patrons\Models\PatronCard;
+use App\Modules\Patrons\Services\PatronCardLookup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -35,11 +42,15 @@ final class PosTerminalController
 {
     private const SESSION_KEY = 'pos.terminal';
 
+    /** Ein gescannter, noch freier Ausweis wartet darauf, einer Person zugeordnet zu werden. */
+    private const PENDING_CARD = 'pos.pending_card';
+
     // ---- Bildschirm 1: Start -----------------------------------------------------------------------------------
 
     public function start(Request $request): Response|RedirectResponse
     {
         $draft = $this->draft($request);
+        $request->session()->forget(self::PENDING_CARD);
 
         if ($draft['patron_id'] !== null && $this->patron($draft) instanceof Patron) {
             return redirect()->route('pos.terminal.person');
@@ -67,10 +78,16 @@ final class PosTerminalController
     }
 
     /** Ein Scanfeld: Bibliotheksnummer (Person), Exemplar-Barcode (Rückgabe) oder ein Name zum Suchen. */
-    public function startScan(Request $request, CounterTransactionService $service): RedirectResponse
+    public function startScan(Request $request, CounterTransactionService $service, PatronCardLookup $cards): RedirectResponse
     {
         $code = trim((string) $request->validate(['code' => ['required', 'string', 'max:80']], ['code.required' => 'Bitte einen Ausweis oder Barcode scannen oder einen Namen eingeben.'])['code']);
         $draft = $this->draft($request);
+
+        $card = $cards->find($code);
+
+        if ($card instanceof PatronCard) {
+            return $this->scanCard($request, $draft, $card);
+        }
 
         $byNumber = Patron::query()->whereRaw('lower(library_number) = ?', [mb_strtolower($code)])->first();
 
@@ -103,6 +120,85 @@ final class PosTerminalController
         }
 
         return $this->activate($request, $this->draft($request), $patron);
+    }
+
+    /** @param  array{patron_id: ?string, items: list<array<string, mixed>>}  $draft */
+    private function scanCard(Request $request, array $draft, PatronCard $card): RedirectResponse
+    {
+        if ($card->status === CardStatus::Blocked) {
+            $request->session()->forget(self::PENDING_CARD);
+
+            return redirect()->route('pos.terminal')->with('terminal_error', 'Dieser Ausweis ist gesperrt'.($card->block_reason ? ' ('.$card->block_reason->label().')' : '').'. Bitte einen anderen verwenden.');
+        }
+
+        if ($card->status === CardStatus::Assigned && $card->patron instanceof Patron) {
+            $request->session()->forget(self::PENDING_CARD);
+
+            return $this->activate($request, $draft, $card->patron);
+        }
+
+        $request->session()->put(self::PENDING_CARD, $card->number);
+
+        return redirect()->route('pos.terminal.card.register');
+    }
+
+    /** Registrierung eines neuen Ausweises: Person suchen und auswählen. */
+    public function register(Request $request): Response|RedirectResponse
+    {
+        $number = $request->session()->get(self::PENDING_CARD);
+        $card = is_string($number) ? PatronCard::query()->where('number', $number)->first() : null;
+
+        if (! $card instanceof PatronCard || ! $card->status->isUnassigned()) {
+            $request->session()->forget(self::PENDING_CARD);
+
+            return redirect()->route('pos.terminal')->with('terminal_error', 'Der Ausweis ist nicht mehr frei. Bitte erneut scannen.');
+        }
+
+        $term = trim((string) $request->query('q', ''));
+
+        $results = $term !== ''
+            ? Patron::query()
+                ->with('schoolClass')
+                ->where('status', PatronStatus::Active->value)
+                ->where(static function ($query) use ($term): void {
+                    $like = '%'.$term.'%';
+                    $query->where('last_name', 'like', $like)->orWhere('first_name', 'like', $like)->orWhere('library_number', 'like', $like);
+                })
+                ->orderBy('last_name')
+                ->orderBy('first_name')
+                ->limit(15)
+                ->get()
+            : collect();
+
+        $current = PatronCard::query()
+            ->whereIn('patron_id', $results->pluck('id')->all())
+            ->where('status', CardStatus::Assigned->value)
+            ->pluck('number', 'patron_id')
+            ->all();
+
+        return response()
+            ->view('pages.surfaces.pos.terminal.card-register', ['card' => $card, 'term' => $term, 'results' => $results, 'current' => $current])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Ordnet den gescannten Ausweis der gewählten Person zu und öffnet deren Ausleihbildschirm. */
+    public function claimCard(Request $request): RedirectResponse
+    {
+        $id = (string) $request->validate(['patron_id' => ['required', 'string', 'max:40']])['patron_id'];
+        $number = $request->session()->get(self::PENDING_CARD);
+        $patron = Patron::query()->find($id);
+
+        if (! is_string($number)) {
+            return redirect()->route('pos.terminal')->with('terminal_error', 'Es wartet kein neuer Ausweis auf die Zuordnung. Bitte den Ausweis erneut scannen.');
+        }
+
+        if (! $patron instanceof Patron || $patron->status !== PatronStatus::Active) {
+            return redirect()->route('pos.terminal.card.register')->with('terminal_error', 'Diese Person gibt es nicht oder ihr Ausleihkonto ist nicht aktiv.');
+        }
+
+        $request->session()->forget(self::PENDING_CARD);
+
+        return $this->activate($request, $this->draft($request), $patron, $number);
     }
 
     // ---- Bildschirm 2: Person ----------------------------------------------------------------------------------
@@ -149,6 +245,7 @@ final class PosTerminalController
                 'renewable' => $renewable,
                 'queued' => $queued,
                 'maxOpenLoans' => $policy->maxOpenLoans($patron),
+                'card' => PatronCard::query()->where('patron_id', $patron->getKey())->where('status', CardStatus::Assigned->value)->first(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
@@ -211,6 +308,52 @@ final class PosTerminalController
         $request->session()->put(self::SESSION_KEY, $draft);
 
         return redirect()->route('pos.terminal.person');
+    }
+
+    /** Einen (neuen) Ausweis der Person am Bildschirm zuordnen; frühere Ausweise werden gesperrt. */
+    public function assignCard(Request $request, AssignPatronCardAction $assign): RedirectResponse
+    {
+        $number = trim((string) $request->validate(['code' => ['required', 'string', 'max:40']], ['code.required' => 'Bitte den Ausweis scannen oder die Nummer eingeben.'])['code']);
+        $patron = $this->patron($this->draft($request));
+
+        if (! $patron instanceof Patron) {
+            return redirect()->route('pos.terminal');
+        }
+
+        try {
+            $replaced = $assign->execute($number, $patron);
+        } catch (PatronCardConflict $exception) {
+            return redirect()->route('pos.terminal.person')->with('terminal_error', $exception->getMessage());
+        }
+
+        return redirect()->route('pos.terminal.person')->with('terminal_notice', 'Ausweis '.$number.' ist zugeordnet.'.($replaced > 0 ? ' Der frühere Ausweis wurde gesperrt.' : ''));
+    }
+
+    /** Ausweis verloren: sperren. Die Person bekommt danach sofort einen neuen. */
+    public function lostCard(Request $request, BlockPatronCardAction $block): RedirectResponse
+    {
+        $patron = $this->patron($this->draft($request));
+
+        if (! $patron instanceof Patron) {
+            return redirect()->route('pos.terminal');
+        }
+
+        $cards = PatronCard::query()->where('patron_id', $patron->getKey())->where('status', CardStatus::Assigned->value)->get();
+
+        foreach ($cards as $card) {
+            $block->execute($card, CardBlockReason::Lost);
+        }
+
+        return redirect()->route('pos.terminal.person')->with('terminal_notice', $cards->isEmpty()
+            ? 'Es ist kein Ausweis zugeordnet.'
+            : 'Der Ausweis ist gesperrt. Bitte jetzt einen neuen Ausweis scannen und zuordnen.');
+    }
+
+    public function cancelCard(Request $request): RedirectResponse
+    {
+        $request->session()->forget(self::PENDING_CARD);
+
+        return redirect()->route('pos.terminal');
     }
 
     // ---- gemeinsam --------------------------------------------------------------------------------------------
@@ -284,7 +427,7 @@ final class PosTerminalController
     }
 
     /** @param  array{patron_id: ?string, items: list<array<string, mixed>>}  $draft */
-    private function activate(Request $request, array $draft, Patron $patron): RedirectResponse
+    private function activate(Request $request, array $draft, Patron $patron, ?string $claimCard = null): RedirectResponse
     {
         if ($patron->status !== PatronStatus::Active) {
             return redirect()->route('pos.terminal')->with('terminal_error', 'Das Ausleihkonto ist nicht aktiv.');
@@ -300,11 +443,24 @@ final class PosTerminalController
             }
         }
 
+        $notices = [];
+
+        if ($claimCard !== null) {
+            try {
+                $replaced = app(AssignPatronCardAction::class)->execute($claimCard, $patron);
+                $notices[] = 'Ausweis '.$claimCard.' ist jetzt '.$patron->displayName().' zugeordnet.'.($replaced > 0 ? ' Der frühere Ausweis wurde gesperrt.' : '');
+            } catch (PatronCardConflict $exception) {
+                return redirect()->route('pos.terminal')->with('terminal_error', $exception->getMessage());
+            }
+        }
+
         $request->session()->put(self::SESSION_KEY, ['patron_id' => (string) $patron->getKey(), 'items' => $draft['items']]);
 
-        $notice = $patron->blocked_at !== null ? 'Achtung: Das Ausleihkonto ist gesperrt'.($patron->blocked_reason ? ' ('.$patron->blocked_reason.')' : '').'.' : null;
+        if ($patron->blocked_at !== null) {
+            $notices[] = 'Achtung: Das Ausleihkonto ist gesperrt'.($patron->blocked_reason ? ' ('.$patron->blocked_reason.')' : '').'.';
+        }
 
-        return redirect()->route('pos.terminal.person')->with('terminal_notice', $notice);
+        return redirect()->route('pos.terminal.person')->with('terminal_notice', $notices === [] ? null : implode(' ', $notices));
     }
 
     /** @param  array{patron_id: ?string, items: list<array<string, mixed>>}  $draft */

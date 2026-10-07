@@ -12,9 +12,12 @@ use App\Modules\Circulation\Enums\ReservationStatus;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\LoanTransaction;
 use App\Modules\Circulation\Models\Reservation;
+use App\Modules\Patrons\Enums\CardBlockReason;
+use App\Modules\Patrons\Enums\CardStatus;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\Patrons\Models\PatronBlockEvent;
+use App\Modules\Patrons\Models\PatronCard;
 use App\Modules\Patrons\Models\PatronStatusEvent;
 use App\Modules\Reminders\Models\ReminderLog;
 use Carbon\CarbonImmutable;
@@ -252,6 +255,14 @@ final readonly class AnonymizationService
                     'patron_id' => null,
                 ])->save();
             }
+
+            // Die Ausweisnummer bleibt für immer reserviert, verliert aber den Bezug zur Person.
+            PatronCard::query()->where('patron_id', $patron->getKey())->update([
+                'patron_id' => null,
+                'status' => CardStatus::Blocked->value,
+                'block_reason' => CardBlockReason::Withdrawn->value,
+                'blocked_at' => $this->clock->now(),
+            ]);
 
             $patron->forceFill([
                 'library_number' => self::MARKER.$patron->getKey(),

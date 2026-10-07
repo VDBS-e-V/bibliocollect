@@ -26,7 +26,8 @@ Unter **Metadaten prüfen** stehen Medien mit fehlenden oder fehlerhaften Angabe
 ## Ausleihkonten
 
 - **Neue Konten** legst du unter **Ausleihkonten → Neues Ausleihkonto** an oder importierst sie als Tabelle (CSV) mit Vorschau.
-- **Ausweise drucken:** unter Ausleihkonten „Ausweise drucken“, am besten klassenweise.
+- **Ausweise vorbereiten:** unter Ausleihkonten „Ausweise drucken“. Dort eine **Charge erzeugen** (zum Beispiel 50 Stück) und die **Vorderseiten** auf Avery Zweckform C32016 drucken (Einstellungen: A4, Maßstab 100 %, Ränder „Keine“). Für beidseitigen Druck danach die **Rückseiten**. Vorder- und Rückseiten bekommen zufällig verteilt eines der aktiven bunten Motive, voreingestellt gleichmäßig. Sind von einem Motiv zu viele übrig, kannst du die Prozentwerte vor dem Drucken einmalig ändern (zusammen 100 %). Eigene Motive lädst du unter „Motive der Ausweise“ hoch. Die Ausweise gehören noch niemandem; der Name wird von Hand eingetragen.
+- **Ausweis ausgeben:** am Ausleihplatz den neuen Ausweis scannen, dann die Person suchen und auswählen. Hatte die Person schon einen Ausweis, wird er automatisch gesperrt.
 - **Onlinekonto:** Im Ausleihkonto gibst du einen Einmalcode aus. Die Person aktiviert damit ihr Onlinekonto.
 - **Sperren:** Ein gesperrtes Konto kann nichts mehr ausleihen. Der Grund wird protokolliert.
 - **Ausscheiden:** geht nur, wenn nichts mehr ausgeliehen oder vorgemerkt ist.

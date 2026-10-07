@@ -15,9 +15,11 @@ use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
 use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
 use App\Surfaces\Pos\Http\Controllers\HelpController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
+use App\Surfaces\Pos\Http\Controllers\PatronAccountCardController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
 use App\Surfaces\Pos\Http\Controllers\PatronCardController;
+use App\Surfaces\Pos\Http\Controllers\PatronCardDesignController;
 use App\Surfaces\Pos\Http\Controllers\PatronCreateController;
 use App\Surfaces\Pos\Http\Controllers\PatronDataExportController;
 use App\Surfaces\Pos\Http\Controllers\PatronDepartureController;
@@ -136,7 +138,16 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
     Route::middleware('permission:patrons.manage')->group(function (): void {
         Route::get('/betrieb/ausweise', [PatronCardController::class, 'index'])->name('pos.labels.cards');
-        Route::post('/betrieb/ausweise', [PatronCardController::class, 'print'])->name('pos.labels.cards.print');
+        Route::get('/betrieb/ausweise/motive', [PatronCardDesignController::class, 'index'])->name('pos.labels.cards.designs');
+        Route::post('/betrieb/ausweise/motive', [PatronCardDesignController::class, 'store'])->name('pos.labels.cards.designs.store');
+        Route::post('/betrieb/ausweise/motive/{designId}/umschalten', [PatronCardDesignController::class, 'toggle'])->name('pos.labels.cards.designs.toggle');
+        Route::delete('/betrieb/ausweise/motive/{designId}', [PatronCardDesignController::class, 'destroy'])->name('pos.labels.cards.designs.destroy');
+        Route::get('/betrieb/ausweise/charge/{batch}', [PatronCardController::class, 'batch'])->whereNumber('batch')->name('pos.labels.cards.batch');
+        Route::post('/betrieb/ausweise/erzeugen', [PatronCardController::class, 'generate'])->name('pos.labels.cards.generate');
+        Route::post('/betrieb/ausweise/charge/{batch}/druck', [PatronCardController::class, 'print'])->whereNumber('batch')->name('pos.labels.cards.print');
+        Route::post('/betrieb/ausweise/charge/{batch}/export', [PatronCardController::class, 'export'])->whereNumber('batch')->name('pos.labels.cards.export');
+        Route::post('/betrieb/ausweise/charge/{batch}/verfuegbar', [PatronCardController::class, 'available'])->whereNumber('batch')->name('pos.labels.cards.available');
+        Route::post('/betrieb/ausweise/{cardId}/sperren', [PatronCardController::class, 'block'])->name('pos.labels.cards.block');
     });
 
     Route::middleware('permission:statistics.view')->group(function (): void {
@@ -164,6 +175,11 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::post('/betrieb/ausleihe/zurueckgeben/{loanId}', [PosTerminalController::class, 'returnLoan'])->name('pos.terminal.return');
         Route::post('/betrieb/ausleihe/position/{index}/entfernen', [PosTerminalController::class, 'removeItem'])->whereNumber('index')->name('pos.terminal.item.remove');
         Route::post('/betrieb/ausleihe/verwerfen', [PosTerminalController::class, 'discard'])->name('pos.terminal.discard');
+        Route::get('/betrieb/ausleihe/ausweis-registrieren', [PosTerminalController::class, 'register'])->name('pos.terminal.card.register');
+        Route::post('/betrieb/ausleihe/ausweis-registrieren', [PosTerminalController::class, 'claimCard'])->name('pos.terminal.card.claim');
+        Route::post('/betrieb/ausleihe/ausweis', [PosTerminalController::class, 'assignCard'])->name('pos.terminal.card.assign');
+        Route::post('/betrieb/ausleihe/ausweis/verloren', [PosTerminalController::class, 'lostCard'])->name('pos.terminal.card.lost');
+        Route::post('/betrieb/ausleihe/ausweis/abbrechen', [PosTerminalController::class, 'cancelCard'])->name('pos.terminal.card.cancel');
         Route::post('/betrieb/ausleihe/bestaetigen', [PosTerminalController::class, 'confirm'])->name('pos.terminal.confirm');
         Route::get('/betrieb/ausleihe/beleg/{transactionId}', [PosTerminalController::class, 'receipt'])->name('pos.terminal.receipt');
         Route::post('/betrieb/ausleihe/beleg/{transactionId}/mail', [PosTerminalController::class, 'mailReceipt'])->middleware('throttle:20,1')->name('pos.terminal.receipt.mail');
@@ -182,6 +198,12 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::get('/betrieb/vormerkungen', ReservationIndexController::class)
             ->name('pos.reservations.index');
+
+        Route::post('/betrieb/ausleihkonten/{patronId}/ausweise', [PatronAccountCardController::class, 'assign'])
+            ->name('pos.patrons.cards.assign');
+
+        Route::post('/betrieb/ausleihkonten/{patronId}/ausweise/{cardId}/sperren', [PatronAccountCardController::class, 'block'])
+            ->name('pos.patrons.cards.block');
 
         Route::post('/betrieb/ausleihkonten/{patronId}/vormerkungen', [ReservationController::class, 'store'])
             ->name('pos.reservations.store');
