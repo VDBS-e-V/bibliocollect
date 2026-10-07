@@ -79,6 +79,7 @@ return [
                     'title' => 'Auswertungen',
                     'items' => [
                         ['label' => 'Statistik', 'text' => 'Ausleihen, beliebte Titel, Klassen, Medientypen und Bestand für einen Zeitraum; Export und Druck.', 'route' => 'pos.statistics', 'permission' => 'statistics.view'],
+                        ['label' => 'Systemzustand', 'text' => 'Läuft der Cron, wartet etwas in der Warteschlange, ist die Sicherung aktuell, gab es Fehler?', 'route' => 'administration.system.index', 'permission' => 'system.view'],
                         ['label' => 'Protokoll', 'text' => 'Wer hat wann was geändert.', 'route' => 'administration.audit.index', 'permission' => 'audit.view'],
                     ],
                 ],

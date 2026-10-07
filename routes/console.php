@@ -1,5 +1,6 @@
 <?php
 
+use App\Foundation\Support\SystemErrorLog;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -49,5 +50,12 @@ Schedule::call($command('backup:database'))
 Schedule::call($command('privacy:anonymize'))
     ->name('privacy:anonymize')
     ->weeklyOn(7, '02:00')
+    ->withoutOverlapping()
+    ->onOneServer();
+
+// Räumt die Fehlerliste der Betriebsüberwachung nach 30 Tagen auf.
+Schedule::call(static fn () => app(SystemErrorLog::class)->prune(30))
+    ->name('system:prune-errors')
+    ->dailyAt('02:30')
     ->withoutOverlapping()
     ->onOneServer();

@@ -178,6 +178,12 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Betriebsüberwachung (v0.17.0)
+
+- **Systemzustand** (`/verwaltung/systemzustand`, Recht `system.view`, Verwaltung und technische Administration): Prüfungen für Datenbank, Cron, Warteschlange, Datensicherung, Fehler der letzten 24 Stunden, Mail und Speicherplatz mit Ergebnis in Ordnung, Achtung oder Fehler, dazu die letzten 25 Fehler (gleiche zusammengefasst, nach 30 Tagen aufgeräumt) und ein Knopf „Testmeldung senden“.
+- **Meldungen per Mail** an `ALERT_EMAIL` bei unerwarteten Fehlern (nicht bei 404, Anmeldung, Berechtigung, Formularprüfung), fehlgeschlagenen Jobs und wenn der Cron länger als `CRON_GAP_MINUTES` (15) ausgefallen war. Dieselbe Meldung höchstens alle 30 Minuten. Es werden nie Anfragedaten, Cookies oder Eingaben gespeichert; Datenbankfehler erscheinen ohne Einzelheiten.
+- **Statusadresse** `/_status` (JSON, Schlüssel `STATUS_TOKEN` oder `CRON_TOKEN` im Header `X-Api-Key`) für ein Monitoring wie UptimeRobot; bei Fehlern HTTP 503.
+
 ### Medium erfassen angepasst (Issue 2)
 
 - **Getrennte Abfragen:** Erst die Inventarnummer (Schritt 1), dann ISBN oder Titel/Autor:in (Schritt 2); Treffer prüfen, Titel & Ausgabe, Exemplar und Prüfen & speichern folgen (6 Schritte).

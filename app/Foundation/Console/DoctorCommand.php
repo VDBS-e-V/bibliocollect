@@ -97,6 +97,11 @@ final class DoctorCommand extends Command
             ? [$production ? 'Warnung' : 'OK', 'Mail', "Versand über „{$mailer}“: Erinnerungen werden nur ins Log geschrieben"]
             : ['OK', 'Mail', $mailer.' (Test: php artisan mail:test adresse@example.org)'];
 
+        $alert = config('hosting.alert_email');
+        $rows[] = is_string($alert) && trim($alert) !== ''
+            ? ['OK', 'Betriebsmeldungen', 'gehen an '.trim($alert)]
+            : [$production ? 'Warnung' : 'OK', 'Betriebsmeldungen', 'keine ALERT_EMAIL gesetzt: Fehler und Cron-Ausfälle werden nicht per Mail gemeldet'];
+
         $rows[] = config('catalog.covers.google_books.key')
             ? ['OK', 'Google-Books-Key', 'gesetzt']
             : ['OK', 'Google-Books-Key', 'nicht gesetzt (Cover nur über Open Library)'];

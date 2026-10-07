@@ -11,6 +11,7 @@ use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearTransitionController;
+use App\Surfaces\Administration\Http\Controllers\SystemHealthController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.administration.access'])->group(function (): void {
@@ -21,6 +22,11 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/seiten', [ContentPageAdminController::class, 'index'])->name('administration.pages.index');
         Route::get('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'edit'])->name('administration.pages.edit');
         Route::patch('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'update'])->name('administration.pages.update');
+    });
+
+    Route::middleware('permission:system.view')->group(function (): void {
+        Route::get('/verwaltung/systemzustand', [SystemHealthController::class, 'index'])->name('administration.system.index');
+        Route::post('/verwaltung/systemzustand/testmeldung', [SystemHealthController::class, 'testAlert'])->middleware('throttle:5,1')->name('administration.system.test-alert');
     });
 
     Route::get('/verwaltung/protokoll', AuditIndexController::class)

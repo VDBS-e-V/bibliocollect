@@ -2,6 +2,7 @@
 
 use App\Foundation\Http\Middleware\RequirePermission;
 use App\Foundation\Http\Middleware\SecurityHeaders;
+use App\Foundation\Support\SystemErrorLog;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Unerwartete Fehler festhalten und der Administration melden (siehe SystemErrorLog).
+        $exceptions->report(function (Throwable $exception): void {
+            app(SystemErrorLog::class)->record($exception, app()->runningInConsole() && ! app()->runningUnitTests() ? null : request());
+        });
+
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

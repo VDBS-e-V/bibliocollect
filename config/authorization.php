@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'system.view' => [
+            'label' => 'Systemzustand einsehen',
+            'description' => 'Erlaubt, den Zustand von Cron, Warteschlange, Sicherung und die letzten Fehler einzusehen.',
+        ],
         'inventory.renumber' => [
             'label' => 'Inventarnummern umstellen',
             'description' => 'Erlaubt, alte Inventarnummern ausdrücklich auf siebenstellige Nummern umzustellen.',
@@ -154,11 +158,12 @@ return [
                 'wishes.manage',
                 'shelves.manage',
                 'inventory.renumber',
+                'system.view',
             ],
         ],
         'technical_admin' => [
             'label' => 'Technische Administration',
-            'permissions' => ['surface.administration.access'],
+            'permissions' => ['surface.administration.access', 'system.view'],
         ],
     ],
 ];

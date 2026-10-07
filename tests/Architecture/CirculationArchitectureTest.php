@@ -29,7 +29,7 @@ it('defines circulation as a permission based operational capability', function 
         ->not->toContain('circulation.manage');
 
     expect($roles->permissionsFor(['technical_admin']))
-        ->toBe(['surface.administration.access']);
+        ->toBe(['surface.administration.access', 'system.view']);
 });
 
 it('keeps circulation dependent on patrons school catalog and audit without reversing module boundaries', function (): void {

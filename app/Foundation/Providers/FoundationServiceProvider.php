@@ -17,6 +17,9 @@ use App\Foundation\Navigation\NavigationRegistry;
 use App\Foundation\Support\BusinessClock;
 use App\Foundation\Support\ModuleRegistry;
 use App\Foundation\Support\SurfaceRegistry;
+use App\Foundation\Support\SystemErrorLog;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -51,6 +54,11 @@ final class FoundationServiceProvider extends ServiceProvider
                     && $user->allowsPermission($permission),
             );
         }
+
+        // Fehlgeschlagene Jobs festhalten und melden.
+        Event::listen(JobFailed::class, static function (JobFailed $event): void {
+            app(SystemErrorLog::class)->recordFailedJob($event->job->resolveName(), $event->exception);
+        });
 
         // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
         $this->commands([

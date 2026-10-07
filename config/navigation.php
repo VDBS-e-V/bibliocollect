@@ -142,6 +142,13 @@ return [
                     'order' => 35,
                 ],
                 [
+                    'label' => 'Systemzustand',
+                    'route' => 'administration.system.index',
+                    'active' => 'administration.system.*',
+                    'permission' => 'system.view',
+                    'order' => 38,
+                ],
+                [
                     'label' => 'Protokoll',
                     'route' => 'administration.audit.index',
                     'active' => 'administration.audit.*',

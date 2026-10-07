@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Foundation\Console;
 
+use App\Foundation\Support\AlertService;
+use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -26,6 +28,8 @@ final class CronCommand extends Command
 
     public function handle(): int
     {
+        $this->reportGap();
+
         Artisan::call('schedule:run');
         $schedule = trim(Artisan::output());
 
@@ -50,6 +54,27 @@ final class CronCommand extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /** Lief der Cron lange nicht, geht eine Meldung an die Administration, sobald er wieder aufgerufen wird. */
+    private function reportGap(): void
+    {
+        $previous = Cache::get(self::HEARTBEAT_KEY);
+
+        if (! is_string($previous)) {
+            return;
+        }
+
+        $minutes = (int) CarbonImmutable::parse($previous)->diffInMinutes(now());
+        $limit = max(1, (int) config('hosting.cron_gap_minutes', 15));
+
+        if ($minutes > $limit) {
+            app(AlertService::class)->notify('cron-gap', 'Der Cron ist ausgefallen gewesen', [
+                'Der Cron lief '.$minutes.' Minuten nicht (erlaubt: '.$limit.').',
+                'Zeitplan, Erinnerungen und Warteschlange standen in dieser Zeit still. Jetzt läuft er wieder.',
+                'Zeit: '.now()->toDateTimeString(),
+            ]);
+        }
     }
 
     /** Anzahl der Jobs in der Warteschlange; null, wenn sie sich nicht zählen lassen (zum Beispiel bei „sync“). */
