@@ -12,6 +12,14 @@ return [
         'prevent_surface_dependencies_from_modules' => true,
     ],
 
+    // Environment-Dateien: .env.example ist die Vorlage für Struktur und Kommentare, Werte bleiben im Ziel.
+    'environment' => [
+        'root' => base_path(),
+        'template' => '.env.example',
+        'targets' => ['.env', '.env.testing'],
+        'backup_path' => '.foundation/env-backups',
+    ],
+
     'production' => [
         'require_debug_disabled' => true,
         'require_app_key' => true,

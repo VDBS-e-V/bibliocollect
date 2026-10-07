@@ -25,6 +25,7 @@ yarn-error.log
 /bootstrap.php
 /.bootstrap/
 /START_HERE.md
+/.foundation/env-backups/
 
 # Local patch delivery artifacts (keep outside version control)
 /*.patch

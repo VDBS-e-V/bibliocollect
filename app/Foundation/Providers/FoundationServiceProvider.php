@@ -10,6 +10,11 @@ use App\Foundation\Console\BackupDatabaseCommand;
 use App\Foundation\Console\CronCommand;
 use App\Foundation\Console\DemoQueueCommand;
 use App\Foundation\Console\DoctorCommand;
+use App\Foundation\Console\EnvBackupCommand;
+use App\Foundation\Console\EnvCheckCommand;
+use App\Foundation\Console\EnvDiffCommand;
+use App\Foundation\Console\EnvRestoreCommand;
+use App\Foundation\Console\EnvSyncCommand;
 use App\Foundation\Console\FoundationCheckCommand;
 use App\Foundation\Console\MailTestCommand;
 use App\Foundation\Contracts\AuthorizesPermissions;
@@ -68,6 +73,11 @@ final class FoundationServiceProvider extends ServiceProvider
             DoctorCommand::class,
             BackupDatabaseCommand::class,
             MailTestCommand::class,
+            EnvSyncCommand::class,
+            EnvCheckCommand::class,
+            EnvDiffCommand::class,
+            EnvBackupCommand::class,
+            EnvRestoreCommand::class,
         ]);
     }
 }
