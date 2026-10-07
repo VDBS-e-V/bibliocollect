@@ -139,7 +139,7 @@ it('records wishes at the counter with or without a person', function (): void {
     $this->actingAs($staff)->post(route('pos.wishes.store'), ['title' => 'Falsche Nummer', 'library_number' => 'X-0'])->assertSessionHasErrors('library_number');
 
     expect(BookWish::query()->count())->toBe(2)->and(BookWish::query()->whereNull('patron_id')->count())->toBe(1);
-    $this->actingAs($staff)->get(route('pos.wishes.index'))->assertSee('ohne Person erfasst')->assertSee('Tresenwunsch');
+    $this->actingAs($staff)->get(route('pos.wishes.index'))->assertSee('ohne Person erfasst')->assertSee('Tresenwunsch')->assertSee('data-isbn-lookup', false)->assertSee(route('public.wishes.lookup'), false);
 });
 
 it('restricts wish handling to staff and management', function (): void {

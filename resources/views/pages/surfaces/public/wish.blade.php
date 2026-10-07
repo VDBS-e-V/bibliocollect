@@ -23,12 +23,12 @@
             <div class="bc-field">
                 <label class="bc-field__label" for="wish-isbn">ISBN (wenn bekannt)</label>
                 <div class="bc-wish-form__isbn">
-                    <input id="wish-isbn" class="bc-field__control" name="isbn" type="text" inputmode="numeric" value="{{ old('isbn', $prefill['isbn']) }}" autocomplete="off" aria-describedby="wish-isbn-status">
+                    <input id="wish-isbn" class="bc-field__control" data-isbn-field name="isbn" type="text" inputmode="numeric" value="{{ old('isbn', $prefill['isbn']) }}" autocomplete="off" aria-describedby="wish-isbn-status">
                     <button type="button" class="bc-wish-form__search" data-isbn-lookup="{{ route('public.wishes.lookup') }}" aria-label="ISBN nachschlagen und Titel vorschlagen lassen">
                         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm5.5-2 5 5"/></svg>
                     </button>
                 </div>
-                <p id="wish-isbn-status" class="bc-wish-form__status" role="status" aria-live="polite"></p>
+                <p id="wish-isbn-status" data-isbn-status class="bc-wish-form__status" role="status" aria-live="polite"></p>
             </div>
 
             <x-ui.input label="Titel *" name="title" id="wish-title" :value="old('title', $prefill['title'])" required maxlength="255" />
