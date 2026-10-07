@@ -25,6 +25,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function (): void {
+    // Eine übrig gebliebene Sicherung eines anderen Tests würde die Prüfung „Sicherung fehlt“ verfälschen.
+    File::deleteDirectory(storage_path('app/backups'));
+    Cache::flush();
+});
+
 afterEach(function (): void {
     File::deleteDirectory(storage_path('app/backups'));
     Cache::flush();

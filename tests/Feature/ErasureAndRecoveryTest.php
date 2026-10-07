@@ -15,9 +15,14 @@ use App\Modules\School\Models\SchoolYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
+
+afterEach(function (): void {
+    File::deleteDirectory(storage_path('app/backups'));
+});
 
 function erasureUser(string $role): User
 {
