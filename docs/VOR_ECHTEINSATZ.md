@@ -1,19 +1,20 @@
 # Funktionen, die vor dem Echteinsatz noch fehlen
 
-Stand: v0.12.0 (nach Buchwünschen und vorgangsorientierter Navigation). Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
+Stand: v0.20.0. Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
 
 Die Einstufung ist ein Vorschlag: **Muss** = ohne das würde ich nicht starten, **Sollte** = im ersten Halbjahr, **Kann** = bei Bedarf.
 
 ## Muss
 
-| Funktion | Warum | Aufwand |
-|---|---|---|
-| **Fehlerüberwachung** | Heute gibt es nur Logdateien. Fehler im Betrieb würde niemand bemerken. Gebraucht: Mail an die Administration bei unerwarteten Fehlern (gedrosselt) und eine Seite „Systemzustand“ mit den letzten Fehlern, fehlgeschlagenen Jobs und dem Stand von Cron und Sicherung. | klein bis mittel |
-| **Notbetrieb bei Ausfall** | Fällt Internet oder Server aus, steht die Ausleihe. Gebraucht: ein Ausdruck oder eine Datei „Offene Ausleihen und Vormerkungen“ (aktuell, jederzeit abrufbar) und ein Weg, Papierausleihen nachträglich zu erfassen (Datum der Ausleihe frei wählbar). | mittel |
-| **Ausleihen nachträglich erfassen** | Gehört zum Notbetrieb: Beim Nachtragen muss das tatsächliche Datum gesetzt werden können, sonst stimmen Fristen und Erinnerungen nicht. | klein |
-| **Aussonderung von Exemplaren** | Verloren und beschädigt gibt es, aber kein geführter Ablauf „aussortieren“ (Grund, Datum, Liste für den Jahresbericht, Rückholbarkeit). | klein bis mittel |
-| **Benutzerverwaltung für Mitarbeitende prüfen** | Sicherstellen, dass Verwaltung Konten für Mitarbeiter:innen und Schüler-AG anlegt, Rollen vergibt und Konten deaktiviert, ohne Konsole. Falls Lücken: bauen. | klein, erst Prüfung |
-| **Signaturen und Themen pflegen** | Etiketten und Regalordnung hängen an Signaturen. Es gibt keine Oberfläche zum Anlegen, Umbenennen und Zusammenführen. | mittel |
+Alle Punkte der früheren „Muss“-Liste sind umgesetzt bis auf den Notbetrieb, der bewusst verschoben wurde.
+
+| Funktion | Stand |
+|---|---|
+| Fehlerüberwachung und Systemzustand | ✔ v0.17.0: Seite „Systemzustand“, Mails bei Fehlern, fehlgeschlagenen Jobs und Cron-Ausfall, Statusadresse `/_status` |
+| Benutzerverwaltung für Mitarbeitende | ✔ v0.18.0: Konten anlegen und einladen, Rollen, Deaktivieren, Schutz vor Aussperren |
+| Signaturen und Themen pflegen, Bücher zuordnen | ✔ v0.19.0, mit Regalbrett-Vorschlag beim Einsortieren |
+| Aussonderung von Exemplaren | ✔ v0.20.0 |
+| **Notbetrieb bei Ausfall** (Liste „Offene Ausleihen und Vormerkungen“ jederzeit abrufbar, Papierausleihen mit frei wählbarem Datum nachtragen) | verschoben |
 
 ## Sollte
 
