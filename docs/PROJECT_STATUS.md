@@ -184,7 +184,7 @@ Ein Ausleihkonto kann einen Titel nur einmal offen (wartend oder bereitgelegt) v
 
 ### Bibliotheksnummern (v0.26.0)
 
-Neue Ausleihkonten bekommen eine zufällige sechsstellige Bibliotheksnummer ohne Kennung für Schüler:innen, Lehrkräfte usw. (nie mit 0 am Anfang, nicht fortlaufend, einmalig). Das gilt für den Import (wenn die Datei keine Nummer enthält) und für „Ausleihkonto anlegen“ (Feld leer lassen). Eine von Hand eingetragene Nummer bleibt möglich. Vorhandene Nummern im Schema `S-10001` bleiben unverändert und lassen sich im Konto von Hand ändern.
+Neue Ausleihkonten bekommen eine zufällige sechsstellige Bibliotheksnummer ohne Kennung für Schüler:innen, Lehrkräfte usw. (nie mit 0 am Anfang, nicht fortlaufend, einmalig). Das gilt für den Import (wenn die Datei keine Nummer enthält) und für „Ausleihkonto anlegen“ (Feld leer lassen). Eine von Hand eingetragene Nummer bleibt möglich. Vorhandene Nummern im Schema `S-10001` ersetzt der Befehl `php artisan patrons:renumber` (v0.26.1; `--dry-run` zeigt vorab die Zahl, `--yes` ohne Rückfrage). Er lässt gute und anonymisierte Nummern unberührt, läuft ganz oder gar nicht und schreibt die Zuordnung alt → neu (mit Namen, vertraulich) nach `storage/app/private/bibliotheksnummern-alt-neu-….csv`. Ausweise bleiben unverändert, nur gedruckte Zettel oder Listen mit den alten Nummern passen danach nicht mehr.
 
 ### Inventur (v0.22.0)
 

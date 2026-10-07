@@ -6,6 +6,7 @@ namespace App\Modules\Patrons\Providers;
 
 use App\Modules\Identity\Contracts\PatronLinkGateway;
 use App\Modules\Patrons\Console\IssuePatronLinkCodeCommand;
+use App\Modules\Patrons\Console\RenumberPatronsCommand;
 use App\Modules\Patrons\Services\EloquentPatronLinkGateway;
 use App\Modules\Patrons\Support\PatronLinkCodeGenerator;
 use App\Modules\Patrons\Support\PatronLinkCodeHasher;
@@ -25,6 +26,6 @@ final class PatronsServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
-        $this->commands([IssuePatronLinkCodeCommand::class]);
+        $this->commands([IssuePatronLinkCodeCommand::class, RenumberPatronsCommand::class]);
     }
 }
