@@ -1,0 +1,71 @@
+## Worum es geht
+
+Die Schulbibliothek verwaltet Medien, Ausleihen und Leser:innen mit dieser Anwendung. Hier erfährst du, welche Daten dabei entstehen, wofür wir sie brauchen, wie lange wir sie speichern und welche Rechte du hast. Wir benutzen keine Werbung, kein Tracking und keine Analysedienste.
+
+## Verantwortliche Stelle
+
+Verantwortlich für die Datenverarbeitung ist:
+
+[BITTE ERGÄNZEN: Name der verantwortlichen Stelle (Verein oder Schule), Anschrift]
+E-Mail: [BITTE ERGÄNZEN: E-Mail-Adresse]
+
+Datenschutzbeauftragte:r: [BITTE ERGÄNZEN: Name und Kontakt, oder streichen, falls nicht benannt]
+
+## Welche Daten wir speichern
+
+- Ausleihkonto: Name, Geburtsdatum, Klasse, Bibliotheksnummer und, wenn angegeben, eine E-Mail-Adresse. Das Ausleihkonto legt die Bibliothek an.
+- Bibliotheksausweis: Eine zufällige Ausweisnummer und die Zuordnung zu deinem Ausleihkonto. Auf dem Ausweis stehen nur die Nummer und der Name, den du selbst einträgst.
+- Onlinekonto (nur wenn du eines hast): Name, E-Mail-Adresse, ein verschlüsseltes Passwort, deine Rollen und ob du Erinnerungen per E-Mail bekommst.
+- Ausleihen, Verlängerungen, Vormerkungen und Belege: Welches Medium du wann ausgeliehen, verlängert, zurückgegeben oder vorgemerkt hast.
+- Erinnerungen: Welche Erinnerungs-E-Mails wir dir geschickt haben, damit sie nicht doppelt kommen.
+- Buchwünsche: Titel, Autor:in, ISBN und deine Bemerkung. Wenn du eingeloggt bist, gehört der Wunsch zu deinem Konto. Als Gast kannst du freiwillig Name und E-Mail angeben, damit wir dir antworten können.
+- Protokoll: Wichtige Vorgänge in der Bibliothek (zum Beispiel Ausleihe, Katalogänderungen, Kontoänderungen) mit dem handelnden Konto und der Uhrzeit, damit Änderungen nachvollziehbar bleiben.
+- Technische Daten: Beim Aufruf der Seiten entstehen kurzzeitig technische Angaben wie IP-Adresse und Zeitpunkt in den Protokolldateien des Servers. Wir nutzen sie nur, um Fehler zu finden und die Sicherheit zu gewährleisten.
+
+## Wofür wir die Daten brauchen
+
+Wir brauchen die Daten, um Medien zu verleihen, Fristen und Vormerkungen zu verwalten, dich an fällige Medien zu erinnern, Klassenlisten mit überfälligen Medien für die Klassenleitungen zu erstellen und die Bibliothek zu organisieren. Rechtsgrundlage ist [BITTE PRÜFEN UND ERGÄNZEN: Art. 6 Abs. 1 Buchst. e DSGVO in Verbindung mit dem Schulgesetz des Landes, oder Buchst. f DSGVO (berechtigtes Interesse am Betrieb der Bibliothek)]. Freiwillige Angaben, zum Beispiel Name und E-Mail bei einem Buchwunsch als Gast, verarbeiten wir auf Grundlage deiner Einwilligung (Art. 6 Abs. 1 Buchst. a DSGVO). Du kannst sie jederzeit widerrufen.
+
+## Wer deine Daten sieht
+
+- Mitarbeiter:innen der Bibliothek und die Verwaltung sehen Ausleihkonten und Ausleihen, soweit sie das für ihre Aufgabe brauchen.
+- Mitglieder der Schüler-AG sehen bei der Ausleihe deinen Namen und deine Klasse, aber kein Geburtsdatum und keine Kontaktdaten.
+- Klassenleitungen bekommen Listen der überfälligen Medien ihrer Klasse.
+- Andere Leser:innen sehen nie, was du ausgeliehen hast. Der öffentliche Katalog zeigt nur, ob ein Medium da ist, nicht wer es hat.
+
+## Wo die Daten liegen und wer technisch beteiligt ist
+
+Die Anwendung läuft bei [BITTE ERGÄNZEN: Hosting-Anbieter, Ort des Servers in Deutschland oder der EU]. Mit dem Anbieter besteht ein Vertrag zur Auftragsverarbeitung [BITTE PRÜFEN]. E-Mails verschicken wir über [BITTE ERGÄNZEN: Mailanbieter]. Zum Nachschlagen von Büchern fragt die Bibliothek öffentliche Verzeichnisse ab (Deutsche Nationalbibliothek, Open Library, Google Books). Dabei werden nur Buchangaben wie die ISBN übertragen, nie Daten von Leser:innen.
+
+## Cookies und lokale Speicherung
+
+Wir setzen nur technisch nötige Cookies: ein Sitzungs-Cookie, ein Schutz-Cookie gegen gefälschte Anfragen und, wenn du „angemeldet bleiben“ wählst, ein Cookie dafür. Dazu speichert dein Browser deine Wahl zwischen hellem und dunklem Aussehen. Darüber hinaus gibt es keine Cookies und keine Einbindung externer Dienste, Schriften oder Statistik.
+
+## Wie lange wir Daten speichern
+
+- Ausleihen, Vormerkungen, Belege und Protokolleinträge werden drei Jahre nach ihrem Abschluss anonymisiert: Sie bleiben für Statistiken ohne Personenbezug erhalten, verlieren aber jeden Bezug zu dir. Das Protokoll der verschickten Erinnerungen wird nach drei Jahren gelöscht.
+- Ausleihkonten und Onlinekonten von Personen, die die Schule verlassen haben, werden sofort gesperrt und drei Jahre nach dem Austritt anonymisiert.
+- Ausweisnummern bleiben gesperrt gespeichert und werden nie wieder vergeben, sind nach der Anonymisierung aber keiner Person mehr zugeordnet.
+- Buchwünsche: Name und E-Mail von Gästen werden drei Jahre nach Abschluss des Wunsches gelöscht.
+- Technische Protokolle des Servers werden nach [BITTE ERGÄNZEN: Frist, zum Beispiel 14 Tage] gelöscht.
+
+## Deine Rechte
+
+Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15 bis 21 DSGVO). Konkret:
+
+- Alle zu dir gespeicherten Daten kannst du in deinem Konto unter „Meine gespeicherten Daten herunterladen“ abrufen.
+- Erinnerungs-E-Mails kannst du in deinem Konto abschalten.
+- Für alles andere wende dich an die Bibliothek oder an die oben genannte Stelle.
+- Du kannst dich bei einer Datenschutzaufsichtsbehörde beschweren, zum Beispiel bei [BITTE ERGÄNZEN: zuständige Landesbeauftragte:r für den Datenschutz mit Anschrift].
+
+Wenn du noch nicht 16 Jahre alt bist, können deine Eltern oder Sorgeberechtigten diese Rechte für dich wahrnehmen. Eine automatisierte Entscheidungsfindung oder Profilbildung findet nicht statt.
+
+## Sicherheit
+
+Die Verbindung zur Anwendung ist verschlüsselt. Passwörter speichern wir nur verschlüsselt, Zugriffe sind nach Rollen begrenzt, und wichtige Vorgänge werden protokolliert. Die Daten werden täglich gesichert.
+
+## Änderungen
+
+Wir passen diese Erklärung an, wenn sich die Anwendung ändert. Stand: [BITTE ERGÄNZEN: Datum].
+
+Dieser Text ist ein Entwurf. Bitte alle Angaben in eckigen Klammern ausfüllen und den Text vor der Veröffentlichung vom Datenschutzbeauftragten oder einer fachkundigen Person prüfen lassen.

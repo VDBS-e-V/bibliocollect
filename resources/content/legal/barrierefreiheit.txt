@@ -1,0 +1,44 @@
+## Erklärung zur Barrierefreiheit
+
+Der VDBS e.V. möchte, dass alle Menschen die Bibliothek nutzen können, auch mit Einschränkungen beim Sehen, Hören, Bewegen oder Lernen. Diese Erklärung gilt für den Katalog, die Konto-Seiten und den Arbeitsbereich der Bibliothek.
+
+## Stand der Vereinbarkeit
+
+Wir orientieren uns an den Web Content Accessibility Guidelines (WCAG) 2.1 Stufe AA und der europäischen Norm EN 301 549. Ob die Seiten alle Anforderungen erfüllen, ist **noch nicht abschließend geprüft**. Wir bezeichnen sie deshalb als teilweise barrierefrei.
+
+## Was wir bereits geprüft haben
+
+- Bei jeder Änderung prüfen automatische Tests alle Hauptseiten: Seitensprache, genau eine Hauptüberschrift, sinnvolle Überschriftenstufen, beschriftete Formularfelder, Tabellenköpfe, Beschreibungen für Bilder und Schaltflächen, eindeutige Kennungen und funktionierende Sprungmarken.
+- Die Seiten sind für die Bedienung mit der Tastatur gebaut. Ein Link „Zum Inhalt springen“ steht am Seitenanfang.
+- Die Seiten passen sich der Bildschirmgröße an. Es gibt ein helles und ein dunkles Aussehen.
+- Meldungen und Fehler tragen eine Textüberschrift und werden nicht nur durch Farbe gezeigt.
+
+## Was noch nicht geprüft ist
+
+- Eine Prüfung durch Menschen mit Screenreader (zum Beispiel NVDA, VoiceOver) und nur mit der Tastatur steht noch aus.
+- Die Farbkontraste wurden noch nicht für alle Elemente gemessen.
+- Wir haben die Seiten noch nicht mit Menschen mit Behinderungen getestet.
+
+## Bekannte Einschränkungen
+
+- Ausdrucke wie Etiketten, Ausweise und Listen sind für den Druck gedacht und nicht barrierefrei. Strichcodes sind grafisch, die Nummer steht zusätzlich im Klartext darunter.
+- Die Scan-Eingabe an der Ausleihe ist für Strichcode-Scanner gemacht. Alle Nummern lassen sich auch von Hand eintippen.
+- Titelbilder im Katalog haben keine Beschreibung. Sie sind reine Dekoration, der Titel steht immer als Text daneben.
+
+## Rückmeldung und Kontakt
+
+Wenn dir eine Barriere auffällt oder du etwas nicht nutzen kannst, schreib uns. Wir antworten so schnell wie möglich und suchen eine Lösung, zum Beispiel indem wir dir die Information anders zur Verfügung stellen.
+
+E-Mail: [BITTE ERGÄNZEN: E-Mail-Adresse]
+Telefon: [BITTE ERGÄNZEN: Telefonnummer, falls vorhanden]
+Anschrift: VDBS e.V., [BITTE ERGÄNZEN: Anschrift]
+
+## Schlichtung
+
+Wenn du mit unserer Antwort nicht zufrieden bist, kannst du dich an die Schlichtungsstelle wenden: [BITTE PRÜFEN UND ERGÄNZEN: zuständige Schlichtungsstelle, zum Beispiel die Schlichtungsstelle nach dem Behindertengleichstellungsgesetz oder die Stelle des Landes].
+
+## Erstellt
+
+Diese Erklärung wurde am [BITTE ERGÄNZEN: Datum] erstellt und zuletzt am [BITTE ERGÄNZEN: Datum] überprüft. Sie wird nach der Prüfung mit Screenreader und Tastatur aktualisiert.
+
+Dieser Text ist ein Entwurf. Bitte die Angaben in eckigen Klammern ausfüllen und die Aussagen zur Prüfung auf den tatsächlichen Stand bringen.

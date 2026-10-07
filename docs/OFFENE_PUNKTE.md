@@ -8,7 +8,7 @@ Stand: v0.13.0. Fehlende Funktionen vor dem Echteinsatz: siehe `docs/VOR_ECHTEIN
 |---|---|---|
 | ✔ | Passwort vergessen | `/passwort-vergessen`, Link per Mail (60 Min), deaktivierte Konten bekommen keinen Link, immer dieselbe Antwort |
 | ✔ | Anmeldeversuche begrenzen | 5 Fehlversuche je Adresse und IP pro Minute |
-| ◐ | Impressum, Datenschutz, Barrierefreiheit | Seiten und Bearbeitung unter `/verwaltung/seiten` sind da, die Texte sind Platzhalter. **Du:** Inhalte eintragen |
+| ◐ | Impressum, Datenschutz, Barrierefreiheit | Ausführliche Entwürfe stehen unter `/verwaltung/seiten` (Quelle: `resources/content/legal/`). **Du:** alle Angaben in `[BITTE ERGÄNZEN: …]` ausfüllen, die Texte rechtlich prüfen lassen und speichern; erst dann entfällt der Hinweis „Platzhalter“ |
 | ✔ | Leihfrist und Obergrenze je Rolle | `config/circulation.php`: Standard 14 Tage / 5 Medien, Lehrkräfte und Mitarbeiter:innen 28 Tage / 20 Medien, Frist auch je Medientyp. **Du:** Werte bestätigen |
 | ✔ | Verlust und Beschädigung | „Problem melden“ an der Ausleihe beendet sie, setzt das Exemplar auf verloren bzw. beschädigt |
 | ✔ | Sicherheits-Header, CSP, `composer audit`/`npm audit` | keine bekannten Lücken; strenge Policy im Produktivbetrieb |

@@ -78,3 +78,24 @@ it('validates the page text', function (): void {
         ->patch(route('administration.pages.update', ['slug' => 'datenschutz']), ['title' => '', 'body' => ''])
         ->assertSessionHasErrors(['title', 'body']);
 });
+
+it('fills untouched placeholder pages with the long drafts and leaves edited pages alone', function (): void {
+    $migration = require base_path('app/Modules/Content/database/migrations/2026_10_08_120000_fill_placeholder_pages_with_drafts.php');
+
+    // Frisch eingespielt sind die Seiten schon mit den Entwürfen gefüllt und noch Platzhalter.
+    $migration->up();
+    $datenschutz = ContentPage::query()->where('slug', 'datenschutz')->firstOrFail();
+
+    expect($datenschutz->is_placeholder)->toBeTrue()->and($datenschutz->body)->toContain('## Verantwortliche Stelle')->toContain('[BITTE ERGÄNZEN')->toContain('Meine gespeicherten Daten herunterladen');
+
+    foreach (['impressum', 'barrierefreiheit'] as $slug) {
+        expect(ContentPage::query()->where('slug', $slug)->firstOrFail()->body)->toContain('[BITTE ERGÄNZEN');
+    }
+
+    $this->get('/datenschutz')->assertOk()->assertSee('Worum es geht')->assertSee('Deine Rechte');
+
+    // Eine bearbeitete Seite wird nicht überschrieben.
+    $datenschutz->forceFill(['body' => 'Eigener Text der Schule', 'is_placeholder' => false])->save();
+    $migration->up();
+    expect($datenschutz->refresh()->body)->toBe('Eigener Text der Schule');
+});
