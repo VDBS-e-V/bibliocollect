@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Foundation\Console\CronCommand;
+use App\Foundation\Jobs\DemoQueueJob;
 use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
@@ -100,4 +101,27 @@ it('runs the schedule tasks inside the same process so that the web cron can sta
     $this->artisan('schedule:run')->expectsOutputToContain('circulation:reservations:expire')->assertSuccessful();
 
     Carbon::setTestNow();
+});
+
+it('queues demo jobs and reports how many the cron call worked off', function (): void {
+    config(['queue.default' => 'database']);
+    Cache::forget(DemoQueueJob::COUNTER_KEY);
+
+    $this->artisan('app:demo:queue', ['count' => 3])->expectsOutputToContain('3 Beispieljob(s)')->assertSuccessful();
+    expect(DB::table('jobs')->count())->toBe(3);
+
+    $this->artisan('app:cron', ['--queue-seconds' => 5])
+        ->expectsOutputToContain('Jobs: 3 abgearbeitet, 0 wartend, 0 fehlgeschlagen')
+        ->assertSuccessful();
+
+    expect(DB::table('jobs')->count())->toBe(0)->and((int) Cache::get(DemoQueueJob::COUNTER_KEY))->toBe(3);
+
+    // Ein zweiter Lauf hat nichts mehr zu tun.
+    $this->artisan('app:cron', ['--queue-seconds' => 5])->expectsOutputToContain('Jobs: 0 abgearbeitet')->assertSuccessful();
+});
+
+it('refuses to queue demo jobs in production', function (): void {
+    app()->detectEnvironment(static fn (): string => 'production');
+
+    $this->artisan('app:demo:queue')->expectsOutputToContain('Im Produktivbetrieb nicht verfügbar')->assertFailed();
 });

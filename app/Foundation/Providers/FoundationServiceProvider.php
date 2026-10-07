@@ -8,6 +8,7 @@ use App\Foundation\Auth\PermissionRegistry;
 use App\Foundation\Auth\RoleRegistry;
 use App\Foundation\Console\BackupDatabaseCommand;
 use App\Foundation\Console\CronCommand;
+use App\Foundation\Console\DemoQueueCommand;
 use App\Foundation\Console\DoctorCommand;
 use App\Foundation\Console\FoundationCheckCommand;
 use App\Foundation\Console\MailTestCommand;
@@ -55,6 +56,7 @@ final class FoundationServiceProvider extends ServiceProvider
         $this->commands([
             FoundationCheckCommand::class,
             CronCommand::class,
+            DemoQueueCommand::class,
             DoctorCommand::class,
             BackupDatabaseCommand::class,
             MailTestCommand::class,
