@@ -24,11 +24,11 @@ final class CirculationDemoSeeder extends Seeder
             ->firstOrFail();
 
         $student = Patron::query()
-            ->where('library_number', 'S-10001')
+            ->where('library_number', '384917')
             ->firstOrFail();
 
         $teacher = Patron::query()
-            ->where('library_number', 'L-20001')
+            ->where('library_number', '156803')
             ->firstOrFail();
 
         $openCopy = Copy::query()

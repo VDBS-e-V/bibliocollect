@@ -166,7 +166,7 @@ final class DemoSeeder extends Seeder
     {
         return [
             'student' => $this->upsertPatron(
-                libraryNumber: 'S-10001',
+                libraryNumber: '384917',
                 kind: PatronKind::Student,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Lina',
@@ -176,7 +176,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: $classes['current:7a'],
             ),
             'ag_basic' => $this->upsertPatron(
-                libraryNumber: 'S-10002',
+                libraryNumber: '527164',
                 kind: PatronKind::Student,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Mika',
@@ -186,7 +186,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: $classes['current:8a'],
             ),
             'ag_extended' => $this->upsertPatron(
-                libraryNumber: 'S-10003',
+                libraryNumber: '691083',
                 kind: PatronKind::Student,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Samira',
@@ -196,7 +196,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: $classes['current:9a'],
             ),
             'link_code' => $this->upsertPatron(
-                libraryNumber: 'S-10004',
+                libraryNumber: '745230',
                 kind: PatronKind::Student,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Noah',
@@ -206,7 +206,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: $classes['current:6a'],
             ),
             'block_history' => $this->upsertPatron(
-                libraryNumber: 'S-10005',
+                libraryNumber: '218659',
                 kind: PatronKind::Student,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Emil',
@@ -216,7 +216,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: $classes['current:10a'],
             ),
             'departed' => $this->upsertPatron(
-                libraryNumber: 'S-10006',
+                libraryNumber: '903472',
                 kind: PatronKind::Student,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Paula',
@@ -226,7 +226,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: $classes['current:10a'],
             ),
             'teacher' => $this->upsertPatron(
-                libraryNumber: 'L-20001',
+                libraryNumber: '156803',
                 kind: PatronKind::Teacher,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Anna',
@@ -236,7 +236,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: null,
             ),
             'employee' => $this->upsertPatron(
-                libraryNumber: 'M-30001',
+                libraryNumber: '862315',
                 kind: PatronKind::Employee,
                 initialStatus: PatronStatus::Active,
                 firstName: 'Alex',
@@ -246,7 +246,7 @@ final class DemoSeeder extends Seeder
                 schoolClass: null,
             ),
             'archived' => $this->upsertPatron(
-                libraryNumber: 'M-30002',
+                libraryNumber: '439781',
                 kind: PatronKind::Employee,
                 initialStatus: PatronStatus::Archived,
                 firstName: 'Mara',

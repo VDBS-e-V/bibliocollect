@@ -127,7 +127,7 @@ it('finds no automatically detectable accessibility problems on the main pages',
 
     $manager = User::query()->where('email', 'management@demo.bibliocollect.test')->firstOrFail();
     $student = User::query()->where('email', 'student@demo.bibliocollect.test')->firstOrFail();
-    $patron = Patron::query()->where('library_number', 'S-10105')->firstOrFail();
+    $patron = Patron::query()->where('library_number', '131692')->firstOrFail();
     $title = Title::query()->firstOrFail();
 
     $guest = [

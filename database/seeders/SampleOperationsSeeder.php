@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\DB;
  * auf vorhandenen Exemplaren (überfällig, bald fällig, laufend) samt Vormerkungen. Medien werden nicht angelegt.
  *
  * Aufruf: php artisan db:seed --class=SampleOperationsSeeder
- * Wiederholbar: Sind die Beispielkonten (S-10101 …) schon da, passiert nichts.
+ * Wiederholbar: Sind die Beispielkonten (Nummern aus number()) schon da, passiert nichts.
  */
 final class SampleOperationsSeeder extends Seeder
 {
@@ -50,7 +50,7 @@ final class SampleOperationsSeeder extends Seeder
             return;
         }
 
-        if (Patron::query()->where('library_number', 'S-10101')->exists()) {
+        if (Patron::query()->where('library_number', $this->number(0))->exists()) {
             $this->command?->info('Die Beispieldaten sind bereits vorhanden.');
 
             return;
@@ -131,6 +131,12 @@ final class SampleOperationsSeeder extends Seeder
         }
     }
 
+    /** Feste, nicht fortlaufende sechsstellige Nummer für die Beispielkonten (wie im Echtbetrieb ohne Kennung). */
+    private function number(int $index): string
+    {
+        return (string) (100003 + (($index * 7919 + 13) % 800000));
+    }
+
     /**
      * @param  list<SchoolClass>  $classes
      * @return list<Patron>
@@ -138,7 +144,7 @@ final class SampleOperationsSeeder extends Seeder
     private function seedPatrons(array $classes): array
     {
         $patrons = [];
-        $number = 10101;
+        $index = 0;
 
         foreach ($classes as $classIndex => $class) {
             for ($i = 0; $i < 5; $i++) {
@@ -148,7 +154,7 @@ final class SampleOperationsSeeder extends Seeder
                 $birthYear = CarbonImmutable::now()->year - ($class->grade_level + 6);
 
                 $patrons[] = Patron::query()->create([
-                    'library_number' => 'S-'.$number,
+                    'library_number' => $this->number($index),
                     'kind' => PatronKind::Student,
                     'status' => PatronStatus::Active,
                     'first_name' => $first,
@@ -157,13 +163,13 @@ final class SampleOperationsSeeder extends Seeder
                     'school_class_id' => $class->getKey(),
                 ]);
 
-                $number++;
+                $index++;
             }
         }
 
         foreach (array_slice(self::TEACHERS, 0, 3) as $index => $name) {
             $patrons[] = Patron::query()->create([
-                'library_number' => 'L-'.(20101 + $index),
+                'library_number' => $this->number(1000 + $index),
                 'kind' => PatronKind::Teacher,
                 'status' => PatronStatus::Active,
                 'first_name' => explode(' ', $name)[0] === 'Frau' ? 'Petra' : 'Thomas',

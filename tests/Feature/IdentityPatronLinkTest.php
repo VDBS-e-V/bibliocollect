@@ -21,7 +21,7 @@ it('links an online account to an existing patron with a one-time code', functio
     Notification::fake();
 
     $patron = Patron::query()->create([
-        'library_number' => 'S-10001',
+        'library_number' => '384917',
         'kind' => PatronKind::Student,
         'status' => PatronStatus::Active,
         'first_name' => 'Mika',
@@ -53,7 +53,7 @@ it('links an online account to an existing patron with a one-time code', functio
 
 it('never allows a patron link code to be consumed twice', function (): void {
     $patron = Patron::query()->create([
-        'library_number' => 'S-10002',
+        'library_number' => '527164',
         'kind' => PatronKind::Teacher,
         'status' => PatronStatus::Active,
         'first_name' => 'Alex',

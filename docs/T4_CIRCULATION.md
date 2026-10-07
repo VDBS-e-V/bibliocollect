@@ -80,8 +80,8 @@ Es wird bewusst keine Liste bereits zurückgegebener Medien angezeigt. Damit erh
 
 `CirculationDemoSeeder` ergänzt reproduzierbar:
 
-- eine offene Ausleihe von `BC-MOMO-001` an `S-10001`,
-- eine bereits zurückgegebene historische Ausleihe von `BC-PRINZ-001` an `L-20001`.
+- eine offene Ausleihe von `BC-MOMO-001` an `384917`,
+- eine bereits zurückgegebene historische Ausleihe von `BC-PRINZ-001` an `156803`.
 
 Der Seeder ist idempotent und verweigert die direkte Ausführung in `production`.
 

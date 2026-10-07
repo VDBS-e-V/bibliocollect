@@ -76,21 +76,21 @@ Die Bibliotheksnummern sind absichtlich stabil:
 
 | Bibliotheksnr. | Zustand |
 | --- | --- |
-| `S-10001` | aktive Schülerin mit verknüpftem Onlinekonto |
-| `S-10002` | aktiver Schüler mit AG-Basis-Onlinekonto |
-| `S-10003` | aktive, aktuell gesperrte Schülerin mit AG-Erweitert-Konto |
-| `S-10004` | aktiver, noch nicht verknüpfter Schüler für den Linkcode-Workflow |
-| `S-10005` | aktiver Schüler mit historischer Sperre und anschließender Entsperrung |
-| `S-10006` | dauerhaft ausgeschiedene Schülerin mit deaktiviertem Onlinekonto |
-| `L-20001` | aktive Lehrkraft |
-| `M-30001` | aktives Mitarbeiter-Ausleihkonto |
-| `M-30002` | archiviertes Mitarbeiter-Ausleihkonto |
+| `384917` | aktive Schülerin mit verknüpftem Onlinekonto |
+| `527164` | aktiver Schüler mit AG-Basis-Onlinekonto |
+| `691083` | aktive, aktuell gesperrte Schülerin mit AG-Erweitert-Konto |
+| `745230` | aktiver, noch nicht verknüpfter Schüler für den Linkcode-Workflow |
+| `218659` | aktiver Schüler mit historischer Sperre und anschließender Entsperrung |
+| `903472` | dauerhaft ausgeschiedene Schülerin mit deaktiviertem Onlinekonto |
+| `156803` | aktive Lehrkraft |
+| `862315` | aktives Mitarbeiter-Ausleihkonto |
+| `439781` | archiviertes Mitarbeiter-Ausleihkonto |
 
 Block-/Unblock- und Austrittsereignisse werden über die vorhandenen Domain-Actions erzeugt, damit Audit-Zustände realistisch bleiben.
 
 ## Demo-Linkcode
 
-Für `S-10004` / Noah Linkcode wird ein offener Demo-Linkcode vorbereitet:
+Für `745230` / Noah Linkcode wird ein offener Demo-Linkcode vorbereitet:
 
 ```text
 D3MZ2-26ABC
@@ -184,8 +184,8 @@ Ab T4 v0.5.0 ruft der normale `DatabaseSeeder` nach den bestehenden Demo-Seedern
 
 Der Seeder ergänzt zwei feste Workflow-Zustände:
 
-- `S-10001` / Lina Berger hat `BC-MOMO-001` seit dem 01.10.2026 offen ausgeliehen; Fälligkeit ist der 15.10.2026.
-- `L-20001` / Anna Lehrkraft besitzt eine bereits am 22.09.2026 zurückgegebene historische Ausleihe von `BC-PRINZ-001`.
+- `384917` / Lina Berger hat `BC-MOMO-001` seit dem 01.10.2026 offen ausgeliehen; Fälligkeit ist der 15.10.2026.
+- `156803` / Anna Lehrkraft besitzt eine bereits am 22.09.2026 zurückgegebene historische Ausleihe von `BC-PRINZ-001`.
 
 Damit lassen sich offene Ausleihe, Rückgabe und die bewusste Nichtanzeige abgeschlossener Lesehistorie im Patron-Arbeitsbereich direkt prüfen. `CirculationDemoSeeder` ist idempotent und verweigert die direkte Ausführung in `production`.
 

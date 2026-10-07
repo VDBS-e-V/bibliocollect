@@ -53,9 +53,9 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and($technicalAdmin->allowsPermission('catalog.manage'))->toBeFalse()
         ->and($technicalAdmin->allowsPermission('catalog.import'))->toBeFalse();
 
-    $blockedPatron = Patron::query()->where('library_number', 'S-10003')->firstOrFail();
-    $historyPatron = Patron::query()->where('library_number', 'S-10005')->firstOrFail();
-    $departedPatron = Patron::query()->where('library_number', 'S-10006')->firstOrFail();
+    $blockedPatron = Patron::query()->where('library_number', '691083')->firstOrFail();
+    $historyPatron = Patron::query()->where('library_number', '218659')->firstOrFail();
+    $departedPatron = Patron::query()->where('library_number', '903472')->firstOrFail();
     $departedUser = User::query()->where('email', 'departed@demo.bibliocollect.test')->firstOrFail();
 
     expect($blockedPatron->blocked_at)->not->toBeNull()
@@ -67,7 +67,7 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
         ->and($departedUser->disabled_at)->not->toBeNull()
         ->and(PatronStatusEvent::query()->where('patron_id', $departedPatron->getKey())->count())->toBe(1);
 
-    $linkPatron = Patron::query()->where('library_number', 'S-10004')->firstOrFail();
+    $linkPatron = Patron::query()->where('library_number', '745230')->firstOrFail();
     $openToken = PatronAccountLinkToken::query()
         ->where('patron_id', $linkPatron->getKey())
         ->whereNull('used_at')

@@ -39,7 +39,7 @@ Jede Klasse hat ein Feld **Klassenleitung** (Freitext, unter „Schule und Schul
 
 ## Beispieldaten
 
-`php artisan db:seed --class=SampleOperationsSeeder` legt (nur außerhalb der Produktion und nur einmal) Klassen mit Klassenleitung, 45 Schüler:innen und 3 Lehrkräfte (`S-10101…`, `L-20101…`), Schließtage (Herbst- und Weihnachtsferien), 16 Ausleihen auf vorhandenen Exemplaren (überfällig, bald fällig, laufend) sowie drei Vormerkungen an, davon eine abholbereit. Medien werden nicht erzeugt. Dazu bekommt das nächste Schuljahr passende Folgeklassen, damit sich der Schuljahreswechsel ausprobieren lässt.
+`php artisan db:seed --class=SampleOperationsSeeder` legt (nur außerhalb der Produktion und nur einmal) Klassen mit Klassenleitung, 45 Schüler:innen und 3 Lehrkräfte (feste, nicht fortlaufende sechsstellige Nummern), Schließtage (Herbst- und Weihnachtsferien), 16 Ausleihen auf vorhandenen Exemplaren (überfällig, bald fällig, laufend) sowie drei Vormerkungen an, davon eine abholbereit. Medien werden nicht erzeugt. Dazu bekommt das nächste Schuljahr passende Folgeklassen, damit sich der Schuljahreswechsel ausprobieren lässt.
 
 ## Offen
 

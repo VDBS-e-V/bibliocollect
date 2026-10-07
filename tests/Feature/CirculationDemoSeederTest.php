@@ -13,8 +13,8 @@ uses(RefreshDatabase::class);
 it('provides idempotent demo circulation states and permission boundaries', function (): void {
     $this->seed(DatabaseSeeder::class);
 
-    $student = Patron::query()->where('library_number', 'S-10001')->firstOrFail();
-    $teacher = Patron::query()->where('library_number', 'L-20001')->firstOrFail();
+    $student = Patron::query()->where('library_number', '384917')->firstOrFail();
+    $teacher = Patron::query()->where('library_number', '156803')->firstOrFail();
 
     $openLoan = Loan::query()
         ->where('patron_id', $student->getKey())
