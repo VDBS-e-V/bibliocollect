@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'inventory.renumber' => [
+            'label' => 'Inventarnummern umstellen',
+            'description' => 'Erlaubt, alte Inventarnummern ausdrücklich auf siebenstellige Nummern umzustellen.',
+        ],
         'shelves.manage' => [
             'label' => 'Regalbretter pflegen',
             'description' => 'Erlaubt, die Liste der Regalbretter (Standorte der Exemplare) anzulegen und zu ändern.',
@@ -122,6 +126,8 @@ return [
                 'circulation.reports',
                 'statistics.view',
                 'wishes.manage',
+                'shelves.manage',
+                'inventory.renumber',
             ],
         ],
         'management' => [
@@ -147,6 +153,7 @@ return [
                 'statistics.view',
                 'wishes.manage',
                 'shelves.manage',
+                'inventory.renumber',
             ],
         ],
         'technical_admin' => [

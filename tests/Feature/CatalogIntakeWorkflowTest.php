@@ -161,14 +161,14 @@ it('walks through all steps with DNB data and writes only on the final save', fu
 
     $this->get(route('pos.catalog.intake.copy'))->assertOk()->assertSee('0012345');
 
-    $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => 'J 5 MORO', 'status' => 'active'])
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'active'])
         ->assertRedirect(route('pos.catalog.intake.review'));
 
     $this->get(route('pos.catalog.intake.review'))
         ->assertOk()
         ->assertSee('Shi Yu')
         ->assertSee('Morosinotto, Davide')
-        ->assertSee('J 5 MORO')
+        ->assertSee('wird beim Einsortieren ins Regal vermerkt')
         ->assertSee('0012345')
         ->assertSee('Speichern');
 
@@ -212,7 +212,8 @@ it('walks through all steps with DNB data and writes only on the final save', fu
     $copy = Copy::query()->where('barcode', '0012345')->firstOrFail();
 
     expect($copy->edition_id)->toBe($edition->getKey())
-        ->and($copy->shelf_location)->toBe('J 5 MORO')
+        ->and($copy->shelf_location)->toBeNull()
+        ->and($copy->needs_shelving)->toBeTrue()
         ->and($copy->status->value)->toBe('active')
         ->and($edition->cover_status)->toBe('pending');
 
@@ -235,7 +236,7 @@ it('lets staff continue straight to the next medium after saving', function (): 
     $this->actingAs($staff);
     intakeLookup();
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload());
-    $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => '', 'status' => 'active']);
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'active']);
 
     $this->post(route('pos.catalog.intake.commit'), ['next' => 'again'])
         ->assertRedirect(route('pos.catalog.intake.identify'))
@@ -279,7 +280,7 @@ it('offers adding a copy to an existing edition instead of creating a duplicate'
 
     $this->get(route('pos.catalog.intake.copy'))->assertOk()->assertSee('Weiteres Exemplar');
 
-    $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => 'REG 1', 'status' => 'active'])
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'active'])
         ->assertRedirect(route('pos.catalog.intake.review'));
 
     $this->get(route('pos.catalog.intake.review'))->assertOk()->assertSee('Vorhandene Ausgabe')->assertSee('Altverlag');
@@ -309,7 +310,7 @@ it('reuses a contributor with the same GND id instead of creating a duplicate', 
     $this->actingAs($staff);
     intakeLookup();
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload());
-    $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => '', 'status' => 'active']);
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'active']);
     $this->post(route('pos.catalog.intake.commit'), ['next' => 'open']);
 
     expect(Contributor::query()->where('gnd_id', '1015211690')->count())->toBe(1)
@@ -403,7 +404,7 @@ it('allows manual intake without asking the DNB at all', function (): void {
         'minimum_age' => '14',
     ]))->assertRedirect(route('pos.catalog.intake.copy'));
 
-    $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => 'HEFT', 'status' => 'damaged']);
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'damaged']);
     $this->post(route('pos.catalog.intake.commit'), ['next' => 'open']);
 
     $title = Title::query()->where('preferred_title', 'Handerfasstes Heft')->firstOrFail();
@@ -473,7 +474,7 @@ it('validates title and edition data and ignores empty contributor rows', functi
     ]))->assertSessionHasErrors('contributors.0.role');
 
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload())->assertRedirect(route('pos.catalog.intake.copy'));
-    $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => '', 'status' => 'kaputt'])->assertSessionHasErrors('status');
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'kaputt'])->assertSessionHasErrors('status');
 });
 
 it('does not let anyone skip ahead of the steps that are still open', function (): void {
@@ -509,7 +510,7 @@ it('rolls everything back when the barcode was taken in the meantime', function 
     $this->actingAs($staff);
     intakeLookup();
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload());
-    $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => '', 'status' => 'active']);
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'active']);
 
     // Zwischen Prüfung und Speichern vergibt jemand anderes denselben Barcode.
     $other = Edition::query()->create(['title_id' => Title::query()->create(['preferred_title' => 'Konkurrenz'])->getKey()]);

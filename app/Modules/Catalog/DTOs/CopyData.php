@@ -12,5 +12,7 @@ final readonly class CopyData
         public string $barcode,
         public ?string $shelfLocation,
         public CopyStatus $status,
+        /** Neu erfasst und noch nicht im Regal: das Exemplar liegt auf dem Stapel „Einsortieren“. */
+        public bool $awaitingShelving = false,
     ) {}
 }

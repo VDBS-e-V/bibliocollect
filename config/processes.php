@@ -40,6 +40,7 @@ return [
                         ['label' => 'Medium erfassen', 'text' => 'Neuzugang per ISBN oder Titel aufnehmen, Exemplar anlegen, Etikett drucken.', 'route' => 'pos.catalog.intake.identify', 'permission' => 'catalog.manage'],
                         ['label' => 'Katalog suchen und pflegen', 'text' => 'Titel, Ausgaben und Exemplare ausführlich recherchieren und bearbeiten.', 'route' => 'pos.catalog.index', 'permission' => 'catalog.manage'],
                         ['label' => 'Metadaten prüfen', 'text' => 'Fehlerhafte und lückenhafte Katalogdaten mit Vorschlägen durchgehen.', 'route' => 'pos.catalog.quality.index', 'permission' => 'catalog.manage'],
+                        ['label' => 'Medien einsortieren', 'text' => 'Neu erfasste Bücher vom Stapel ins Regal stellen: Regalbrett wählen, Bücher scannen, Standort wird vermerkt.', 'route' => 'pos.shelving', 'permission' => 'circulation.manage'],
                         ['label' => 'Etiketten drucken', 'text' => 'Exemplar-Etiketten mit Strichcode und Signatur auf Etikettenbögen.', 'route' => 'pos.labels.copies', 'permission' => 'catalog.manage'],
                         ['label' => 'Öffentlichen Katalog öffnen', 'text' => 'So sehen Leser:innen den Katalog.', 'route' => 'public.catalog.index', 'permission' => null],
                     ],
@@ -70,6 +71,7 @@ return [
                     'title' => 'Bestand',
                     'items' => [
                         ['label' => 'Regalbretter pflegen', 'text' => 'Die Liste der Regalbretter anlegen, die beim Erfassen als Standort gewählt werden.', 'route' => 'administration.shelves.index', 'permission' => 'shelves.manage'],
+                        ['label' => 'Alte Inventarnummern umstellen', 'text' => 'Exemplare mit alter Nummer ausdrücklich auf neue siebenstellige Nummern umstellen und Etiketten drucken.', 'route' => 'administration.inventory.index', 'permission' => 'inventory.renumber'],
                         ['label' => 'Katalog importieren', 'text' => 'Bestandsdaten aus einer Datei einlesen.', 'route' => 'pos.catalog.import.create', 'permission' => 'catalog.import'],
                     ],
                 ],

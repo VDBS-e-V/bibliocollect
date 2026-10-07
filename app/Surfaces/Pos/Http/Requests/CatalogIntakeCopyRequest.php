@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Requests;
 
 use App\Modules\Catalog\Enums\CopyStatus;
-use App\Modules\Catalog\Services\CatalogShelfOptions;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** Schritt 5 der Erfassung: Standort (ein Regalbrett aus der Liste) und Zustand des Exemplars. */
+/** Schritt 5 der Erfassung: Zustand des Exemplars. Der Standort kommt später beim Einsortieren ins Regal. */
 final class CatalogIntakeCopyRequest extends FormRequest
 {
     public function authorize(): bool
@@ -21,22 +20,8 @@ final class CatalogIntakeCopyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shelf_location' => ['nullable', 'string', 'max:120', Rule::in(app(CatalogShelfOptions::class)->activeCodes())],
             'status' => ['required', Rule::enum(CopyStatus::class)],
         ];
-    }
-
-    /** @return array<string, string> */
-    public function messages(): array
-    {
-        return ['shelf_location.in' => 'Bitte ein Regalbrett aus der Liste wählen.'];
-    }
-
-    public function shelfLocation(): ?string
-    {
-        $value = $this->validated()['shelf_location'] ?? null;
-
-        return is_string($value) && trim($value) !== '' ? trim($value) : null;
     }
 
     public function status(): CopyStatus

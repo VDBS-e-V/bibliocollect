@@ -87,6 +87,13 @@ return [
                     'order' => 30,
                 ],
                 [
+                    'label' => 'Medien einsortieren',
+                    'route' => 'pos.shelving',
+                    'active' => 'pos.shelving*',
+                    'permission' => 'circulation.manage',
+                    'order' => 32,
+                ],
+                [
                     'label' => 'Ausleihkonten',
                     'route' => 'pos.patrons.index',
                     'active' => 'pos.patrons.*',
@@ -147,6 +154,13 @@ return [
                     'active' => 'administration.shelves.*',
                     'permission' => 'shelves.manage',
                     'order' => 32,
+                ],
+                [
+                    'label' => 'Inventarnummern',
+                    'route' => 'administration.inventory.index',
+                    'active' => 'administration.inventory.*',
+                    'permission' => 'inventory.renumber',
+                    'order' => 33,
                 ],
                 [
                     'label' => 'Öffnungszeiten',

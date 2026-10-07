@@ -7,6 +7,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 use App\Foundation\Support\BusinessClock;
 use App\Modules\Catalog\Enums\MetadataReviewStatus;
 use App\Modules\Catalog\Models\CatalogMetadataReview;
+use App\Modules\Catalog\Models\Copy;
 use App\Modules\Circulation\Enums\ReservationStatus;
 use App\Modules\Circulation\Enums\WishStatus;
 use App\Modules\Circulation\Models\BookWish;
@@ -40,6 +41,7 @@ final class PosHomeController
         if (Gate::allows('circulation.manage')) {
             $open = Loan::query()->whereNull('returned_at');
 
+            $tiles[] = ['label' => 'Zum Einsortieren (Stapel)', 'value' => Copy::query()->where('needs_shelving', true)->count(), 'url' => route('pos.shelving'), 'warn' => false];
             $tiles[] = ['label' => 'Überfällige Ausleihen', 'value' => (clone $open)->whereDate('due_on', '<', $todayDate)->count(), 'url' => Gate::allows('circulation.reports') ? route('pos.reports.class-loans') : null, 'warn' => true];
             $tiles[] = ['label' => 'Heute fällig', 'value' => (clone $open)->whereDate('due_on', $todayDate)->count(), 'url' => null, 'warn' => false];
             $tiles[] = ['label' => 'Zur Abholung zurückgelegt', 'value' => Reservation::query()->where('status', ReservationStatus::Ready->value)->count(), 'url' => route('pos.reservations.index'), 'warn' => false];

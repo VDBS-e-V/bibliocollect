@@ -16,6 +16,8 @@ use Illuminate\Support\Carbon;
  * @property string $barcode
  * @property CopyStatus $status
  * @property string|null $shelf_location
+ * @property bool $needs_shelving
+ * @property Carbon|null $shelved_at
  * @property string|null $signature_id
  * @property string|null $legacy_source
  * @property string|null $legacy_media_id
@@ -50,6 +52,8 @@ final class Copy extends Model
         'barcode',
         'status',
         'shelf_location',
+        'needs_shelving',
+        'shelved_at',
         'signature_id',
         'legacy_source',
         'legacy_media_id',
@@ -89,6 +93,8 @@ final class Copy extends Model
     {
         return [
             'status' => CopyStatus::class,
+            'needs_shelving' => 'boolean',
+            'shelved_at' => 'datetime',
             'legacy_in_transition' => 'boolean',
             'legacy_is_available' => 'boolean',
             'purchase_date' => 'date',

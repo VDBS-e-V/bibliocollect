@@ -128,8 +128,8 @@
         <dl class="bc-intake-summary">
             <dt>Inventarnummer</dt>
             <dd><strong>{{ $barcode }}</strong></dd>
-            <dt>Signatur / Standort</dt>
-            <dd>{{ $copy['shelf_location'] ?? 'nicht angegeben' }}</dd>
+            <dt>Standort</dt>
+            <dd>wird beim Einsortieren ins Regal vermerkt (Stapel „Einsortieren“)</dd>
             <dt>Zustand im Bestand</dt>
             <dd>{{ CatalogIntakeVocabulary::copyStatus($copy['status']->value) }}</dd>
         </dl>

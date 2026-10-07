@@ -3,7 +3,6 @@
 
     $existing = $context['existing'];
     $currentStatus = old('status', $copy['status']->value ?? 'active');
-    $currentShelf = old('shelf_location', $copy['shelf_location'] ?? '');
     $backRoute = $detailsSkipped ? route('pos.catalog.intake.matches') : route('pos.catalog.intake.details');
 @endphp
 
@@ -43,12 +42,10 @@
             </dl>
 
             <div class="bc-intake-fieldset__grid">
-                <x-ui.select label="Standort (Regalbrett)" name="shelf_location" :error="$errors->first('shelf_location')">
-                    <option value="">Kein Standort</option>
-                    @foreach ($shelfOptions as $code => $display)
-                        <option value="{{ $code }}" @selected($currentShelf === $code)>{{ $display }}</option>
-                    @endforeach
-                </x-ui.select>
+                <p class="bc-intake-note">
+                    Den Standort legst du hier nicht fest. Nach dem Erfassen kommt das Buch auf den Stapel „Einsortieren“;
+                    beim Einsortieren ins Regal wird das Regalbrett im System vermerkt.
+                </p>
                 <x-ui.select label="Zustand im Bestand" name="status" :error="$errors->first('status')">
                     @foreach (CatalogIntakeVocabulary::copyStatuses() as $key => $label)
                         <option value="{{ $key }}" @selected($currentStatus === $key)>{{ $label }}</option>

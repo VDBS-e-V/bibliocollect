@@ -7,8 +7,17 @@ Für Mitarbeiter:innen und die Schüler-AG „Erweitert“.
 1. **Medium erfassen** in der Navigation.
 2. Scanne zuerst die **Inventarnummer** (genau 7 Ziffern, steht auf dem Etikett im Buch).
 3. Danach gibst du die **ISBN** ein oder suchst nach Titel und Autor. Die Daten kommen aus der Deutschen Nationalbibliothek; fehlt dort der Klappentext, wird er zur ISBN bei Google Books oder Open Library gesucht und nur vorgeschlagen.
-4. Prüfe die Vorschläge und ergänze fehlende Angaben. Wähle den **Standort aus der Liste der Regalbretter** (die Liste pflegt die Verwaltung unter Regalbretter).
-5. Im letzten Schritt prüfst du alles und speicherst. **Erst jetzt** wird etwas angelegt.
+4. Prüfe die Vorschläge und ergänze fehlende Angaben.
+5. Im letzten Schritt prüfst du alles und speicherst. **Erst jetzt** wird etwas angelegt. Den Standort legst du hier **nicht** fest: Das Buch kommt auf den Stapel „Einsortieren“.
+
+## Medien einsortieren
+
+Die Bücher vom Stapel kommen ins Regal: **Medien einsortieren** öffnen, das **Regalbrett wählen** und die **Inventarnummern der Bücher scannen**, die du dort einstellst. Mit jedem Scan wird der Standort im System vermerkt und das Buch vom Stapel genommen. Wechselst du das Brett, wählst du oben das nächste.
+
+## Regalbretter und alte Inventarnummern (Mitarbeiter:innen und Verwaltung)
+
+- **Regalbretter** (Verwaltung): Die Liste der Regalbretter mit ihrer Bezeichnung und der Beschriftung am Brett legst du unter „Regalbretter“ an. Sie ist die Auswahl beim Einsortieren.
+- **Inventarnummern:** Neue Nummern haben genau 7 Ziffern. Alte Nummern bleiben unverändert, bis du sie unter „Inventarnummern“ ausdrücklich umstellst: Exemplare auswählen, „Neue Nummern vergeben“, danach die neuen Etiketten drucken und im Buch ersetzen.
 
 Das Cover wird im Hintergrund geladen und erscheint nach kurzer Zeit.
 

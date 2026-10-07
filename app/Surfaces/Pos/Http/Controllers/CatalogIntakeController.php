@@ -16,7 +16,6 @@ use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Queries\CatalogImportMatchQuery;
 use App\Modules\Catalog\Services\BibliographicLookupService;
 use App\Modules\Catalog\Services\CatalogIsbnNormalizer;
-use App\Modules\Catalog\Services\CatalogShelfOptions;
 use App\Modules\Catalog\Services\CatalogSummaryService;
 use App\Surfaces\Pos\Http\Requests\CatalogIntakeBarcodeRequest;
 use App\Surfaces\Pos\Http\Requests\CatalogIntakeChoiceRequest;
@@ -234,12 +233,9 @@ final class CatalogIntakeController
             return $guard;
         }
 
-        $copy = $this->draft->copy();
-
         return $this->view('copy', [
-            'copy' => $copy,
+            'copy' => $this->draft->copy(),
             'context' => $this->context(),
-            'shelfOptions' => app(CatalogShelfOptions::class)->forSelect($copy['shelf_location'] ?? null),
         ]);
     }
 
@@ -251,7 +247,7 @@ final class CatalogIntakeController
             return $guard;
         }
 
-        $this->draft->setCopy($request->shelfLocation(), $request->status());
+        $this->draft->setCopy(null, $request->status());
 
         return redirect()->route('pos.catalog.intake.review');
     }
@@ -283,7 +279,8 @@ final class CatalogIntakeController
             return $guard ?? redirect()->route('pos.catalog.intake.identify');
         }
 
-        $copyData = new CopyData($barcode, $copy['shelf_location'], $copy['status']);
+        // Der Standort wird erst beim Einsortieren ins Regal vermerkt (Vorgang „Medien einsortieren“).
+        $copyData = new CopyData($barcode, null, $copy['status'], true);
         $editionId = $this->draft->existingEditionId();
         $details = $this->draft->details();
 

@@ -34,6 +34,7 @@ use App\Surfaces\Pos\Http\Controllers\PosTerminalController;
 use App\Surfaces\Pos\Http\Controllers\ProcessesController;
 use App\Surfaces\Pos\Http\Controllers\ReservationController;
 use App\Surfaces\Pos\Http\Controllers\ReservationIndexController;
+use App\Surfaces\Pos\Http\Controllers\ShelvingController;
 use App\Surfaces\Pos\Http\Controllers\StatisticsController;
 use App\Surfaces\Pos\Http\Controllers\WishController;
 use Illuminate\Support\Facades\Route;
@@ -179,6 +180,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::middleware('permission:circulation.manage')->group(function (): void {
         Route::post('/betrieb/scan', PosScanController::class)
             ->name('pos.scan');
+
+        Route::get('/betrieb/einsortieren', [ShelvingController::class, 'index'])->name('pos.shelving');
+        Route::post('/betrieb/einsortieren', [ShelvingController::class, 'scan'])->name('pos.shelving.scan');
 
         Route::get('/betrieb/ausleihe', [PosTerminalController::class, 'start'])->name('pos.terminal');
         Route::post('/betrieb/ausleihe', [PosTerminalController::class, 'startScan'])->name('pos.terminal.start');

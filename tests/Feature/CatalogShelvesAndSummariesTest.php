@@ -77,7 +77,8 @@ it('moves the copies along when a shelf is renamed and refuses to delete shelves
 });
 
 it('keeps shelf management for the administration only', function (): void {
-    $this->actingAs(shelfUser('staff'))->get(route('administration.shelves.index'))->assertForbidden();
+    $this->actingAs(shelfUser('student_ag_basic'))->get(route('administration.shelves.index'))->assertForbidden();
+    $this->actingAs(shelfUser('staff'))->get(route('administration.shelves.index'))->assertOk()->assertSee('Regalbretter');
     $this->actingAs(shelfUser('student_ag_extended'))->get(route('administration.shelves.index'))->assertForbidden();
     $this->actingAs(shelfUser('management'))->get(route('administration.shelves.index'))->assertOk();
     $this->actingAs(shelfUser('management'))->get(route('pos.processes'))->assertSee('Regalbretter pflegen');
