@@ -348,3 +348,67 @@ it('keeps the terminal away from roles without circulation rights', function (st
     $this->actingAs(terminalUser($role))->get(route('pos.terminal.person'))->assertForbidden();
     $this->actingAs(terminalUser($role))->post(route('pos.terminal.confirm'))->assertForbidden();
 })->with(['technical_admin', 'student', 'teacher']);
+
+it('mails the receipt automatically when the library account has an address and still allows printing', function (): void {
+    Mail::fake();
+    $user = terminalUser();
+    terminalPatron('S-TM-30');
+    terminalCopy('TM-AUTO');
+
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-30']);
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-AUTO']);
+    $response = $this->post(route('pos.terminal.confirm'));
+
+    $transaction = LoanTransaction::query()->firstOrFail();
+    $response->assertRedirect(route('pos.terminal.receipt', ['transactionId' => $transaction->getKey()]))
+        ->assertSessionHas('terminal_notice', static fn (string $text): bool => str_contains($text, 'S-TM-30@example.invalid') && str_contains($text, 'Drucken'));
+
+    Mail::assertSent(TransactionReceiptMail::class, 1);
+    Mail::assertSent(TransactionReceiptMail::class, static fn (TransactionReceiptMail $mail): bool => $mail->hasTo('S-TM-30@example.invalid'));
+
+    expect($transaction->fresh()->emailed_to)->toBe('S-TM-30@example.invalid')
+        ->and($transaction->fresh()->emailed_at)->not->toBeNull()
+        ->and(AuditEvent::query()->where('action', 'circulation.transaction.emailed')->count())->toBe(1);
+
+    // Der Druck bleibt möglich.
+    $this->get(route('pos.terminal.receipt', ['transactionId' => $transaction->getKey()]))->assertOk()->assertSee('Beleg drucken');
+});
+
+it('sends no automatic receipt without an address, without a person or when the rule is off', function (): void {
+    Mail::fake();
+    $user = terminalUser();
+    terminalPatron('S-TM-31', ['email' => null]);
+    terminalCopy('TM-NONE');
+
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-31']);
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-NONE']);
+    $this->post(route('pos.terminal.confirm'))->assertSessionMissing('terminal_notice');
+
+    Mail::assertNothingSent();
+
+    config(['circulation.auto_receipt_mail' => false]);
+    terminalPatron('S-TM-32');
+    terminalCopy('TM-OFF');
+    $this->post(route('pos.terminal.start'), ['code' => 'S-TM-32']);
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-OFF']);
+    $this->post(route('pos.terminal.confirm'));
+
+    Mail::assertNothingSent();
+});
+
+it('does not disturb the counter when the mail server fails', function (): void {
+    $user = terminalUser();
+    terminalPatron('S-TM-33');
+    terminalCopy('TM-FAIL');
+    Mail::shouldReceive('to')->andThrow(new RuntimeException('Mailserver nicht erreichbar'));
+
+    $this->actingAs($user)->post(route('pos.terminal.start'), ['code' => 'S-TM-33']);
+    $this->post(route('pos.terminal.scan'), ['code' => 'TM-FAIL']);
+    $transaction = null;
+
+    $this->post(route('pos.terminal.confirm'))->assertRedirect()->assertSessionHasNoErrors();
+
+    $transaction = LoanTransaction::query()->firstOrFail();
+    expect($transaction->emailed_at)->toBeNull()->and($transaction->checked_out_count)->toBe(1);
+    $this->get(route('pos.terminal.receipt', ['transactionId' => $transaction->getKey()]))->assertOk();
+});

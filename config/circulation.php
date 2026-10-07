@@ -33,6 +33,9 @@ return [
     // Wie viele Vormerkungen je aktivem Exemplar eines Titels angenommen werden (1 = die Warteschlange ist nie länger als die Zahl der Exemplare).
     'max_reservations_per_copy' => 1,
 
+    // Belege: Nach jedem Vorgang automatisch per E-Mail schicken, wenn es eine Adresse gibt (Drucken bleibt möglich).
+    'auto_receipt_mail' => true,
+
     // Buchwünsche: Höchstzahl offener Wünsche je Ausleihkonto.
     'max_open_wishes' => 3,
 ];

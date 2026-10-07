@@ -58,6 +58,13 @@ final class SettingsRegistry
                 ],
             ],
             [
+                'title' => 'Belege',
+                'lead' => 'Nach jedem Vorgang am Ausleihplatz gibt es einen Beleg. Er lässt sich immer drucken.',
+                'items' => [
+                    $this->bool('circulation.auto_receipt_mail', 'Beleg automatisch per E-Mail schicken, wenn am Ausleihkonto eine Adresse steht'),
+                ],
+            ],
+            [
                 'title' => 'Buchwünsche',
                 'lead' => '',
                 'items' => [

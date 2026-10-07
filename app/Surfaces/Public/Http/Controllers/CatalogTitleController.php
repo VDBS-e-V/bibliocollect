@@ -55,20 +55,28 @@ final class CatalogTitleController
 
         $copyStates = $availability->forCopies($copyIds);
 
-        // Vormerken ist nur sinnvoll, solange kein Exemplar verfügbar ist.
+        // Vormerken ist nur sinnvoll, solange kein Exemplar verfügbar ist. Die Seite sagt aber immer, warum der Knopf fehlt.
         $reserveState = null;
 
-        if ($titleAvailability->hasActiveCopies() && ! $titleAvailability->isAvailable()) {
+        if ($titleAvailability->hasActiveCopies()) {
             $user = auth()->user();
 
             if (! $user instanceof User) {
-                $reserveState = 'login';
+                $reserveState = $titleAvailability->isAvailable() ? null : 'login';
             } elseif ($user->patron_id !== null) {
-                $reserveState = Reservation::query()
-                    ->where('patron_id', $user->patron_id)
-                    ->where('title_id', (string) $title->getKey())
-                    ->whereIn('status', ReservationStatus::openValues())
-                    ->exists() ? 'reserved' : 'ready';
+                $maximum = max(0, (int) config('circulation.max_open_reservations', 5));
+                $own = Reservation::query()->where('patron_id', $user->patron_id)->whereIn('status', ReservationStatus::openValues());
+                $reservedHere = (clone $own)->where('title_id', (string) $title->getKey())->exists();
+                $queue = $titleAvailability->waitingReservations + $titleAvailability->heldCopies;
+
+                $reserveState = match (true) {
+                    $reservedHere => 'reserved',
+                    $titleAvailability->isAvailable() => 'available',
+                    $maximum === 0 => 'off',
+                    (clone $own)->count() >= $maximum => 'limit',
+                    $queue >= $titleAvailability->activeCopies * max(1, (int) config('circulation.max_reservations_per_copy', 1)) => 'full',
+                    default => 'ready',
+                };
             }
         }
 

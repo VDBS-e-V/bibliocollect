@@ -12,6 +12,7 @@ use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
+use App\Modules\Patrons\Queries\SearchPatronsQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -69,7 +70,23 @@ final class WishController
             ->header('Cache-Control', 'private, no-store');
     }
 
-    /** Wunsch vom Tresen erfassen, mit oder ohne Person (Bibliotheksnummer). */
+    /** Eigene Seite zum Erfassen: ISBN-Abfrage und Namenssuche für die Person (ohne Skript über „Person suchen“). */
+    public function create(Request $request, SearchPatronsQuery $patrons): Response
+    {
+        $term = trim((string) $request->query('person', ''));
+        $selected = trim((string) $request->query('patron_id', ''));
+
+        return response()
+            ->view('pages.surfaces.pos.wishes.create', [
+                'term' => $term,
+                'matches' => $term !== '' ? $patrons->execute($term, 15)->filter(static fn (Patron $patron): bool => $patron->status === PatronStatus::Active)->values() : collect(),
+                'selected' => $selected,
+                'searched' => $term !== '',
+            ])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Wunsch vom Tresen erfassen, mit oder ohne Person (Auswahl nach Namenssuche oder Bibliotheksnummer). */
     public function store(Request $request, CreateBookWishAction $create): RedirectResponse
     {
         $data = $request->validate([
@@ -78,11 +95,20 @@ final class WishController
             'isbn' => ['nullable', 'string', 'max:30'],
             'note' => ['nullable', 'string', 'max:500'],
             'library_number' => ['nullable', 'string', 'max:40'],
+            'patron_id' => ['nullable', 'string', 'max:40'],
         ], ['title.required' => 'Bitte einen Titel angeben.']);
 
         $patron = null;
 
-        if (($data['library_number'] ?? '') !== '') {
+        if (($data['patron_id'] ?? '') !== '') {
+            $patron = Patron::query()->where('status', PatronStatus::Active->value)->find($data['patron_id']);
+
+            if (! $patron instanceof Patron) {
+                return back()->withInput()->withErrors(['person' => 'Diese Person gibt es nicht oder das Ausleihkonto ist nicht aktiv. Bitte neu suchen.']);
+            }
+        }
+
+        if ($patron === null && ($data['library_number'] ?? '') !== '') {
             $patron = Patron::query()->where('status', PatronStatus::Active->value)->whereRaw('lower(library_number) = ?', [mb_strtolower(trim($data['library_number']))])->first();
 
             if (! $patron instanceof Patron) {

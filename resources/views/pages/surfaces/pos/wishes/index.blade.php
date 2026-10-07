@@ -13,6 +13,10 @@
         <x-ui.alert variant="error" title="Fehler">{{ $errors->first() }}</x-ui.alert>
     @endif
 
+    <div class="bc-context-actions">
+        <x-ui.button href="{{ route('pos.wishes.create') }}">Buchwunsch erfassen</x-ui.button>
+    </div>
+
     <form method="get" action="{{ route('pos.wishes.index') }}" class="bc-audit-filter" role="search">
         <x-ui.select label="Anzeigen" name="status" id="wish-filter" data-auto-submit>
             <option value="offen" @selected($filter === 'offen')>Offene Wünsche</option>
@@ -79,25 +83,4 @@
         @endif
     </section>
 
-    <section class="bc-content-section" aria-labelledby="wish-new-heading">
-        <div class="bc-section-heading"><h2 id="wish-new-heading">Wunsch am Tresen erfassen</h2></div>
-        <form method="post" action="{{ route('pos.wishes.store') }}" class="bc-audit-filter">
-            @csrf
-            <div class="bc-field">
-                <label class="bc-field__label" for="new-wish-isbn">ISBN</label>
-                <div class="bc-wish-form__isbn">
-                    <input id="new-wish-isbn" class="bc-field__control" data-isbn-field name="isbn" type="text" inputmode="numeric" value="{{ old('isbn') }}" autocomplete="off" aria-describedby="new-wish-isbn-status">
-                    <button type="button" class="bc-wish-form__search" data-isbn-lookup="{{ route('public.wishes.lookup') }}" aria-label="ISBN nachschlagen und Titel vorschlagen lassen">
-                        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm5.5-2 5 5"/></svg>
-                    </button>
-                </div>
-                <p id="new-wish-isbn-status" data-isbn-status class="bc-wish-form__status" role="status" aria-live="polite"></p>
-            </div>
-            <x-ui.input label="Titel" name="title" id="new-wish-title" :value="old('title')" required />
-            <x-ui.input label="Autor:in" name="author" id="new-wish-author" :value="old('author')" />
-            <x-ui.input label="Bibliotheksnummer der Person (optional)" name="library_number" id="new-wish-number" :value="old('library_number')" hint="Mit Nummer sieht die Person den Stand in ihrem Konto." />
-            <x-ui.input label="Anmerkung" name="note" id="new-wish-note" :value="old('note')" maxlength="500" />
-            <x-ui.button type="submit">Wunsch erfassen</x-ui.button>
-        </form>
-    </section>
 </x-app-shell>

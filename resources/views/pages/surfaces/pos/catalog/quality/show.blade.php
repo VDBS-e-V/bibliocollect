@@ -113,7 +113,7 @@
                             <tbody>
                                 @foreach ($suggestions as $change)
                                     <tr>
-                                        <td>
+                                        <td class="bc-quality-check-cell">
                                             <label class="bc-quality-check">
                                                 <input type="checkbox" name="changes[]" value="{{ $change->key }}" @checked($change->selected)>
                                                 <span class="sr-only">{{ $change->label }} übernehmen</span>
@@ -153,7 +153,7 @@
                                 <tbody>
                                     @foreach ($differences as $change)
                                         <tr>
-                                            <td>
+                                            <td class="bc-quality-check-cell">
                                                 <label class="bc-quality-check">
                                                     <input type="checkbox" name="changes[]" value="{{ $change->key }}">
                                                     <span class="sr-only">{{ $change->label }} übernehmen</span>

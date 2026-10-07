@@ -7,6 +7,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 use App\Modules\Catalog\Actions\CreateTitleAction;
 use App\Modules\Catalog\Actions\UpdateTitleAction;
 use App\Modules\Catalog\Models\Title;
+use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Surfaces\Pos\Http\Requests\CatalogTitleRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
@@ -22,14 +23,16 @@ final class CatalogTitleController
             ->with('catalog_success', 'Der Titel wurde angelegt.');
     }
 
-    public function show(string $titleId): Response
+    public function show(string $titleId, CopyAvailabilityService $availability): Response
     {
         $title = Title::query()
             ->with(['contributions.contributor', 'editions.copies'])
             ->findOrFail($titleId);
 
+        $copyIds = $title->editions->flatMap(static fn ($edition) => $edition->copies->map(static fn ($copy): string => (string) $copy->getKey()))->all();
+
         return response()
-            ->view('pages.surfaces.pos.catalog.show', ['title' => $title])
+            ->view('pages.surfaces.pos.catalog.show', ['title' => $title, 'copyStates' => $availability->forCopies($copyIds)])
             ->header('Cache-Control', 'private, no-store');
     }
 

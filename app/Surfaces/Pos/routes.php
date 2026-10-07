@@ -184,6 +184,7 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
     Route::middleware('permission:wishes.manage')->group(function (): void {
         Route::get('/betrieb/buchwuensche', [WishController::class, 'index'])->name('pos.wishes.index');
+        Route::get('/betrieb/buchwuensche/neu', [WishController::class, 'create'])->name('pos.wishes.create');
         Route::post('/betrieb/buchwuensche', [WishController::class, 'store'])->name('pos.wishes.store');
         Route::patch('/betrieb/buchwuensche/{wishId}', [WishController::class, 'update'])->name('pos.wishes.update');
     });

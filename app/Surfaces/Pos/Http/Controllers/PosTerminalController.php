@@ -7,6 +7,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 use App\Models\User;
 use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Models\Copy;
+use App\Modules\Circulation\Actions\SendTransactionReceiptAction;
 use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Exceptions\CounterTransactionFailed;
 use App\Modules\Circulation\Mail\TransactionReceiptMail;
@@ -377,7 +378,7 @@ final class PosTerminalController
         return redirect()->route('pos.terminal')->with('terminal_notice', $hadItems ? 'Der Vorgang wurde verworfen. Es wurde nichts gebucht.' : null);
     }
 
-    public function confirm(Request $request, CounterTransactionService $service): RedirectResponse
+    public function confirm(Request $request, CounterTransactionService $service, SendTransactionReceiptAction $receipts): RedirectResponse
     {
         $actor = $request->user();
         abort_unless($actor instanceof User, 403);
@@ -392,7 +393,17 @@ final class PosTerminalController
 
         $request->session()->forget(self::SESSION_KEY);
 
-        return redirect()->route('pos.terminal.receipt', ['transactionId' => $transaction->getKey()]);
+        $redirect = redirect()->route('pos.terminal.receipt', ['transactionId' => $transaction->getKey()]);
+        $address = config('circulation.auto_receipt_mail', true) ? $receipts->recipient($transaction->load('patron')) : null;
+
+        if ($address !== null) {
+            // Nach der Antwort verschicken: Ein langsamer Mailserver hält den Tresen nicht auf, ein Fehler bleibt ohne Folgen.
+            defer(static fn (): bool => $receipts->execute($transaction, $address));
+
+            $redirect->with('terminal_notice', 'Der Beleg wird an '.$address.' geschickt. Drucken geht weiterhin.');
+        }
+
+        return $redirect;
     }
 
     public function receipt(string $transactionId): Response
@@ -488,18 +499,6 @@ final class PosTerminalController
 
     private function recipient(LoanTransaction $transaction): ?string
     {
-        $patron = $transaction->patron;
-
-        if ($patron === null) {
-            return null;
-        }
-
-        if (is_string($patron->email) && $patron->email !== '') {
-            return $patron->email;
-        }
-
-        $user = User::query()->where('patron_id', $patron->getKey())->whereNotNull('email_verified_at')->first();
-
-        return $user?->email;
+        return app(SendTransactionReceiptAction::class)->recipient($transaction);
     }
 }

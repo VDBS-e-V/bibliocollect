@@ -21,6 +21,14 @@
         <x-ui.alert variant="error" title="Fehler">Bitte prüfe die markierten Eingaben.</x-ui.alert>
     @endif
 
+    <section class="bc-content-section" id="exemplare" aria-labelledby="catalog-copies-heading">
+        <div class="bc-section-heading bc-section-heading--with-meta">
+            <h2 id="catalog-copies-heading">Exemplare</h2>
+            <span>{{ $title->editions->sum(fn ($edition) => $edition->copies->count()) }}</span>
+        </div>
+        <x-catalog.staff-copies :title="$title" :states="$copyStates" />
+    </section>
+
     <section class="bc-content-section" aria-labelledby="catalog-title-data-heading">
         <div class="bc-section-heading"><h2 id="catalog-title-data-heading">Titeldaten</h2></div>
 

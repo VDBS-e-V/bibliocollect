@@ -139,7 +139,31 @@ it('records wishes at the counter with or without a person', function (): void {
     $this->actingAs($staff)->post(route('pos.wishes.store'), ['title' => 'Falsche Nummer', 'library_number' => 'X-0'])->assertSessionHasErrors('library_number');
 
     expect(BookWish::query()->count())->toBe(2)->and(BookWish::query()->whereNull('patron_id')->count())->toBe(1);
-    $this->actingAs($staff)->get(route('pos.wishes.index'))->assertSee('ohne Person erfasst')->assertSee('Tresenwunsch')->assertSee('data-isbn-lookup', false)->assertSee(route('public.wishes.lookup'), false);
+    $this->actingAs($staff)->get(route('pos.wishes.index'))->assertSee('ohne Person erfasst')->assertSee('Tresenwunsch')->assertSee('Buchwunsch erfassen')->assertSee(route('pos.wishes.create'), false);
+    $this->actingAs($staff)->get(route('pos.wishes.create'))->assertOk()->assertSee('data-isbn-lookup', false)->assertSee(route('public.wishes.lookup'), false);
+});
+
+it('records a wish on its own page and picks the person through a name search', function (): void {
+    $staff = wishUser('staff');
+    $patron = wishPatron('W-20');
+    $patron->forceFill(['first_name' => 'Zora', 'last_name' => 'Suchtreffer'])->save();
+    $other = wishPatron('W-21');
+    $other->forceFill(['first_name' => 'Zora', 'last_name' => 'Anders'])->save();
+
+    // Namenssuche: Treffer als Auswahlliste, die Eingaben bleiben erhalten.
+    $page = $this->actingAs($staff)->get(route('pos.wishes.create', ['person' => 'Suchtreffer', 'title' => 'Mein Wunschbuch', 'isbn' => '9783791504650']))->assertOk();
+    $page->assertSee('Suchtreffer, Zora')->assertDontSee('Anders, Zora')->assertSee('Mein Wunschbuch')->assertSee('9783791504650')->assertSee('name="patron_id"', false);
+
+    $this->get(route('pos.wishes.create', ['person' => 'xyzxyz']))->assertSee('Keine aktive Person gefunden');
+    $this->get(route('pos.wishes.create', ['person' => 'Zora']))->assertSee('Suchtreffer, Zora')->assertSee('Anders, Zora');
+
+    // Speichern mit der gewählten Person: Der Wunsch gehört ihr.
+    $this->post(route('pos.wishes.store'), ['title' => 'Mein Wunschbuch', 'patron_id' => (string) $patron->getKey()])->assertRedirect(route('pos.wishes.index'));
+    expect(BookWish::query()->where('title', 'Mein Wunschbuch')->value('patron_id'))->toBe((string) $patron->getKey());
+
+    // Eine ungültige Person wird abgelehnt, ohne Person geht es weiterhin.
+    $this->post(route('pos.wishes.store'), ['title' => 'Falsche Person', 'patron_id' => 'gibt-es-nicht'])->assertSessionHasErrors('person');
+    $this->post(route('pos.wishes.store'), ['title' => 'Ohne Person', 'patron_id' => ''])->assertRedirect(route('pos.wishes.index'));
 });
 
 it('restricts wish handling to staff and management', function (): void {

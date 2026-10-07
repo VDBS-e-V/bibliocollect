@@ -112,6 +112,14 @@
                     </form>
                 @elseif ($reserveState === 'reserved')
                     <p class="bc-public-reserve"><x-ui.badge variant="success">Vorgemerkt</x-ui.badge> <a href="{{ route('portal.home') }}#vormerkungen">Zu meinen Vormerkungen</a></p>
+                @elseif ($reserveState === 'available')
+                    <p class="bc-public-reserve">Ein Exemplar ist da. Komm in die Bibliothek und leih es direkt aus, vormerken ist nur nötig, wenn alle Exemplare ausgeliehen sind.</p>
+                @elseif ($reserveState === 'full')
+                    <p class="bc-public-reserve">Alle Exemplare sind ausgeliehen und es gibt schon so viele Vormerkungen wie Exemplare. Versuche es später noch einmal.</p>
+                @elseif ($reserveState === 'limit')
+                    <p class="bc-public-reserve">Du hast schon so viele Vormerkungen, wie erlaubt sind. <a href="{{ route('portal.home') }}#vormerkungen">Zu meinen Vormerkungen</a></p>
+                @elseif ($reserveState === 'off')
+                    <p class="bc-public-reserve">Vormerken ist zurzeit nicht möglich.</p>
                 @elseif ($reserveState === 'login')
                     <p class="bc-public-reserve">Alle Exemplare sind ausgeliehen. <a href="{{ route('login') }}">Melde dich an</a>, um den Titel vorzumerken.</p>
                 @endif

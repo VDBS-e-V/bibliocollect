@@ -104,14 +104,10 @@
     <section class="bc-content-section" aria-labelledby="catalog-results-heading">
         <div class="bc-section-heading bc-section-heading--with-meta">
             <h2 id="catalog-results-heading">Treffer</h2>
-            @if ($titles !== null)
-                <span>{{ $titles->total() }} gefunden</span>
-            @endif
+            <span>{{ $titles->total() }} {{ $criteria->hasSearchInput() ? 'gefunden' : 'Titel im Katalog' }}</span>
         </div>
 
-        @if (! $criteria->hasSearchInput())
-            <x-ui.alert title="Gezielte Recherche">Fülle mindestens ein Such- oder Filterfeld aus, um vorhandene Titel zu öffnen.</x-ui.alert>
-        @elseif ($titles === null || $titles->count() === 0)
+        @if ($titles->count() === 0)
             <x-ui.alert title="Keine Treffer">Für diese Kombination wurde kein Titel gefunden.</x-ui.alert>
         @else
             <x-catalog.pagination-controls
@@ -146,6 +142,10 @@
                                 {{ $title->contributions->pluck('contributor.display_name')->filter()->join(', ') ?: '—' }}
                             </td>
                             <td>
+                                @php
+                                    $copyList = $title->editions->flatMap(fn ($edition) => $edition->copies);
+                                    $available = $copyList->filter(fn ($copy): bool => $copy->status->value === 'active' && ! ($copyStates[(string) $copy->getKey()]->loaned ?? false) && ! ($copyStates[(string) $copy->getKey()]->held ?? false))->count();
+                                @endphp
                                 <strong>{{ $title->editions->count() }} Ausgabe(n)</strong>
                                 @if ($latestEdition)
                                     <div class="bc-catalog-muted">
@@ -154,6 +154,10 @@
                                         @if ($latestEdition->isbn) · ISBN {{ $latestEdition->isbn }} @endif
                                     </div>
                                 @endif
+                                <details class="bc-catalog-copies-inline">
+                                    <summary>{{ $copyList->count() }} {{ $copyList->count() === 1 ? 'Exemplar' : 'Exemplare' }}, {{ $available }} da</summary>
+                                    <x-catalog.staff-copies :title="$title" :states="$copyStates" />
+                                </details>
                             </td>
                             <td><a href="{{ route('pos.catalog.titles.show', ['titleId' => $title->getKey()]) }}">Öffnen</a></td>
                         </tr>

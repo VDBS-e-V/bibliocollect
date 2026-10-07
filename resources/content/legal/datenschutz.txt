@@ -17,6 +17,7 @@ Datenschutzbeauftragte:r: [BITTE ERGÄNZEN: Name und Kontakt, oder streichen, fa
 - Bibliotheksausweis: Eine zufällige Ausweisnummer und die Zuordnung zu deinem Ausleihkonto. Auf dem Ausweis stehen nur die Nummer und der Name, den du selbst einträgst.
 - Onlinekonto (nur wenn du eines hast): Name, E-Mail-Adresse, ein verschlüsseltes Passwort, deine Rollen und ob du Erinnerungen per E-Mail bekommst.
 - Ausleihen, Verlängerungen, Vormerkungen und Belege: Welches Medium du wann ausgeliehen, verlängert, zurückgegeben oder vorgemerkt hast.
+- Belege: Nach jedem Vorgang am Ausleihplatz bekommst du einen Beleg. Steht an deinem Ausleihkonto oder Onlinekonto eine E-Mail-Adresse, schicken wir ihn automatisch dorthin; wer das nicht möchte, lässt die Adresse am Ausleihkonto leer. Gedruckt bekommst du ihn immer.
 - Erinnerungen: Welche Erinnerungs-E-Mails wir dir geschickt haben, damit sie nicht doppelt kommen, und ob am Ausleihkonto Erinnerungen an die hinterlegte Adresse gehen sollen.
 - Buchwünsche: Titel, Autor:in, ISBN und deine Bemerkung. Wenn du eingeloggt bist, gehört der Wunsch zu deinem Konto. Als Gast kannst du freiwillig Name und E-Mail angeben, damit wir dir antworten können.
 - Protokoll: Wichtige Vorgänge in der Bibliothek (zum Beispiel Ausleihe, Katalogänderungen, Kontoänderungen) mit dem handelnden Konto und der Uhrzeit, damit Änderungen nachvollziehbar bleiben.

@@ -79,3 +79,8 @@
         display: grid;
     }
 }
+
+/* Exemplare direkt in der Trefferliste der Katalogpflege */
+.bc-catalog-copies-inline { margin-top: .5rem; }
+.bc-catalog-copies-inline summary { cursor: pointer; font-weight: 700; }
+.bc-catalog-copies-inline[open] { padding-bottom: .5rem; }

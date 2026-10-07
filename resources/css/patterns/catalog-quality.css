@@ -90,13 +90,25 @@
 .bc-quality-changes th[scope='row'] { text-align: left; font-weight: 700; }
 .bc-quality-changes td { overflow-wrap: anywhere; }
 
+/* Das Auswahlfeld füllt die ganze Tabellenzelle: Ein Klick irgendwo in der Zelle setzt oder nimmt das Häkchen. */
+.bc-quality-check-cell {
+    position: relative;
+    width: 4rem;
+    min-width: 4rem;
+    padding: 0 !important;
+}
+
 .bc-quality-check {
-    display: inline-grid;
+    position: absolute;
+    inset: 0;
+    display: grid;
     place-items: center;
-    min-width: 2.75rem;
     min-height: 2.75rem;
     cursor: pointer;
 }
+
+.bc-quality-check:hover { background: var(--bg-brand-soft); }
+.bc-quality-check:has(input:focus-visible) { outline: 3px solid var(--focus-ring); outline-offset: -3px; }
 
 .bc-quality-check input { width: 1.2rem; height: 1.2rem; }
 
