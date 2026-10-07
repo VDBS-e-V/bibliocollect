@@ -12,7 +12,8 @@ use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
 
 /**
- * Prüft die gelesenen Zeilen gegen Schule und Bestand und legt fest, was passieren würde. Schreibt nichts.
+ * Prüft die gelesenen Zeilen einer Klassenliste gegen Schule und Bestand und legt fest, was passieren würde. Schreibt nichts.
+ * Alle Zeilen gehören zu der Klasse, die beim Import gewählt wurde, und sind Schüler:innen.
  *
  * Status je Zeile: `new` (wird angelegt), `existing` (gleiche Person ist schon vorhanden, wird übersprungen),
  * `duplicate` (in der Datei doppelt, wird übersprungen) oder `error` (blockiert den Import).
@@ -21,24 +22,20 @@ final class PatronImportPlanner
 {
     /**
      * @param  list<array{line: int, values: array<string, string>}>  $rows
-     * @return array{rows: list<array<string, mixed>>, counts: array{new: int, existing: int, duplicate: int, error: int}, year: ?SchoolYear}
+     * @return array{rows: list<array<string, mixed>>, counts: array{new: int, existing: int, duplicate: int, error: int}, year: ?SchoolYear, class: ?SchoolClass}
      */
-    public function plan(array $rows): array
+    public function plan(array $rows, ?string $classId): array
     {
         $year = SchoolYear::query()->where('is_active', true)->first();
 
-        $classes = $year !== null
-            ? SchoolClass::query()->where('school_year_id', $year->getKey())->where('is_active', true)->get()
-                ->keyBy(fn (SchoolClass $class): string => $this->key($class->name))
-            : collect();
+        $class = $year !== null && $classId !== null && $classId !== ''
+            ? SchoolClass::query()->where('school_year_id', $year->getKey())->where('is_active', true)->find($classId)
+            : null;
 
         $existingPeople = Patron::query()->get(['first_name', 'last_name', 'birth_date'])
             ->mapWithKeys(fn (Patron $patron): array => [$this->personKey($patron->first_name, $patron->last_name, $patron->birth_date->toDateString()) => true]);
 
-        $existingNumbers = Patron::query()->pluck('library_number')->mapWithKeys(fn (string $number): array => [mb_strtolower($number) => true])->all();
-
         $seenPeople = [];
-        $seenNumbers = [];
         $planned = [];
         $counts = ['new' => 0, 'existing' => 0, 'duplicate' => 0, 'error' => 0];
 
@@ -46,10 +43,10 @@ final class PatronImportPlanner
             $values = $row['values'];
             $messages = [];
 
-            $kind = $this->kind($values['art']);
-
-            if ($kind === null) {
-                $messages[] = 'Unbekannte Art „'.$values['art'].'“ (erlaubt: Schüler:in, Lehrkraft, Mitarbeiter:in).';
+            if (! $class instanceof SchoolClass) {
+                $messages[] = $year === null
+                    ? 'Es ist kein Schuljahr aktiv, daher kann keine Klasse zugeordnet werden.'
+                    : 'Die gewählte Klasse gibt es im aktiven Schuljahr '.$year->name.' nicht (mehr).';
             }
 
             if ($values['vorname'] === '' || $values['nachname'] === '') {
@@ -66,36 +63,6 @@ final class PatronImportPlanner
                 $messages[] = 'Die E-Mail-Adresse ist ungültig.';
             }
 
-            $classId = null;
-            $className = null;
-
-            if ($kind === PatronKind::Student) {
-                if ($values['klasse'] === '') {
-                    $messages[] = 'Für Schüler:innen wird eine Klasse benötigt.';
-                } elseif ($year === null) {
-                    $messages[] = 'Es ist kein Schuljahr aktiv, daher kann keine Klasse zugeordnet werden.';
-                } else {
-                    $class = $classes->get($this->key($values['klasse']));
-
-                    if (! $class instanceof SchoolClass) {
-                        $messages[] = 'Die Klasse „'.$values['klasse'].'“ gibt es im aktiven Schuljahr '.$year->name.' nicht.';
-                    } else {
-                        $classId = (string) $class->getKey();
-                        $className = $class->name;
-                    }
-                }
-            }
-
-            $number = $values['bibliotheksnummer'];
-
-            if ($number !== '') {
-                if (mb_strlen($number) > 80) {
-                    $messages[] = 'Die Bibliotheksnummer ist zu lang.';
-                } elseif (isset($existingNumbers[mb_strtolower($number)]) || isset($seenNumbers[mb_strtolower($number)])) {
-                    $messages[] = 'Die Bibliotheksnummer „'.$number.'“ ist schon vergeben.';
-                }
-            }
-
             $status = 'new';
 
             if ($messages !== []) {
@@ -109,10 +76,6 @@ final class PatronImportPlanner
                     $status = 'duplicate';
                 } else {
                     $seenPeople[$personKey] = true;
-
-                    if ($number !== '') {
-                        $seenNumbers[mb_strtolower($number)] = true;
-                    }
                 }
             }
 
@@ -122,31 +85,18 @@ final class PatronImportPlanner
                 'line' => $row['line'],
                 'status' => $status,
                 'messages' => $messages,
-                'kind' => $kind,
+                'kind' => PatronKind::Student,
                 'first_name' => $values['vorname'],
                 'last_name' => $values['nachname'],
                 'birth_date' => $birth,
                 'email' => $values['email'] !== '' ? $values['email'] : null,
-                'school_class_id' => $classId,
-                'class_name' => $className,
-                'library_number' => $number !== '' ? $number : null,
+                'school_class_id' => $class instanceof SchoolClass ? (string) $class->getKey() : null,
+                'class_name' => $class instanceof SchoolClass ? $class->name : null,
+                'library_number' => null,
             ];
         }
 
-        return ['rows' => $planned, 'counts' => $counts, 'year' => $year];
-    }
-
-    private function kind(string $value): ?PatronKind
-    {
-        $value = $this->key($value);
-
-        // Ohne Angabe gilt Schüler:in. Sonst reicht der Wortanfang („Schüler:in“, „Lehrer“, „Mitarbeiterin“).
-        return match (true) {
-            $value === '', $value === 's', $value === 'student', str_starts_with($value, 'schueler') => PatronKind::Student,
-            $value === 'l', $value === 'teacher', str_starts_with($value, 'lehr') => PatronKind::Teacher,
-            $value === 'm', $value === 'employee', str_starts_with($value, 'mitarbeiter') => PatronKind::Employee,
-            default => null,
-        };
+        return ['rows' => $planned, 'counts' => $counts, 'year' => $year, 'class' => $class];
     }
 
     private function date(string $value): ?string

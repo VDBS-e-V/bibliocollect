@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
- * Legt die neuen Ausleihkonten einer geprüften Importdatei an. Der Import läuft ganz oder gar nicht und nur,
+ * Legt die neuen Ausleihkonten einer geprüften Klassenliste an (alle in der gewählten Klasse, ohne Ausweis). Der Import läuft ganz oder gar nicht und nur,
  * wenn die Prüfung keine Fehler meldet. Vorhandene und doppelte Personen werden übersprungen, nie überschrieben.
  */
 final readonly class ImportPatronsAction
@@ -30,10 +30,10 @@ final readonly class ImportPatronsAction
      *
      * @throws InvalidArgumentException wenn die Prüfung Fehler meldet
      */
-    public function execute(array $rows, User $actor): array
+    public function execute(array $rows, string $classId, User $actor): array
     {
-        return DB::transaction(function () use ($rows, $actor): array {
-            $plan = $this->planner->plan($rows);
+        return DB::transaction(function () use ($rows, $classId, $actor): array {
+            $plan = $this->planner->plan($rows, $classId);
 
             if ($plan['counts']['error'] > 0) {
                 throw new InvalidArgumentException('Die Datei enthält noch Fehler. Bitte korrigieren und erneut hochladen.');
@@ -48,10 +48,8 @@ final readonly class ImportPatronsAction
 
                 /** @var PatronKind $kind */
                 $kind = $row['kind'];
-                $number = $row['library_number'] ?? '';
-
                 $this->create->execute(new PatronCreateData(
-                    libraryNumber: $number,
+                    libraryNumber: '', // leer: wird zufällig vergeben
                     kind: $kind,
                     firstName: $row['first_name'],
                     lastName: $row['last_name'],
@@ -70,7 +68,7 @@ final readonly class ImportPatronsAction
                 'patrons.import.committed',
                 "Ausleihkonten importiert: {$created} angelegt, {$skipped} übersprungen.",
                 null,
-                ['created' => $created, 'skipped' => $skipped],
+                ['created' => $created, 'skipped' => $skipped, 'class_id' => $classId],
                 (int) $actor->getKey(),
             );
 

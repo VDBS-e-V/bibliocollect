@@ -9,14 +9,15 @@ use InvalidArgumentException;
 /**
  * Liest die Importdatei für Ausleihkonten (CSV, Trennzeichen Semikolon, Komma oder Tabulator, UTF-8 oder Windows-1252).
  *
- * Erwartete Spalten (Reihenfolge egal, Groß-/Kleinschreibung egal): vorname, nachname, geburtsdatum,
- * klasse, art, email, bibliotheksnummer. Pflicht sind vorname, nachname und geburtsdatum.
+ * Erwartete Spalten (Reihenfolge egal, Groß-/Kleinschreibung egal): vorname, nachname, geburtsdatum und optional email.
+ * Pflicht sind vorname, nachname und geburtsdatum. Die Klasse wird beim Import gewählt; weitere Spalten (z. B. klasse)
+ * werden ignoriert.
  */
 final class PatronCsvParser
 {
     public const MAX_ROWS = 5000;
 
-    public const COLUMNS = ['vorname', 'nachname', 'geburtsdatum', 'klasse', 'art', 'email', 'bibliotheksnummer'];
+    public const COLUMNS = ['vorname', 'nachname', 'geburtsdatum', 'email'];
 
     private const REQUIRED = ['vorname', 'nachname', 'geburtsdatum'];
 
@@ -30,16 +31,9 @@ final class PatronCsvParser
         'geburtsdatum' => 'geburtsdatum',
         'geboren' => 'geburtsdatum',
         'geburtstag' => 'geburtsdatum',
-        'klasse' => 'klasse',
-        'art' => 'art',
-        'typ' => 'art',
-        'rolle' => 'art',
         'email' => 'email',
         'emailadresse' => 'email',
         'mail' => 'email',
-        'bibliotheksnummer' => 'bibliotheksnummer',
-        'nummer' => 'bibliotheksnummer',
-        'ausweisnummer' => 'bibliotheksnummer',
     ];
 
     /**

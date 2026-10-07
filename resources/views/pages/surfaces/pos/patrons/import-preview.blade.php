@@ -2,7 +2,6 @@
     $counts = $plan['counts'];
     $statusLabels = ['new' => 'Wird angelegt', 'existing' => 'Schon vorhanden', 'duplicate' => 'Doppelt in der Datei', 'error' => 'Fehler'];
     $statusVariants = ['new' => 'success', 'existing' => 'neutral', 'duplicate' => 'neutral', 'error' => 'danger'];
-    $kindLabels = ['student' => 'Schüler:in', 'teacher' => 'Lehrkraft', 'employee' => 'Mitarbeiter:in'];
 @endphp
 
 <x-app-shell surface="pos" title="Import prüfen">
@@ -34,8 +33,8 @@
             <x-ui.badge>{{ $counts['existing'] }} schon vorhanden</x-ui.badge>
             <x-ui.badge>{{ $counts['duplicate'] }} doppelt</x-ui.badge>
             <x-ui.badge :variant="$counts['error'] > 0 ? 'danger' : 'neutral'">{{ $counts['error'] }} mit Fehler</x-ui.badge>
-            @if ($plan['year'])
-                · Klassen aus dem aktiven Schuljahr {{ $plan['year']->name }}
+            @if ($plan['class'])
+                · Klasse {{ $plan['class']->name }}@if ($plan['year']), Schuljahr {{ $plan['year']->name }}@endif
             @endif
         </p>
 
@@ -64,7 +63,6 @@
                     <th scope="col">Status</th>
                     <th scope="col">Name</th>
                     <th scope="col">Geburtsdatum</th>
-                    <th scope="col">Art</th>
                     <th scope="col">Klasse</th>
                     <th scope="col">Hinweis</th>
                 </tr>
@@ -76,7 +74,6 @@
                         <td><x-ui.badge :variant="$statusVariants[$row['status']]">{{ $statusLabels[$row['status']] }}</x-ui.badge></td>
                         <td>{{ trim($row['first_name'].' '.$row['last_name']) ?: '—' }}</td>
                         <td class="bc-tabular">{{ $row['birth_date'] ? \Carbon\Carbon::parse($row['birth_date'])->format('d.m.Y') : '—' }}</td>
-                        <td>{{ $row['kind'] ? $kindLabels[$row['kind']->value] : '—' }}</td>
                         <td>{{ $row['class_name'] ?? '—' }}</td>
                         <td>
                             @foreach ($row['messages'] as $message)
