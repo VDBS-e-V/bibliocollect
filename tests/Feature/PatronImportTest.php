@@ -111,7 +111,7 @@ it('classifies rows as new, existing, duplicate or error without writing', funct
         ->and(Patron::query()->count())->toBe(1);
 });
 
-it('imports new patrons with generated numbers per kind and skips known ones', function (): void {
+it('imports new patrons with random six-digit numbers and skips known ones', function (): void {
     [, $classes] = importSchool();
     Patron::query()->create(['library_number' => 'S-10007', 'kind' => PatronKind::Student, 'status' => PatronStatus::Active, 'first_name' => 'Alt', 'last_name' => 'Bestand', 'birth_date' => '2010-01-01', 'school_class_id' => $classes['5a']->getKey()]);
 
@@ -128,13 +128,13 @@ it('imports new patrons with generated numbers per kind and skips known ones', f
     $teacher = Patron::query()->where('last_name', 'Lehrerin')->firstOrFail();
 
     expect($result)->toBe(['created' => 4, 'skipped' => 1])
-        ->and($mia->library_number)->toBe('S-10008')
+        ->and($mia->library_number)->toMatch('/^[1-9]\d{5}$/')
         ->and($mia->school_class_id)->toBe((string) $classes['5a']->getKey())
         ->and($mia->email)->toBe('mia@example.invalid')
         ->and(Patron::query()->where('first_name', 'Jonas')->first()->library_number)->toBe('ABC-1')
-        ->and($teacher->library_number)->toBe('L-20001')
+        ->and($teacher->library_number)->toMatch('/^[1-9]\d{5}$/')->and($teacher->library_number)->not->toBe($mia->library_number)
         ->and($teacher->school_class_id)->toBeNull()
-        ->and(Patron::query()->where('last_name', 'Mitarbeiter')->first()->library_number)->toBe('M-30001')
+        ->and(Patron::query()->where('last_name', 'Mitarbeiter')->first()->library_number)->toMatch('/^[1-9]\d{5}$/')
         ->and(AuditEvent::query()->where('action', 'patrons.import.committed')->count())->toBe(1);
 });
 

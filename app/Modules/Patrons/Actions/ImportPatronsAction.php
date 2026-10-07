@@ -9,7 +9,6 @@ use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Patrons\DTOs\PatronCreateData;
 use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Import\PatronImportPlanner;
-use App\Modules\Patrons\Models\Patron;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -19,12 +18,6 @@ use InvalidArgumentException;
  */
 final readonly class ImportPatronsAction
 {
-    private const PREFIXES = [
-        'student' => ['S', 10001],
-        'teacher' => ['L', 20001],
-        'employee' => ['M', 30001],
-    ];
-
     public function __construct(
         private PatronImportPlanner $planner,
         private CreatePatronAction $create,
@@ -46,7 +39,6 @@ final readonly class ImportPatronsAction
                 throw new InvalidArgumentException('Die Datei enthält noch Fehler. Bitte korrigieren und erneut hochladen.');
             }
 
-            $next = $this->nextNumbers();
             $created = 0;
 
             foreach ($plan['rows'] as $row) {
@@ -56,7 +48,7 @@ final readonly class ImportPatronsAction
 
                 /** @var PatronKind $kind */
                 $kind = $row['kind'];
-                $number = $row['library_number'] ?? $this->generate($kind, $next);
+                $number = $row['library_number'] ?? '';
 
                 $this->create->execute(new PatronCreateData(
                     libraryNumber: $number,
@@ -84,40 +76,5 @@ final readonly class ImportPatronsAction
 
             return ['created' => $created, 'skipped' => $skipped];
         });
-    }
-
-    /**
-     * Nächste freie laufende Nummer je Art, ausgehend von den vorhandenen Nummern im Schema „S-10001“.
-     *
-     * @return array<string, int>
-     */
-    private function nextNumbers(): array
-    {
-        $existing = Patron::query()->pluck('library_number')->all();
-        $next = [];
-
-        foreach (self::PREFIXES as $kind => [$prefix, $start]) {
-            $highest = $start - 1;
-
-            foreach ($existing as $number) {
-                if (preg_match('/^'.$prefix.'-(\d+)$/i', $number, $match) === 1) {
-                    $highest = max($highest, (int) $match[1]);
-                }
-            }
-
-            $next[$kind] = $highest + 1;
-        }
-
-        return $next;
-    }
-
-    /** @param  array<string, int>  $next */
-    private function generate(PatronKind $kind, array &$next): string
-    {
-        [$prefix] = self::PREFIXES[$kind->value];
-        $number = $prefix.'-'.$next[$kind->value];
-        $next[$kind->value]++;
-
-        return $number;
     }
 }

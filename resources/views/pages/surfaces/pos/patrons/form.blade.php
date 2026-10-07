@@ -45,8 +45,9 @@
                     name="library_number"
                     :value="old('library_number', $patron?->library_number)"
                     :error="$errors->first('library_number')"
+                    :hint="$isCreate ? 'Leer lassen: Es wird eine zufällige sechsstellige Nummer vergeben.' : null"
                     autocomplete="off"
-                    required
+                    :required="! $isCreate"
                 />
 
                 @if ($isCreate)

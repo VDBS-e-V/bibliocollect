@@ -200,3 +200,41 @@ it('does not block departed patrons', function (): void {
     expect($patron->fresh()->blocked_at)->toBeNull();
     $this->assertDatabaseCount('patron_block_events', 0);
 });
+
+it('gives a new patron a random six-digit library number without a prefix when none is entered', function (): void {
+    $staff = patronManagementUser('staff');
+    $class = patronManagementClass();
+    $numbers = [];
+
+    foreach (['Eins', 'Zwei', 'Drei'] as $name) {
+        $this->actingAs($staff)->post(route('pos.patrons.store'), [
+            'library_number' => '',
+            'kind' => 'student',
+            'first_name' => $name,
+            'last_name' => 'Zufall',
+            'birth_date' => '2014-02-03',
+            'email' => '',
+            'school_class_id' => $class->getKey(),
+            'leaving_on' => '',
+        ])->assertSessionHasNoErrors();
+
+        $numbers[] = Patron::query()->where('first_name', $name)->firstOrFail()->library_number;
+    }
+
+    foreach ($numbers as $number) {
+        expect($number)->toMatch('/^[1-9]\d{5}$/');
+    }
+
+    expect(array_unique($numbers))->toHaveCount(3);
+});
+
+it('still accepts a library number typed by hand and keeps it unique', function (): void {
+    $staff = patronManagementUser('staff');
+    $class = patronManagementClass();
+    patronManagementPatron(['library_number' => '123456']);
+
+    $payload = ['kind' => 'student', 'first_name' => 'Hand', 'last_name' => 'Nummer', 'birth_date' => '2014-02-03', 'email' => '', 'school_class_id' => $class->getKey(), 'leaving_on' => ''];
+
+    $this->actingAs($staff)->post(route('pos.patrons.store'), $payload + ['library_number' => '123456'])->assertSessionHasErrors('library_number');
+    $this->actingAs($staff)->post(route('pos.patrons.store'), $payload + ['library_number' => '654321'])->assertSessionHasNoErrors();
+});

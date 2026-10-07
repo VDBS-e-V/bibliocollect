@@ -15,7 +15,7 @@ Das Altsystem kennt nur Medien, keine Ausleihen. Für Schüler:innen, Lehrkräft
 | `klasse` | für Schüler:innen | Name einer aktiven Klasse im **aktiven** Schuljahr, z. B. `5a`; Groß-/Kleinschreibung und Leerzeichen sind egal |
 | `art` | nein | `Schüler:in` (Standard bei leerem Feld), `Lehrkraft`, `Mitarbeiter:in`; der Wortanfang genügt |
 | `email` | nein | E-Mail am Ausleihkonto |
-| `bibliotheksnummer` | nein | sonst automatisch: `S-…` (ab 10001), `L-…` (ab 20001), `M-…` (ab 30001), jeweils die nächste freie Nummer |
+| `bibliotheksnummer` | nein | sonst automatisch: zufällige sechsstellige Zahl ohne Kennung (z. B. `482915`), nie fortlaufend und einmalig |
 
 Beispiel:
 

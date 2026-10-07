@@ -8,6 +8,7 @@ use App\Modules\Patrons\DTOs\PatronCreateData;
 use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
+use App\Modules\Patrons\Support\PatronLibraryNumber;
 
 final class CreatePatronAction
 {
@@ -15,7 +16,7 @@ final class CreatePatronAction
     {
         /** @var Patron $patron */
         $patron = Patron::query()->create([
-            'library_number' => $data->libraryNumber,
+            'library_number' => trim($data->libraryNumber) !== '' ? trim($data->libraryNumber) : PatronLibraryNumber::generate(),
             'kind' => $data->kind,
             'status' => PatronStatus::Active,
             'first_name' => $data->firstName,

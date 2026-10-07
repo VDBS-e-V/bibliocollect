@@ -21,7 +21,7 @@ final class PatronStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'library_number' => ['required', 'string', 'max:80', Rule::unique('patrons', 'library_number')],
+            'library_number' => ['nullable', 'string', 'max:80', Rule::unique('patrons', 'library_number')],
             'kind' => ['required', Rule::enum(PatronKind::class)],
             'first_name' => ['required', 'string', 'max:120'],
             'last_name' => ['required', 'string', 'max:120'],
@@ -38,7 +38,7 @@ final class PatronStoreRequest extends FormRequest
         $kind = PatronKind::from((string) $data['kind']);
 
         return new PatronCreateData(
-            libraryNumber: (string) $data['library_number'],
+            libraryNumber: (string) ($data['library_number'] ?? ''),
             kind: $kind,
             firstName: (string) $data['first_name'],
             lastName: (string) $data['last_name'],
@@ -52,7 +52,7 @@ final class PatronStoreRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'library_number' => trim((string) $this->input('library_number', '')),
+            'library_number' => $this->normalizeNullable($this->input('library_number')),
             'first_name' => trim((string) $this->input('first_name', '')),
             'last_name' => trim((string) $this->input('last_name', '')),
             'email' => $this->normalizeNullable($this->input('email')),
