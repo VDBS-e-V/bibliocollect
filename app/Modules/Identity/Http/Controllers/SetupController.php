@@ -37,6 +37,7 @@ final class SetupController
             return match ($action) {
                 'migrate' => $this->artisan('migrate', ['--force' => true], 'Migrationen ausgeführt.'),
                 'doctor' => $this->artisan('app:doctor', [], 'Prüfung abgeschlossen.'),
+                'recover' => $this->recoverAdmin($request, $assign),
                 default => $this->createAdmin($request, $assign),
             };
         } catch (Throwable $exception) {
@@ -50,6 +51,40 @@ final class SetupController
         $status = Artisan::call($command, $arguments);
 
         return $this->page($message.($status === 0 ? '' : ' (mit Fehlern, Exit-Code '.$status.')'), $status !== 0, 200, trim(Artisan::output()));
+    }
+
+    /** Notfall: Ein ausgesperrtes Verwaltungskonto bekommt ein neues Passwort, ist wieder aktiv und hat die Rolle Verwaltung. */
+    private function recoverAdmin(Request $request, AssignRoleAction $assign): Response
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'email:rfc', 'max:255'],
+            'password' => ['required', 'string', 'min:12', 'max:200'],
+        ], ['password.min' => 'Das Passwort braucht mindestens 12 Zeichen.']);
+
+        if ($validator->fails()) {
+            return $this->page((string) $validator->errors()->first(), true, 422);
+        }
+
+        $data = $validator->validated();
+        $user = User::query()->where('email', mb_strtolower(trim($data['email'])))->first();
+
+        if (! $user instanceof User) {
+            return $this->page('Zu dieser E-Mail-Adresse gibt es kein Konto.', true, 404);
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($data['password']),
+            'email_verified_at' => $user->email_verified_at ?? now(),
+            'disabled_at' => null,
+            'disabled_reason' => null,
+            'remember_token' => null,
+        ])->save();
+
+        if (! UserRoleAssignment::query()->where('user_id', $user->getKey())->where('role_key', 'management')->exists()) {
+            $assign->execute($user, 'management');
+        }
+
+        return $this->page('Das Konto '.$user->email.' ist wiederhergestellt: neues Passwort, aktiv, Rolle Verwaltung. Leere danach SETUP_TOKEN in der .env.');
     }
 
     private function createAdmin(Request $request, AssignRoleAction $assign): Response
@@ -116,6 +151,10 @@ final class SetupController
             .'<label for="admin-email">E-Mail</label><input id="admin-email" name="email" type="email" required>'
             .'<label for="admin-password">Passwort (mindestens 12 Zeichen)</label><input id="admin-password" name="password" type="password" minlength="12" required autocomplete="new-password">'
             .'<button type="submit">Konto anlegen</button></form>'
+            .'<form method="post" action="/_setup/recover">'.csrf_field().'<h2>Notfall: Zugang wiederherstellen</h2><p>Für ein ausgesperrtes Verwaltungskonto: setzt ein neues Passwort, aktiviert das Konto und vergibt die Rolle Verwaltung.</p>'.sprintf($field, 'recover')
+            .'<label for="recover-email">E-Mail des Kontos</label><input id="recover-email" name="email" type="email" required>'
+            .'<label for="recover-password">Neues Passwort (mindestens 12 Zeichen)</label><input id="recover-password" name="password" type="password" minlength="12" required autocomplete="new-password">'
+            .'<button type="submit">Zugang wiederherstellen</button></form>'
             .'<form method="post" action="/_setup/doctor">'.csrf_field().'<h2>3. Einrichtung prüfen</h2>'.sprintf($field, 'doctor').'<button type="submit">Prüfen</button></form>'
             .'</body></html>';
 

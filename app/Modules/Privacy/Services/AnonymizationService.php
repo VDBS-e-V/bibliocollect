@@ -268,36 +268,68 @@ final readonly class AnonymizationService
                 continue;
             }
 
-            if ($user instanceof User) {
-                $user->forceFill([
-                    'name' => 'Anonymisiert',
-                    'email' => 'anonymisiert-'.Str::lower((string) Str::ulid()).'@anonym.invalid',
-                    'password' => Hash::make(Str::random(64)),
-                    'remember_token' => null,
-                    'patron_id' => null,
-                ])->save();
-            }
-
-            // Die Ausweisnummer bleibt für immer reserviert, verliert aber den Bezug zur Person.
-            PatronCard::query()->where('patron_id', $patron->getKey())->update([
-                'patron_id' => null,
-                'status' => CardStatus::Blocked->value,
-                'block_reason' => CardBlockReason::Withdrawn->value,
-                'blocked_at' => $this->clock->now(),
-            ]);
-
-            $patron->forceFill([
-                'library_number' => self::MARKER.$patron->getKey(),
-                'first_name' => 'Anonymisiert',
-                'last_name' => 'Anonymisiert',
-                // Nur das Geburtsjahr bleibt (1. Januar) für Altersstatistiken.
-                'birth_date' => $patron->birth_date->copy()->startOfYear()->toDateString(),
-                'email' => null,
-                'blocked_reason' => null,
-                'school_class_id' => null,
-            ])->save();
+            $this->anonymizeOne($patron, $user);
         }
 
         return [$patrons->count(), $accounts];
+    }
+
+    /**
+     * Anonymisiert ein ausgeschiedenes Ausleihkonto sofort, zum Beispiel bei einem Löschverlangen. Ohne Austritt nicht möglich.
+     *
+     * @throws \InvalidArgumentException wenn das Konto noch nicht ausgeschieden ist
+     */
+    public function anonymizePatron(Patron $patron): void
+    {
+        if ($patron->status !== PatronStatus::Departed) {
+            throw new \InvalidArgumentException('Nur ausgeschiedene Ausleihkonten lassen sich anonymisieren. Zuerst den dauerhaften Austritt buchen.');
+        }
+
+        if (str_starts_with($patron->library_number, self::MARKER)) {
+            throw new \InvalidArgumentException('Dieses Ausleihkonto ist schon anonymisiert.');
+        }
+
+        DB::transaction(function () use ($patron): void {
+            $user = User::query()->where('patron_id', $patron->getKey())->first();
+
+            $this->anonymizeOne($patron, $user);
+
+            // Adressen, an die Belege gingen, gehören ebenfalls zur Person.
+            LoanTransaction::query()->where('patron_id', $patron->getKey())->update(['emailed_to' => null]);
+
+            $this->audit->record('privacy.patron.erased', 'Ausgeschiedenes Ausleihkonto auf Verlangen sofort anonymisiert.', null, ['patron_id' => (string) $patron->getKey()]);
+        });
+    }
+
+    private function anonymizeOne(Patron $patron, ?User $user): void
+    {
+        if ($user instanceof User) {
+            $user->forceFill([
+                'name' => 'Anonymisiert',
+                'email' => 'anonymisiert-'.Str::lower((string) Str::ulid()).'@anonym.invalid',
+                'password' => Hash::make(Str::random(64)),
+                'remember_token' => null,
+                'patron_id' => null,
+            ])->save();
+        }
+
+        // Die Ausweisnummer bleibt für immer reserviert, verliert aber den Bezug zur Person.
+        PatronCard::query()->where('patron_id', $patron->getKey())->update([
+            'patron_id' => null,
+            'status' => CardStatus::Blocked->value,
+            'block_reason' => CardBlockReason::Withdrawn->value,
+            'blocked_at' => $this->clock->now(),
+        ]);
+
+        $patron->forceFill([
+            'library_number' => self::MARKER.$patron->getKey(),
+            'first_name' => 'Anonymisiert',
+            'last_name' => 'Anonymisiert',
+            // Nur das Geburtsjahr bleibt (1. Januar) für Altersstatistiken.
+            'birth_date' => $patron->birth_date->copy()->startOfYear()->toDateString(),
+            'email' => null,
+            'blocked_reason' => null,
+            'school_class_id' => null,
+        ])->save();
     }
 }

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Circulation\Providers;
 
+use App\Modules\Catalog\Events\CopyBecameAvailable;
 use App\Modules\Circulation\Console\ExpireReservationsCommand;
+use App\Modules\Circulation\Listeners\PromoteReservationsForAvailableCopy;
 use App\Modules\Circulation\Services\OpenCirculationDepartureGuard;
 use App\Modules\Patrons\Services\PatronDepartureGuards;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 final class CirculationServiceProvider extends ServiceProvider
@@ -22,5 +25,7 @@ final class CirculationServiceProvider extends ServiceProvider
 
         // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
         $this->commands([ExpireReservationsCommand::class]);
+
+        Event::listen(CopyBecameAvailable::class, PromoteReservationsForAvailableCopy::class);
     }
 }

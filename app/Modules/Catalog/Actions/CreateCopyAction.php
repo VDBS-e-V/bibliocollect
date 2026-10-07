@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Catalog\Actions;
 
 use App\Modules\Catalog\DTOs\CopyData;
+use App\Modules\Catalog\Enums\CopyStatus;
+use App\Modules\Catalog\Events\CopyBecameAvailable;
 use App\Modules\Catalog\Exceptions\DuplicateCopyBarcode;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
@@ -14,7 +16,7 @@ final class CreateCopyAction
 {
     public function execute(Edition $edition, CopyData $data): Copy
     {
-        return DB::transaction(function () use ($edition, $data): Copy {
+        $copy = DB::transaction(function () use ($edition, $data): Copy {
             $lockedEdition = Edition::query()
                 ->whereKey($edition->getKey())
                 ->lockForUpdate()
@@ -34,5 +36,11 @@ final class CreateCopyAction
 
             return $copy;
         });
+
+        if ($copy->status === CopyStatus::Active) {
+            event(new CopyBecameAvailable($copy));
+        }
+
+        return $copy;
     }
 }

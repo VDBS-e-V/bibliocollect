@@ -379,12 +379,28 @@
                                 @enderror
                                 <x-ui.button type="submit">Als ausgeschieden markieren</x-ui.button>
                             </form>
-                            <p class="bc-management-note">Reservierungen und weitere Fachfälle reagieren später über das Ereignis <code>PatronDeparted</code>, sobald die betreffenden Module implementiert sind.</p>
                         </div>
                     @else
                         <p>Dieses Ausleihkonto ist nicht mehr aktiv. Ein weiterer Austritt ist nicht möglich.</p>
                     @endif
                 </section>
+            @endcan
+
+            @can('privacy.erase')
+                @if ($patron->status === \App\Modules\Patrons\Enums\PatronStatus::Departed && ! str_starts_with($patron->library_number, \App\Modules\Privacy\Services\AnonymizationService::MARKER))
+                    <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="erase-heading">
+                        <h2 id="erase-heading">Daten jetzt anonymisieren</h2>
+                        <p>Bei einem Löschverlangen: Name, Geburtstag (bleibt als Geburtsjahr), E-Mail, Klasse, Onlinekonto und Ausweis verlieren den Bezug zur Person, ohne die Aufbewahrungsfrist von drei Jahren abzuwarten. Das lässt sich nicht rückgängig machen.</p>
+                        <form method="post" action="{{ route('pos.patrons.anonymize', ['patronId' => $patron->getKey()]) }}" class="bc-departure-workflow">
+                            @csrf
+                            <label class="bc-departure-confirm">
+                                <input type="checkbox" name="confirm_erase" value="1" required>
+                                <span>Ich bestätige, dass die Daten dieser Person unwiderruflich anonymisiert werden sollen.</span>
+                            </label>
+                            <x-ui.button type="submit" variant="secondary" data-confirm="Die Daten dieser Person jetzt unwiderruflich anonymisieren?">Jetzt anonymisieren</x-ui.button>
+                        </form>
+                    </section>
+                @endif
             @endcan
 
             @can('patrons.block')

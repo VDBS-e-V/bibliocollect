@@ -12,12 +12,15 @@ use App\Surfaces\Pos\Http\Controllers\CatalogQualityController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
+use App\Surfaces\Pos\Http\Controllers\CopyFoundController;
 use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
 use App\Surfaces\Pos\Http\Controllers\HelpController;
 use App\Surfaces\Pos\Http\Controllers\InventoryCountController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
+use App\Surfaces\Pos\Http\Controllers\OverdueController;
 use App\Surfaces\Pos\Http\Controllers\PatronAccountCardController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
+use App\Surfaces\Pos\Http\Controllers\PatronAnonymizeController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
 use App\Surfaces\Pos\Http\Controllers\PatronCardController;
 use App\Surfaces\Pos\Http\Controllers\PatronCardDesignController;
@@ -195,6 +198,12 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::get('/betrieb/hilfe', [HelpController::class, 'index'])->name('pos.help');
     Route::get('/betrieb/hilfe/{topic}', [HelpController::class, 'show'])->name('pos.help.show');
 
+    Route::middleware('permission:circulation.manage')->group(function (): void {
+        Route::get('/betrieb/ueberfaellig', OverdueController::class)->name('pos.overdue');
+        Route::get('/betrieb/exemplar/{barcode}/gefunden', [CopyFoundController::class, 'show'])->name('pos.copy-found');
+        Route::post('/betrieb/exemplar/{barcode}/gefunden', [CopyFoundController::class, 'store'])->middleware('throttle:30,1')->name('pos.copy-found.store');
+    });
+
     Route::get('/betrieb/klassenlisten', ClassLoanReportController::class)
         ->middleware('permission:circulation.reports')
         ->name('pos.reports.class-loans');
@@ -314,6 +323,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::delete('/betrieb/ausleihkonten/{patronId}/sperre', [PatronBlockController::class, 'destroy'])
         ->middleware('permission:patrons.block')
         ->name('pos.patrons.block.destroy');
+
+    Route::post('/betrieb/ausleihkonten/{patronId}/anonymisieren', [PatronAnonymizeController::class, 'store'])
+        ->middleware(['permission:privacy.erase', 'throttle:10,1'])
+        ->name('pos.patrons.anonymize');
 
     Route::post('/betrieb/ausleihkonten/{patronId}/austritt', [PatronDepartureController::class, 'store'])
         ->middleware('permission:patrons.depart')

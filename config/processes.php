@@ -22,6 +22,7 @@ return [
                         ['label' => 'Vormerkungen bearbeiten', 'text' => 'Zurückgelegte Medien zur Abholung und die Warteschlangen im Blick.', 'route' => 'pos.reservations.index', 'permission' => 'circulation.manage'],
                         ['label' => 'Buchwunsch erfassen', 'text' => 'Das öffentliche Formular, auch für Leser:innen ohne Anmeldung; mit ISBN-Suche.', 'route' => 'public.wishes.create', 'permission' => null],
                         ['label' => 'Buchwünsche bearbeiten', 'text' => 'Wünsche von Leser:innen ansehen, annehmen, bestellen oder ablehnen.', 'route' => 'pos.wishes.index', 'permission' => 'wishes.manage'],
+                        ['label' => 'Überfällige Ausleihen ansehen', 'text' => 'Wer hat etwas überfällig? Die Liste für alle am Ausleihplatz, am längsten Überfälliges zuerst.', 'route' => 'pos.overdue', 'permission' => 'circulation.manage'],
                         ['label' => 'Überfällige Medien', 'text' => 'Klassenlisten mit überfälligen Ausleihen zum Weitergeben an die Klassenleitungen.', 'route' => 'pos.reports.class-loans', 'permission' => 'circulation.reports'],
                     ],
                 ],

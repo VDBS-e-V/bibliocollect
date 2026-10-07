@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Models\User;
+use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Circulation\Actions\ReturnLoanAction;
 use App\Modules\Circulation\Exceptions\LoanStateConflict;
@@ -34,6 +35,10 @@ final class PosScanController
 
         if ($copy instanceof Copy) {
             $loan = Loan::query()->where('copy_id', $copy->getKey())->whereNull('returned_at')->first();
+
+            if (! $loan instanceof Loan && in_array($copy->status, [CopyStatus::Lost, CopyStatus::Damaged], true)) {
+                return redirect()->route('pos.copy-found', ['barcode' => $copy->barcode]);
+            }
 
             if (! $loan instanceof Loan) {
                 return redirect()->route('pos.home')->with('workspace_error', "Das Exemplar {$copy->barcode} ist nicht ausgeliehen.");

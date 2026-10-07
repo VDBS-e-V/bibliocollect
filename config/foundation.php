@@ -20,6 +20,9 @@ return [
         'backup_path' => '.foundation/env-backups',
     ],
 
+    // Vor dem Schuljahreswechsel automatisch eine Datenbanksicherung erstellen (der Wechsel ist nicht umkehrbar).
+    'backup_before_transition' => env('BACKUP_BEFORE_TRANSITION', true),
+
     'production' => [
         'require_debug_disabled' => true,
         'require_app_key' => true,

@@ -88,6 +88,10 @@ return [
             'label' => 'Regeln der Bibliothek einstellen',
             'description' => 'Erlaubt, Leihfristen, Höchstzahlen, Vormerk- und Erinnerungsregeln im Web zu ändern.',
         ],
+        'privacy.erase' => [
+            'label' => 'Ausgeschiedene Konten sofort anonymisieren',
+            'description' => 'Erlaubt, bei einem Löschverlangen die Daten eines ausgeschiedenen Ausleihkontos sofort zu anonymisieren, ohne die Aufbewahrungsfrist abzuwarten.',
+        ],
         'shelves.manage' => [
             'label' => 'Regalbretter pflegen',
             'description' => 'Erlaubt, die Liste der Regalbretter (Standorte der Exemplare) anzulegen und zu ändern.',
@@ -179,6 +183,7 @@ return [
                 'system.view',
                 'users.manage',
                 'settings.manage',
+                'privacy.erase',
                 'catalog.withdraw',
                 'inventory.count',
             ],

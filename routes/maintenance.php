@@ -13,7 +13,7 @@ $usable = static fn (mixed $token): bool => is_string($token) && strlen($token) 
 if ($usable(config('hosting.setup_token'))) {
     Route::middleware('throttle:10,1')->group(function (): void {
         Route::get('/_setup', [SetupController::class, 'show']);
-        Route::post('/_setup/{action}', [SetupController::class, 'run'])->where('action', 'migrate|admin|doctor');
+        Route::post('/_setup/{action}', [SetupController::class, 'run'])->where('action', 'migrate|admin|doctor|recover');
     });
 }
 

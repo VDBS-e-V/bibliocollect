@@ -205,7 +205,17 @@
 `
 `Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 `
-`### Vorbereitung Testeinsatz, Block 6: Erinnerungen auch ohne Onlinekonto (v0.35.0)
+`### Vorbereitung Testeinsatz, Block 7: Lücken am Tresen (v0.36.0)
+
+- **Exemplar wieder verfügbar:** Wird ein als verloren oder beschädigt eingetragenes Exemplar am Arbeitsplatz gescannt, führt der Scan zur Seite „Exemplar wieder verfügbar machen“ (`/betrieb/exemplar/{Nummer}/gefunden`, Recht `circulation.manage`, also auch Schüler-AG Basis). Danach ist es wieder ausleihbar; wartet jemand, wird es gleich zurückgelegt und die Meldung sagt es.
+- **Warteschlange rückt nach:** Neu erfasste Exemplare und Exemplare, die im Katalog wieder auf „aktiv“ gesetzt werden, lösen das Ereignis `CopyBecameAvailable` aus; `PromoteReservationsForAvailableCopy` (Circulation) legt sie für die erste wartende Vormerkung zurück. Vorher blieb die Vormerkung dann hängen.
+- **Überfällige Ausleihen für alle:** `/betrieb/ueberfaellig` (Recht `circulation.manage`), längste Überfälligkeit zuerst; die Kachel auf dem Arbeitsplatz verlinkt dorthin. Der Klassenlisten-Druck bleibt `circulation.reports`.
+- **Löschverlangen:** Am ausgeschiedenen Ausleihkonto gibt es „Daten jetzt anonymisieren“ (Recht `privacy.erase`, nur Verwaltung): Name, Mail, Klasse, Onlinekonto und Ausweis verlieren den Bezug, das Geburtsjahr bleibt; Belegadressen werden gelöscht; im Protokoll `privacy.patron.erased`. Nur nach dem Austritt möglich.
+- **Schuljahreswechsel:** Vor dem Wechsel wird automatisch eine Datenbanksicherung erstellt; scheitert sie, bleibt alles unverändert (`BACKUP_BEFORE_TRANSITION`, Standard an).
+- **Zugang wiederherstellen:** Die Einrichtungsseite `/_setup` hat „Notfall: Zugang wiederherstellen“: neues Passwort, Konto aktiv, Rolle Verwaltung (nur mit `SETUP_TOKEN`).
+- Entwicklungshinweis „reagieren später über das Ereignis PatronDeparted“ aus dem Austritts-Panel entfernt.
+
+### Vorbereitung Testeinsatz, Block 6: Erinnerungen auch ohne Onlinekonto (v0.35.0)
 `
 ``reminders:send` schickt Erinnerungen (Rückgabe bald fällig, überfällig, Vormerkung abholbereit) nicht mehr nur an bestätigte Onlinekonten, sondern bei Konten ohne Onlinekonto an die **E-Mail-Adresse am Ausleihkonto**. Regeln: Ein bestätigtes Onlinekonto hat Vorrang, und hat die Person dort die Erinnerungen abgeschaltet, bleibt es dabei. Am Ausleihkonto schaltet das Personal sie je Konto ab (Kästchen im Formular „Ausleihkonto bearbeiten“, Standard an). Kein Versand an ungültige Adressen und an nicht aktive Konten. Die Mail spricht mit Vornamen an und ist mit „deine Schulbibliothek“ unterschrieben. Pro Lauf gehen höchstens 100 Mails (`--limit`), der Rest folgt beim nächsten Cron-Lauf, damit die Anfrage nicht zu lange dauert; jede Erinnerung kommt nur einmal. `reminder_logs` kennt dazu `patron_id`. Der Datenschutztext und die Auskunft nennen die Einstellung. Papier-Klassenlisten bleiben als zweiter Weg.
 `

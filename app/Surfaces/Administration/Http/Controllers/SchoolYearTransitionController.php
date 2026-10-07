@@ -13,6 +13,8 @@ use App\Modules\School\Models\SchoolYear;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Artisan;
+use Throwable;
 
 final class SchoolYearTransitionController
 {
@@ -57,6 +59,20 @@ final class SchoolYearTransitionController
 
         $from = SchoolYear::query()->findOrFail($data['from_id']);
         $target = SchoolYear::query()->findOrFail($data['target_id']);
+
+        // Der Wechsel lässt sich nicht rückgängig machen: Erst sichern, und nur bei erfolgreicher Sicherung weitermachen.
+        if (config('foundation.backup_before_transition', true)) {
+            try {
+                Artisan::call('backup:database');
+            } catch (Throwable $exception) {
+                report($exception);
+
+                return redirect()
+                    ->route('administration.transition.show', ['target' => $target->getKey()])
+                    ->withInput()
+                    ->with('school_error', 'Vor dem Wechsel konnte keine Sicherung erstellt werden, deshalb wurde nichts geändert: '.$exception->getMessage());
+            }
+        }
 
         try {
             $result = $transition->execute($from, $target, array_map('strval', $data['mapping']), $actor);

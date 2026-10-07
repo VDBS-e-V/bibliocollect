@@ -42,7 +42,7 @@ final class PosHomeController
             $open = Loan::query()->whereNull('returned_at');
 
             $tiles[] = ['label' => 'Zum Einsortieren (Stapel)', 'value' => Copy::query()->awaitingShelving()->count(), 'url' => route('pos.shelving'), 'warn' => false];
-            $tiles[] = ['label' => 'Überfällige Ausleihen', 'value' => (clone $open)->whereDate('due_on', '<', $todayDate)->count(), 'url' => Gate::allows('circulation.reports') ? route('pos.reports.class-loans') : null, 'warn' => true];
+            $tiles[] = ['label' => 'Überfällige Ausleihen', 'value' => (clone $open)->whereDate('due_on', '<', $todayDate)->count(), 'url' => route('pos.overdue'), 'warn' => true];
             $tiles[] = ['label' => 'Heute fällig', 'value' => (clone $open)->whereDate('due_on', $todayDate)->count(), 'url' => null, 'warn' => false];
             $tiles[] = ['label' => 'Zur Abholung zurückgelegt', 'value' => Reservation::query()->where('status', ReservationStatus::Ready->value)->count(), 'url' => route('pos.reservations.index'), 'warn' => false];
             $tiles[] = ['label' => 'Wartende Vormerkungen', 'value' => Reservation::query()->where('status', ReservationStatus::Waiting->value)->count(), 'url' => route('pos.reservations.index'), 'warn' => false];
