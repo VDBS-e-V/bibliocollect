@@ -64,7 +64,22 @@
                 <option value="recent" @selected($criteria->sort === 'recent')>Zuletzt im Katalog erfasst</option>
             </x-ui.select>
 
-            <label class="bc-public-catalog-filter__check bc-public-advanced-form__wide" for="advanced-active-only">
+                            <label class="bc-public-catalog-filter__check bc-public-advanced-form__wide" for="advanced-available-only">
+                    <input
+                        id="advanced-available-only"
+                        name="available_only"
+                        type="checkbox"
+                        value="1"
+                        @checked($criteria->availableNowOnly)
+                    >
+                    <span>
+                        <strong>Nur jetzt verfügbare Titel</strong>
+                        <small>Mindestens ein Exemplar steht im Regal und ist weder ausgeliehen noch zurückgelegt.</small>
+                    </span>
+                </label>
+
+
+                <label class="bc-public-catalog-filter__check bc-public-advanced-form__wide" for="advanced-active-only">
                 <input
                     id="advanced-active-only"
                     name="active_only"

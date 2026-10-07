@@ -24,6 +24,7 @@ final readonly class CatalogSearchCriteria
         public ?string $mediaType = null,
         public ?string $languageCode = null,
         public bool $activeCopiesOnly = false,
+        public bool $availableNowOnly = false,
         public string $sort = 'title',
         public int $perPage = 20,
         public int $page = 1,
@@ -47,7 +48,8 @@ final readonly class CatalogSearchCriteria
             || $this->yearTo !== null
             || $this->mediaType !== null
             || $this->languageCode !== null
-            || $this->activeCopiesOnly;
+            || $this->activeCopiesOnly
+            || $this->availableNowOnly;
     }
 
     public function hasAdvancedFilters(): bool

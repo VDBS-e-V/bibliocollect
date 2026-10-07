@@ -83,6 +83,21 @@
             </div>
 
             <div class="bc-public-catalog-filter__footer">
+                <label class="bc-public-catalog-filter__check" for="available-only">
+                    <input
+                        id="available-only"
+                        name="available_only"
+                        data-auto-submit
+                        type="checkbox"
+                        value="1"
+                        @checked($criteria->availableNowOnly)
+                    >
+                    <span>
+                        <strong>Nur jetzt verfügbare Titel</strong>
+                        <small>Mindestens ein Exemplar steht im Regal und ist weder ausgeliehen noch zurückgelegt.</small>
+                    </span>
+                </label>
+
                 <label class="bc-public-catalog-filter__check" for="active-only">
                     <input
                         id="active-only"

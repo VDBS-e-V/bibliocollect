@@ -84,6 +84,13 @@
                     <small>Filtert katalogseitig auf CopyStatus „active“.</small>
                 </span>
             </label>
+                <label class="bc-public-catalog-filter__check bc-catalog-search__wide" for="staff-available-only">
+                <input id="staff-available-only" name="available_only" type="checkbox" value="1" @checked($criteria->availableNowOnly)>
+                <span>
+                    <strong>Nur jetzt verfügbare Titel</strong>
+                    <small>Mindestens ein aktives Exemplar, das weder ausgeliehen noch zurückgelegt ist.</small>
+                </span>
+            </label>
 
             <div class="bc-action-row bc-catalog-search__wide">
                 <x-ui.button type="submit">Intern suchen</x-ui.button>

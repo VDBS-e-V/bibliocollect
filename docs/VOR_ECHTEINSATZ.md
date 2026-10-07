@@ -23,7 +23,7 @@ Alle Punkte der früheren „Muss“-Liste sind umgesetzt bis auf den Notbetrieb
 | **Inventur** | Bestand gegen Regal prüfen: Regal scannen, fehlende und falsch einsortierte Exemplare als Liste, Abschluss mit Protokoll. | mittel |
 | **Schuljahreswechsel: Teilwechsel und Rückgängig** | Der erste Wechsel im Sommer ist riskant. Gebraucht: Klassen einzeln umstellen und einen Wechsel innerhalb einiger Tage zurücknehmen können. | mittel |
 | **Ausleihkonten-Import: vorhandene Konten aktualisieren** | Heute werden nur neue Konten angelegt. Für Nachmeldungen und Korrekturen muss ein erneuter Import Klasse, Name und Mail ändern können. | mittel |
-| **Filter „nur verfügbare Titel“** im öffentlichen Katalog | Häufigste Frage von Leser:innen: „Ist das gerade da?“ | klein |
+| ~~Filter „nur verfügbare Titel“~~ | ✔ umgesetzt (v0.21.0) | |
 | **Ende-zu-Ende-Browsertests** für Ausleihe, Ausweis-Registrierung und Rückgabe | Die Tests laufen heute ohne echten Browser. Bei den Kernabläufen am Tresen lohnt sich das. | mittel |
 | **Installationsanleitung für die VM** | Für den Fall, dass der Webspace nicht reicht. | klein |
 | **Jahresbericht als Text** | Statistik gibt Zahlen, aber keinen fertigen Bericht für Verein und Schulleitung. | klein |

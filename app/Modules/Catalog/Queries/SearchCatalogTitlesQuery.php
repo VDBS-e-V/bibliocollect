@@ -165,6 +165,21 @@ final class SearchCatalogTitlesQuery
                     $copyQuery->where('status', CopyStatus::Active->value);
                 });
             }
+
+            // „Jetzt verfügbar“: ein aktives Exemplar, das weder ausgeliehen noch für eine Vormerkung zurückgelegt ist.
+            // Ausleihen und Vormerkungen gehören zum Modul Ausleihe; hier genügen deren Tabellennamen.
+            if ($criteria->availableNowOnly) {
+                $editionQuery->whereHas('copies', function (Builder $copyQuery): void {
+                    $copyQuery
+                        ->where('status', CopyStatus::Active->value)
+                        ->whereNotExists(static function ($loans): void {
+                            $loans->selectRaw('1')->from('circulation_loans')->whereColumn('circulation_loans.copy_id', 'catalog_copies.id')->whereNull('circulation_loans.returned_at');
+                        })
+                        ->whereNotExists(static function ($held): void {
+                            $held->selectRaw('1')->from('circulation_reservations')->whereColumn('circulation_reservations.ready_copy_id', 'catalog_copies.id')->where('circulation_reservations.status', 'ready');
+                        });
+                });
+            }
         });
     }
 
@@ -183,7 +198,8 @@ final class SearchCatalogTitlesQuery
             || $criteria->yearTo !== null
             || $criteria->mediaType !== null
             || $criteria->languageCode !== null
-            || $criteria->activeCopiesOnly;
+            || $criteria->activeCopiesOnly
+            || $criteria->availableNowOnly;
     }
 
     /**

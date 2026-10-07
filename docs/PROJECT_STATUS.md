@@ -178,6 +178,10 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Filter „nur jetzt verfügbare Titel“ (v0.21.0)
+
+Im öffentlichen Katalog (Suche und erweiterte Suche) und in der Katalogpflege gibt es das Kästchen „Nur jetzt verfügbare Titel“: Es bleiben Titel mit mindestens einem aktiven Exemplar, das weder ausgeliehen noch für eine Vormerkung zurückgelegt ist (`available_only`). Das Kästchen „Nur Titel mit aktiven Exemplaren“ bleibt als Katalogfilter bestehen.
+
 ### Aussonderung (v0.20.0)
 
 - **Bücher aussondern** (`/betrieb/aussondern`, Recht `catalog.withdraw`, Mitarbeiter:innen und Verwaltung, nicht die Schüler-AG): Inventarnummern eingeben oder scannen (mehrere auf einmal), Prüfung, dann Grund (beschädigt, veraltet, doppelt, wird nicht mehr gelesen, sonstiges), Verbleib (entsorgt, verschenkt, verkauft, Archiv, offen) und Datum wählen und bestätigen. Ausgeliehene oder für eine Vormerkung zurückgelegte Bücher werden nicht ausgesondert (auch beim Bestätigen nochmals geprüft). Das Exemplar bleibt mit Status „ausgesondert“ im System, die Daten stehen in den bisherigen Feldern des Altsystems (`depreciation_reason`, `depreciated_at`, `further_use`), ältere Freitexte bleiben lesbar.
