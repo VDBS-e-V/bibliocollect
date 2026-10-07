@@ -18,14 +18,19 @@
     $areas = collect([
         ['label' => 'Startseite', 'url' => route('public.home'), 'permission' => null, 'current' => request()->routeIs('public.home')],
         ['label' => 'Katalog', 'url' => route('public.catalog.index'), 'permission' => null, 'current' => $surface === 'public' && ! request()->routeIs('public.home')],
-        ['label' => 'Mein Konto', 'url' => route('portal.home'), 'permission' => 'surface.portal.access', 'current' => $surface === 'portal', 'menu' => true],
-        ['label' => 'Bibliotheksbetrieb', 'url' => route('pos.home'), 'permission' => 'surface.pos.access', 'current' => $surface === 'pos'],
+                ['label' => 'Bibliotheksbetrieb', 'url' => route('pos.home'), 'permission' => 'surface.pos.access', 'current' => $surface === 'pos'],
         ['label' => 'Verwaltung', 'url' => route('administration.home'), 'permission' => 'surface.administration.access', 'current' => $surface === 'administration'],
     ])->filter(static fn (array $area): bool => $area['permission'] === null || Gate::allows($area['permission']))->values();
 
-    // Oben stehen die Bereiche, „Mein Konto“ gehört ins Profilmenü neben die Abmeldung.
-    $topAreas = $areas->reject(static fn (array $area): bool => ($area['menu'] ?? false) === true)->values();
-    $accountAreas = $areas->filter(static fn (array $area): bool => ($area['menu'] ?? false) === true || in_array($area['label'], ['Bibliotheksbetrieb', 'Verwaltung'], true))->values();
+    // Das Profilmenü gehört der Person: ihre Ausleihen, Vormerkungen, Buchwünsche und Einstellungen.
+    $accountLinks = Gate::allows('surface.portal.access') ? [
+        ['label' => 'Mein Konto', 'url' => route('portal.home'), 'current' => request()->routeIs('portal.home')],
+        ['label' => 'Meine Ausleihen', 'url' => route('portal.home').'#ausleihen', 'current' => false],
+        ['label' => 'Meine Vormerkungen', 'url' => route('portal.home').'#vormerkungen', 'current' => false],
+        ['label' => 'Meine Buchwünsche', 'url' => route('portal.wishes.index'), 'current' => request()->routeIs('portal.wishes.*')],
+        ['label' => 'Einstellungen', 'url' => route('portal.home').'#einstellungen', 'current' => false],
+        ['label' => 'Meine Daten', 'url' => route('portal.my-data'), 'current' => false],
+    ] : [];
 
     $profile = auth()->user();
     $initials = '';
@@ -53,7 +58,7 @@
             <div class="bc-utility-bar__inner">
                 <span>VDBS e. V.</span>
                 <div class="bc-utility-bar__actions">
-                    @foreach ($topAreas as $area)
+                    @foreach ($areas as $area)
                         <a href="{{ $area['url'] }}" @if ($area['current']) aria-current="page" class="bc-utility-link--current" @endif>{{ $area['label'] }}</a>
                         <span aria-hidden="true">·</span>
                     @endforeach
@@ -91,10 +96,10 @@
                                         <small>{{ $profile->email }}</small>
                                     </div>
                                 </div>
-                                @if ($accountAreas->isNotEmpty())
+                                @if ($accountLinks !== [])
                                     <ul class="bc-account-menu__list">
-                                        @foreach ($accountAreas as $area)
-                                            <li><a href="{{ $area['url'] }}" @if ($area['current']) aria-current="page" @endif>{{ $area['label'] }}</a></li>
+                                        @foreach ($accountLinks as $link)
+                                            <li><a href="{{ $link['url'] }}" @if ($link['current']) aria-current="page" @endif>{{ $link['label'] }}</a></li>
                                         @endforeach
                                     </ul>
                                 @endif

@@ -46,15 +46,14 @@ it('shows only the areas a person may use', function (string $role, array $expec
     'technical admin' => ['technical_admin', ['Startseite', 'Katalog', 'Verwaltung']],
 ]);
 
-it('puts the account links into the profile menu instead of the top bar', function (string $role, array $expected): void {
+it('fills the profile menu with the personal account pages only', function (string $role, array $expected): void {
     $html = $this->actingAs(switcherUser($role))->get(route('public.catalog.index'))->assertOk()->getContent();
 
     expect(switcherMenu($html))->toBe($expected);
 })->with([
-    'student' => ['student', ['Mein Konto']],
-    'staff' => ['staff', ['Mein Konto', 'Bibliotheksbetrieb']],
-    'management' => ['management', ['Mein Konto', 'Bibliotheksbetrieb', 'Verwaltung']],
-    'technical admin' => ['technical_admin', ['Verwaltung']],
+    'student' => ['student', ['Mein Konto', 'Meine Ausleihen', 'Meine Vormerkungen', 'Meine Buchwünsche', 'Einstellungen', 'Meine Daten']],
+    'staff' => ['staff', ['Mein Konto', 'Meine Ausleihen', 'Meine Vormerkungen', 'Meine Buchwünsche', 'Einstellungen', 'Meine Daten']],
+    'technical admin' => ['technical_admin', []],
 ]);
 
 it('shows the initials and a logout button in the profile menu, not in the top bar', function (): void {
