@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name', 120);
             $table->string('status', 10)->index();
             $table->foreignId('started_by_user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('started_at');
+            $table->dateTime('started_at');
             $table->timestamp('closed_at')->nullable();
             $table->timestamps();
         });
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignUlid('copy_id')->nullable()->constrained('catalog_copies')->nullOnDelete();
             $table->string('barcode', 80);
             $table->string('shelf_code', 40);
-            $table->timestamp('scanned_at');
+            $table->dateTime('scanned_at');
 
             $table->unique(['inventory_count_id', 'barcode']);
         });

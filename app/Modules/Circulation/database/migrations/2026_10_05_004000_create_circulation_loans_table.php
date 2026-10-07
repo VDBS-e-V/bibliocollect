@@ -14,7 +14,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignUlid('patron_id')->constrained('patrons')->restrictOnDelete();
             $table->foreignUlid('copy_id')->constrained('catalog_copies')->restrictOnDelete();
-            $table->timestamp('checked_out_at')->index();
+            $table->dateTime('checked_out_at')->index();
             $table->date('due_on')->index();
             $table->timestamp('returned_at')->nullable()->index();
             $table->foreignId('checked_out_by_user_id')->nullable()->constrained('users')->nullOnDelete();

@@ -14,6 +14,7 @@ use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 uses(RefreshDatabase::class);
@@ -288,7 +289,7 @@ it('keeps the legacy metadata migration rollback capable', function (): void {
     expect(Schema::hasTable('catalog_topics'))->toBeTrue()
         ->and(Schema::hasColumn('catalog_editions', 'source_record_id'))->toBeTrue()
         ->and(Schema::hasColumn('catalog_copies', 'legacy_media_id'))->toBeTrue();
-});
+})->skip(fn (): bool => DB::connection()->getDriverName() !== 'sqlite', 'Einzelne Migrationen lassen sich nur ohne Fremdschlüssel-Prüfung zurückrollen (SQLite).');
 
 it('registers analyze and import console commands', function (): void {
     $this->artisan('catalog:legacy:analyze', [

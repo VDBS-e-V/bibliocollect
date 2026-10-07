@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('subject_id', 40);
             // Unterscheidet wiederholte Erinnerungen zum selben Gegenstand (z. B. Überfälligkeitsstufe).
             $table->string('stage', 20)->default('');
-            $table->timestamp('sent_at');
+            $table->dateTime('sent_at');
             $table->timestamps();
 
             $table->unique(['kind', 'subject_id', 'stage']);

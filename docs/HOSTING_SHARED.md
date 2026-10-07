@@ -75,7 +75,9 @@ Ohne SSH: Erinnerungen laufen erst, wenn SMTP stimmt. Teste lokal mit denselben 
 
 ## 7. Daten sichern
 
-- Die Datenbank sichert `backup:database` täglich um 01:30 Uhr nach `storage/app/backups` (14 Stück). Für MySQL entsteht eine `.sql.gz`-Datei mit den Daten; die Tabellenstruktur kommt beim Wiederherstellen aus den Migrationen. Lade die Dateien regelmäßig herunter, ein Backup auf demselben Server schützt nicht vor einem Serverausfall.
+- Die Datenbank sichert `backup:database` täglich um 01:30 Uhr nach `storage/app/backups` (14 Stück). Für MySQL entsteht eine eigenständige `.sql.gz`-Datei (Struktur und Daten, `DROP TABLE` + `CREATE TABLE` + `INSERT`). Auf der Seite **Verwaltung → Systemzustand → Datensicherung** kannst du jederzeit eine Sicherung erstellen und die Dateien **herunterladen** (ohne FTP). Lade sie regelmäßig herunter und lege sie außerhalb des Servers ab, ein Backup auf demselben Server schützt nicht vor einem Serverausfall.
+- **Wiederherstellen ohne SSH:** In phpMyAdmin die Datenbank wählen und über „Importieren“ die `.sql.gz`-Datei einspielen (keine vorherige Migration nötig; vorhandene Tabellen werden ersetzt). Mit SSH: `php artisan backup:restore <Datei>`. Übe das **einmal vor dem Start** mit einer leeren Test-Datenbank.
+- Schlägt die tägliche Sicherung fehl, geht eine Betriebsmeldung an `ALERT_EMAIL`.
 - Cover (`public/covers`) lassen sich jederzeit neu laden; sie sind kein Datenverlust.
 - Zusätzlich bietet fast jeder Anbieter Datenbank-Backups im Kundenbereich.
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Foundation\Support\AlertService;
 use App\Foundation\Support\SystemErrorLog;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -39,8 +40,18 @@ Schedule::call($command('circulation:reservations:expire'))
     ->withoutOverlapping()
     ->onOneServer();
 
-// Tägliche Datensicherung nach storage/app/backups.
-Schedule::call($command('backup:database'))
+// Tägliche Datensicherung nach storage/app/backups. Scheitert sie, geht eine Betriebsmeldung an die Administration.
+Schedule::call(static function (): void {
+    try {
+        Artisan::call('backup:database');
+    } catch (Throwable $exception) {
+        report($exception);
+        app(AlertService::class)->notify('backup-failed', 'Die Datensicherung ist fehlgeschlagen', [
+            'Die tägliche Sicherung konnte nicht geschrieben werden: '.$exception->getMessage(),
+            'Zeit: '.now()->toDateTimeString(),
+        ]);
+    }
+})
     ->name('backup:database')
     ->dailyAt('01:30')
     ->withoutOverlapping()

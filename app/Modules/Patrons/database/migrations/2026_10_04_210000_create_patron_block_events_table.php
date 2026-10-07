@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('action', 20)->index();
             $table->string('reason', 500)->nullable();
             $table->foreignId('actor_user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('created_at')->index();
+            $table->dateTime('created_at')->index();
         });
     }
 

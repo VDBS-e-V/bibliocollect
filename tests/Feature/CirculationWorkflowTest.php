@@ -20,6 +20,7 @@ use App\Modules\School\Models\LibraryClosure;
 use App\Modules\School\Models\LibraryOpeningHour;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 uses(RefreshDatabase::class);
@@ -330,4 +331,4 @@ it('keeps the circulation migration rollback capable', function (): void {
     $migration->up();
 
     expect(Schema::hasTable('circulation_loans'))->toBeTrue();
-});
+})->skip(fn (): bool => DB::connection()->getDriverName() !== 'sqlite', 'Einzelne Migrationen lassen sich nur ohne Fremdschlüssel-Prüfung zurückrollen (SQLite).');

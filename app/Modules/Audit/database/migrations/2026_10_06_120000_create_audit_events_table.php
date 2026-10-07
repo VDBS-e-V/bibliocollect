@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('audit_events', function (Blueprint $table): void {
             $table->ulid('id')->primary();
-            $table->timestamp('occurred_at')->index();
+            $table->dateTime('occurred_at')->index();
             // Ohne Fremdschlüssel: Das Protokoll soll das Löschen von Konten überdauern.
             $table->unsignedBigInteger('actor_user_id')->nullable()->index();
             $table->string('action', 80)->index();

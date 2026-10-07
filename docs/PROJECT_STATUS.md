@@ -205,6 +205,13 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Vorbereitung Testeinsatz, Block 3: MySQL/MariaDB (v0.32.0)
+
+- **Die komplette Testsuite läuft auf MariaDB** (CI-Job `mariadb` in `.github/workflows/quality.yml`, lokal geprüft mit MariaDB 10.4). Dabei gefunden und behoben: Zeitspalten ohne Vorgabe (`timestamp`) bekamen auf MariaDB automatisch „bei Änderung auf jetzt setzen“ und eine ungültige Vorgabe, was zum Beispiel das Ausleihdatum bei jeder Rückgabe überschrieben hätte. Alle betroffenen Spalten sind jetzt `dateTime`.
+- **Sicherung/Wiederherstellung:** `backup:database` schreibt für MySQL/MariaDB eine eigenständige Datei (`DROP TABLE`, `CREATE TABLE`, `INSERT`, in Blöcken gelesen, atomar über `.part`), `backup:restore` und phpMyAdmin spielen sie ohne vorherige Migration ein. Probe: Demodaten in MariaDB, Sicherung, Wiederherstellung in leere Datenbank, 42 Tabellen und alle Zeilen identisch.
+- **Systemzustand → Datensicherung:** „Jetzt sichern“ und Download der letzten 15 Sicherungen ohne FTP (im Protokoll vermerkt). Scheitert die tägliche Sicherung, geht eine Betriebsmeldung an `ALERT_EMAIL`.
+- Zwei Tests, die einzelne Migrationen zurückrollen, laufen nur auf SQLite.
+
 ### Vorbereitung Testeinsatz, Block 2: Zeit und Betriebseinstellungen (v0.31.0)
 
 - **Zeitzone:** `APP_TIMEZONE` (Standard `Europe/Berlin`) gilt für Speicherung, Anzeige und Zeitplan. Vorher war UTC eingestellt, sodass der Zeitplan 07:00 UTC (= 09:00 Ortszeit) lief und Anzeigen zwei Stunden daneben lagen. Bereits gespeicherte Entwicklungsdaten wirken dadurch um 1 bis 2 Stunden verschoben; im Echtbetrieb beginnt man mit der neuen Einstellung.

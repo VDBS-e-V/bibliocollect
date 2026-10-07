@@ -70,6 +70,35 @@
         <p class="bc-section-copy">Der Cron-Lauf macht dasselbe wie der Cronjob: Er führt die gerade fälligen Aufgaben aus und arbeitet danach etwa 10 Sekunden lang die Warteschlange ab.</p>
     </section>
 
+    <section class="bc-content-section" aria-labelledby="backups-heading">
+        <div class="bc-section-heading"><h2 id="backups-heading">Datensicherung</h2></div>
+        <p class="bc-section-copy">Die Sicherung läuft täglich automatisch (siehe Zeitplan-Aufgaben). Lade sie regelmäßig herunter und lege sie <strong>außerhalb des Servers</strong> ab: Eine Sicherung nur auf dem Server hilft nicht, wenn der Server ausfällt. Sie enthält alle personenbezogenen Daten und gehört nicht in fremde Hände.</p>
+        <form method="post" action="{{ route('administration.system.backup') }}">
+            @csrf
+            <x-ui.button type="submit" variant="secondary">Jetzt sichern</x-ui.button>
+        </form>
+
+        @if ($backups === [])
+            <p class="bc-section-copy">Es gibt noch keine Sicherung.</p>
+        @else
+            <table class="bc-calendar-table">
+                <thead><tr><th scope="col">Sicherung</th><th scope="col">Erstellt</th><th scope="col">Größe</th><th scope="col">Herunterladen</th></tr></thead>
+                <tbody>
+                    @foreach ($backups as $backup)
+                        <tr>
+                            <th scope="row"><code>{{ $backup['name'] }}</code></th>
+                            <td class="bc-tabular">{{ $backup['created'] }}</td>
+                            <td class="bc-tabular">{{ number_format($backup['size_kb'], 0, ',', '.') }} KB</td>
+                            <td><a href="{{ route('administration.system.backup.download', ['file' => $backup['name']]) }}">Herunterladen</a></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
+        <p class="bc-section-copy">Wiederherstellen: <code>php artisan backup:restore &lt;Datei&gt;</code> oder in phpMyAdmin die <code>.sql.gz</code>-Datei über „Importieren“ einspielen. Beides ersetzt alle Daten. Der Ablauf steht in <code>docs/OPERATIONS.md</code>.</p>
+    </section>
+
     <section class="bc-content-section" aria-labelledby="alerts-heading">
         <div class="bc-section-heading"><h2 id="alerts-heading">Meldungen</h2></div>
         @if ($alertAddress)

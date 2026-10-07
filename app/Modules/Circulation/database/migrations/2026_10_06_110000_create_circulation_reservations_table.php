@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignUlid('patron_id')->constrained('patrons')->restrictOnDelete();
             $table->foreignUlid('title_id')->constrained('catalog_titles')->restrictOnDelete();
             $table->string('status', 20)->index();
-            $table->timestamp('requested_at');
+            $table->dateTime('requested_at');
             // Gesetzt, sobald ein Exemplar zurückgelegt wurde (Status `ready`).
             $table->foreignUlid('ready_copy_id')->nullable()->constrained('catalog_copies')->nullOnDelete();
             $table->timestamp('ready_at')->nullable();

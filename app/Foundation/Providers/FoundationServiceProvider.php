@@ -17,6 +17,7 @@ use App\Foundation\Console\EnvRestoreCommand;
 use App\Foundation\Console\EnvSyncCommand;
 use App\Foundation\Console\FoundationCheckCommand;
 use App\Foundation\Console\MailTestCommand;
+use App\Foundation\Console\RestoreDatabaseCommand;
 use App\Foundation\Contracts\AuthorizesPermissions;
 use App\Foundation\Navigation\NavigationRegistry;
 use App\Foundation\Support\BusinessClock;
@@ -78,6 +79,7 @@ final class FoundationServiceProvider extends ServiceProvider
             DemoQueueCommand::class,
             DoctorCommand::class,
             BackupDatabaseCommand::class,
+            RestoreDatabaseCommand::class,
             MailTestCommand::class,
             EnvSyncCommand::class,
             EnvCheckCommand::class,

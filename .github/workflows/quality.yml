@@ -32,3 +32,53 @@ jobs:
       - run: ./vendor/bin/phpstan analyse --no-progress --memory-limit=1G
       - run: php artisan foundation:check
       - run: ./vendor/bin/pest --colors=always
+
+  # Dieselben Tests auf MariaDB, weil der Webspace MySQL/MariaDB nutzt (andere Zeitstempel-Regeln, Fremdschlüssel, Groß-/Kleinschreibung).
+  mariadb:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
+          MARIADB_DATABASE: bibliocollect_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: bibliocollect_test
+      DB_USERNAME: root
+      DB_PASSWORD: ''
+      DB_RESTORE_DATABASE: bibliocollect_restore
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - run: npm run build
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - run: mysql -h 127.0.0.1 -uroot -e "CREATE DATABASE IF NOT EXISTS bibliocollect_restore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+      - run: php artisan migrate --force
+      - run: ./vendor/bin/pest --colors=always

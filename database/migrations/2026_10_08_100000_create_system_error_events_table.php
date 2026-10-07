@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('path', 190)->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedInteger('occurrences')->default(1);
-            $table->timestamp('first_seen_at');
-            $table->timestamp('last_seen_at')->index();
+            $table->dateTime('first_seen_at');
+            $table->dateTime('last_seen_at')->index();
         });
     }
 

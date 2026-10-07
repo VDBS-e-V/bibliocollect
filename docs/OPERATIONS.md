@@ -30,7 +30,7 @@ Zeitplan (`routes/console.php`):
 
 ## Sicherung
 
-`php artisan backup:database` legt unter `storage/app/backups` eine Sicherung an (SQLite: Datei, MySQL/MariaDB: `.sql.gz` mit den Daten) und behält die letzten 14 (`--keep=`). Wiederherstellen bei MySQL: Struktur mit `php artisan migrate --force` anlegen, dann die Datei in phpMyAdmin oder mit `mysql` einspielen. Sicherungen regelmäßig auch außerhalb des Servers ablegen.
+`php artisan backup:database` legt unter `storage/app/backups` eine Sicherung an (SQLite: Datei, MySQL/MariaDB: `.sql.gz` mit den Daten) und behält die letzten 14 (`--keep=`). Die MySQL-Sicherung ist eigenständig (Struktur und Daten, eine Anweisung je Zeile). Auf der Seite „Systemzustand“ lässt sie sich erstellen und herunterladen. **Wiederherstellen** (ersetzt alle Daten): `php artisan backup:restore <Datei> [--database=<Verbindung>] [--yes]` oder in phpMyAdmin „Importieren“; vorher keine Migration nötig. SQLite: Datei zurückkopieren bzw. `backup:restore`. Eine Probe-Wiederherstellung in eine leere Datenbank ist Teil von `docs/GO_LIVE.md`. Sicherungen regelmäßig auch außerhalb des Servers ablegen.
 
 ## Arbeitsplatz im Alltag
 

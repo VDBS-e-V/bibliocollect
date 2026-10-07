@@ -30,7 +30,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignUlid('patron_id')->constrained('patrons')->cascadeOnDelete();
             $table->char('fingerprint', 64)->unique();
-            $table->timestamp('expires_at')->index();
+            $table->dateTime('expires_at')->index();
             $table->timestamp('used_at')->nullable()->index();
             $table->timestamp('revoked_at')->nullable()->index();
             $table->foreignId('issued_by_user_id')->nullable()->constrained('users')->nullOnDelete();

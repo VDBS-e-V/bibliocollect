@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('to_status', 30);
             $table->date('effective_on');
             $table->foreignId('actor_user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('created_at');
+            $table->dateTime('created_at');
             $table->index(['patron_id', 'created_at']);
         });
     }
