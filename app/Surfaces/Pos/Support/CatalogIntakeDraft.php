@@ -7,6 +7,7 @@ namespace App\Surfaces\Pos\Support;
 use App\Modules\Catalog\DTOs\BibliographicRecord;
 use App\Modules\Catalog\DTOs\CatalogIntakeDetails;
 use App\Modules\Catalog\DTOs\CatalogIntakeProvenance;
+use App\Modules\Catalog\Enums\CopyAccess;
 use App\Modules\Catalog\Enums\CopyStatus;
 use Illuminate\Contracts\Session\Session;
 
@@ -180,12 +181,12 @@ final class CatalogIntakeDraft
         return $this->details() ?? $this->prefill();
     }
 
-    public function setCopy(?string $shelfLocation, CopyStatus $status, ?string $signatureId = null): void
+    public function setCopy(?string $shelfLocation, CopyStatus $status, CopyAccess $access = CopyAccess::Free): void
     {
-        $this->merge(['copy' => ['shelf_location' => $shelfLocation, 'status' => $status->value, 'signature_id' => $signatureId]]);
+        $this->merge(['copy' => ['shelf_location' => $shelfLocation, 'status' => $status->value, 'access' => $access->value]]);
     }
 
-    /** @return array{shelf_location: string|null, status: CopyStatus, signature_id: string|null}|null */
+    /** @return array{shelf_location: string|null, status: CopyStatus, access: CopyAccess}|null */
     public function copy(): ?array
     {
         $copy = $this->all()['copy'] ?? null;
@@ -203,7 +204,7 @@ final class CatalogIntakeDraft
         return [
             'shelf_location' => is_string($copy['shelf_location'] ?? null) ? $copy['shelf_location'] : null,
             'status' => $status,
-            'signature_id' => is_string($copy['signature_id'] ?? null) && $copy['signature_id'] !== '' ? $copy['signature_id'] : null,
+            'access' => CopyAccess::fromStored(is_string($copy['access'] ?? null) ? $copy['access'] : null),
         ];
     }
 

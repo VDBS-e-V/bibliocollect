@@ -83,7 +83,7 @@
                 @endif
 
                 @if ($details->localClassification)
-                    <dt>Lokale Klassifikation</dt>
+                    <dt>Themenbereich</dt>
                     <dd>{{ $details->localClassification }}</dd>
                 @endif
 
@@ -132,6 +132,9 @@
             <dd>wird beim Einsortieren ins Regal vermerkt (Stapel „Einsortieren“)</dd>
             <dt>Zustand im Bestand</dt>
             <dd>{{ CatalogIntakeVocabulary::copyStatus($copy['status']->value) }}</dd>
+
+            <dt>Zugänglichkeit</dt>
+            <dd>{{ $copy['access']->label() }}</dd>
         </dl>
 
         <p class="bc-intake-note"><a href="{{ route('pos.catalog.intake.copy') }}">Exemplardaten ändern</a></p>

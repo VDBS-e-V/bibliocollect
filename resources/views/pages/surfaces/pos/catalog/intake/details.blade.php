@@ -209,13 +209,19 @@
                     :error="$errors->first('series_statement')"
                     maxlength="500"
                 />
-                <x-ui.input
-                    label="Lokale Klassifikation"
-                    name="local_classification"
-                    :value="old('local_classification', $details->localClassification)"
-                    :error="$errors->first('local_classification')"
-                    maxlength="120"
-                />
+                @php
+                    $topicOptions = app(\App\Modules\Catalog\Services\CatalogTopicOptions::class)->forSelect();
+                    $currentTopic = (string) old('local_classification', $details->localClassification ?? '');
+                @endphp
+                <x-ui.select label="Themenbereich" name="local_classification" :error="$errors->first('local_classification')">
+                    <option value="">– nicht angegeben –</option>
+                    @foreach ($topicOptions as $name => $display)
+                        <option value="{{ $name }}" @selected($currentTopic === $name)>{{ $display }}</option>
+                    @endforeach
+                    @if ($currentTopic !== '' && ! isset($topicOptions[$currentTopic]))
+                        <option value="{{ $currentTopic }}" selected>{{ $currentTopic }}</option>
+                    @endif
+                </x-ui.select>
                 <x-ui.input
                     label="Zielgruppe"
                     name="target_audience"

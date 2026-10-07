@@ -80,10 +80,9 @@
                         <option value="{{ $code }}" @selected(old('shelf_location', $copy->shelf_location) === $code)>{{ $display }}</option>
                     @endforeach
                 </x-ui.select>
-                <x-ui.select label="Themenbereich / Signatur" name="signature_id" :error="$errors->first('signature_id') ?: null">
-                    <option value="">Noch nicht festgelegt</option>
-                    @foreach ($signatureOptions as $id => $display)
-                        <option value="{{ $id }}" @selected((string) old('signature_id', $copy->signature_id) === $id)>{{ $display }}</option>
+                <x-ui.select label="Zugänglichkeit" name="access_status" :error="$errors->first('access_status') ?: null">
+                    @foreach ($accessOptions as $key => $label)
+                        <option value="{{ $key }}" @selected(old('access_status', \App\Modules\Catalog\Enums\CopyAccess::fromStored($copy->access_status)->value) === $key)>{{ $label }}</option>
                     @endforeach
                 </x-ui.select>
                 <x-ui.select
@@ -119,7 +118,7 @@
                         <div><dt>Themen</dt><dd>{{ $copy->signature->topics->pluck('name')->implode(', ') }}</dd></div>
                     @endif
                 @endif
-                @if ($copy->access_status)<div><dt>Zugangsstatus</dt><dd>{{ $copy->access_status }}</dd></div>@endif
+                @if ($copy->access_status && ! \App\Modules\Catalog\Enums\CopyAccess::tryFrom($copy->access_status))<div><dt>Zugangsstatus (Altsystem)</dt><dd>{{ $copy->access_status }}</dd></div>@endif
                 @if ($copy->condition_code)<div><dt>Zustand</dt><dd>{{ $copy->condition_code }}</dd></div>@endif
                 @if ($copy->purchase_date)<div><dt>Erwerbungsdatum</dt><dd>{{ $copy->purchase_date->format('d.m.Y') }}</dd></div>@endif
                 @if ($copy->purchase_price !== null)<div><dt>Erwerbungspreis</dt><dd>{{ $copy->purchase_price }} €</dd></div>@endif

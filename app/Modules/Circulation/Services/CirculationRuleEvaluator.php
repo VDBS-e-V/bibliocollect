@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Circulation\Services;
 
 use App\Foundation\Support\BusinessClock;
+use App\Modules\Catalog\Enums\CopyAccess;
 use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
@@ -41,6 +42,10 @@ final readonly class CirculationRuleEvaluator
 
         if ($copy->status !== CopyStatus::Active) {
             $violations[] = 'Der aktuelle Exemplarstatus erlaubt keine Ausleihe.';
+        }
+
+        if (CopyAccess::fromStored($copy->access_status) === CopyAccess::LibraryOnly) {
+            $violations[] = 'Dieses Exemplar darf nur in der Bibliothek genutzt werden und wird nicht ausgeliehen.';
         }
 
         if ($copyAlreadyLoaned) {

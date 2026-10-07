@@ -108,6 +108,14 @@
 }
 
 .bc-intake-fieldset__grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* Gleich große Felder: Eingaben und Auswahlfelder haben dieselbe Höhe und stehen unten auf einer Linie, auch wenn ein Hinweistext darüber steht. */
+.bc-intake-fieldset__grid { align-items: end; }
+.bc-intake-fieldset__grid .bc-field { align-content: end; }
+.bc-intake-fieldset__grid .bc-field__control:is(input:not([type="file"]), select) {
+    height: var(--control-min-height);
+    box-sizing: border-box;
+}
 .bc-intake-fieldset__wide { grid-column: 1 / -1; }
 
 .bc-intake-form {

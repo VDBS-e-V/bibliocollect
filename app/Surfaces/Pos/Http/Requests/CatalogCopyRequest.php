@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Requests;
 
 use App\Modules\Catalog\DTOs\CopyData;
+use App\Modules\Catalog\Enums\CopyAccess;
 use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Services\CatalogInventoryNumber;
@@ -36,7 +37,7 @@ final class CatalogCopyRequest extends FormRequest
             'barcode' => ['required', 'string', 'max:80'],
             'shelf_location' => ['nullable', 'string', 'max:120', Rule::in($allowed)],
             'status' => ['required', Rule::enum(CopyStatus::class)],
-            'signature_id' => ['nullable', 'string', Rule::exists('catalog_signatures', 'id')],
+            'access_status' => ['required', Rule::enum(CopyAccess::class)],
         ];
     }
 
@@ -72,7 +73,7 @@ final class CatalogCopyRequest extends FormRequest
             // Ein neues Exemplar bekommt seinen Standort erst beim Einsortieren; nur beim Bearbeiten wird er hier gesetzt.
             shelfLocation: $this->isMethod('POST') ? null : $this->nullableString($data['shelf_location'] ?? null),
             status: CopyStatus::from((string) $data['status']),
-            signatureId: $this->nullableString($data['signature_id'] ?? null),
+            access: CopyAccess::from((string) $data['access_status']),
         );
     }
 
@@ -81,7 +82,7 @@ final class CatalogCopyRequest extends FormRequest
         $this->merge([
             'barcode' => trim((string) $this->input('barcode', '')),
             'shelf_location' => $this->normalizeNullable($this->input('shelf_location')),
-            'signature_id' => $this->normalizeNullable($this->input('signature_id')),
+            'access_status' => trim((string) $this->input('access_status', CopyAccess::Free->value)),
             'status' => mb_strtolower(trim((string) $this->input('status', ''))),
         ]);
     }

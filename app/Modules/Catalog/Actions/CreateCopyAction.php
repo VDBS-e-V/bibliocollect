@@ -29,7 +29,7 @@ final class CreateCopyAction
                 'barcode' => $data->barcode,
                 'shelf_location' => $data->shelfLocation,
                 'status' => $data->status,
-                'signature_id' => $data->signatureId,
+                'access_status' => $data->access->value,
             ]);
 
             return $copy;

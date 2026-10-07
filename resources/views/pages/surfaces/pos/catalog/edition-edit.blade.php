@@ -89,7 +89,7 @@
                 @if (is_array($edition->alternate_identifiers) && $edition->alternate_identifiers !== [])<div><dt>Weitere Identifikatoren</dt><dd>{{ implode(', ', $edition->alternate_identifiers) }}</dd></div>@endif
                 @if ($edition->issn)<div><dt>ISSN</dt><dd>{{ $edition->issn }}</dd></div>@endif
                 @if ($edition->doi_handle)<div><dt>DOI / Handle</dt><dd>{{ $edition->doi_handle }}</dd></div>@endif
-                @if ($edition->local_classification)<div><dt>Lokale Klassifikation</dt><dd>{{ $edition->local_classification }}</dd></div>@endif
+                @if ($edition->local_classification)<div><dt>Themenbereich</dt><dd>{{ $edition->local_classification }}</dd></div>@endif
                 @if ($edition->original_language_code)<div><dt>Originalsprache</dt><dd>{{ $edition->original_language_code }}</dd></div>@endif
                 @if ($edition->page_count)<div><dt>Seiten</dt><dd>{{ $edition->page_count }}</dd></div>@endif
                 @if ($edition->physical_extent)<div><dt>Umfang</dt><dd>{{ $edition->physical_extent }}</dd></div>@endif
@@ -173,10 +173,9 @@
                     required
                 />
 <p class="bc-intake-note">Den Standort bekommt das Exemplar beim Einsortieren ins Regal (Vorgang „Medien einsortieren“).</p>
-                <x-ui.select label="Themenbereich / Signatur" name="signature_id" :error="$errors->first('signature_id') ?: null">
-                    <option value="">Noch nicht festgelegt</option>
-                    @foreach ($signatureOptions as $id => $display)
-                        <option value="{{ $id }}" @selected((string) old('signature_id') === $id)>{{ $display }}</option>
+                <x-ui.select label="Zugänglichkeit" name="access_status" :error="$errors->first('access_status') ?: null">
+                    @foreach ($accessOptions as $key => $label)
+                        <option value="{{ $key }}" @selected(old('access_status', 'frei') === $key)>{{ $label }}</option>
                     @endforeach
                 </x-ui.select>
                 <x-ui.select

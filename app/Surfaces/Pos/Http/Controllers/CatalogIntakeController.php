@@ -16,7 +16,6 @@ use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Queries\CatalogImportMatchQuery;
 use App\Modules\Catalog\Services\BibliographicLookupService;
 use App\Modules\Catalog\Services\CatalogIsbnNormalizer;
-use App\Modules\Catalog\Services\CatalogSignatureOptions;
 use App\Modules\Catalog\Services\CatalogSummaryService;
 use App\Surfaces\Pos\Http\Requests\CatalogIntakeBarcodeRequest;
 use App\Surfaces\Pos\Http\Requests\CatalogIntakeChoiceRequest;
@@ -237,7 +236,6 @@ final class CatalogIntakeController
         return $this->view('copy', [
             'copy' => $this->draft->copy(),
             'context' => $this->context(),
-            'signatureOptions' => app(CatalogSignatureOptions::class)->forSelect(),
         ]);
     }
 
@@ -249,7 +247,7 @@ final class CatalogIntakeController
             return $guard;
         }
 
-        $this->draft->setCopy(null, $request->status(), $request->signatureId());
+        $this->draft->setCopy(null, $request->status(), $request->access());
 
         return redirect()->route('pos.catalog.intake.review');
     }
@@ -282,7 +280,7 @@ final class CatalogIntakeController
         }
 
         // Der Standort wird erst beim Einsortieren ins Regal vermerkt (Vorgang „Medien einsortieren“).
-        $copyData = new CopyData($barcode, null, $copy['status'], $copy['signature_id']);
+        $copyData = new CopyData($barcode, null, $copy['status'], $copy['access']);
         $editionId = $this->draft->existingEditionId();
         $details = $this->draft->details();
 

@@ -49,7 +49,7 @@
             <x-ui.input label="Erscheinungsort" name="publication_place" :value="$criteria->publicationPlace" />
             <x-ui.input label="Reihe" name="series" :value="$criteria->series" />
             <x-ui.input label="Thema" name="topic" :value="$criteria->topic" />
-            <x-ui.input label="Lokale Klassifikation" name="classification" :value="$criteria->classification" />
+            <x-ui.input label="Themenbereich" name="classification" :value="$criteria->classification" />
             <x-ui.input label="Zielgruppe" name="target_audience" :value="$criteria->targetAudience" />
             <x-ui.input label="DNB-/Quell-ID" name="source_record_id" :value="$criteria->sourceRecordId" />
             <x-ui.input label="Jahr von" name="year_from" type="number" :value="$criteria->yearFrom" min="1000" max="2100" />

@@ -9,7 +9,13 @@ use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
+use App\Modules\Circulation\Actions\CheckoutCopyAction;
+use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Identity\Actions\AssignRoleAction;
+use App\Modules\Patrons\Enums\PatronKind;
+use App\Modules\Patrons\Enums\PatronStatus;
+use App\Modules\Patrons\Models\Patron;
+use App\Modules\School\Models\LibraryOpeningHour;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
@@ -103,23 +109,22 @@ it('manages topics and prevents loops in the tree', function (): void {
     $this->actingAs($admin)->post(route('administration.topics.store'), ['name' => ''])->assertSessionHasErrors('name');
 });
 
-it('sets the signature when a copy is recorded, added and edited', function (): void {
+it('sets the access when a copy is added and edited and keeps the learned signature', function (): void {
     $staff = taxonomyUser('staff');
     $signature = CatalogSignature::query()->create(['signature' => 'I. A 1 d']);
-    $topic = CatalogTopic::query()->create(['name' => 'Leicht zu lesen']);
-    $signature->topics()->attach($topic->getKey(), ['position' => 1]);
-    $copy = taxonomyCopy('0030010');
+    $copy = taxonomyCopy('0030010', null, null, $signature);
 
-    $this->actingAs($staff)->get(route('pos.catalog.copies.edit', ['editionId' => $copy->edition_id, 'copyId' => $copy->getKey()]))->assertOk()->assertSee('I. A 1 d · Leicht zu lesen');
-    $this->actingAs($staff)->get(route('pos.catalog.editions.edit', ['editionId' => $copy->edition_id]))->assertOk()->assertSee('I. A 1 d · Leicht zu lesen');
+    // Keine Signatur-Auswahl mehr, dafür die Zugänglichkeit.
+    $this->actingAs($staff)->get(route('pos.catalog.copies.edit', ['editionId' => $copy->edition_id, 'copyId' => $copy->getKey()]))->assertOk()->assertSee('Zugänglichkeit')->assertDontSee('Themenbereich / Signatur')->assertSee('Nur auf Nachfrage (verschlossen)');
+    $this->actingAs($staff)->get(route('pos.catalog.editions.edit', ['editionId' => $copy->edition_id]))->assertOk()->assertSee('Zugänglichkeit')->assertDontSee('Themenbereich / Signatur');
 
-    $this->actingAs($staff)->patch(route('pos.catalog.copies.update', ['editionId' => $copy->edition_id, 'copyId' => $copy->getKey()]), ['barcode' => '0030010', 'status' => 'active', 'signature_id' => (string) $signature->getKey()])->assertSessionHasNoErrors();
-    expect($copy->refresh()->signature_id)->toBe($signature->getKey());
+    $this->actingAs($staff)->patch(route('pos.catalog.copies.update', ['editionId' => $copy->edition_id, 'copyId' => $copy->getKey()]), ['barcode' => '0030010', 'status' => 'active', 'access_status' => 'nur_nachfrage'])->assertSessionHasNoErrors();
+    expect($copy->refresh()->access_status)->toBe('nur_nachfrage')->and($copy->signature_id)->toBe($signature->getKey());
 
-    $this->actingAs($staff)->post(route('pos.catalog.copies.store', ['editionId' => $copy->edition_id]), ['barcode' => '0030011', 'status' => 'active', 'signature_id' => (string) $signature->getKey()])->assertSessionHasNoErrors();
-    expect(Copy::query()->where('barcode', '0030011')->firstOrFail()->signature_id)->toBe($signature->getKey());
+    $this->actingAs($staff)->post(route('pos.catalog.copies.store', ['editionId' => $copy->edition_id]), ['barcode' => '0030011', 'status' => 'active', 'access_status' => 'nur_bibliothek'])->assertSessionHasNoErrors();
+    expect(Copy::query()->where('barcode', '0030011')->firstOrFail()->access_status)->toBe('nur_bibliothek');
 
-    $this->actingAs($staff)->post(route('pos.catalog.copies.store', ['editionId' => $copy->edition_id]), ['barcode' => '0030012', 'status' => 'active', 'signature_id' => 'gibt-es-nicht'])->assertSessionHasErrors('signature_id');
+    $this->actingAs($staff)->post(route('pos.catalog.copies.store', ['editionId' => $copy->edition_id]), ['barcode' => '0030012', 'status' => 'active', 'access_status' => 'geheim'])->assertSessionHasErrors('access_status');
 });
 
 it('suggests the shelf from the signature, then from the other copies of the edition, and learns the signature', function (): void {
@@ -167,21 +172,54 @@ it('connects a shelf with a signature on the shelf page', function (): void {
     $this->actingAs($admin)->post(route('administration.shelves.store'), ['code' => 'Falsch', 'signature_id' => 'gibt-es-nicht'])->assertSessionHasErrors('signature_id');
 });
 
-it('offers the signature in the intake and keeps it on the recorded copy', function (): void {
+it('offers topics only in the details step and the access in the copy step of the intake', function (): void {
     Http::fake(['*' => Http::response('', 500)]);
     $staff = taxonomyUser('staff');
     $signature = CatalogSignature::query()->create(['signature' => 'I. A 5 b']);
-    $topic = CatalogTopic::query()->create(['name' => 'Manga']);
-    $signature->topics()->attach($topic->getKey(), ['position' => 1]);
+    $parent = CatalogTopic::query()->create(['name' => 'Geschichten']);
+    $child = CatalogTopic::query()->create(['name' => 'Manga', 'parent_id' => $parent->getKey()]);
+    $signature->topics()->attach($child->getKey(), ['position' => 1]);
 
     $this->actingAs($staff)->post(route('pos.catalog.intake.barcode'), ['barcode' => '0030030']);
     $this->post(route('pos.catalog.intake.lookup'), ['isbn' => '', 'title' => '', 'person' => '', 'action' => 'manual']);
-    $this->post(route('pos.catalog.intake.details.store'), ['preferred_title' => 'Ein Manga', 'media_type' => 'book', 'language_code' => 'de']);
 
-    $this->get(route('pos.catalog.intake.copy'))->assertOk()->assertSee('I. A 5 b · Manga')->assertSee('Themenbereich / Signatur');
-    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'active', 'signature_id' => (string) $signature->getKey()])->assertRedirect(route('pos.catalog.intake.review'));
+    $this->get(route('pos.catalog.intake.details'))->assertOk()
+        ->assertSee('Themenbereich')
+        ->assertDontSee('Lokale Klassifikation')
+        ->assertSee('Geschichten')
+        ->assertSee('– Manga')
+        ->assertDontSee('I. A 5 b');
+
+    $this->post(route('pos.catalog.intake.details.store'), ['preferred_title' => 'Ein Manga', 'media_type' => 'book', 'language_code' => 'de', 'local_classification' => 'Manga']);
+
+    $this->get(route('pos.catalog.intake.copy'))->assertOk()
+        ->assertSee('Zugänglichkeit')
+        ->assertSee('Frei zugänglich')
+        ->assertSee('Nur Nutzung in der Bibliothek')
+        ->assertDontSee('Themenbereich / Signatur')
+        ->assertDontSee('I. A 5 b');
+
+    $this->post(route('pos.catalog.intake.copy.store'), ['status' => 'active', 'access_status' => 'nur_nachfrage'])->assertRedirect(route('pos.catalog.intake.review'));
+    $this->get(route('pos.catalog.intake.review'))->assertOk()->assertSee('Nur auf Nachfrage (verschlossen)')->assertSee('Manga');
     $this->post(route('pos.catalog.intake.commit'), ['next' => 'open'])->assertRedirect();
 
-    $copy = Copy::query()->where('barcode', '0030030')->firstOrFail();
-    expect($copy->signature_id)->toBe($signature->getKey())->and($copy->shelf_location)->toBeNull();
+    $copy = Copy::query()->where('barcode', '0030030')->with('edition')->firstOrFail();
+    expect($copy->access_status)->toBe('nur_nachfrage')
+        ->and($copy->edition->local_classification)->toBe('Manga')
+        ->and($copy->signature_id)->toBeNull()
+        ->and($copy->shelf_location)->toBeNull();
+});
+
+it('does not lend copies that may only be used in the library', function (): void {
+    $staff = taxonomyUser('staff');
+    $copy = taxonomyCopy('0030040');
+    $copy->forceFill(['access_status' => 'nur_bibliothek'])->save();
+    $patron = Patron::query()->create(['library_number' => '111222', 'kind' => PatronKind::Student, 'status' => PatronStatus::Active, 'first_name' => 'Lea', 'last_name' => 'Lesesaal', 'birth_date' => '2010-01-01']);
+    LibraryOpeningHour::query()->create(['day_of_week' => 1, 'is_open' => true, 'opens_at' => '08:00', 'closes_at' => '16:00']);
+
+    expect(fn () => app(CheckoutCopyAction::class)->execute($patron, '0030040', $staff))
+        ->toThrow(CirculationRuleViolation::class, 'nur in der Bibliothek');
+
+    $copy->forceFill(['access_status' => 'nur_nachfrage'])->save();
+    expect(app(CheckoutCopyAction::class)->execute($patron, '0030040', $staff)->copy_id)->toBe((string) $copy->getKey());
 });

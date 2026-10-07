@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\DTOs;
 
+use App\Modules\Catalog\Enums\CopyAccess;
 use App\Modules\Catalog\Enums\CopyStatus;
 
 final readonly class CopyData
@@ -12,6 +13,6 @@ final readonly class CopyData
         public string $barcode,
         public ?string $shelfLocation,
         public CopyStatus $status,
-        public ?string $signatureId = null,
+        public CopyAccess $access = CopyAccess::Free,
     ) {}
 }

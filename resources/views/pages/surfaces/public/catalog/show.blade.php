@@ -173,8 +173,8 @@
                                                         <td>{{ $copy->signature?->signature ?: '—' }}</td>
                                                         <td>
                                                             <x-ui.badge :variant="$presenter->copyStateVariant($state)">{{ $presenter->copyStateLabel($state) }}</x-ui.badge>
-                                                            @if ($copy->access_status)
-                                                                <small class="bc-public-metadata-source">{{ $copy->access_status }}</small>
+                                                            @if (\App\Modules\Catalog\Enums\CopyAccess::noteFor($copy->access_status))
+                                                                <small class="bc-public-metadata-source">{{ \App\Modules\Catalog\Enums\CopyAccess::noteFor($copy->access_status) }}</small>
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -274,7 +274,7 @@
                                     <div><dt>Weitere Kennungen</dt><dd>{{ implode(', ', $edition->alternate_identifiers) }}</dd></div>
                                 @endif
                                 @if ($edition->local_classification)
-                                    <div><dt>Klassifikation</dt><dd>{{ $edition->local_classification }}</dd></div>
+                                    <div><dt>Themenbereich</dt><dd>{{ $edition->local_classification }}</dd></div>
                                 @endif
                                 @if ($topics !== [])
                                     <div><dt>Themen</dt><dd>{{ implode(', ', $topics) }}</dd></div>
