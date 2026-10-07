@@ -29,14 +29,7 @@
         <section class="bc-content-section" aria-labelledby="wish-form-heading">
             <div class="bc-section-heading"><h2 id="wish-form-heading">Neuer Wunsch</h2></div>
             <p class="bc-section-copy">Du kannst höchstens {{ $maxOpen }} offene Wünsche gleichzeitig haben. Ob ein Wunsch erfüllt wird, entscheidet die Bibliothek.</p>
-            <form method="post" action="{{ route('portal.wishes.store') }}" class="bc-audit-filter">
-                @csrf
-                <x-ui.input label="Titel" name="title" id="wish-title" :value="old('title', $prefill)" required />
-                <x-ui.input label="Autor:in (wenn bekannt)" name="author" id="wish-author" :value="old('author')" />
-                <x-ui.input label="ISBN (wenn bekannt)" name="isbn" id="wish-isbn" :value="old('isbn')" />
-                <x-ui.input label="Warum wünschst du es dir? (freiwillig)" name="note" id="wish-note" :value="old('note')" maxlength="500" />
-                <x-ui.button type="submit">Wunsch abgeben</x-ui.button>
-            </form>
+            <x-ui.button href="{{ route('public.wishes.create') }}">Buchwunsch erfassen</x-ui.button>
         </section>
 
         <section class="bc-content-section" aria-labelledby="wish-list-heading">

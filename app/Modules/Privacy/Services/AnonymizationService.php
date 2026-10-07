@@ -159,14 +159,16 @@ final readonly class AnonymizationService
     private function wishes(CarbonImmutable $cutoff, bool $dryRun): int
     {
         $query = BookWish::query()
-            ->whereNotNull('patron_id')
+            ->where(static function ($inner): void {
+                $inner->whereNotNull('patron_id')->orWhereNotNull('contact_name')->orWhereNotNull('contact_email');
+            })
             ->whereNotIn('status', WishStatus::openValues())
             ->where('updated_at', '<', $cutoff);
 
         $count = $query->count();
 
         if (! $dryRun && $count > 0) {
-            $query->update(['patron_id' => null, 'decided_by_user_id' => null]);
+            $query->update(['patron_id' => null, 'contact_name' => null, 'contact_email' => null, 'decided_by_user_id' => null]);
         }
 
         return $count;

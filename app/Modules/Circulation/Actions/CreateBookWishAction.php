@@ -16,7 +16,7 @@ final readonly class CreateBookWishAction
 {
     public function __construct(private AuditRecorder $audit) {}
 
-    public function execute(?Patron $patron, string $title, ?string $author, ?string $isbn, ?string $note): BookWish
+    public function execute(?Patron $patron, string $title, ?string $author, ?string $isbn, ?string $note, ?string $contactName = null, ?string $contactEmail = null): BookWish
     {
         $title = trim($title);
         $isbn = $isbn !== null ? preg_replace('/[^0-9Xx]/', '', $isbn) : null;
@@ -50,12 +50,34 @@ final readonly class CreateBookWishAction
             }
         }
 
+        if (! $patron instanceof Patron) {
+            $recent = BookWish::query()
+                ->whereNull('patron_id')
+                ->whereIn('status', WishStatus::openValues())
+                ->where('created_at', '>=', now()->subDay())
+                ->where(static function ($query) use ($isbn, $title): void {
+                    $query->whereRaw('lower(title) = ?', [mb_strtolower($title)]);
+
+                    if ($isbn !== null) {
+                        $query->orWhere('isbn', $isbn);
+                    }
+                })
+                ->where('contact_email', $contactEmail !== null && trim($contactEmail) !== '' ? trim($contactEmail) : null)
+                ->exists();
+
+            if ($recent && $contactEmail !== null && trim($contactEmail) !== '') {
+                throw new CirculationRuleViolation(['Diesen Wunsch hast du gerade schon abgegeben.']);
+            }
+        }
+
         $wish = BookWish::query()->create([
             'patron_id' => $patron?->getKey(),
             'title' => mb_substr($title, 0, 255),
             'author' => $author !== null && trim($author) !== '' ? mb_substr(trim($author), 0, 255) : null,
             'isbn' => $isbn,
             'note' => $note !== null && trim($note) !== '' ? mb_substr(trim($note), 0, 500) : null,
+            'contact_name' => $contactName !== null && trim($contactName) !== '' ? mb_substr(trim($contactName), 0, 120) : null,
+            'contact_email' => $contactEmail !== null && trim($contactEmail) !== '' ? mb_substr(trim($contactEmail), 0, 190) : null,
             'status' => WishStatus::New,
         ]);
 

@@ -140,6 +140,7 @@ it('finds no automatically detectable accessibility problems on the main pages',
         'Passwort vergessen' => route('password.request'),
         'Konto aktivieren' => route('identity.claim.create'),
         'Impressum' => route('public.page', ['slug' => 'impressum']),
+        'Buchwunsch erfassen' => route('public.wishes.create'),
     ];
 
     $staff = [

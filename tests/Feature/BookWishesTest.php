@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use App\Modules\Catalog\Contracts\BibliographicLookupProvider;
+use App\Modules\Catalog\DTOs\BibliographicRecord;
 use App\Modules\Circulation\Enums\WishStatus;
 use App\Modules\Circulation\Mail\WishStatusMail;
 use App\Modules\Circulation\Models\BookWish;
@@ -14,6 +16,7 @@ use App\Modules\Privacy\Services\AnonymizationService;
 use App\Modules\Privacy\Services\PatronDataExport;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
@@ -45,7 +48,7 @@ it('lets a reader wish for a book, shows the status and lets them withdraw', fun
 
     $this->actingAs($user)->get(route('portal.wishes.index'))->assertOk()->assertSee('Neuer Wunsch');
 
-    $this->actingAs($user)->post(route('portal.wishes.store'), ['title' => 'Der kleine Hobbit', 'author' => 'Tolkien', 'isbn' => '978-3-423-08000-5', 'note' => 'Habe den Film gesehen'])
+    $this->actingAs($user)->post(route('public.wishes.store'), ['title' => 'Der kleine Hobbit', 'author' => 'Tolkien', 'isbn' => '978-3-423-08000-5', 'note' => 'Habe den Film gesehen'])
         ->assertRedirect(route('portal.wishes.index'))->assertSessionHas('portal_success');
 
     $wish = BookWish::query()->firstOrFail();
@@ -59,19 +62,21 @@ it('lets a reader wish for a book, shows the status and lets them withdraw', fun
 });
 
 it('limits open wishes, refuses duplicates and bad isbns', function (): void {
+    $this->withoutMiddleware(ThrottleRequests::class);
+
     $user = wishUser('student', wishPatron('W-2'));
 
     foreach (['Eins', 'Zwei', 'Drei'] as $title) {
-        $this->actingAs($user)->post(route('portal.wishes.store'), ['title' => $title])->assertSessionHas('portal_success');
+        $this->actingAs($user)->post(route('public.wishes.store'), ['title' => $title])->assertSessionHas('portal_success');
     }
 
-    $this->actingAs($user)->post(route('portal.wishes.store'), ['title' => 'Vier'])->assertSessionHas('portal_error');
+    $this->actingAs($user)->post(route('public.wishes.store'), ['title' => 'Vier'])->assertSessionHasErrors('title');
     expect(BookWish::query()->count())->toBe(3);
 
     BookWish::query()->where('title', 'Drei')->update(['status' => WishStatus::Declined->value]);
-    $this->actingAs($user)->post(route('portal.wishes.store'), ['title' => 'eins'])->assertSessionHas('portal_error');
-    $this->actingAs($user)->post(route('portal.wishes.store'), ['title' => 'Fünf', 'isbn' => '123'])->assertSessionHas('portal_error');
-    $this->actingAs($user)->post(route('portal.wishes.store'), ['title' => ''])->assertSessionHasErrors('title');
+    $this->actingAs($user)->post(route('public.wishes.store'), ['title' => 'eins'])->assertSessionHasErrors('title');
+    $this->actingAs($user)->post(route('public.wishes.store'), ['title' => 'Fünf', 'isbn' => '123'])->assertSessionHasErrors('title');
+    $this->actingAs($user)->post(route('public.wishes.store'), ['title' => ''])->assertSessionHasErrors('title');
 });
 
 it('keeps wishes private and works only with a linked account', function (): void {
@@ -79,15 +84,15 @@ it('keeps wishes private and works only with a linked account', function (): voi
     $other = wishUser('student', wishPatron('W-4'));
     $unlinked = wishUser('student');
 
-    $this->actingAs($mine)->post(route('portal.wishes.store'), ['title' => 'Geheimwunsch']);
+    $this->actingAs($mine)->post(route('public.wishes.store'), ['title' => 'Geheimwunsch']);
     $wish = BookWish::query()->firstOrFail();
     $this->flushSession();
 
     $this->actingAs($other)->get(route('portal.wishes.index'))->assertOk()->assertDontSee('Geheimwunsch');
     $this->actingAs($other)->post(route('portal.wishes.withdraw', ['wishId' => $wish->getKey()]))->assertNotFound();
     $this->actingAs($unlinked)->get(route('portal.wishes.index'))->assertOk()->assertSee('noch nicht mit einem Ausleihkonto verknüpft');
-    $this->actingAs($unlinked)->post(route('portal.wishes.store'), ['title' => 'Ohne Konto'])->assertSessionHas('portal_error');
-    expect(BookWish::query()->count())->toBe(1);
+    $this->actingAs($unlinked)->post(route('public.wishes.store'), ['title' => 'Ohne Konto'])->assertSessionHas('wish_success');
+    expect(BookWish::query()->count())->toBe(2)->and(BookWish::query()->where('title', 'Ohne Konto')->firstOrFail()->patron_id)->toBeNull();
 
 });
 
@@ -98,7 +103,7 @@ it('lets staff review wishes, spot repeated wishes and answer by mail', function
     $ben = wishPatron('W-6');
 
     foreach ([$anna, $ben] as $patron) {
-        $this->actingAs(wishUser('student', $patron))->post(route('portal.wishes.store'), ['title' => 'Drachenreiter', 'isbn' => '9783791504650']);
+        $this->actingAs(wishUser('student', $patron))->post(route('public.wishes.store'), ['title' => 'Drachenreiter', 'isbn' => '9783791504650']);
     }
 
     $page = $this->actingAs($staff)->get(route('pos.wishes.index'))->assertOk();
@@ -188,4 +193,93 @@ it('points readers to fulfilled wishes on their overview', function (): void {
     BookWish::query()->create(['patron_id' => $patron->getKey(), 'title' => 'Noch offen', 'status' => WishStatus::Ordered, 'decided_at' => now()]);
 
     $this->actingAs($user)->get(route('portal.home'))->assertOk()->assertSee('Dein Buchwunsch ist da')->assertSee('Endlich da')->assertDontSee('Schon lange her')->assertDontSee('Noch offen');
+});
+
+it('lets anybody wish for a book without logging in', function (): void {
+    Mail::fake();
+
+    $this->get(route('public.wishes.create'))->assertOk()->assertSee('Buchwunsch erfassen')->assertSee('ISBN')->assertSee('Name (optional)')->assertSee('E-Mail (optional)')->assertSee('Buchwunsch speichern');
+    $this->get(route('public.home'))->assertSee('Buchwunsch');
+
+    $this->post(route('public.wishes.store'), ['title' => 'Das doppelte Lottchen', 'author' => 'Kästner', 'isbn' => '9783855350261', 'note' => 'Bitte auch als Hörbuch', 'contact_name' => 'Gast', 'contact_email' => 'gast@example.invalid'])
+        ->assertRedirect(route('public.wishes.create'))->assertSessionHas('wish_success');
+
+    $wish = BookWish::query()->firstOrFail();
+    expect($wish->patron_id)->toBeNull()->and($wish->contact_name)->toBe('Gast')->and($wish->contact_email)->toBe('gast@example.invalid')->and($wish->status)->toBe(WishStatus::New);
+
+    // Dieselbe Person darf denselben Wunsch nicht noch einmal schicken.
+    $this->post(route('public.wishes.store'), ['title' => 'Das doppelte Lottchen', 'contact_email' => 'gast@example.invalid'])->assertSessionHasErrors('title');
+
+    // Ohne Angaben zur Person geht es auch, nur der Titel ist Pflicht.
+    $this->post(route('public.wishes.store'), ['title' => 'Anonym gewünscht'])->assertSessionHas('wish_success');
+    $this->post(route('public.wishes.store'), ['title' => ''])->assertSessionHasErrors('title');
+    $this->post(route('public.wishes.store'), ['title' => 'Falsche Mail', 'contact_email' => 'keine-mail'])->assertSessionHasErrors('contact_email');
+    expect(BookWish::query()->count())->toBe(2);
+
+    // Die Antwort der Bibliothek geht an die angegebene Adresse.
+    $staff = wishUser('staff');
+    $this->actingAs($staff)->patch(route('pos.wishes.update', ['wishId' => $wish->getKey()]), ['status' => 'ordered', 'answer' => 'Bestellt'])->assertRedirect();
+    Mail::assertSent(WishStatusMail::class, static fn (WishStatusMail $mail): bool => $mail->hasTo('gast@example.invalid'));
+    $this->actingAs($staff)->get(route('pos.wishes.index'))->assertSee('Gast &lt;gast@example.invalid&gt;', false);
+});
+
+it('ignores bots that fill the hidden field and attaches wishes of logged in readers to their account', function (): void {
+    $this->post(route('public.wishes.store'), ['title' => 'Spam', 'website' => 'http://spam.invalid'])->assertSessionHas('wish_success');
+    expect(BookWish::query()->count())->toBe(0);
+
+    $patron = wishPatron('W-10');
+    $user = wishUser('student', $patron);
+    $this->actingAs($user)->get(route('public.wishes.create'))->assertOk()->assertSee('Du bist angemeldet')->assertDontSee('E-Mail (optional)');
+    $this->actingAs($user)->post(route('public.wishes.store'), ['title' => 'Mit Konto', 'contact_email' => 'ignoriert@example.invalid'])->assertRedirect(route('portal.wishes.index'));
+
+    $wish = BookWish::query()->firstOrFail();
+    expect($wish->patron_id)->toBe((string) $patron->getKey())->and($wish->contact_email)->toBeNull();
+});
+
+it('throttles the public form per address', function (): void {
+    foreach (range(1, 5) as $number) {
+        $this->post(route('public.wishes.store'), ['title' => 'Wunsch '.$number])->assertSessionHas('wish_success');
+    }
+
+    $this->post(route('public.wishes.store'), ['title' => 'Wunsch 6'])->assertStatus(429);
+});
+
+it('looks up an isbn and suggests title and author without saving anything', function (): void {
+    $record = new BibliographicRecord('dnb', '1', null, 'Momo', 'oder die seltsame Geschichte', null, [['name' => 'Ende, Michael', 'role' => 'author', 'gnd_id' => null]], '9783522202602', null, null, 1973, null, null, 'ger', null, 'book', null, null, null, null);
+
+    app()->bind(BibliographicLookupProvider::class, static fn () => new class($record) implements BibliographicLookupProvider
+    {
+        public function __construct(private readonly BibliographicRecord $record) {}
+
+        public function findByIsbn(string $isbn): array
+        {
+            return $isbn === '9783522202602' ? [$this->record] : [];
+        }
+
+        public function search(?string $title, ?string $person): array
+        {
+            return [];
+        }
+
+        public function findByRecordId(string $recordId): array
+        {
+            return [];
+        }
+    });
+
+    $this->getJson(route('public.wishes.lookup', ['isbn' => '978-3-522-20260-2']))->assertOk()->assertJson(['found' => true, 'title' => 'Momo: oder die seltsame Geschichte', 'author' => 'Ende, Michael']);
+    $this->getJson(route('public.wishes.lookup', ['isbn' => '9783000000003']))->assertOk()->assertJson(['found' => false]);
+    $this->getJson(route('public.wishes.lookup', ['isbn' => '12']))->assertOk()->assertJson(['found' => false, 'message' => 'Die ISBN muss 10 oder 13 Stellen haben.']);
+    expect(BookWish::query()->count())->toBe(0);
+});
+
+it('removes the contact data of closed public wishes after the retention period', function (): void {
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-10-05 10:00:00', 'Europe/Berlin'));
+    $old = BookWish::query()->create(['title' => 'Alt', 'contact_name' => 'Gast', 'contact_email' => 'gast@example.invalid', 'status' => WishStatus::Declined]);
+    BookWish::query()->whereKey($old->getKey())->update(['updated_at' => '2020-01-01 10:00:00']);
+
+    expect(app(AnonymizationService::class)->run()['wishes'])->toBe(1)
+        ->and($old->refresh()->contact_email)->toBeNull()->and($old->contact_name)->toBeNull();
+
+    CarbonImmutable::setTestNow();
 });

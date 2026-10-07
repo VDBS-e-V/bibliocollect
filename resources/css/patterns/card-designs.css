@@ -145,3 +145,84 @@
     margin: 1.25rem 0 0.5rem;
     font-size: 1.0625rem;
 }
+
+/* Öffentliches Wunschformular */
+.bc-wish-form-page {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 1.5rem 0 3rem;
+}
+
+.bc-wish-form {
+    display: grid;
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface-muted);
+}
+
+.bc-wish-form textarea {
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font: inherit;
+}
+
+.bc-wish-form__isbn {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.bc-wish-form__isbn input {
+    flex: 1;
+}
+
+.bc-wish-form__search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    color: var(--action-primary);
+    cursor: pointer;
+}
+
+.bc-wish-form__status {
+    min-height: 1.25rem;
+    margin: 0.25rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+}
+
+.bc-wish-form__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--action-primary);
+    color: var(--text-on-action, #fff);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.bc-wish-form-page__title {
+    margin-bottom: 0.5rem;
+    font-family: var(--font-family-display);
+    font-size: var(--text-3xl, 2rem);
+    line-height: var(--leading-tight);
+}
+
+.bc-wish-form__isbn .bc-field__control {
+    flex: 1;
+}

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Portal\Http\Controllers;
 
 use App\Models\User;
-use App\Modules\Circulation\Actions\CreateBookWishAction;
 use App\Modules\Circulation\Enums\WishStatus;
-use App\Modules\Circulation\Exceptions\CirculationRuleViolation;
 use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Patrons\Models\Patron;
 use Illuminate\Http\RedirectResponse;
@@ -26,33 +24,8 @@ final class PortalWishController
                 'patron' => $patron,
                 'wishes' => $patron instanceof Patron ? BookWish::query()->where('patron_id', $patron->getKey())->orderByDesc('created_at')->limit(50)->get() : collect(),
                 'maxOpen' => max(1, (int) config('circulation.max_open_wishes', 3)),
-                'prefill' => (string) $request->query('titel', ''),
             ])
             ->header('Cache-Control', 'private, no-store');
-    }
-
-    public function store(Request $request, CreateBookWishAction $create): RedirectResponse
-    {
-        $patron = $this->patron($request);
-
-        if (! $patron instanceof Patron || ! $patron->isActive()) {
-            return redirect()->route('portal.wishes.index')->with('portal_error', 'Dein Onlinekonto ist noch mit keinem aktiven Ausleihkonto verknüpft. Frag in der Bibliothek nach einem Verknüpfungscode.');
-        }
-
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'author' => ['nullable', 'string', 'max:255'],
-            'isbn' => ['nullable', 'string', 'max:30'],
-            'note' => ['nullable', 'string', 'max:500'],
-        ], ['title.required' => 'Bitte gib den Titel des Buches an.']);
-
-        try {
-            $create->execute($patron, $data['title'], $data['author'] ?? null, $data['isbn'] ?? null, $data['note'] ?? null);
-        } catch (CirculationRuleViolation $exception) {
-            return redirect()->route('portal.wishes.index')->withInput()->with('portal_error', $exception->getMessage());
-        }
-
-        return redirect()->route('portal.wishes.index')->with('portal_success', 'Danke! Dein Wunsch „'.trim($data['title']).'“ ist angekommen. Du siehst hier, wie es damit weitergeht.');
     }
 
     public function withdraw(Request $request, string $wishId): RedirectResponse

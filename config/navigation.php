@@ -19,6 +19,12 @@ return [
                     'active' => 'public.catalog.*',
                     'order' => 20,
                 ],
+                [
+                    'label' => 'Buchwunsch',
+                    'route' => 'public.wishes.create',
+                    'active' => 'public.wishes.*',
+                    'order' => 30,
+                ],
             ],
         ],
         'portal' => [

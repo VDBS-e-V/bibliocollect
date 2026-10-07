@@ -43,7 +43,7 @@
                                 {{ $wish->author ?: 'Autor:in unbekannt' }}@if ($wish->isbn) · ISBN <span class="bc-tabular">{{ $wish->isbn }}</span>@endif
                             </span>
                             <span>
-                                {{ $wish->patron ? $wish->patron->last_name.', '.$wish->patron->first_name.($wish->patron->schoolClass ? ' ('.$wish->patron->schoolClass->name.')' : '') : 'ohne Person erfasst' }}
+                                {{ $wish->patron ? $wish->patron->last_name.', '.$wish->patron->first_name.($wish->patron->schoolClass ? ' ('.$wish->patron->schoolClass->name.')' : '') : ($wish->contact_name || $wish->contact_email ? trim(($wish->contact_name ?: 'Unbekannt').' '.($wish->contact_email ? '<'.$wish->contact_email.'>' : '')) : 'ohne Person erfasst') }}
                                 · {{ $wish->created_at?->format('d.m.Y') }}
                             </span>
                             @if ($wish->note)

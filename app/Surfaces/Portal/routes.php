@@ -20,7 +20,6 @@ Route::middleware(['auth', 'verified', 'permission:surface.portal.access'])->gro
         ->name('portal.my-data');
 
     Route::get('/konto/buchwuensche', [PortalWishController::class, 'index'])->name('portal.wishes.index');
-    Route::post('/konto/buchwuensche', [PortalWishController::class, 'store'])->middleware('throttle:20,1')->name('portal.wishes.store');
     Route::post('/konto/buchwuensche/{wishId}/zurueckziehen', [PortalWishController::class, 'withdraw'])->name('portal.wishes.withdraw');
 
     Route::post('/konto/vormerkungen', [PortalCirculationController::class, 'reserve'])

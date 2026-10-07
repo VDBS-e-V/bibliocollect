@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <body style="font-family: Arial, Helvetica, sans-serif; color: #111; line-height: 1.5;">
-<p>Hallo{{ $wish->patron ? ' '.$wish->patron->first_name : '' }},</p>
+<p>Hallo{{ $wish->patron ? ' '.$wish->patron->first_name : ($wish->contact_name ? ' '.$wish->contact_name : '') }},</p>
 
 @switch($wish->status->value)
     @case('accepted')
@@ -24,7 +24,9 @@
     <p>Anmerkung der Bibliothek: {{ $wish->answer }}</p>
 @endif
 
-<p>Deine Wünsche findest du in deinem Konto unter „Buchwünsche“.</p>
+@if ($wish->patron)
+    <p>Deine Wünsche findest du in deinem Konto unter „Buchwünsche“.</p>
+@endif
 <p>Viele Grüße<br>Deine Bibliothek</p>
 </body>
 </html>

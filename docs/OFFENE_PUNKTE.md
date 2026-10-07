@@ -1,6 +1,6 @@
 # Offene Punkte vor dem Start
 
-Stand: v0.12.0. Fehlende Funktionen vor dem Echteinsatz: siehe `docs/VOR_ECHTEINSATZ.md`. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
+Stand: v0.13.0. Fehlende Funktionen vor dem Echteinsatz: siehe `docs/VOR_ECHTEINSATZ.md`. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
 
 ## A. Muss vor dem Start
 

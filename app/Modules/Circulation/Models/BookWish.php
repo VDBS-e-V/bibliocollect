@@ -20,6 +20,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $author
  * @property string|null $isbn
  * @property string|null $note
+ * @property string|null $contact_name
+ * @property string|null $contact_email
  * @property WishStatus $status
  * @property string|null $answer
  * @property int|null $decided_by_user_id
@@ -34,7 +36,7 @@ final class BookWish extends Model
     protected $table = 'circulation_book_wishes';
 
     /** @var list<string> */
-    protected $fillable = ['patron_id', 'title', 'author', 'isbn', 'note', 'status', 'answer', 'decided_by_user_id', 'decided_at'];
+    protected $fillable = ['patron_id', 'title', 'author', 'isbn', 'note', 'contact_name', 'contact_email', 'status', 'answer', 'decided_by_user_id', 'decided_at'];
 
     /** @return BelongsTo<Patron, $this> */
     public function patron(): BelongsTo

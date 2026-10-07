@@ -20,6 +20,7 @@ return [
                         ['label' => 'Ausleihe und Rückgabe', 'text' => 'Person oder Ausweis scannen, Medien ausleihen, verlängern und zurücknehmen, Beleg drucken oder mailen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
                         ['label' => 'Rückgabe ohne Person', 'text' => 'Zurückgebrachte Medien nacheinander scannen und gemeinsam bestätigen.', 'route' => 'pos.terminal', 'permission' => 'circulation.manage'],
                         ['label' => 'Vormerkungen bearbeiten', 'text' => 'Zurückgelegte Medien zur Abholung und die Warteschlangen im Blick.', 'route' => 'pos.reservations.index', 'permission' => 'circulation.manage'],
+                        ['label' => 'Buchwunsch erfassen', 'text' => 'Das öffentliche Formular, auch für Leser:innen ohne Anmeldung; mit ISBN-Suche.', 'route' => 'public.wishes.create', 'permission' => null],
                         ['label' => 'Buchwünsche bearbeiten', 'text' => 'Wünsche von Leser:innen ansehen, annehmen, bestellen oder ablehnen.', 'route' => 'pos.wishes.index', 'permission' => 'wishes.manage'],
                         ['label' => 'Überfällige Medien', 'text' => 'Klassenlisten mit überfälligen Ausleihen zum Weitergeben an die Klassenleitungen.', 'route' => 'pos.reports.class-loans', 'permission' => 'circulation.reports'],
                     ],

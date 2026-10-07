@@ -42,13 +42,15 @@ final readonly class DecideBookWishAction
     {
         $patron = $wish->patron;
 
-        if ($patron === null) {
-            return;
+        $address = null;
+
+        if ($patron !== null) {
+            $address = is_string($patron->email) && $patron->email !== ''
+                ? $patron->email
+                : User::query()->where('patron_id', $patron->getKey())->whereNotNull('email_verified_at')->value('email');
         }
 
-        $address = is_string($patron->email) && $patron->email !== ''
-            ? $patron->email
-            : User::query()->where('patron_id', $patron->getKey())->whereNotNull('email_verified_at')->value('email');
+        $address ??= $wish->contact_email;
 
         if (! is_string($address) || $address === '') {
             return;
