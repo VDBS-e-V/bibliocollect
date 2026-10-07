@@ -28,6 +28,14 @@ Die Einstufung ist ein Vorschlag: **Muss** = ohne das würde ich nicht starten, 
 | **Jahresbericht als Text** | Statistik gibt Zahlen, aber keinen fertigen Bericht für Verein und Schulleitung. | klein |
 | **Anreicherung** (Zusammenfassungen, Schlagwörter) | Fehlen fast überall und machen die Suche schwächer. | mittel |
 
+## Geplant, wartet auf Angaben
+
+| Funktion | Stand |
+|---|---|
+| **Etiketten für Regalbretter** (Strichcode der Bezeichnung, zum Scannen beim Einsortieren) | Kommt. **Du:** Maße und Etikettenformat heraussuchen |
+| **Kamera-Scan am Handy** (Einsortieren, später auch Ausleihe) | Kommt später; die Seite „Medien einsortieren“ ist dafür vorbereitet |
+| **Vorschlag des Regalbretts je Buch** nach Themenbereich | Braucht die Zuordnung der Bücher zu Themenbereichen, die es noch nicht gibt |
+
 ## Kann
 
 | Funktion | Warum | Aufwand |
