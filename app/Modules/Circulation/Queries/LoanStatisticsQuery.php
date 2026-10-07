@@ -24,7 +24,7 @@ final class LoanStatisticsQuery
      *     popular: list<array{title: string, loans: int}>,
      *     by_class: list<array{class: string, loans: int}>,
      *     by_media_type: list<array{media_type: ?string, loans: int}>,
-     *     stock: array{titles: int, editions: int, copies: array<string, int>}
+     *     stock: array{titles: int, editions: int, copies: array<string, int>, withdrawn_in_period: int}
      * }
      */
     public function execute(CarbonImmutable $from, CarbonImmutable $to, CarbonImmutable $today): array
@@ -103,6 +103,7 @@ final class LoanStatisticsQuery
             'stock' => [
                 'titles' => DB::table('catalog_titles')->count(),
                 'editions' => DB::table('catalog_editions')->count(),
+                'withdrawn_in_period' => DB::table('catalog_copies')->where('status', 'withdrawn')->whereBetween('depreciated_at', [$from->toDateString(), $to->toDateString()])->count(),
                 'copies' => DB::table('catalog_copies')->groupBy('status')->selectRaw('status, count(*) as total')->pluck('total', 'status')->map(static fn (mixed $count): int => (int) $count)->all(),
             ],
         ];

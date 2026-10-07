@@ -178,6 +178,11 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Aussonderung (v0.20.0)
+
+- **Bücher aussondern** (`/betrieb/aussondern`, Recht `catalog.withdraw`, Mitarbeiter:innen und Verwaltung, nicht die Schüler-AG): Inventarnummern eingeben oder scannen (mehrere auf einmal), Prüfung, dann Grund (beschädigt, veraltet, doppelt, wird nicht mehr gelesen, sonstiges), Verbleib (entsorgt, verschenkt, verkauft, Archiv, offen) und Datum wählen und bestätigen. Ausgeliehene oder für eine Vormerkung zurückgelegte Bücher werden nicht ausgesondert (auch beim Bestätigen nochmals geprüft). Das Exemplar bleibt mit Status „ausgesondert“ im System, die Daten stehen in den bisherigen Feldern des Altsystems (`depreciation_reason`, `depreciated_at`, `further_use`), ältere Freitexte bleiben lesbar.
+- **Liste der Aussonderungen** (`/betrieb/aussondern/liste`): Zeitraum und Grund wählen, Zusammenfassung nach Grund, Druck, CSV-Export für den Jahresbericht. Ein Irrtum lässt sich mit „Zurückholen“ rückgängig machen (protokolliert). Die Statistik zeigt „Im Zeitraum ausgesondert“.
+
 ### Signaturen, Themenbereiche und Regalbrett-Vorschlag (v0.19.0)
 
 - **Pflege** in der Verwaltung (Recht `shelves.manage`, Mitarbeiter:innen und Verwaltung): `/verwaltung/signaturen` (Signatur anlegen, ändern, Themenbereiche in gewählter Reihenfolge zuordnen, löschen nur ohne Exemplare) und `/verwaltung/themenbereiche` (Baum aus Haupt- und Unterbereichen mit Schlüssel und Beschreibung; Schleifen sind verboten, Löschen nur ohne Unterbereiche und Signaturen). Regalbretter lassen sich mit einer Signatur verbinden.

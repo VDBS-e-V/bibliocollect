@@ -10,6 +10,10 @@ Für Mitarbeiter:innen und die Schüler-AG „Erweitert“.
 4. Prüfe die Vorschläge und ergänze fehlende Angaben.
 5. Im letzten Schritt prüfst du alles und speicherst. **Erst jetzt** wird etwas angelegt. Den Standort legst du hier **nicht** fest: Das Buch kommt auf den Stapel „Einsortieren“. Dort liegt jedes Buch ohne Standort, auch der Altbestand.
 
+## Bücher aussondern (Mitarbeiter:innen und Verwaltung)
+
+**Bücher aussondern** unter „Alle Vorgänge“: Inventarnummern scannen oder eintippen, prüfen lassen, Grund und Verbleib wählen, bestätigen. Ausgeliehene Bücher werden nicht ausgesondert. Die **Liste der Aussonderungen** zeigt, was wann und warum ausgesondert wurde, und lässt sich als CSV für den Jahresbericht herunterladen. Aus Versehen Ausgesondertes holst du dort mit „Zurückholen“ zurück.
+
 ## Medien einsortieren
 
 Die Bücher vom Stapel kommen ins Regal: **Medien einsortieren** öffnen, die **Inventarnummer des Buchs scannen** und das **Regalbrett bestätigen**. Vorgewählt ist das zuletzt benutzte Brett (oder das der Signatur); du kannst ein anderes aus der Liste wählen oder dessen Etikett scannen. Mit „Einsortieren“ wird der Standort im System vermerkt und das Buch vom Stapel genommen. Dann das nächste Buch.

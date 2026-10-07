@@ -123,6 +123,7 @@
                 <tbody>
                     <tr><th scope="row">Titel</th><td class="bc-tabular">{{ number_format($stats['stock']['titles'], 0, ',', '.') }}</td></tr>
                     <tr><th scope="row">Ausgaben</th><td class="bc-tabular">{{ number_format($stats['stock']['editions'], 0, ',', '.') }}</td></tr>
+                    <tr><th scope="row">Im Zeitraum ausgesondert</th><td class="bc-tabular">{{ number_format($stats['stock']['withdrawn_in_period'], 0, ',', '.') }}</td></tr>
                     @foreach ($stats['stock']['copies'] as $status => $count)
                         <tr><th scope="row">Exemplare: {{ $statusLabels[$status] ?? $status }}</th><td class="bc-tabular">{{ number_format($count, 0, ',', '.') }}</td></tr>
                     @endforeach

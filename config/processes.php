@@ -41,6 +41,7 @@ return [
                         ['label' => 'Katalog suchen und pflegen', 'text' => 'Titel, Ausgaben und Exemplare ausführlich recherchieren und bearbeiten.', 'route' => 'pos.catalog.index', 'permission' => 'catalog.manage'],
                         ['label' => 'Metadaten prüfen', 'text' => 'Fehlerhafte und lückenhafte Katalogdaten mit Vorschlägen durchgehen.', 'route' => 'pos.catalog.quality.index', 'permission' => 'catalog.manage'],
                         ['label' => 'Medien einsortieren', 'text' => 'Neu erfasste Bücher vom Stapel ins Regal stellen: Regalbrett wählen, Bücher scannen, Standort wird vermerkt.', 'route' => 'pos.shelving', 'permission' => 'circulation.manage'],
+                        ['label' => 'Bücher aussondern', 'text' => 'Alte, beschädigte oder doppelte Bücher mit Grund und Verbleib aus dem Bestand nehmen; Liste für den Jahresbericht.', 'route' => 'pos.withdrawal', 'permission' => 'catalog.withdraw'],
                         ['label' => 'Etiketten drucken', 'text' => 'Exemplar-Etiketten mit Strichcode und Signatur auf Etikettenbögen.', 'route' => 'pos.labels.copies', 'permission' => 'catalog.manage'],
                         ['label' => 'Öffentlichen Katalog öffnen', 'text' => 'So sehen Leser:innen den Katalog.', 'route' => 'public.catalog.index', 'permission' => null],
                     ],

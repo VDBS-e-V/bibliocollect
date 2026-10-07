@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'catalog.withdraw' => [
+            'label' => 'Bücher aussondern',
+            'description' => 'Erlaubt, Exemplare aus dem Bestand auszusondern und Aussonderungen zurückzuholen.',
+        ],
         'users.manage' => [
             'label' => 'Benutzerkonten verwalten',
             'description' => 'Erlaubt, Konten für Mitarbeitende anzulegen und einzuladen, Rollen zu vergeben und Konten zu deaktivieren.',
@@ -135,6 +139,7 @@ return [
                 'statistics.view',
                 'wishes.manage',
                 'shelves.manage',
+                'catalog.withdraw',
                 'inventory.renumber',
             ],
         ],
@@ -164,6 +169,7 @@ return [
                 'inventory.renumber',
                 'system.view',
                 'users.manage',
+                'catalog.withdraw',
             ],
         ],
         'technical_admin' => [

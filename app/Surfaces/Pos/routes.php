@@ -37,6 +37,7 @@ use App\Surfaces\Pos\Http\Controllers\ReservationIndexController;
 use App\Surfaces\Pos\Http\Controllers\ShelvingController;
 use App\Surfaces\Pos\Http\Controllers\StatisticsController;
 use App\Surfaces\Pos\Http\Controllers\WishController;
+use App\Surfaces\Pos\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(function (): void {
@@ -155,6 +156,15 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::post('/betrieb/ausweise/charge/{batch}/export', [PatronCardController::class, 'export'])->whereNumber('batch')->name('pos.labels.cards.export');
         Route::post('/betrieb/ausweise/charge/{batch}/verfuegbar', [PatronCardController::class, 'available'])->whereNumber('batch')->name('pos.labels.cards.available');
         Route::post('/betrieb/ausweise/{cardId}/sperren', [PatronCardController::class, 'block'])->name('pos.labels.cards.block');
+    });
+
+    Route::middleware('permission:catalog.withdraw')->group(function (): void {
+        Route::get('/betrieb/aussondern', [WithdrawalController::class, 'index'])->name('pos.withdrawal');
+        Route::post('/betrieb/aussondern/pruefen', [WithdrawalController::class, 'preview'])->name('pos.withdrawal.preview');
+        Route::post('/betrieb/aussondern', [WithdrawalController::class, 'store'])->name('pos.withdrawal.store');
+        Route::get('/betrieb/aussondern/liste', [WithdrawalController::class, 'list'])->name('pos.withdrawal.list');
+        Route::get('/betrieb/aussondern/liste.csv', [WithdrawalController::class, 'export'])->name('pos.withdrawal.export');
+        Route::post('/betrieb/aussondern/{copyId}/zurueckholen', [WithdrawalController::class, 'restore'])->name('pos.withdrawal.restore');
     });
 
     Route::middleware('permission:wishes.manage')->group(function (): void {
