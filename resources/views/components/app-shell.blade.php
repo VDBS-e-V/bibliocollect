@@ -118,7 +118,7 @@
         </div>
 
         @if ($navigationItems !== [])
-            <nav class="bc-nav" aria-label="Hauptnavigation">
+            <nav class="bc-nav" aria-label="Hauptnavigation" data-nav>
                 <div class="bc-nav__inner">
                     @foreach ($navigationItems as $item)
                         @php
@@ -129,8 +129,27 @@
                             href="{{ route($routeName) }}"
                             @class(['bc-nav__link', 'bc-nav__link--active' => $isCurrent])
                             @if ($isCurrent) aria-current="page" @endif
+                            data-nav-item
                         >{{ $item->label }}</a>
                     @endforeach
+
+                    {{-- Passt nicht alles in die Zeile, kommen die übrigen Punkte hierher (siehe app.js). Ohne JavaScript bleibt das Menü verborgen und die Leiste bricht um. --}}
+                    <div class="bc-nav__more" data-nav-more hidden>
+                        <details class="bc-nav__more-menu" data-account-menu>
+                            <summary class="bc-nav__more-button" aria-label="Weitere Menüpunkte">
+                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
+                            </summary>
+                            <ul class="bc-nav__more-list">
+                                @foreach ($navigationItems as $item)
+                                    @php
+                                        $moreRoute = $preview && $item->previewRoute !== null ? $item->previewRoute : $item->route;
+                                        $moreCurrent = request()->routeIs($item->activePattern) || ($preview && request()->routeIs($item->previewRoute ?? ''));
+                                    @endphp
+                                    <li data-nav-more-item hidden><a href="{{ route($moreRoute) }}" @if ($moreCurrent) aria-current="page" @endif>{{ $item->label }}</a></li>
+                                @endforeach
+                            </ul>
+                        </details>
+                    </div>
                 </div>
             </nav>
         @endif

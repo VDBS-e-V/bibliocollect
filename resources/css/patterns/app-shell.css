@@ -124,11 +124,16 @@
 }
 
 .bc-nav__inner {
+    position: relative;
     display: flex;
+    flex-wrap: wrap;
     align-items: stretch;
-    overflow-x: auto;
     gap: .25rem;
 }
+
+/* Mit JavaScript bleibt die Leiste einzeilig; was nicht passt, steht im Menü „⋯“ (kein Scrollbalken). */
+.bc-nav--fit .bc-nav__inner { flex-wrap: nowrap; }
+.bc-nav [hidden] { display: none !important; }
 
 .bc-nav__link {
     position: relative;
@@ -451,4 +456,60 @@
     .bc-account {
         display: none;
     }
+}
+
+/* Menü „Weitere Menüpunkte“ in der Hauptnavigation */
+.bc-nav__more {
+    position: relative;
+    display: flex;
+    margin-left: auto;
+    align-items: stretch;
+}
+
+.bc-nav__more-menu { display: flex; }
+
+.bc-nav__more-button {
+    display: inline-flex;
+    min-height: 3rem;
+    min-width: 3rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    list-style: none;
+}
+
+.bc-nav__more-button::-webkit-details-marker { display: none; }
+.bc-nav__more-button:hover { background: var(--bg-brand-soft); }
+.bc-nav__more-button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: -3px; }
+
+.bc-nav__more-list {
+    position: absolute;
+    z-index: 30;
+    top: 100%;
+    right: 0;
+    min-width: 14rem;
+    margin: 0;
+    padding: .4rem 0;
+    border: 1px solid var(--border-default);
+    border-radius: .35rem;
+    background: var(--bg-surface);
+    box-shadow: 0 .6rem 1.6rem rgb(15 23 42 / 18%);
+    list-style: none;
+}
+
+.bc-nav__more-list a {
+    display: block;
+    padding: .6rem 1rem;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.bc-nav__more-list a:hover { background: var(--bg-brand-soft); }
+.bc-nav__more-list a[aria-current="page"] { font-weight: 900; }
+
+@media print {
+    .bc-nav__more { display: none; }
 }

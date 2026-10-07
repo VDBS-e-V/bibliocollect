@@ -91,3 +91,23 @@ it('marks the current area', function (): void {
         ->assertSee('aria-current="page"', false)
         ->assertSeeInOrder(['aria-current="page"', 'Verwaltung']);
 });
+
+it('offers an overflow menu with every navigation item instead of a scroll bar', function (): void {
+    $html = $this->actingAs(switcherUser('staff'))->get(route('pos.home'))->assertOk()->getContent();
+
+    $items = substr_count($html, 'data-nav-item');
+    $inMenu = substr_count($html, 'data-nav-more-item');
+
+    expect($items)->toBeGreaterThan(3)
+        ->and($inMenu)->toBe($items)
+        ->and($html)->toContain('data-nav-more hidden')
+        ->and($html)->toContain('aria-label="Weitere Menüpunkte"');
+});
+
+it('keeps the navigation bar free of scroll bars in the stylesheet', function (): void {
+    $css = (string) file_get_contents(base_path('resources/css/patterns/app-shell.css'));
+
+    preg_match('/\.bc-nav__inner \{(.*?)\}/s', $css, $block);
+
+    expect($block[1] ?? '')->not->toContain('overflow-x: auto')->and($block[1] ?? '')->not->toContain('overflow: auto');
+});

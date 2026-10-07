@@ -201,6 +201,10 @@ Neue Ausleihkonten bekommen eine zufällige sechsstellige Bibliotheksnummer ohne
 
 Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Zeitplan-Aufgaben" alle Aufgaben aus `routes/console.php` mit Erklärung und nächstem Lauf. Jede lässt sich mit „Einmal ausführen" (nach Rückfrage) sofort starten, ohne den Zeitplan zu ändern; läuft sie gerade schon, wird sie nicht doppelt gestartet. „Cron-Lauf jetzt auslösen" macht dasselbe wie der Cronjob (fällige Aufgaben und rund 10 Sekunden Warteschlange). Ergebnis und Dauer erscheinen oben, im Protokoll stehen `system.job.run` und `system.cron.run` mit dem auslösenden Konto. Die Anfragen sind je Minute begrenzt.
 
+### Hauptnavigation ohne Scrollbalken (v0.29.1)
+
+Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
+
 ### Inventur (v0.22.0)
 
 `/betrieb/inventur` (Recht `inventory.count`: Mitarbeiter:innen, Verwaltung, Schüler-AG Erweitert): Eine Inventur beginnen (immer nur eine laufende), Regalbrett wählen und die Inventarnummern der dort stehenden Bücher scannen. Jeder Scan zeigt sofort: richtig einsortiert, steht laut System woanders, hat noch keinen Standort, gilt als verloren oder ausgesondert, oder Nummer unbekannt. Beim Abschließen entsteht der Bericht (auch als Zwischenstand, Druck und CSV): **Fehlt** (laut System am geprüften Regalbrett, nicht gescannt, ausgeliehene zählen nicht), **Falsch einsortiert**, **Ohne Standort**, **Verloren oder ausgesondert, aber im Regal**, **Unbekannt**. Geprüft sind nur Regalbretter, an denen gescannt wurde. „Standorte korrigieren“ setzt falsch eingetragene Standorte und fehlende auf das gefundene Regalbrett (protokolliert); mit Fehlendem passiert nichts automatisch.
