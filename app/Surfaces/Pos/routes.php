@@ -13,7 +13,6 @@ use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
 use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
-use App\Surfaces\Pos\Http\Controllers\EmergencyController;
 use App\Surfaces\Pos\Http\Controllers\HelpController;
 use App\Surfaces\Pos\Http\Controllers\InventoryCountController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
@@ -178,17 +177,6 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::get('/betrieb/aussondern/liste', [WithdrawalController::class, 'list'])->name('pos.withdrawal.list');
         Route::get('/betrieb/aussondern/liste.csv', [WithdrawalController::class, 'export'])->name('pos.withdrawal.export');
         Route::post('/betrieb/aussondern/{copyId}/zurueckholen', [WithdrawalController::class, 'restore'])->name('pos.withdrawal.restore');
-    });
-
-    Route::middleware('permission:circulation.manage')->group(function (): void {
-        Route::get('/betrieb/notbetrieb', [EmergencyController::class, 'index'])->name('pos.emergency');
-        Route::post('/betrieb/notbetrieb/ausleihen', [EmergencyController::class, 'storeLoans'])->name('pos.emergency.loans');
-        Route::post('/betrieb/notbetrieb/rueckgaben', [EmergencyController::class, 'storeReturns'])->name('pos.emergency.returns');
-    });
-
-    Route::middleware('permission:circulation.reports')->group(function (): void {
-        Route::get('/betrieb/notbetrieb/liste', [EmergencyController::class, 'list'])->name('pos.emergency.list');
-        Route::get('/betrieb/notbetrieb/liste.csv', [EmergencyController::class, 'export'])->name('pos.emergency.export');
     });
 
     Route::middleware('permission:wishes.manage')->group(function (): void {

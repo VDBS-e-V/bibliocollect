@@ -178,13 +178,6 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
-### Notbetrieb (v0.23.0)
-
-`/betrieb/notbetrieb` (Recht `circulation.manage`, Liste: `circulation.reports`):
-- **Notfallliste** (`/betrieb/notbetrieb/liste`, auch CSV): alle offenen Ausleihen (Name, Klasse, Medium, Inventarnummer, ausgeliehen, fällig) und offenen Vormerkungen, nach Name sortiert, druckbar. Zum regelmäßigen Ausdrucken für den Ausfall.
-- **Nachtragen von Papier:** Ausleihen (Person über Ausweis- oder Bibliotheksnummer, Datum, mehrere Inventarnummern) und Rückgaben (Datum, Inventarnummern). Das Datum darf nicht in der Zukunft und höchstens 365 Tage zurückliegen. Die Fälligkeit ergibt sich aus dem gewählten Tag, kann also schon überfällig sein. Es gelten die üblichen Regeln; alles oder nichts, fehlerhafte Zeilen werden genannt. Rückgaben vor dem Ausleihdatum sind nicht möglich. Das Protokoll vermerkt „nachgetragen“. `CheckoutCopyAction` und `ReturnLoanAction` nehmen dafür einen optionalen Zeitpunkt.
-- Nicht enthalten: Nachtragen von Verlängerungen und Vormerkungen, Namenssuche beim Nachtragen.
-
 ### Inventur (v0.22.0)
 
 `/betrieb/inventur` (Recht `inventory.count`: Mitarbeiter:innen, Verwaltung, Schüler-AG Erweitert): Eine Inventur beginnen (immer nur eine laufende), Regalbrett wählen und die Inventarnummern der dort stehenden Bücher scannen. Jeder Scan zeigt sofort: richtig einsortiert, steht laut System woanders, hat noch keinen Standort, gilt als verloren oder ausgesondert, oder Nummer unbekannt. Beim Abschließen entsteht der Bericht (auch als Zwischenstand, Druck und CSV): **Fehlt** (laut System am geprüften Regalbrett, nicht gescannt, ausgeliehene zählen nicht), **Falsch einsortiert**, **Ohne Standort**, **Verloren oder ausgesondert, aber im Regal**, **Unbekannt**. Geprüft sind nur Regalbretter, an denen gescannt wurde. „Standorte korrigieren“ setzt falsch eingetragene Standorte und fehlende auf das gefundene Regalbrett (protokolliert); mit Fehlendem passiert nichts automatisch.

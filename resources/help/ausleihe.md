@@ -27,12 +27,6 @@ Fehler in der Liste kannst du mit **Entfernen** zurücknehmen, solange du nicht 
 
 Leser:innen können sich über **Buchwunsch** in der öffentlichen Navigation Bücher wünschen (ohne Anmeldung, mit freiwilligem Namen und E-Mail), du kannst Wünsche auch am Tresen eintragen (die Lupe neben der ISBN holt Titel und Autor:in) (**Buchwünsche** in der Navigation). Setze den Stand (angenommen, bestellt, ist da oder abgelehnt) und schreibe bei Bedarf eine kurze Antwort; die Person bekommt eine Mail und sieht beides in ihrem Konto. Der Hinweis „weitere Wünsche für diesen Titel“ zeigt, was mehrere wollen.
 
-## Wenn das System ausfällt (Notbetrieb)
-
-- **Vorher:** Drucke regelmäßig die **Notfallliste** (**Notbetrieb** unter Alle Vorgänge → Liste ansehen und drucken). Sie nennt alle offenen Ausleihen und Vormerkungen nach Name sortiert. Bewahre sie am Ausleihplatz auf; sie enthält Namen und gehört nicht in fremde Hände.
-- **Während des Ausfalls:** Schreibe auf Papier auf, wer was wann ausgeliehen oder zurückgegeben hat (Ausweisnummer, Inventarnummer, Datum).
-- **Danach:** Öffne **Notbetrieb** und trage zuerst die **Ausleihen** nach (eine Person, ein Datum, die Inventarnummern untereinander), dann die **Rückgaben**. Es gelten die üblichen Regeln; bei einem Fehler wird nichts gebucht und die betroffenen Zeilen werden genannt. Liegt die Fälligkeit wegen des alten Datums schon in der Vergangenheit, gilt das Buch gleich als überfällig.
-
 ## Alle Vorgänge
 
 Unter **Alle Vorgänge** findest du alles, was du in der Bibliothek tun kannst, nach Aufgaben geordnet, auch Statistik, Klassenlisten und Katalogpflege.

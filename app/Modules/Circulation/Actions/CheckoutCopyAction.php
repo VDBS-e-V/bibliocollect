@@ -18,7 +18,6 @@ use App\Modules\Circulation\Services\LoanDueDateService;
 use App\Modules\Circulation\Services\LoanPolicy;
 use App\Modules\Circulation\Services\ReservationQueueService;
 use App\Modules\Patrons\Models\Patron;
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
 final readonly class CheckoutCopyAction
@@ -32,8 +31,7 @@ final readonly class CheckoutCopyAction
         private LoanPolicy $policy,
     ) {}
 
-    /** Mit $at wird eine Ausleihe nachgetragen, die am Tag $at stattfand (Notbetrieb mit Papierliste). */
-    public function execute(Patron $patron, string $barcode, User $actor, ?CarbonImmutable $at = null): Loan
+    public function execute(Patron $patron, string $barcode, User $actor): Loan
     {
         $normalizedBarcode = trim($barcode);
 
@@ -41,7 +39,7 @@ final readonly class CheckoutCopyAction
             throw new CirculationRuleViolation(['Der Exemplar-Barcode fehlt.']);
         }
 
-        return DB::transaction(function () use ($patron, $normalizedBarcode, $actor, $at): Loan {
+        return DB::transaction(function () use ($patron, $normalizedBarcode, $actor): Loan {
             $lockedPatron = Patron::query()
                 ->whereKey($patron->getKey())
                 ->lockForUpdate()
@@ -83,7 +81,7 @@ final readonly class CheckoutCopyAction
                 throw new CirculationRuleViolation($violations);
             }
 
-            $checkedOutAt = $at ?? $this->clock->now();
+            $checkedOutAt = $this->clock->now();
             $dueOn = $this->dueDates->forCheckoutAt($checkedOutAt, $this->policy->periodDays($lockedPatron, $edition));
 
             $loan = Loan::query()->create([
@@ -98,9 +96,9 @@ final readonly class CheckoutCopyAction
 
             $this->audit->record(
                 'circulation.loan.checked_out',
-                "Exemplar {$copy->barcode} ".($at !== null ? "nachgetragen (ausgeliehen am {$checkedOutAt->format('d.m.Y')})" : 'ausgeliehen').", fällig am {$dueOn->format('d.m.Y')}.",
+                "Exemplar {$copy->barcode} ausgeliehen, fällig am {$dueOn->format('d.m.Y')}.",
                 $loan,
-                ['patron_id' => (string) $lockedPatron->getKey(), 'copy_id' => (string) $copy->getKey(), 'due_on' => $dueOn->toDateString(), 'backdated' => $at !== null],
+                ['patron_id' => (string) $lockedPatron->getKey(), 'copy_id' => (string) $copy->getKey(), 'due_on' => $dueOn->toDateString()],
                 (int) $actor->getKey(),
             );
 

@@ -1,12 +1,12 @@
 # Funktionen, die vor dem Echteinsatz noch fehlen
 
-Stand: v0.23.0. Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
+Stand: v0.20.0. Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
 
 Die Einstufung ist ein Vorschlag: **Muss** = ohne das würde ich nicht starten, **Sollte** = im ersten Halbjahr, **Kann** = bei Bedarf.
 
 ## Muss
 
-Alle Punkte der früheren „Muss“-Liste sind umgesetzt.
+Alle Punkte der früheren „Muss“-Liste sind umgesetzt. Ein Notbetrieb (Papierliste, Nachtragen) wurde gebaut und auf Wunsch wieder entfernt (v0.23.0, zurückgenommen in v0.23.1).
 
 | Funktion | Stand |
 |---|---|
@@ -14,7 +14,7 @@ Alle Punkte der früheren „Muss“-Liste sind umgesetzt.
 | Benutzerverwaltung für Mitarbeitende | ✔ v0.18.0: Konten anlegen und einladen, Rollen, Deaktivieren, Schutz vor Aussperren |
 | Signaturen und Themen pflegen, Bücher zuordnen | ✔ v0.19.0, mit Regalbrett-Vorschlag beim Einsortieren |
 | Aussonderung von Exemplaren | ✔ v0.20.0 |
-| Notbetrieb bei Ausfall (Notfallliste, Papierausleihen und -rückgaben mit Datum nachtragen) | ✔ v0.23.0 |
+| Notbetrieb bei Ausfall | entfällt (bewusst entfernt) |
 
 ## Sollte
 
@@ -54,6 +54,5 @@ Ausleihe mit Beleg, Vormerkungen, Verlängerungen, Erinnerungen und Klassenliste
 
 1. Fehlerüberwachung, Benutzerverwaltung prüfen (klein, sofort sinnvoll)
 2. Signaturen und Themen pflegen, Aussonderung
-3. Notbetrieb und nachträgliche Erfassung
 4. Inventur, Schuljahreswechsel-Rückgängig, Konten-Import mit Aktualisierung
 5. Filter „nur verfügbare Titel“, Jahresbericht, Browsertests
