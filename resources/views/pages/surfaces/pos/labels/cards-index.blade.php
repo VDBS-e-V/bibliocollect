@@ -7,6 +7,7 @@
 
     <div class="bc-context-actions">
         <a href="{{ route('pos.patrons.index') }}">← Zurück zur Suche</a>
+        <a href="{{ route('pos.labels.cards.issue') }}">Ausweise ausgeben (klassenweise)</a>
         <a href="{{ route('pos.labels.cards.designs') }}">Motive der Ausweise</a>
         <a href="{{ route('pos.help.show', ['topic' => 'ausleihe']) }}">Anleitung</a>
     </div>

@@ -45,3 +45,31 @@
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.04em;
 }
+
+.bc-issue-scan {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bc-issue-scan input[type='text'] {
+    min-width: 12rem;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.bc-checkbox-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media print {
+    .bc-issue-scan input,
+    .bc-issue-scan button {
+        display: none;
+    }
+}

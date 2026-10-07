@@ -20,6 +20,7 @@ use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
 use App\Surfaces\Pos\Http\Controllers\PatronBlockController;
 use App\Surfaces\Pos\Http\Controllers\PatronCardController;
 use App\Surfaces\Pos\Http\Controllers\PatronCardDesignController;
+use App\Surfaces\Pos\Http\Controllers\PatronCardIssueController;
 use App\Surfaces\Pos\Http\Controllers\PatronCreateController;
 use App\Surfaces\Pos\Http\Controllers\PatronDataExportController;
 use App\Surfaces\Pos\Http\Controllers\PatronDepartureController;
@@ -198,6 +199,12 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::get('/betrieb/vormerkungen', ReservationIndexController::class)
             ->name('pos.reservations.index');
+
+        Route::get('/betrieb/ausweise-ausgabe', [PatronCardIssueController::class, 'index'])
+            ->name('pos.labels.cards.issue');
+
+        Route::post('/betrieb/ausweise-ausgabe', [PatronCardIssueController::class, 'store'])
+            ->name('pos.labels.cards.issue.store');
 
         Route::post('/betrieb/ausleihkonten/{patronId}/ausweise', [PatronAccountCardController::class, 'assign'])
             ->name('pos.patrons.cards.assign');

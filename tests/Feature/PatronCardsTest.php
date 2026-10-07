@@ -16,6 +16,8 @@ use App\Modules\Patrons\Models\Patron;
 use App\Modules\Patrons\Models\PatronCard;
 use App\Modules\Patrons\Models\PatronCardDesign;
 use App\Modules\Patrons\Support\PatronCardNumber;
+use App\Modules\School\Models\SchoolClass;
+use App\Modules\School\Models\SchoolYear;
 use App\Surfaces\Pos\Http\Controllers\PatronCardController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -392,4 +394,37 @@ it('prints on plain white when a side has no active motif', function (): void {
     expect(substr_count($html, 'class="namebox"'))->toBe(2)->and($html)->not->toContain('background-image');
 
     $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'rueck'])->assertOk();
+});
+
+it('issues cards class by class and lists persons without a card', function (): void {
+    $staff = cardTestUser('staff');
+    [$a, $b] = cardTestNumbers(2);
+    $year = SchoolYear::query()->create(['name' => '2026/27', 'starts_on' => '2026-08-01', 'ends_on' => '2027-07-31', 'is_active' => true]);
+    $class = SchoolClass::query()->create(['school_year_id' => $year->getKey(), 'name' => '7a', 'grade_level' => 7, 'is_active' => true]);
+    $anna = cardTestPatron('S-I-1', 'Anna', 'Ausgabe');
+    $ben = cardTestPatron('S-I-2', 'Ben', 'Bogen');
+    $ohne = cardTestPatron('S-I-3', 'Olli', 'Ohneklasse');
+    Patron::query()->whereKey([$anna->getKey(), $ben->getKey()])->update(['school_class_id' => $class->getKey()]);
+
+    $this->actingAs($staff)->get(route('pos.labels.cards.issue'))->assertOk()->assertDontSee('Ausgabe, Anna');
+
+    $page = $this->actingAs($staff)->get(route('pos.labels.cards.issue', ['klasse' => (string) $class->getKey()]))->assertOk();
+    $page->assertSee('Ausgabe, Anna')->assertSee('Bogen, Ben')->assertDontSee('Ohneklasse')->assertSee('2 ohne Ausweis')->assertSee('autofocus', false);
+
+    $this->actingAs($staff)->post(route('pos.labels.cards.issue.store'), ['patron_id' => (string) $anna->getKey(), 'code' => $a, 'klasse' => (string) $class->getKey()])
+        ->assertRedirect(route('pos.labels.cards.issue', ['klasse' => (string) $class->getKey()]))->assertSessionHas('issue_notice');
+    expect(PatronCard::query()->where('number', $a)->firstOrFail()->patron_id)->toBe((string) $anna->getKey());
+
+    $this->actingAs($staff)->get(route('pos.labels.cards.issue', ['klasse' => (string) $class->getKey()]))->assertSee('1 ohne Ausweis')->assertSee($a);
+    $this->actingAs($staff)->get(route('pos.labels.cards.issue', ['klasse' => (string) $class->getKey(), 'nur_ohne' => 1]))->assertSee('Bogen, Ben')->assertDontSee('Ausgabe, Anna');
+
+    // Ausweis einer anderen Person und unbekannte Nummern werden mit Meldung abgewiesen.
+    $this->actingAs($staff)->post(route('pos.labels.cards.issue.store'), ['patron_id' => (string) $ben->getKey(), 'code' => $a, 'klasse' => 'alle'])->assertSessionHas('issue_error');
+    $this->actingAs($staff)->post(route('pos.labels.cards.issue.store'), ['patron_id' => (string) $ben->getKey(), 'code' => '1234567890', 'klasse' => 'alle'])->assertSessionHas('issue_error');
+
+    $this->actingAs($staff)->get(route('pos.labels.cards.issue', ['klasse' => 'alle']))->assertSee('Ohneklasse')->assertSee('7a');
+    $this->actingAs($staff)->get(route('pos.labels.cards.issue', ['klasse' => 'ohne']))->assertSee('Ohneklasse')->assertDontSee('Bogen, Ben');
+
+    expect($ohne->refresh()->school_class_id)->toBeNull();
+    $this->actingAs(cardTestUser('student_ag_basic'))->get(route('pos.labels.cards.issue'))->assertOk();
 });
