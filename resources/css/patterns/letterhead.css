@@ -1,0 +1,60 @@
+/*
+ * Briefpapier für Ausdrucke auf A4. Das Bild füllt die ganze Seite (randlos) und steht fest an der Seitenecke, dadurch
+ * wiederholt es sich auf jeder gedruckten Seite. Der Text darf nur in der freien Fläche stehen: unter dem Kopf mit Logo
+ * (ca. 4,6 cm), rechts vor dem Punktband und über dem Fuß mit den Punkten.
+ *
+ * Browser drucken nicht in den Seitenrand. Deshalb gilt @page margin 0 (das unterdrückt zugleich Datum und Adresse, die der
+ * Browser sonst an den Rand druckt), und der Satzspiegel entsteht über das Polster des Seitenrahmens. Mit
+ * box-decoration-break: clone wiederholt sich dieses Polster oben und unten auf jeder Seite.
+ */
+:root {
+    --letterhead-top: 5cm;
+    --letterhead-right: 2.4cm;
+    --letterhead-bottom: 3.2cm;
+    --letterhead-left: 2.6cm;
+}
+
+.bc-letterhead {
+    display: none;
+}
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+@media print {
+    .bc-has-letterhead .bc-letterhead {
+        position: fixed;
+        z-index: -1;
+        display: block;
+        top: 0;
+        left: 0;
+        width: 210mm;
+        height: 297mm;
+        max-width: none;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    body,
+    .bc-shell,
+    .bc-shell__main {
+        background: transparent !important;
+    }
+
+    .bc-has-letterhead .bc-shell {
+        box-sizing: border-box;
+        width: 100%;
+        min-height: 0;
+        padding: var(--letterhead-top) var(--letterhead-right) var(--letterhead-bottom) var(--letterhead-left);
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+    }
+
+    .bc-has-letterhead .bc-shell__main {
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}

@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Briefpapier für Ausdrucke (v0.37.1)
+
+Alle Ausdrucke auf A4, die über die Anwendung laufen (Klassenlisten, Beleg, Auskunft, Statistik, Inventurbericht, Aussonderungsliste, Ausweisliste und jede andere Seite, die man druckt), erscheinen auf dem VDBS-Briefpapier „BiblioCollect“ in Farbe. Das Bild (`public/brand/vdbs/briefpapier-farbe.png`, Schwarz-Weiß: `briefpapier-sw.png`, beide 2481 × 3508 Pixel) steht fest an der Seitenecke und wiederholt sich auf jeder Seite; Text und Tabellen bleiben in der freien Fläche (Kopf mit Logo oben, Punktband rechts, Punkte unten, Falzmarken links). Umschaltbar mit `LETTERHEAD=farbe|sw|aus` in der `.env`. Ausweis- und Etikettenbögen haben ein eigenes Layout und bekommen kein Briefpapier. Der Druck ist randlos (`@page margin 0`), dadurch druckt der Browser auch kein Datum und keine Adresse an den Rand. Geprüft mit einer mehrseitigen Liste in Edge (PDF): Briefpapier und Satzspiegel stimmen auf allen Seiten. Das Satzspiegel-Polster oben und unten wiederholt `box-decoration-break: clone`; Ränder in `resources/css/patterns/letterhead.css`.
+
 ### Vorbereitung Testeinsatz, Block 8: Startseiten, Hilfe, Einrichtung (v0.37.0)
 
 - **Öffentliche Startseite:** zeigt die echten Öffnungszeiten und die Schließtage der nächsten 60 Tage aus der Datenbank, die wichtigsten Ausleihregeln aus den Einstellungen („bis zu 5 Medien für 14 Tage“), „Buchwunsch abgeben“, „Onlinekonto aktivieren“ und den Knopf Anmelden bzw. Zum Konto. Die Platzhalter („später“, „ab T2“, deaktivierter Knopf) sind weg; die Seite erscheint auch bei nicht erreichbarer Datenbank.

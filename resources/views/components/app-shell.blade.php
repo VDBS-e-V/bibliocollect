@@ -2,11 +2,16 @@
     'surface' => 'public',
     'title' => null,
     'preview' => false,
+    'letterhead' => null,
 ])
 
 @php
     use App\Foundation\Navigation\NavigationRegistry;
     use Illuminate\Support\Facades\Gate;
+
+    // Briefpapier nur beim Drucken: Datei je nach Einstellung (farbe, sw) oder aus.
+    $letterheadMode = $letterhead ?? config('foundation.letterhead', 'farbe');
+    $letterheadFile = ['farbe' => 'briefpapier-farbe.png', 'sw' => 'briefpapier-sw.png'][$letterheadMode] ?? null;
 
     $navigation = app(NavigationRegistry::class);
     $surfaceLabel = $navigation->surfaceLabel($surface);
@@ -50,8 +55,12 @@
     <title>{{ $title ? $title.' · ' : '' }}{{ config('app.name', 'BiblioCollect') }} · VDBS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body @class(['bc-has-letterhead' => $letterheadFile !== null])>
 <a class="bc-skip-link" href="#main-content">Zum Inhalt springen</a>
+@if ($letterheadFile)
+    {{-- Wird nur beim Drucken sichtbar und steht auf jeder Seite des Ausdrucks (siehe letterhead.css). --}}
+    <img class="bc-letterhead" src="/brand/vdbs/{{ $letterheadFile }}" alt="" aria-hidden="true" width="793" height="1122">
+@endif
 <div class="bc-shell">
     <header class="bc-shell__header">
         <div class="bc-utility-bar">

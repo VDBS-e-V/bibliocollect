@@ -20,6 +20,9 @@ return [
         'backup_path' => '.foundation/env-backups',
     ],
 
+    // Briefpapier für alle Ausdrucke auf A4: 'farbe' (Standard), 'sw' (Schwarz-Weiß) oder 'aus'.
+    'letterhead' => env('LETTERHEAD', 'farbe'),
+
     // Vor dem Schuljahreswechsel automatisch eine Datenbanksicherung erstellen (der Wechsel ist nicht umkehrbar).
     'backup_before_transition' => env('BACKUP_BEFORE_TRANSITION', true),
 
