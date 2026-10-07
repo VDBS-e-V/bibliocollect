@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * Titelbezogene Vormerkung. Die Reihenfolge der Warteschlange ergibt sich aus `requested_at`.
  *
  * @property string $id
- * @property string $patron_id
+ * @property string|null $patron_id
  * @property string $title_id
  * @property ReservationStatus $status
  * @property Carbon $requested_at
@@ -55,6 +55,17 @@ final class Reservation extends Model
     public function patron(): BelongsTo
     {
         return $this->belongsTo(Patron::class);
+    }
+
+    protected static function booted(): void
+    {
+        // Der eindeutige Schlüssel gilt nur für offene Vormerkungen mit Ausleihkonto (siehe Migration open_key).
+        self::saving(static function (self $reservation): void {
+            $reservation->setAttribute(
+                'open_key',
+                $reservation->status->isOpen() && $reservation->patron_id !== null ? $reservation->patron_id.'|'.$reservation->title_id : null,
+            );
+        });
     }
 
     /** @return BelongsTo<Title, $this> */

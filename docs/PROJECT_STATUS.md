@@ -178,6 +178,10 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Keine doppelten Vormerkungen (v0.24.0)
+
+Ein Ausleihkonto kann einen Titel nur einmal offen (wartend oder bereitgelegt) vorgemerkt haben, auch über verschiedene Ausgaben desselben Titels. Die Anwendung prüft das schon beim Vormerken; zusätzlich sichert ein eindeutiger Schlüssel in der Datenbank (`open_key`) es auch bei gleichzeitigen Anfragen. Vorhandene Doppelte werden bei der Migration bereinigt: Die älteste bleibt, spätere gelten als storniert. Nach Erfüllung, Stornierung oder Ablauf ist eine neue Vormerkung wieder möglich.
+
 ### Inventur (v0.22.0)
 
 `/betrieb/inventur` (Recht `inventory.count`: Mitarbeiter:innen, Verwaltung, Schüler-AG Erweitert): Eine Inventur beginnen (immer nur eine laufende), Regalbrett wählen und die Inventarnummern der dort stehenden Bücher scannen. Jeder Scan zeigt sofort: richtig einsortiert, steht laut System woanders, hat noch keinen Standort, gilt als verloren oder ausgesondert, oder Nummer unbekannt. Beim Abschließen entsteht der Bericht (auch als Zwischenstand, Druck und CSV): **Fehlt** (laut System am geprüften Regalbrett, nicht gescannt, ausgeliehene zählen nicht), **Falsch einsortiert**, **Ohne Standort**, **Verloren oder ausgesondert, aber im Regal**, **Unbekannt**. Geprüft sind nur Regalbretter, an denen gescannt wurde. „Standorte korrigieren“ setzt falsch eingetragene Standorte und fehlende auf das gefundene Regalbrett (protokolliert); mit Fehlendem passiert nichts automatisch.

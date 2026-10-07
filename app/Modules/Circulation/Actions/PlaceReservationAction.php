@@ -19,6 +19,7 @@ use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Modules\Patrons\Models\Patron;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -79,13 +80,18 @@ final readonly class PlaceReservationAction
                 throw new CirculationRuleViolation($violations);
             }
 
-            $reservation = Reservation::query()->create([
-                'patron_id' => $lockedPatron->getKey(),
-                'title_id' => $titleId,
-                'status' => ReservationStatus::Waiting,
-                'requested_at' => $this->clock->now(),
-                'created_by_user_id' => $actor->getKey(),
-            ]);
+            try {
+                $reservation = Reservation::query()->create([
+                    'patron_id' => $lockedPatron->getKey(),
+                    'title_id' => $titleId,
+                    'status' => ReservationStatus::Waiting,
+                    'requested_at' => $this->clock->now(),
+                    'created_by_user_id' => $actor->getKey(),
+                ]);
+            } catch (UniqueConstraintViolationException) {
+                // Eine gleichzeitige Anfrage war schneller.
+                throw new CirculationRuleViolation(['Dieser Titel ist für das Ausleihkonto bereits vorgemerkt.']);
+            }
 
             $this->audit->record(
                 'circulation.reservation.placed',

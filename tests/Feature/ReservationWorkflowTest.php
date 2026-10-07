@@ -24,6 +24,7 @@ use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\School\Models\LibraryOpeningHour;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 
@@ -380,4 +381,30 @@ it('keeps the reservation migration rollback capable', function (): void {
     $migration->up();
 
     expect(Schema::hasTable('circulation_reservations'))->toBeTrue();
+});
+
+it('never allows two open reservations of one title for one account, even past the application check', function (): void {
+    [$title, , [$copy]] = rsvTitle('Doppelbuch');
+    $actor = rsvActor();
+    $holder = rsvPatron('S-DUP-1');
+    $waiter = rsvPatron('S-DUP-2');
+
+    rsvCheckout($holder, $copy, $actor);
+    $first = rsvPlace($waiter, $copy->barcode, $actor);
+
+    expect(fn () => rsvPlace($waiter, $copy->barcode, $actor))->toThrow(CirculationRuleViolation::class, 'bereits vorgemerkt');
+
+    // Die Datenbank verhindert es auch, wenn die Anwendung umgangen wird.
+    expect(fn () => Reservation::query()->create([
+        'patron_id' => $waiter->getKey(),
+        'title_id' => $title->getKey(),
+        'status' => ReservationStatus::Waiting,
+        'requested_at' => now(),
+    ]))->toThrow(UniqueConstraintViolationException::class);
+
+    expect(Reservation::query()->where('patron_id', $waiter->getKey())->count())->toBe(1);
+
+    // Ist die erste Vormerkung abgeschlossen, ist eine neue wieder möglich.
+    app(CancelReservationAction::class)->execute($first, $actor);
+    expect(rsvPlace($waiter, $copy->barcode, $actor)->status)->toBe(ReservationStatus::Waiting);
 });
