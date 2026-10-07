@@ -5,6 +5,15 @@
 
     RewriteEngine On
 
+    # In hochgeladenen Ordnern (Cover, Ausweismotive) darf nie ein Skript laufen.
+    RewriteRule ^(covers|card-designs)/.*\.(php[0-9]?|phtml|phar)$ - [F,L]
+
+    # HTTPS erzwingen: erst einkommentieren, wenn die Seite über https läuft und der Hoster https richtig meldet,
+    # sonst droht eine Weiterleitungsschleife. Alternativ im Kundenmenü des Hosters „SSL erzwingen“ nutzen.
+    # RewriteCond %{HTTPS} !=on
+    # RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

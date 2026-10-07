@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Hinter dem Proxy des Hosters kommen Adresse und https aus den X-Forwarded-Headern. Mit TRUSTED_PROXIES lässt sich das einschränken.
+        $middleware->trustProxies(at: env('TRUSTED_PROXIES', '*') === '*' ? '*' : array_map('trim', explode(',', (string) env('TRUSTED_PROXIES'))));
+
         $middleware->append(SecurityHeaders::class);
 
         $middleware->alias([

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Foundation\Support\BusinessClock;
+use App\Foundation\Support\CsvExport;
 use App\Modules\Circulation\Queries\LoanStatisticsQuery;
 use App\Modules\School\Models\SchoolYear;
 use Carbon\CarbonImmutable;
@@ -39,33 +40,33 @@ final class StatisticsController
         return response()->streamDownload(static function () use ($stats, $from, $to): void {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Zeitraum', $from->format('d.m.Y').' bis '.$to->format('d.m.Y')], ';');
-            fputcsv($out, [], ';');
-            fputcsv($out, ['Kennzahl', 'Wert'], ';');
+            CsvExport::put($out, ['Zeitraum', $from->format('d.m.Y').' bis '.$to->format('d.m.Y')], ';');
+            CsvExport::put($out, [], ';');
+            CsvExport::put($out, ['Kennzahl', 'Wert'], ';');
 
             foreach (['Ausleihen' => 'loans', 'Rückgaben' => 'returns', 'Verlängerungen' => 'renewals', 'Aktive Leser:innen' => 'active_patrons', 'Aktuell ausgeliehen' => 'open', 'Überfällig' => 'overdue'] as $label => $key) {
-                fputcsv($out, [$label, $stats[$key]], ';');
+                CsvExport::put($out, [$label, $stats[$key]], ';');
             }
 
-            fputcsv($out, [], ';');
-            fputcsv($out, ['Monat', 'Ausleihen'], ';');
+            CsvExport::put($out, [], ';');
+            CsvExport::put($out, ['Monat', 'Ausleihen'], ';');
 
             foreach ($stats['by_month'] as $row) {
-                fputcsv($out, [$row['month'], $row['loans']], ';');
+                CsvExport::put($out, [$row['month'], $row['loans']], ';');
             }
 
-            fputcsv($out, [], ';');
-            fputcsv($out, ['Beliebteste Titel', 'Ausleihen'], ';');
+            CsvExport::put($out, [], ';');
+            CsvExport::put($out, ['Beliebteste Titel', 'Ausleihen'], ';');
 
             foreach ($stats['popular'] as $row) {
-                fputcsv($out, [$row['title'], $row['loans']], ';');
+                CsvExport::put($out, [$row['title'], $row['loans']], ';');
             }
 
-            fputcsv($out, [], ';');
-            fputcsv($out, ['Klasse (aktuell)', 'Ausleihen'], ';');
+            CsvExport::put($out, [], ';');
+            CsvExport::put($out, ['Klasse (aktuell)', 'Ausleihen'], ';');
 
             foreach ($stats['by_class'] as $row) {
-                fputcsv($out, [$row['class'], $row['loans']], ';');
+                CsvExport::put($out, [$row['class'], $row['loans']], ';');
             }
 
             fclose($out);

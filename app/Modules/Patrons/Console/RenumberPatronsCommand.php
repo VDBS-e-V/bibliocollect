@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Patrons\Console;
 
+use App\Foundation\Support\CsvExport;
 use App\Modules\Patrons\Actions\RenumberPatronsAction;
 use Illuminate\Console\Command;
 
@@ -62,10 +63,10 @@ final class RenumberPatronsCommand extends Command
 
         if ($handle !== false) {
             fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, ['Alte Nummer', 'Neue Nummer', 'Name'], ';');
+            CsvExport::put($handle, ['Alte Nummer', 'Neue Nummer', 'Name'], ';');
 
             foreach ($changes as $change) {
-                fputcsv($handle, [$change['old'], $change['new'], $change['name']], ';');
+                CsvExport::put($handle, [$change['old'], $change['new'], $change['name']], ';');
             }
 
             fclose($handle);

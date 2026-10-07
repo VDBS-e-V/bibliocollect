@@ -41,6 +41,33 @@ final class DoctorCommand extends Command
             $rows[] = ['OK', 'Umgebung', (string) app()->environment().' (Prüfungen für den Produktivbetrieb entfallen)'];
         }
 
+        if ($production) {
+            $secure = config('session.secure');
+            $rows[] = $secure === true ? ['OK', 'Sitzungs-Cookie', 'nur über https (Secure)'] : ['Warnung', 'Sitzungs-Cookie', 'ohne Secure-Markierung (SESSION_SECURE_COOKIE=true setzen)'];
+
+            $channel = (string) config('logging.default');
+            $level = (string) config('logging.channels.'.($channel === 'stack' ? 'single' : $channel).'.level', 'debug');
+            $rows[] = $channel === 'daily' && ! in_array($level, ['debug', 'info'], true)
+                ? ['OK', 'Log', "täglich neue Datei, Stufe {$level}"]
+                : ['Warnung', 'Log', "Kanal {$channel}, Stufe {$level}: die Logdatei wächst unbegrenzt (LOG_CHANNEL=daily, LOG_LEVEL=warning)"];
+
+            $setupToken = (string) config('hosting.setup_token', '');
+            $rows[] = $setupToken !== ''
+                ? ['Warnung', 'SETUP_TOKEN', 'ist noch gesetzt. Nach der Einrichtung leeren, die Einrichtungsseite bleibt sonst erreichbar']
+                : ['OK', 'SETUP_TOKEN', 'leer, die Einrichtungsseite ist aus'];
+        }
+
+        $driver = (string) config('database.connections.'.config('database.default').'.driver', '');
+        $driverExtension = ['mysql' => 'pdo_mysql', 'mariadb' => 'pdo_mysql', 'sqlite' => 'pdo_sqlite'][$driver] ?? null;
+
+        if ($driverExtension !== null) {
+            $rows[] = extension_loaded($driverExtension) ? ['OK', 'Datenbank-Treiber', $driverExtension] : ['Fehler', 'Datenbank-Treiber', "{$driverExtension} fehlt"];
+        }
+
+        $rows[] = (string) config('app.timezone') === (string) config('foundation.business_timezone')
+            ? ['OK', 'Zeitzone', (string) config('app.timezone')]
+            : ['Warnung', 'Zeitzone', 'APP_TIMEZONE ('.config('app.timezone').') und BUSINESS_TIMEZONE ('.config('foundation.business_timezone').') weichen ab: Zeiten wirken verschoben'];
+
         $databaseOk = false;
 
         try {
@@ -90,6 +117,11 @@ final class DoctorCommand extends Command
 
         if ($coverDisk === 'public' && ! file_exists(public_path('storage'))) {
             $rows[] = ['Warnung', 'storage:link', 'fehlt. Cover wären nicht sichtbar (php artisan storage:link oder CATALOG_COVER_DISK=covers)'];
+        }
+
+        foreach (['covers', 'card-designs'] as $folder) {
+            $path = public_path($folder);
+            $rows[] = is_dir($path) ? (is_writable($path) ? ['OK', 'Schreibrechte', "public/{$folder}"] : ['Fehler', 'Schreibrechte', "public/{$folder} ist nicht beschreibbar"]) : (is_writable(public_path()) ? ['OK', 'Schreibrechte', "public/{$folder} wird bei Bedarf angelegt"] : ['Fehler', 'Schreibrechte', "public/{$folder} kann nicht angelegt werden"]);
         }
 
         $mailer = (string) config('mail.default');

@@ -26,6 +26,7 @@ use App\Foundation\Support\SystemErrorLog;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 final class FoundationServiceProvider extends ServiceProvider
@@ -52,6 +53,11 @@ final class FoundationServiceProvider extends ServiceProvider
 
     public function boot(PermissionRegistry $permissions): void
     {
+        // Links, Cover und signierte Adressen im Betrieb immer mit https, auch wenn der Proxy es nicht meldet.
+        if (str_starts_with((string) config('app.url'), 'https://') && ! $this->app->environment(['local', 'testing'])) {
+            URL::forceScheme('https');
+        }
+
         foreach ($permissions->keys() as $permission) {
             Gate::define(
                 $permission,

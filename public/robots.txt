@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /verwaltung
+Disallow: /betrieb
+Disallow: /konto
+Disallow: /_
+Disallow: /anmelden

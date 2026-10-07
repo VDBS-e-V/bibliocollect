@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Foundation\Support\BusinessClock;
+use App\Foundation\Support\CsvExport;
 use App\Modules\Catalog\Actions\RestoreWithdrawnCopyAction;
 use App\Modules\Catalog\Actions\WithdrawCopiesAction;
 use App\Modules\Catalog\Enums\CopyStatus;
@@ -153,10 +154,10 @@ final class WithdrawalController
         return response()->streamDownload(static function () use ($copies): void {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Inventarnummer', 'Titel', 'ISBN', 'Ausgesondert am', 'Grund', 'Verbleib'], ';');
+            CsvExport::put($out, ['Inventarnummer', 'Titel', 'ISBN', 'Ausgesondert am', 'Grund', 'Verbleib'], ';');
 
             foreach ($copies as $copy) {
-                fputcsv($out, [$copy->barcode, $copy->edition->title->preferred_title, $copy->edition->isbn, $copy->depreciated_at?->format('d.m.Y'), WithdrawalReason::describe($copy->depreciation_reason), WithdrawalFate::describe($copy->further_use)], ';');
+                CsvExport::put($out, [$copy->barcode, $copy->edition->title->preferred_title, $copy->edition->isbn, $copy->depreciated_at?->format('d.m.Y'), WithdrawalReason::describe($copy->depreciation_reason), WithdrawalFate::describe($copy->further_use)], ';');
             }
 
             fclose($out);

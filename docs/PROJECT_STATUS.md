@@ -205,6 +205,15 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Vorbereitung Testeinsatz, Block 2: Zeit und Betriebseinstellungen (v0.31.0)
+
+- **Zeitzone:** `APP_TIMEZONE` (Standard `Europe/Berlin`) gilt für Speicherung, Anzeige und Zeitplan. Vorher war UTC eingestellt, sodass der Zeitplan 07:00 UTC (= 09:00 Ortszeit) lief und Anzeigen zwei Stunden daneben lagen. Bereits gespeicherte Entwicklungsdaten wirken dadurch um 1 bis 2 Stunden verschoben; im Echtbetrieb beginnt man mit der neuen Einstellung.
+- **Proxy und https:** `TRUSTED_PROXIES` (Standard `*`) für die X-Forwarded-Header des Hosters; mit https-`APP_URL` erzeugt die Anwendung außerhalb von lokal/Test nur https-Links; `SESSION_SECURE_COOKIE` ist dann automatisch an.
+- **Drosselung:** Konto aktivieren höchstens 5 Versuche je Minute.
+- **Wartungsseite `app:doctor`** prüft zusätzlich: Sitzungs-Cookie, Logkanal und -stufe, `SETUP_TOKEN` noch gesetzt, Datenbank-Treiber, Zeitzone, Schreibrechte `public/covers` und `public/card-designs`.
+- **Apache:** In `covers` und `card-designs` laufen keine Skripte; die https-Weiterleitung steht auskommentiert in `public/.htaccess`. `robots.txt` sperrt Verwaltung, Betrieb, Konto und interne Adressen.
+- **CSV-Exporte** (Statistik, Inventur, Aussonderung, Ausweise, Nummernumstellung) entschärfen Zellen, die mit `=`, `+`, `-`, `@` beginnen (`CsvExport`).
+
 ### Vorbereitung Testeinsatz, Block 1: Deutsch und Fehlerseiten (v0.30.0)
 
 Sprache Standard ist Deutsch (Locale und Fallback). Neu: `lang/de/{validation,auth,passwords,pagination}.php` mit Feldnamen und `lang/de.json` (Mail-Fußzeilen, Fehlertitel). Die Bestätigungsmail für Onlinekonten ist deutsch („Bitte bestätige deine E-Mail-Adresse"), ebenso die Meldungen bei falschen Eingaben. Eigene Fehlerseiten (403, 404, 419, 429, 500, 503) im Aussehen der Anwendung unter `resources/views/errors/`; sie hängen nicht an Sitzung oder Datenbank. Plan und weitere Blöcke: `docs/GO_LIVE.md` (folgt in Block 8).

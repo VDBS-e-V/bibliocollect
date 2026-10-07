@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Pos\Http\Controllers;
 
+use App\Foundation\Support\CsvExport;
 use App\Modules\Patrons\Actions\BlockPatronCardAction;
 use App\Modules\Patrons\Actions\GeneratePatronCardsAction;
 use App\Modules\Patrons\Enums\CardBlockReason;
@@ -217,10 +218,10 @@ final class PatronCardController
         return response()->streamDownload(static function () use ($cards): void {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Ausweisnummer', 'Charge', 'Status'], ';');
+            CsvExport::put($out, ['Ausweisnummer', 'Charge', 'Status'], ';');
 
             foreach ($cards as $card) {
-                fputcsv($out, [$card->number, $card->batch, $card->status->label()], ';');
+                CsvExport::put($out, [$card->number, $card->batch, $card->status->label()], ';');
             }
 
             fclose($out);

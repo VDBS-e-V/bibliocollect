@@ -19,7 +19,7 @@ Route::middleware('web')->group(function (): void {
         Route::post('/passwort-zuruecksetzen', [PasswordResetController::class, 'update'])->middleware('throttle:5,1')->name('password.update');
 
         Route::get('/konto-aktivieren', [ClaimAccountController::class, 'create'])->name('identity.claim.create');
-        Route::post('/konto-aktivieren', [ClaimAccountController::class, 'store'])->name('identity.claim.store');
+        Route::post('/konto-aktivieren', [ClaimAccountController::class, 'store'])->middleware('throttle:5,1')->name('identity.claim.store');
     });
 
     Route::middleware('auth')->group(function (): void {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Foundation\Support\BusinessClock;
+use App\Foundation\Support\CsvExport;
 use App\Modules\Catalog\Actions\ApplyInventoryCorrectionsAction;
 use App\Modules\Catalog\Actions\RecordInventoryScanAction;
 use App\Modules\Catalog\Models\InventoryCount;
@@ -136,16 +137,16 @@ final class InventoryCountController
         return response()->streamDownload(static function () use ($data): void {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Ergebnis', 'Inventarnummer', 'Titel', 'Regalbrett gefunden', 'Regalbrett laut System'], ';');
+            CsvExport::put($out, ['Ergebnis', 'Inventarnummer', 'Titel', 'Regalbrett gefunden', 'Regalbrett laut System'], ';');
 
             foreach (['ok' => 'Richtig', 'misplaced' => 'Falsch einsortiert', 'unplaced' => 'Ohne Standort', 'inactive' => 'Verloren oder ausgesondert', 'unknown' => 'Unbekannt'] as $key => $label) {
                 foreach ($data[$key] as $item) {
-                    fputcsv($out, [$label, $item->barcode, $item->copy?->edition->title->preferred_title, $item->shelf_code, $item->copy?->shelf_location], ';');
+                    CsvExport::put($out, [$label, $item->barcode, $item->copy?->edition->title->preferred_title, $item->shelf_code, $item->copy?->shelf_location], ';');
                 }
             }
 
             foreach ($data['missing'] as $copy) {
-                fputcsv($out, ['Fehlt', $copy->barcode, $copy->edition->title->preferred_title, '', $copy->shelf_location], ';');
+                CsvExport::put($out, ['Fehlt', $copy->barcode, $copy->edition->title->preferred_title, '', $copy->shelf_location], ';');
             }
 
             fclose($out);
