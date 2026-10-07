@@ -9,7 +9,6 @@ use App\Modules\Catalog\Actions\UpdateEditionAction;
 use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
-use App\Modules\Catalog\Services\CatalogShelfOptions;
 use App\Surfaces\Pos\Http\Requests\CatalogEditionRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
@@ -39,7 +38,6 @@ final class CatalogEditionController
             ->view('pages.surfaces.pos.catalog.edition-edit', [
                 'edition' => $edition,
                 'copyStatuses' => CopyStatus::cases(),
-                'shelfOptions' => app(CatalogShelfOptions::class)->forSelect(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }

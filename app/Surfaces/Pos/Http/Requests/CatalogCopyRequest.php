@@ -68,7 +68,8 @@ final class CatalogCopyRequest extends FormRequest
 
         return new CopyData(
             barcode: (string) $data['barcode'],
-            shelfLocation: $this->nullableString($data['shelf_location'] ?? null),
+            // Ein neues Exemplar bekommt seinen Standort erst beim Einsortieren; nur beim Bearbeiten wird er hier gesetzt.
+            shelfLocation: $this->isMethod('POST') ? null : $this->nullableString($data['shelf_location'] ?? null),
             status: CopyStatus::from((string) $data['status']),
         );
     }

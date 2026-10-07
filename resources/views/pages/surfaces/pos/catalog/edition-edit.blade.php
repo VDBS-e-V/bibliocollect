@@ -172,12 +172,7 @@
                     autocomplete="off"
                     required
                 />
-                <x-ui.select label="Standort (Regalbrett)" name="shelf_location" :error="$errors->first('shelf_location') ?: null">
-                    <option value="">Kein Standort</option>
-                    @foreach ($shelfOptions as $code => $display)
-                        <option value="{{ $code }}" @selected(old('shelf_location') === $code)>{{ $display }}</option>
-                    @endforeach
-                </x-ui.select>
+<p class="bc-intake-note">Den Standort bekommt das Exemplar beim Einsortieren ins Regal (Vorgang „Medien einsortieren“).</p>
                 <x-ui.select
                     label="Exemplarstatus"
                     name="status"

@@ -27,7 +27,7 @@ function stackCopy(string $barcode, string $title = 'Stapelbuch', bool $onStack 
     $titleModel = Title::query()->create(['preferred_title' => $title, 'sort_title' => $title]);
     $edition = Edition::query()->create(['title_id' => $titleModel->getKey(), 'media_type' => 'book']);
 
-    return Copy::query()->create(['edition_id' => $edition->getKey(), 'barcode' => $barcode, 'status' => 'active', 'needs_shelving' => $onStack, 'shelf_location' => $location]);
+    return Copy::query()->create(['edition_id' => $edition->getKey(), 'barcode' => $barcode, 'status' => 'active', 'shelf_location' => $onStack ? null : $location]);
 }
 
 it('puts new copies on the stack and shelves them with a shelf and a scan', function (): void {
@@ -47,8 +47,8 @@ it('puts new copies on the stack and shelves them with a shelf and a scan', func
         ->assertRedirect(route('pos.shelving', ['regalbrett' => 'R3-B2']))->assertSessionHas('shelving_notice');
 
     $first->refresh();
-    expect($first->shelf_location)->toBe('R3-B2')->and($first->needs_shelving)->toBeFalse()->and($first->shelved_at)->not->toBeNull()
-        ->and($second->refresh()->needs_shelving)->toBeTrue();
+    expect($first->shelf_location)->toBe('R3-B2')->and(Copy::query()->awaitingShelving()->whereKey($first->getKey())->exists())->toBeFalse()->and($first->shelved_at)->not->toBeNull()
+        ->and(Copy::query()->awaitingShelving()->whereKey($second->getKey())->exists())->toBeTrue();
 
     $this->actingAs($helper)->get(route('pos.shelving', ['regalbrett' => 'R3-B2']))->assertSee('Zuletzt einsortiert')->assertSee('Erstes Buch')->assertSee('Stapel „Einsortieren“');
 
@@ -71,7 +71,7 @@ it('refuses unknown books, unknown shelves and missing input while shelving', fu
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => '', 'code' => '0020010'])->assertSessionHasErrors('regalbrett');
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => 'R3-B2', 'code' => ''])->assertSessionHasErrors('code');
 
-    expect($copy->refresh()->needs_shelving)->toBeTrue()->and($copy->shelf_location)->toBeNull();
+    expect(Copy::query()->awaitingShelving()->whereKey($copy->getKey())->exists())->toBeTrue()->and($copy->refresh()->shelf_location)->toBeNull();
 
 });
 
@@ -131,4 +131,32 @@ it('does not touch copies that already have a seven digit number', function (): 
 
     $this->actingAs($staff)->post(route('administration.inventory.store'), ['copies' => [(string) $modern->getKey()]])->assertSessionHasErrors('copies');
     expect($modern->refresh()->barcode)->toBe('0001234');
+});
+
+it('counts every copy without a location as not yet shelved, but not weeded out or lost ones', function (): void {
+    $helper = stackUser('student_ag_basic');
+    stackCopy('0020030', 'Altbestand ohne Standort', true);
+    stackCopy('0020031', 'Mit leerem Standort', false, '');
+    stackCopy('0020032', 'Im Regal', false, 'R1-B1');
+    $lost = stackCopy('0020033', 'Verloren', true);
+    $lost->forceFill(['status' => 'lost'])->save();
+    $withdrawn = stackCopy('0020034', 'Ausgesondert', true);
+    $withdrawn->forceFill(['status' => 'withdrawn'])->save();
+
+    expect(Copy::query()->awaitingShelving()->pluck('barcode')->sort()->values()->all())->toBe(['0020030', '0020031']);
+
+    $this->actingAs($helper)->get(route('pos.shelving'))->assertOk()->assertSee('Altbestand ohne Standort')->assertSee('Mit leerem Standort')->assertDontSee('Im Regal')->assertDontSee('Ausgesondert');
+});
+
+it('puts copies that are added by hand in the catalog on the stack, whatever is sent as location', function (): void {
+    $staff = stackUser('staff');
+    CatalogShelf::query()->create(['code' => 'R3-B2']);
+    $copy = stackCopy('0020040', 'Bestehendes Exemplar', false, 'R3-B2');
+
+    $this->actingAs($staff)->post(route('pos.catalog.copies.store', ['editionId' => $copy->edition_id]), ['barcode' => '0020041', 'shelf_location' => 'R3-B2', 'status' => 'active'])->assertSessionHasNoErrors();
+
+    $new = Copy::query()->where('barcode', '0020041')->firstOrFail();
+    expect($new->shelf_location)->toBeNull()->and(Copy::query()->awaitingShelving()->whereKey($new->getKey())->exists())->toBeTrue();
+
+    $this->actingAs($staff)->get(route('pos.catalog.editions.edit', ['editionId' => $copy->edition_id]))->assertOk()->assertSee('beim Einsortieren ins Regal');
 });

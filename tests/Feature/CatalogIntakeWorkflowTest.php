@@ -213,7 +213,7 @@ it('walks through all steps with DNB data and writes only on the final save', fu
 
     expect($copy->edition_id)->toBe($edition->getKey())
         ->and($copy->shelf_location)->toBeNull()
-        ->and($copy->needs_shelving)->toBeTrue()
+        ->and(Copy::query()->awaitingShelving()->whereKey($copy->getKey())->exists())->toBeTrue()
         ->and($copy->status->value)->toBe('active')
         ->and($edition->cover_status)->toBe('pending');
 

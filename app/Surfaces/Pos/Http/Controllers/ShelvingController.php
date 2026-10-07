@@ -28,8 +28,8 @@ final class ShelvingController
             ->view('pages.surfaces.pos.shelving', [
                 'shelf' => isset($options[$shelf]) ? $shelf : '',
                 'shelfOptions' => $options,
-                'stack' => Copy::query()->with('edition.title')->where('needs_shelving', true)->orderBy('created_at')->orderBy('barcode')->limit(self::STACK_LIMIT)->get(),
-                'stackTotal' => Copy::query()->where('needs_shelving', true)->count(),
+                'stack' => Copy::query()->with('edition.title')->awaitingShelving()->orderBy('barcode')->limit(self::STACK_LIMIT)->get(),
+                'stackTotal' => Copy::query()->awaitingShelving()->count(),
                 'recent' => Copy::query()->with('edition.title')->whereNotNull('shelved_at')->orderByDesc('shelved_at')->limit(8)->get(),
             ])
             ->header('Cache-Control', 'private, no-store');
@@ -58,7 +58,7 @@ final class ShelvingController
             return redirect()->route('pos.shelving', $back)->with('shelving_error', 'Zur Inventarnummer „'.trim($data['code']).'“ gibt es kein Exemplar.');
         }
 
-        $moved = ! $copy->needs_shelving && $copy->shelf_location !== null && $copy->shelf_location !== $shelf;
+        $moved = $copy->shelf_location !== null && $copy->shelf_location !== '' && $copy->shelf_location !== $shelf;
         $previous = $copy->shelf_location;
 
         $shelve->execute($copy, $shelf);

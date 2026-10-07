@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Catalog\Models;
 
 use App\Modules\Catalog\Enums\CopyStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +17,6 @@ use Illuminate\Support\Carbon;
  * @property string $barcode
  * @property CopyStatus $status
  * @property string|null $shelf_location
- * @property bool $needs_shelving
  * @property Carbon|null $shelved_at
  * @property string|null $signature_id
  * @property string|null $legacy_source
@@ -52,7 +52,6 @@ final class Copy extends Model
         'barcode',
         'status',
         'shelf_location',
-        'needs_shelving',
         'shelved_at',
         'signature_id',
         'legacy_source',
@@ -76,6 +75,21 @@ final class Copy extends Model
         'legacy_metadata',
     ];
 
+    /**
+     * Der Stapel „Einsortieren“: Exemplare im Bestand ohne Standort. Ausgesonderte und verlorene gehören nicht dazu.
+     *
+     * @param  Builder<Copy>  $query
+     * @return Builder<Copy>
+     */
+    public function scopeAwaitingShelving(Builder $query): Builder
+    {
+        return $query
+            ->whereIn('status', [CopyStatus::Active->value, CopyStatus::Damaged->value])
+            ->where(static function (Builder $inner): void {
+                $inner->whereNull('shelf_location')->orWhere('shelf_location', '');
+            });
+    }
+
     /** @return BelongsTo<Edition, $this> */
     public function edition(): BelongsTo
     {
@@ -93,7 +107,6 @@ final class Copy extends Model
     {
         return [
             'status' => CopyStatus::class,
-            'needs_shelving' => 'boolean',
             'shelved_at' => 'datetime',
             'legacy_in_transition' => 'boolean',
             'legacy_is_available' => 'boolean',

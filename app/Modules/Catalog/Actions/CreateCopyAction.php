@@ -29,7 +29,6 @@ final class CreateCopyAction
                 'barcode' => $data->barcode,
                 'shelf_location' => $data->shelfLocation,
                 'status' => $data->status,
-                'needs_shelving' => $data->awaitingShelving,
             ]);
 
             return $copy;

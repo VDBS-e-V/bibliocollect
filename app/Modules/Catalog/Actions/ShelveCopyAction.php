@@ -7,7 +7,7 @@ namespace App\Modules\Catalog\Actions;
 use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Models\Copy;
 
-/** Vermerkt, dass ein Exemplar ins Regal einsortiert wurde: Standort setzen, vom Stapel nehmen. */
+/** Vermerkt, dass ein Exemplar ins Regal einsortiert wurde: Mit dem Standort ist es nicht mehr auf dem Stapel. */
 final readonly class ShelveCopyAction
 {
     public function __construct(private AuditRecorder $audit) {}
@@ -18,7 +18,6 @@ final readonly class ShelveCopyAction
 
         $copy->forceFill([
             'shelf_location' => $shelfCode,
-            'needs_shelving' => false,
             'shelved_at' => now(),
         ])->save();
 

@@ -49,7 +49,7 @@ it('lets catalog managers create and update physical copies', function (): void 
     $copy = Copy::query()->where('barcode', '0099001')->firstOrFail();
 
     expect($copy->edition_id)->toBe($edition->getKey())
-        ->and($copy->shelf_location)->toBe('J 5 ENDE')
+        ->and($copy->shelf_location)->toBeNull()
         ->and($copy->status)->toBe(CopyStatus::Active);
 
     $this->actingAs($manager)

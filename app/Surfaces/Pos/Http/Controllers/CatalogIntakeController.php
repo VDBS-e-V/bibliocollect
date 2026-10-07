@@ -280,7 +280,7 @@ final class CatalogIntakeController
         }
 
         // Der Standort wird erst beim Einsortieren ins Regal vermerkt (Vorgang „Medien einsortieren“).
-        $copyData = new CopyData($barcode, null, $copy['status'], true);
+        $copyData = new CopyData($barcode, null, $copy['status']);
         $editionId = $this->draft->existingEditionId();
         $details = $this->draft->details();
 

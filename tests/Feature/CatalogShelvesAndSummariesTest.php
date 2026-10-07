@@ -109,7 +109,7 @@ it('offers the shelves as a dropdown while editing a copy and keeps an old locat
         ->assertSee('R3-B2 · Fantasy')
         ->assertSee('Altes Regal (nicht mehr in der Liste)');
 
-    $this->actingAs($staff)->get(route('pos.catalog.editions.edit', ['editionId' => $copy->edition_id]))->assertOk()->assertSee('R3-B2 · Fantasy');
+    $this->actingAs($staff)->get(route('pos.catalog.editions.edit', ['editionId' => $copy->edition_id]))->assertOk()->assertSee('beim Einsortieren ins Regal');
 });
 
 it('suggests a summary from google books', function (): void {
