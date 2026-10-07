@@ -175,7 +175,7 @@ it('shows a process oriented menu and a page with all processes', function (): v
     $home->assertSee('Ausleihe und Rückgabe')->assertSee('Ausweise ausgeben')->assertSee('Buchwünsche')->assertSee('Medium erfassen')->assertSee('Alle Vorgänge');
 
     $all = $this->actingAs($staff)->get(route('pos.processes'))->assertOk();
-    $all->assertSeeInOrder(['id="area-betrieb-heading"', 'Ausleihe und Rückgabe', 'Rückgabe ohne Person', 'Ausleihkonto suchen', 'id="area-verwaltung-heading"', 'Ausleihkonten importieren', 'Ausweise erzeugen und drucken', 'Statistik'], false);
+    $all->assertSeeInOrder(['id="area-betrieb-heading"', 'Ausleihe und Rückgabe', 'Rückgabe ohne Person', 'Ausleihkonto suchen', 'id="area-verwaltung-heading"', 'Klassendaten importieren', 'Ausweise erzeugen und drucken', 'Statistik'], false);
     $all->assertSee('Rückgabe ohne Person')->assertSee('Ausweise klassenweise ausgeben')->assertSee('Statistik')->assertSee('Metadaten prüfen')->assertDontSee('Schuljahreswechsel');
 
     $this->actingAs(wishUser('management'))->get(route('pos.processes'))->assertSee('Schuljahreswechsel')->assertSee('Informationsseiten');

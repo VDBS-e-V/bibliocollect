@@ -1,14 +1,17 @@
-<x-app-shell surface="pos" title="Ausleihkonten importieren">
+<x-app-shell surface="pos" title="Klassendaten importieren">
     <x-ui.page-header
         kicker="Ausleihkonten"
-        title="Ausleihkonten importieren"
-        lead="Schüler:innen, Lehrkräfte und Mitarbeiter:innen aus einer CSV-Datei anlegen. Vor dem Anlegen gibt es eine Vorschau."
+        title="Klassendaten importieren"
+        lead="Klassenleitungen füllen die Vorlage mit den Schülerdaten aus, ihr importiert sie auf einen Schlag. Vor dem Anlegen gibt es eine Vorschau."
     />
 
     <div class="bc-context-actions">
         <a href="{{ route('pos.patrons.index') }}">← Zurück zur Suche</a>
-        <a href="{{ route('pos.patrons.import.template') }}">Vorlage herunterladen</a>
+        <a href="{{ route('pos.patrons.import.template') }}">Vorlage für die Klassenleitungen herunterladen</a>
+        <a href="{{ route('pos.labels.cards.issue', ['klasse' => 'alle']) }}">Danach: Ausweise klassenweise ausgeben</a>
     </div>
+
+    <x-ui.alert title="Ausweise gibt es erst später">Der Import legt nur die Ausleihkonten an. Die Ausweise werden erst ausgegeben, wenn die Schüler:innen vor euch stehen: unter „Ausweise klassenweise ausgeben“ die Klasse wählen und jeden Ausweis neben dem Namen scannen. Einzelne neue Konten legt ihr dagegen mit Ausweis an, weil die Person dann ohnehin da ist.</x-ui.alert>
 
     @if ($errors->any())
         <x-ui.alert variant="error" title="Datei nicht nutzbar">{{ $errors->first() }}</x-ui.alert>

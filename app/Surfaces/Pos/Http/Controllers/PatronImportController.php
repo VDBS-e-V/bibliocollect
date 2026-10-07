@@ -85,7 +85,7 @@ final class PatronImportController
 
         return redirect()
             ->route('pos.patrons.index')
-            ->with('workspace_success', "Import abgeschlossen: {$result['created']} Ausleihkonten angelegt, {$result['skipped']} übersprungen.");
+            ->with('workspace_success', "Import abgeschlossen: {$result['created']} Ausleihkonten angelegt, {$result['skipped']} übersprungen. Die Ausweise gibst du unter „Ausweise klassenweise ausgeben“ aus, sobald die Schüler:innen da sind.");
     }
 
     private function path(string $token): string

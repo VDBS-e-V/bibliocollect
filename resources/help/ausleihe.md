@@ -15,6 +15,11 @@ Diese Anleitung ist für die Schüler-AG und alle, die am Ausleihplatz arbeiten.
 
 Fehler in der Liste kannst du mit **Entfernen** zurücknehmen, solange du nicht bestätigt hast. Mit **Vorgang verwerfen** beginnst du von vorn, ohne dass etwas gebucht wird.
 
+## Neue Konten anlegen
+
+- **Einzelne Person:** Die Person steht vor dir. Öffne **Ausleihkonto anlegen**, trage die Daten ein und **scanne im ersten Feld den Ausweis**, den sie bekommt. Konto und Ausweis werden zusammen angelegt; ohne Ausweis geht es nicht. Die Bibliotheksnummer kannst du leer lassen, sie wird zufällig vergeben.
+- **Ganze Klasse:** Gib den Klassenleitungen die **Vorlage** (Ausleihkonten → Importieren → Vorlage herunterladen). Mit der ausgefüllten Datei importierst du alle Konten auf einmal, noch ohne Ausweise. Die Ausweise gibst du aus, wenn die Schüler:innen da sind (siehe unten, klassenweise).
+
 ## Ausweise
 
 - **Neuer Ausweis:** Scanne den neuen Ausweis auf dem Startbildschirm. Er gehört noch niemandem, deshalb öffnet sich die Seite **Ausweis registrieren**: Suche dort die Person (Name oder Bibliotheksnummer) und klicke sie an. Danach ist der Ausweis zugeordnet und der Ausleihbildschirm der Person öffnet sich. Hatte die Person schon einen Ausweis, steht das in der Trefferliste, und der alte wird gesperrt.

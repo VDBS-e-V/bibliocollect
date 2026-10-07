@@ -4,7 +4,7 @@
     $isCreate = $mode === 'create';
     $title = $isCreate ? 'Ausleihkonto anlegen' : 'Ausleihkonto bearbeiten';
     $lead = $isCreate
-        ? 'Lege ein fachliches Ausleihkonto an. Ein Onlinekonto ist dafür nicht erforderlich.'
+        ? 'Die Person steht vor dir: Konto anlegen und gleich den Ausweis scannen, den sie bekommt. Ein Onlinekonto ist dafür nicht erforderlich.'
         : $patron->displayName().' · '.$patron->library_number;
     $formAction = $isCreate
         ? route('pos.patrons.store')
@@ -40,6 +40,21 @@
         <section aria-labelledby="patron-form-basis">
             <div class="bc-section-heading"><h2 id="patron-form-basis">Stammdaten</h2></div>
             <div class="bc-patron-form__grid">
+                @if ($isCreate)
+                    <x-ui.input
+                        label="Ausweis (jetzt scannen)"
+                        name="card_number"
+                        id="card_number"
+                        :value="old('card_number', $pendingCard ?? '')"
+                        :error="$errors->first('card_number')"
+                        hint="Scanne den Ausweis, den die Person mitnimmt. Er wird beim Speichern dem neuen Konto zugeordnet."
+                        inputmode="numeric"
+                        autocomplete="off"
+                        autofocus
+                        required
+                    />
+                @endif
+
                 <x-ui.input
                     label="Bibliotheksnummer"
                     name="library_number"

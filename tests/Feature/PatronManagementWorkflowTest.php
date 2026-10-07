@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Modules\Identity\Actions\AssignRoleAction;
+use App\Modules\Patrons\Enums\CardStatus;
 use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
+use App\Modules\Patrons\Models\PatronCard;
+use App\Modules\Patrons\Support\PatronCardNumber;
 use App\Modules\School\Models\SchoolClass;
 use App\Modules\School\Models\SchoolYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,6 +22,15 @@ function patronManagementUser(string $role): User
     app(AssignRoleAction::class)->execute($user, $role);
 
     return $user;
+}
+
+/** Ein gedruckter, noch nicht zugeordneter Ausweis. */
+function patronManagementCard(): string
+{
+    $number = PatronCardNumber::fromBase(random_int(100_000_000, 999_999_999));
+    PatronCard::query()->create(['number' => $number, 'batch' => 1, 'status' => CardStatus::Available]);
+
+    return $number;
 }
 
 function patronManagementClass(): SchoolClass
@@ -55,7 +67,10 @@ it('lets staff create a patron with mandatory birth date and current class assig
     $staff = patronManagementUser('staff');
     $class = patronManagementClass();
 
+    $cardNumber = patronManagementCard();
+
     $response = $this->actingAs($staff)->post(route('pos.patrons.store'), [
+        'card_number' => $cardNumber,
         'library_number' => 'S-53010',
         'kind' => 'student',
         'first_name' => 'Lina',
@@ -73,6 +88,9 @@ it('lets staff create a patron with mandatory birth date and current class assig
         ->and($patron->status)->toBe(PatronStatus::Active)
         ->and($patron->school_class_id)->toBe($class->getKey())
         ->and($patron->email)->toBeNull();
+
+    $card = PatronCard::query()->where('number', $cardNumber)->firstOrFail();
+    expect($card->status)->toBe(CardStatus::Assigned)->and($card->patron_id)->toBe((string) $patron->getKey());
 });
 
 it('requires a full birth date when creating a patron', function (): void {
@@ -94,6 +112,7 @@ it('does not persist a class assignment for non-student patrons', function (): v
     $class = patronManagementClass();
 
     $this->actingAs($staff)->post(route('pos.patrons.store'), [
+        'card_number' => patronManagementCard(),
         'library_number' => 'L-53012',
         'kind' => 'teacher',
         'first_name' => 'Mara',
@@ -208,6 +227,7 @@ it('gives a new patron a random six-digit library number without a prefix when n
 
     foreach (['Eins', 'Zwei', 'Drei'] as $name) {
         $this->actingAs($staff)->post(route('pos.patrons.store'), [
+            'card_number' => patronManagementCard(),
             'library_number' => '',
             'kind' => 'student',
             'first_name' => $name,
@@ -235,6 +255,40 @@ it('still accepts a library number typed by hand and keeps it unique', function 
 
     $payload = ['kind' => 'student', 'first_name' => 'Hand', 'last_name' => 'Nummer', 'birth_date' => '2014-02-03', 'email' => '', 'school_class_id' => $class->getKey(), 'leaving_on' => ''];
 
-    $this->actingAs($staff)->post(route('pos.patrons.store'), $payload + ['library_number' => '123456'])->assertSessionHasErrors('library_number');
-    $this->actingAs($staff)->post(route('pos.patrons.store'), $payload + ['library_number' => '654321'])->assertSessionHasNoErrors();
+    $this->actingAs($staff)->post(route('pos.patrons.store'), $payload + ['library_number' => '123456', 'card_number' => patronManagementCard()])->assertSessionHasErrors('library_number');
+    $this->actingAs($staff)->post(route('pos.patrons.store'), $payload + ['library_number' => '654321', 'card_number' => patronManagementCard()])->assertSessionHasNoErrors();
+});
+
+it('creates the account only together with a usable card', function (): void {
+    $staff = patronManagementUser('staff');
+    $class = patronManagementClass();
+    $payload = ['kind' => 'student', 'first_name' => 'Karla', 'last_name' => 'Kartenlos', 'birth_date' => '2014-02-03', 'email' => '', 'school_class_id' => $class->getKey(), 'leaving_on' => '', 'library_number' => ''];
+
+    // ohne Ausweis
+    $this->actingAs($staff)->post(route('pos.patrons.store'), $payload)->assertSessionHasErrors('card_number');
+
+    // unbekannter, gesperrter oder fremder Ausweis
+    $this->post(route('pos.patrons.store'), $payload + ['card_number' => '1234567890'])->assertSessionHasErrors('card_number');
+
+    $blocked = patronManagementCard();
+    PatronCard::query()->where('number', $blocked)->update(['status' => CardStatus::Blocked]);
+    $this->post(route('pos.patrons.store'), $payload + ['card_number' => $blocked])->assertSessionHasErrors('card_number');
+
+    $foreign = patronManagementCard();
+    $owner = patronManagementPatron(['library_number' => '777001']);
+    PatronCard::query()->where('number', $foreign)->update(['status' => CardStatus::Assigned, 'patron_id' => $owner->getKey()]);
+    $this->post(route('pos.patrons.store'), $payload + ['card_number' => $foreign])->assertSessionHasErrors('card_number');
+
+    // Kein halbes Konto bleibt zurück.
+    expect(Patron::query()->where('last_name', 'Kartenlos')->exists())->toBeFalse();
+});
+
+it('offers the card scan field on the create form and prefills a card scanned before', function (): void {
+    $staff = patronManagementUser('staff');
+    $number = patronManagementCard();
+
+    $this->actingAs($staff)->withSession(['pos.pending_card' => $number])->get(route('pos.patrons.create'))
+        ->assertOk()
+        ->assertSee('Ausweis (jetzt scannen)')
+        ->assertSee($number);
 });

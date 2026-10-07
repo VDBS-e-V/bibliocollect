@@ -1,5 +1,7 @@
 # Import von Ausleihkonten (v0.6.0)
 
+**Ablauf im Betrieb:** Klassenleitungen füllen die Vorlage (Button „Vorlage für die Klassenleitungen herunterladen“) mit den Schülerdaten aus. Ihr importiert die Datei auf einen Schlag. Der Import legt **nur die Konten** an, **ohne Ausweis**. Die Ausweise werden erst ausgegeben, wenn die Schüler:innen vor euch stehen (Ausweise klassenweise ausgeben: Klasse wählen, Ausweis neben dem Namen scannen). Einzelne neue Konten legt ihr dagegen unter „Ausleihkonto anlegen“ an: Die Person steht vor euch, ihr scannt dabei gleich den Ausweis, und Konto und Ausweis entstehen zusammen.
+
 Das Altsystem kennt nur Medien, keine Ausleihen. Für Schüler:innen, Lehrkräfte und Mitarbeiter:innen gibt es deshalb ein eigenes, einfaches CSV-Format. Der Import liegt unter `/betrieb/ausleihkonten/import` (Link „Aus CSV importieren“ in der Kontosuche, Recht `patrons.manage`: Mitarbeiter:innen und Verwaltung). Eine Vorlage lädt man dort herunter.
 
 ## Dateiformat

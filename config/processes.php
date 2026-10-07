@@ -64,8 +64,8 @@ return [
                     'title' => 'Ausleihkonten und Ausweise',
                     'items' => [
                         ['label' => 'Benutzerkonten verwalten', 'text' => 'Mitarbeitende einladen, Rollen vergeben, Konten deaktivieren oder wieder aktivieren.', 'route' => 'administration.users.index', 'permission' => 'users.manage'],
-                        ['label' => 'Ausleihkonto anlegen', 'text' => 'Eine einzelne Person neu aufnehmen.', 'route' => 'pos.patrons.create', 'permission' => 'patrons.manage'],
-                        ['label' => 'Ausleihkonten importieren', 'text' => 'Schüler- und Lehrerlisten aus einer Datei einlesen und vor dem Übernehmen prüfen.', 'route' => 'pos.patrons.import.create', 'permission' => 'patrons.manage'],
+                        ['label' => 'Ausleihkonto anlegen', 'text' => 'Eine einzelne Person aufnehmen, die vor dir steht: Konto anlegen und gleich den Ausweis scannen.', 'route' => 'pos.patrons.create', 'permission' => 'patrons.manage'],
+                        ['label' => 'Klassendaten importieren', 'text' => 'Von den Klassenleitungen ausgefüllte Vorlage einlesen und vor dem Übernehmen prüfen. Die Ausweise folgen, wenn die Klasse da ist.', 'route' => 'pos.patrons.import.create', 'permission' => 'patrons.manage'],
                         ['label' => 'Ausweise erzeugen und drucken', 'text' => 'Chargen mit Zufallsnummern anlegen, Bögen drucken, Nummern als Liste exportieren.', 'route' => 'pos.labels.cards', 'permission' => 'patrons.manage'],
                         ['label' => 'Motive der Ausweise', 'text' => 'Gestaltung der Vorder- und Rückseiten hochladen und ein- oder ausschalten.', 'route' => 'pos.labels.cards.designs', 'permission' => 'patrons.manage'],
                     ],

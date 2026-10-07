@@ -22,6 +22,7 @@ final class PatronStoreRequest extends FormRequest
     {
         return [
             'library_number' => ['nullable', 'string', 'max:80', Rule::unique('patrons', 'library_number')],
+            'card_number' => ['required', 'string', 'max:20'],
             'kind' => ['required', Rule::enum(PatronKind::class)],
             'first_name' => ['required', 'string', 'max:120'],
             'last_name' => ['required', 'string', 'max:120'],
@@ -30,6 +31,19 @@ final class PatronStoreRequest extends FormRequest
             'school_class_id' => ['nullable', 'string', new ActiveSchoolClassRule],
             'leaving_on' => ['nullable', 'date', 'after:birth_date'],
         ];
+    }
+
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return [
+            'card_number.required' => 'Bitte den Ausweis scannen, den die Person bekommt. Neue Konten werden nur mit Ausweis angelegt.',
+        ];
+    }
+
+    public function cardNumber(): string
+    {
+        return trim((string) $this->validated('card_number'));
     }
 
     public function toData(): PatronCreateData
@@ -53,6 +67,7 @@ final class PatronStoreRequest extends FormRequest
     {
         $this->merge([
             'library_number' => $this->normalizeNullable($this->input('library_number')),
+            'card_number' => trim((string) $this->input('card_number', '')),
             'first_name' => trim((string) $this->input('first_name', '')),
             'last_name' => trim((string) $this->input('last_name', '')),
             'email' => $this->normalizeNullable($this->input('email')),
