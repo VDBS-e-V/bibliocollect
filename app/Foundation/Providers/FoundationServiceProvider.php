@@ -20,6 +20,8 @@ use App\Foundation\Console\MailTestCommand;
 use App\Foundation\Console\RestoreDatabaseCommand;
 use App\Foundation\Contracts\AuthorizesPermissions;
 use App\Foundation\Navigation\NavigationRegistry;
+use App\Foundation\Settings\SettingsRegistry;
+use App\Foundation\Settings\SettingsRepository;
 use App\Foundation\Support\BusinessClock;
 use App\Foundation\Support\ModuleRegistry;
 use App\Foundation\Support\SurfaceRegistry;
@@ -40,6 +42,8 @@ final class FoundationServiceProvider extends ServiceProvider
         $this->app->singleton(RoleRegistry::class);
         $this->app->singleton(NavigationRegistry::class);
         $this->app->singleton(BusinessClock::class);
+        $this->app->singleton(SettingsRegistry::class);
+        $this->app->singleton(SettingsRepository::class);
 
         $registry = $this->app->make(ModuleRegistry::class);
 
@@ -58,6 +62,9 @@ final class FoundationServiceProvider extends ServiceProvider
         if (str_starts_with((string) config('app.url'), 'https://') && ! $this->app->environment(['local', 'testing'])) {
             URL::forceScheme('https');
         }
+
+        // Im Web geänderte Regeln über die Konfiguration legen (siehe Seite „Regeln“).
+        $this->app->make(SettingsRepository::class)->apply();
 
         foreach ($permissions->keys() as $permission) {
             Gate::define(

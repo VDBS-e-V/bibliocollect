@@ -27,6 +27,9 @@ return [
     'reservation_pickup_days' => 7,
     'max_open_reservations' => 5,
 
+    // Puffer in Tagen für die Wartezeit einer Vormerkung: Leihfrist + eine Verlängerung + dieser Puffer.
+    'reservation_buffer_days' => 7,
+
     // Buchwünsche: Höchstzahl offener Wünsche je Ausleihkonto.
     'max_open_wishes' => 3,
 ];

@@ -147,9 +147,11 @@ final readonly class PlaceReservationAction
             $violations[] = 'Dieser Titel ist auf dem Ausleihkonto bereits ausgeliehen.';
         }
 
-        $maximum = max(1, (int) config('circulation.max_open_reservations', 5));
+        $maximum = max(0, (int) config('circulation.max_open_reservations', 5));
 
-        if (Reservation::query()
+        if ($maximum === 0) {
+            $violations[] = 'Vormerkungen sind in der Bibliothek zurzeit ausgeschaltet.';
+        } elseif (Reservation::query()
             ->where('patron_id', $patron->getKey())
             ->whereIn('status', ReservationStatus::openValues())
             ->count() >= $maximum) {

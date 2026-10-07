@@ -84,6 +84,10 @@ return [
             'label' => 'Inventarnummern umstellen',
             'description' => 'Erlaubt, alte Inventarnummern ausdrücklich auf siebenstellige Nummern umzustellen.',
         ],
+        'settings.manage' => [
+            'label' => 'Regeln der Bibliothek einstellen',
+            'description' => 'Erlaubt, Leihfristen, Höchstzahlen, Vormerk- und Erinnerungsregeln im Web zu ändern.',
+        ],
         'shelves.manage' => [
             'label' => 'Regalbretter pflegen',
             'description' => 'Erlaubt, die Liste der Regalbretter (Standorte der Exemplare) anzulegen und zu ändern.',
@@ -174,6 +178,7 @@ return [
                 'inventory.renumber',
                 'system.view',
                 'users.manage',
+                'settings.manage',
                 'catalog.withdraw',
                 'inventory.count',
             ],

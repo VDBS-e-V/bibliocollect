@@ -9,6 +9,7 @@ use App\Surfaces\Administration\Http\Controllers\CatalogTopicController;
 use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
 use App\Surfaces\Administration\Http\Controllers\InventoryRenumberController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
+use App\Surfaces\Administration\Http\Controllers\RulesController;
 use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
@@ -36,6 +37,12 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::post('/verwaltung/benutzer/{userId}/deaktivieren', [UserAccountController::class, 'disable'])->whereNumber('userId')->name('administration.users.disable');
         Route::post('/verwaltung/benutzer/{userId}/aktivieren', [UserAccountController::class, 'enable'])->whereNumber('userId')->name('administration.users.enable');
         Route::post('/verwaltung/benutzer/{userId}/einladen', [UserAccountController::class, 'invite'])->whereNumber('userId')->middleware('throttle:10,1')->name('administration.users.invite');
+    });
+
+    Route::middleware('permission:settings.manage')->group(function (): void {
+        Route::get('/verwaltung/regeln', [RulesController::class, 'index'])->name('administration.rules.index');
+        Route::put('/verwaltung/regeln', [RulesController::class, 'update'])->middleware('throttle:20,1')->name('administration.rules.update');
+        Route::post('/verwaltung/regeln/zuruecksetzen', [RulesController::class, 'reset'])->middleware('throttle:5,1')->name('administration.rules.reset');
     });
 
     Route::middleware('permission:system.view')->group(function (): void {

@@ -149,6 +149,13 @@ return [
                     'order' => 25,
                 ],
                 [
+                    'label' => 'Regeln',
+                    'route' => 'administration.rules.index',
+                    'active' => 'administration.rules.*',
+                    'permission' => 'settings.manage',
+                    'order' => 29,
+                ],
+                [
                     'label' => 'Systemzustand',
                     'route' => 'administration.system.index',
                     'active' => 'administration.system.*',

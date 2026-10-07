@@ -63,6 +63,7 @@ return [
                 [
                     'title' => 'Ausleihkonten und Ausweise',
                     'items' => [
+                        ['label' => 'Regeln der Bibliothek', 'text' => 'Leihfristen, Höchstzahlen, Verlängern, Vormerken und Erinnerungen im Web einstellen.', 'route' => 'administration.rules.index', 'permission' => 'settings.manage'],
                         ['label' => 'Benutzerkonten verwalten', 'text' => 'Mitarbeitende einladen, Rollen vergeben, Konten deaktivieren oder wieder aktivieren.', 'route' => 'administration.users.index', 'permission' => 'users.manage'],
                         ['label' => 'Ausleihkonto anlegen', 'text' => 'Eine einzelne Person aufnehmen, die vor dir steht: Konto anlegen und gleich den Ausweis scannen.', 'route' => 'pos.patrons.create', 'permission' => 'patrons.manage'],
                         ['label' => 'Klassendaten importieren', 'text' => 'Von den Klassenleitungen ausgefüllte Vorlage einlesen und vor dem Übernehmen prüfen. Die Ausweise folgen, wenn die Klasse da ist.', 'route' => 'pos.patrons.import.create', 'permission' => 'patrons.manage'],

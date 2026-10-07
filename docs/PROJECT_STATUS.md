@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Vorbereitung Testeinsatz, Block 4: Seite „Regeln“ (v0.33.0)
+
+`/verwaltung/regeln` (Recht `settings.manage`, nur Verwaltung): Leihfristen (Schüler:innen, Lehrkräfte, Mitarbeiter:innen), Höchstzahl gleichzeitiger Ausleihen je Gruppe, Verlängern (Anzahl, Dauer, bei Überfälligkeit), Vormerken (**offene Vormerkungen je Person, 0 = ausgeschaltet**, Abholfrist, Puffer für die Wartezeit), Buchwünsche, Erinnerungen (Tage vor Fälligkeit, Abstand bei Überfälligkeit). Die Werte stehen in der Tabelle `app_settings` und überschreiben die Konfigurationsdateien (`config/circulation.php`, `config/reminders.php`); beim Start legt `SettingsRepository` sie über die Konfiguration, alle bisherigen `config()`-Zugriffe sehen sie damit ohne Codeänderung. Wert = Standard entfernt die Änderung, „Alle Regeln zurücksetzen“ stellt die Standardwerte her. Änderungen gelten sofort für neue Vorgänge (laufende Ausleihen behalten ihr Fälligkeitsdatum) und stehen im Protokoll (`settings.updated`, `settings.reset`). Neue Einstellung `reservation_buffer_days` (Standard 7) für die Vormerk-Regel in Block 5.
+
 ### Vorbereitung Testeinsatz, Block 3: MySQL/MariaDB (v0.32.0)
 
 - **Die komplette Testsuite läuft auf MariaDB** (CI-Job `mariadb` in `.github/workflows/quality.yml`, lokal geprüft mit MariaDB 10.4). Dabei gefunden und behoben: Zeitspalten ohne Vorgabe (`timestamp`) bekamen auf MariaDB automatisch „bei Änderung auf jetzt setzen“ und eine ungültige Vorgabe, was zum Beispiel das Ausleihdatum bei jeder Rückgabe überschrieben hätte. Alle betroffenen Spalten sind jetzt `dateTime`.
