@@ -57,4 +57,15 @@ Die Meldung nennt den Grund. Häufige Gründe:
 
 ## Vormerken
 
-Ist ein Titel ausgeliehen, können Personen ihn **im Katalog oder im Portal vormerken**. Am Tresen geht es im Ausleihkonto unter **Vormerkungen**. Wird das Medium zurückgegeben, liegt es sieben Öffnungstage für die erste Person in der Warteschlange bereit. Die Seite **Vormerkungen** zeigt, was bereitliegt.
+Ist ein Titel ausgeliehen, können Personen ihn **im Katalog oder im Portal vormerken**. Am Tresen geht es im Ausleihkonto unter **Vormerkungen**. Wird das Medium zurückgegeben, liegt es für die erste Person in der Warteschlange bereit (Abholfrist: Tage und Schließtage stehen unter **Verwaltung → Regeln**, Standard 7 Tage). Die Seite **Vormerkungen** zeigt, was bereitliegt.
+
+- **Mehrere Titel, jeder nur einmal:** Eine Person kann mehrere Titel vormerken, denselben Titel aber nur einmal. Wie viele insgesamt, steht unter **Regeln**.
+- **Warteschlange begrenzt:** Für einen Titel werden nur so viele Vormerkungen angenommen, wie er Exemplare hat. Sonst nennt die Meldung die Wartezeit-Grenze (Leihfrist + eine Verlängerung + Puffer). Bitte die Person später noch einmal fragen.
+
+## Überfällige Medien
+
+Auf dem Arbeitsplatz zeigt die Kachel **Überfällige Ausleihen**, wie viele es gibt. Ein Klick öffnet die Liste: Name, Klasse, Medium und wie lange schon, am längsten Überfälliges zuerst. Erinnerungen per E-Mail gehen automatisch an Onlinekonten und an die E-Mail-Adresse am Ausleihkonto. Konten ohne Adresse erreichst du nur über die **Klassenlisten** (Mitarbeiter:innen drucken sie für die Klassenleitungen). Es gibt keine Gebühren und keine automatische Sperre.
+
+## Verloren geglaubtes Medium taucht wieder auf
+
+Scanne die Inventarnummer auf dem Arbeitsplatz. Ist das Exemplar als verloren oder beschädigt eingetragen, öffnet sich die Seite **Exemplar wieder verfügbar machen**. Ein Klick macht es wieder ausleihbar. Wartet jemand darauf, wird es gleich für die erste Person zurückgelegt; die Meldung sagt es dir.

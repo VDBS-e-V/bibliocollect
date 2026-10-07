@@ -48,35 +48,58 @@
                 </div>
                 <div class="bc-link-list">
                     <div class="bc-link-list__row">
-                        <div><a href="{{ route('public.catalog.index') }}"><strong>Im Katalog stöbern</strong></a><span>Alle erfassten Titel, Ausgaben und Bestandsinformationen entdecken</span></div>
-                        <span class="bc-status-text">aktiv</span>
+                        <div><a href="{{ route('public.catalog.index') }}"><strong>Im Katalog stöbern</strong></a><span>Alle Titel und Ausgaben, mit Filter „nur jetzt verfügbare Titel“</span></div>
                     </div>
                     <div class="bc-link-list__row">
-                        <div><strong>Veranstaltungen</strong><span>Termine, Aktionen und Anmeldungen</span></div>
-                        <span class="bc-status-text">später</span>
+                        <div><a href="{{ route('public.wishes.create') }}"><strong>Buchwunsch abgeben</strong></a><span>Dir fehlt ein Buch? Sag es uns, auch ohne Anmeldung</span></div>
                     </div>
-                    <div class="bc-link-list__row">
-                        <div><strong>Leselisten</strong><span>Freigegebene Listen von Lehrkräften</span></div>
-                        <span class="bc-status-text">später</span>
-                    </div>
-                    <div class="bc-link-list__row">
-                        <div><strong>Öffnungszeiten</strong><span>Bibliothekstage und aktuelle Hinweise</span></div>
-                        <span class="bc-status-text">ab T2</span>
-                    </div>
+                    @guest
+                        <div class="bc-link-list__row">
+                            <div><a href="{{ route('identity.claim.create') }}"><strong>Onlinekonto aktivieren</strong></a><span>Mit dem Code aus der Bibliothek: verlängern, vormerken, eigene Ausleihen sehen</span></div>
+                        </div>
+                    @endguest
                 </div>
+            </section>
+
+            <section class="bc-content-section" aria-labelledby="hours-heading">
+                <div class="bc-section-heading">
+                    <h2 id="hours-heading">Öffnungszeiten</h2>
+                </div>
+                @if ($hours === [])
+                    <p class="bc-section-copy">Die Öffnungszeiten werden noch eingetragen. Frag bitte in der Schule nach.</p>
+                @else
+                    <table class="bc-calendar-table">
+                        <caption class="sr-only">Öffnungszeiten der Bibliothek</caption>
+                        <thead><tr><th scope="col">Tag</th><th scope="col">Zeit</th></tr></thead>
+                        <tbody>
+                            @foreach ($hours as $hour)
+                                <tr><th scope="row">{{ $hour['day'] }}</th><td class="bc-tabular">{{ $hour['time'] }}</td></tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+
+                @if ($closures !== [])
+                    <h3>Geschlossen in den nächsten Wochen</h3>
+                    <ul class="bc-plain-links">
+                        @foreach ($closures as $closure)
+                            <li><span class="bc-tabular">{{ $closure['date'] }}</span>@if ($closure['reason']) · {{ $closure['reason'] }}@endif</li>
+                        @endforeach
+                    </ul>
+                @endif
             </section>
 
             <section class="bc-content-section" aria-labelledby="info-heading">
                 <div class="bc-section-heading">
-                    <h2 id="info-heading">Gut zu wissen</h2>
+                    <h2 id="info-heading">So funktioniert die Ausleihe</h2>
                 </div>
                 <div class="bc-notice-row">
                     <strong>Ausleihe vor Ort</strong>
-                    <p>Ein Onlinekonto ist für die Nutzung der Bibliothek nicht erforderlich. Bibliotheksnummer und Ausleihkonto funktionieren unabhängig davon.</p>
+                    <p>Du bekommst einen Bibliotheksausweis. Damit kannst du bis zu {{ $maxLoans }} Medien gleichzeitig für {{ $loanDays }} Tage ausleihen. Ein Onlinekonto brauchst du dafür nicht.</p>
                 </div>
                 <div class="bc-notice-row">
-                    <strong>Selbstbedienung</strong>
-                    <p>Mit einem optionalen Onlinekonto können später eigene Ausleihen, Vormerkungen und weitere persönliche Funktionen genutzt werden.</p>
+                    <strong>Verlängern und vormerken</strong>
+                    <p>{{ $maxRenewals > 0 ? "Du kannst eine Ausleihe bis zu {$maxRenewals} Mal verlängern, wenn niemand den Titel vorgemerkt hat." : 'Verlängern ist zurzeit nicht vorgesehen.' }} {{ $reservations ? 'Ist ein Titel ausgeliehen, kannst du ihn vormerken. Wir legen ihn für dich zurück, sobald er wieder da ist.' : '' }}</p>
                 </div>
             </section>
         </div>
@@ -84,17 +107,19 @@
         <aside class="bc-home-layout__aside" aria-label="Service">
             <section class="bc-side-panel" aria-labelledby="account-heading">
                 <h2 id="account-heading">Mein Konto</h2>
-                <p>Eigene Ausleihen, Vormerkungen und Kontodaten verwalten.</p>
-                @if (app()->environment('local'))
-                    <x-ui.button class="mt-4" variant="secondary" :href="route('preview.portal')">Portal-Vorschau</x-ui.button>
+                <p>Eigene Ausleihen, Vormerkungen und Buchwünsche verwalten.</p>
+                @auth
+                    @can('surface.portal.access')
+                        <x-ui.button class="mt-4" variant="secondary" :href="route('portal.home')">Zum Konto</x-ui.button>
+                    @endcan
                 @else
-                    <x-ui.button class="mt-4" variant="secondary" disabled>Zum Konto</x-ui.button>
-                @endif
+                    <x-ui.button class="mt-4" variant="secondary" :href="route('login')">Anmelden</x-ui.button>
+                @endauth
             </section>
 
             <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="help-heading">
-                <h2 id="help-heading">Hilfe & Orientierung</h2>
-                <p>Informationen zur Bibliotheksnutzung, zu Ausleihe und Vormerkungen werden hier später gebündelt.</p>
+                <h2 id="help-heading">Fragen?</h2>
+                <p>Sprich uns in der Bibliothek an. Hinweise zum Datenschutz und zur Barrierefreiheit stehen unten auf jeder Seite.</p>
             </section>
 
             @if (app()->environment('local'))

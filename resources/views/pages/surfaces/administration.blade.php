@@ -1,53 +1,54 @@
-@php($preview = $preview ?? false)
+@php
+    $preview = $preview ?? false;
+@endphp
 
 <x-app-shell surface="administration" title="Verwaltung" :preview="$preview">
     <x-ui.page-header
         kicker="Verwaltung"
-        title="System und Regeln"
-        lead="Konfiguration, Importe und datenschutzrelevante Aufgaben in einer ruhigen Arbeitsansicht."
+        title="Übersicht"
+        lead="Was ist eingerichtet, was fehlt noch, und wo findest du die Verwaltungsaufgaben?"
     />
 
-    <div class="bc-work-layout">
-        <aside class="bc-section-nav" aria-label="Verwaltungsbereiche">
-            <strong>Verwaltung</strong>
-            <span aria-current="page">Übersicht</span>
-            <span>Leihregeln</span>
-            @can('school.manage')
-                <a href="{{ route('administration.school.index') }}">Schule</a>
-            @endcan
-            <span>Öffnungstage</span>
-            <span>Importe</span>
-            <span>Datenschutz</span>
-            <span>Audit</span>
-        </aside>
+    @if (($snapshot ?? null) !== null)
+        @php
+            $labels = ['ok' => 'In Ordnung', 'warn' => 'Achtung', 'fail' => 'Fehler'];
+        @endphp
+        <x-ui.alert :variant="$snapshot['status'] === 'ok' ? 'success' : ($snapshot['status'] === 'warn' ? 'warning' : 'error')" title="Systemzustand: {{ $labels[$snapshot['status']] }}">
+            <a href="{{ route('administration.system.index') }}">Einzelheiten ansehen</a>
+        </x-ui.alert>
+    @endif
 
-        <div class="bc-work-layout__main">
-            <section class="bc-content-section" aria-labelledby="admin-tasks-heading">
-                <div class="bc-section-heading"><h2 id="admin-tasks-heading">Bereiche</h2></div>
-                <div class="bc-admin-list">
-                    <div><strong>Leihregeln</strong><span>Fristen, Limits und Verlängerungen</span><span class="bc-status-text">später</span></div>
-                    @can('school.manage')
-                        <div><strong><a href="{{ route('administration.school.index') }}">Schule & Schuljahre</a></strong><span>Schuljahre, Klassen und Wechsel vorbereiten</span><span class="bc-status-text">T2</span></div>
-                    @endcan
-                    <div><strong>Öffnungstage</strong><span>Kalender und Bibliothekszeiten</span><span class="bc-status-text">T2</span></div>
-                    <div><strong>Importe</strong><span>Schul- und Mediendaten mit Vorschau</span><span class="bc-status-text">später</span></div>
-                    <div><strong>Datenschutz</strong><span>Aufbewahrung, Auskunft und Anonymisierung</span><span class="bc-status-text">T8</span></div>
-                </div>
-            </section>
+    @if (($checklist ?? []) !== [])
+        <section class="bc-content-section" aria-labelledby="launch-heading">
+            <div class="bc-section-heading"><h2 id="launch-heading">Startklar?</h2></div>
+            <p class="bc-section-copy">Alles, was für den Betrieb eingerichtet sein sollte. Ein Haken heißt: erledigt.</p>
+            <table class="bc-calendar-table">
+                <thead><tr><th scope="col">Punkt</th><th scope="col">Stand</th><th scope="col">Einzelheiten</th></tr></thead>
+                <tbody>
+                    @foreach ($checklist as $item)
+                        <tr>
+                            <th scope="row">@if ($item['route'])<a href="{{ $item['route'] }}">{{ $item['label'] }}</a>@else{{ $item['label'] }}@endif</th>
+                            <td><x-ui.badge :variant="$item['ok'] ? 'success' : 'warning'">{{ $item['ok'] ? 'Erledigt' : 'Offen' }}</x-ui.badge></td>
+                            <td>{{ $item['detail'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </section>
+    @endif
 
-            <section class="bc-content-section" aria-labelledby="permission-preview-heading">
-                <div class="bc-section-heading"><h2 id="permission-preview-heading">Berechtigungsprinzip</h2></div>
-                <x-ui.table>
-                    <thead>
-                        <tr><th scope="col">Rolle</th><th scope="col">Verwaltung</th><th scope="col">Grundsatz</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Verwaltung</td><td><x-ui.badge variant="success">Zugang</x-ui.badge></td><td>Fachrechte werden einzeln vergeben</td></tr>
-                        <tr><td>Technische Administration</td><td><x-ui.badge variant="success">Zugang</x-ui.badge></td><td>kein automatischer Zugriff auf Lesedaten</td></tr>
-                        <tr><td>Schüler-AG</td><td><x-ui.badge>kein Standardzugang</x-ui.badge></td><td>Arbeitsrechte liegen im Bibliotheksbetrieb</td></tr>
-                    </tbody>
-                </x-ui.table>
-            </section>
-        </div>
-    </div>
+    @foreach (($areas ?? []) as $group)
+        <section class="bc-content-section" aria-labelledby="admin-group-{{ $loop->index }}">
+            <div class="bc-section-heading"><h2 id="admin-group-{{ $loop->index }}">{{ $group['title'] }}</h2></div>
+            <div class="bc-admin-list">
+                @foreach ($group['items'] as $item)
+                    <div><strong><a href="{{ route($item['route']) }}">{{ $item['label'] }}</a></strong><span>{{ $item['text'] }}</span></div>
+                @endforeach
+            </div>
+        </section>
+    @endforeach
+
+    @if ($preview)
+        <x-ui.alert title="Entwicklungsansicht">Dies ist die Vorschau ohne Daten.</x-ui.alert>
+    @endif
 </x-app-shell>

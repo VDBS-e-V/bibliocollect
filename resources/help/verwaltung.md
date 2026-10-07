@@ -6,9 +6,9 @@ Für die Verwaltung der Bibliothek.
 
 1. **Schule → Schuljahre:** Das neue Schuljahr als Entwurf anlegen und die Klassen mit Klassenleitung eintragen.
 2. **Schuljahreswechsel:** Die Seite schlägt vor, welche Klasse in welche Klasse wechselt (zum Beispiel 5a → 6a). Prüfe die Zuordnung, wähle bei Abgängen „Ausscheiden“ und bestätige. Danach ist das neue Schuljahr aktiv. Der Wechsel läuft ganz oder gar nicht. Wer noch Medien hat, kann nicht ausscheiden; die Seite nennt die Nummern.
-3. Neue Schüler:innen (zum Beispiel die 5. Klasse) importierst du anschließend unter **Ausleihkonten → Aus CSV importieren**.
+3. Neue Schüler:innen (zum Beispiel die 5. Klasse) importierst du anschließend unter **Ausleihkonten → Klassendaten importieren** (eine Klasse je Datei, die Klassenleitungen füllen die Vorlage aus).
 
-Mache vor dem Wechsel eine **Datensicherung** (`backup:database`, passiert auch täglich automatisch).
+Vor dem Wechsel erstellt die Anwendung **automatisch eine Datensicherung**. Gelingt sie nicht, bleibt alles unverändert. Der Wechsel selbst lässt sich nicht rückgängig machen; im Notfall spielst du die Sicherung zurück (siehe unten).
 
 ## Öffnungszeiten und Schließtage
 
@@ -27,3 +27,23 @@ Mache vor dem Wechsel eine **Datensicherung** (`backup:database`, passiert auch 
 - **Auskunft:** Im Ausleihkonto „Auskunft über gespeicherte Daten“ (Ansicht, Druck oder JSON). Personen mit Onlinekonto finden ihre Daten selbst unter „Mein Konto“.
 - **Aufbewahrung:** Alles wird drei Jahre nach Abschluss anonymisiert, automatisch jede Woche.
 - **Erinnerungs-Mails** lassen sich im Portal abschalten.
+
+## Regeln einstellen
+
+Unter **Verwaltung → Regeln** stellst du Leihfristen, Höchstzahlen, Verlängern, Vormerken, Buchwünsche und Erinnerungen ein. Änderungen gelten sofort für neue Vorgänge; laufende Ausleihen behalten ihr Fälligkeitsdatum. Mit „Alle Regeln zurücksetzen“ gelten wieder die Standardwerte. Jede Änderung steht im Protokoll.
+
+## Benutzerkonten
+
+Unter **Verwaltung → Benutzerkonten** lädst du Mitarbeitende per E-Mail ein (die Person legt das Passwort selbst fest), vergibst Rollen und deaktivierst Konten. Die letzte Verwaltung kann sich nicht selbst aussperren. Ist der Zugang trotzdem verloren, hilft die Einrichtungsseite (`/_setup`, nur mit `SETUP_TOKEN`) mit „Zugang wiederherstellen“.
+
+## Systemzustand und Sicherung
+
+**Verwaltung → Systemzustand** zeigt, ob Cronjob, Warteschlange und Sicherung laufen, und die letzten Fehler. Dort kannst du Zeitplan-Aufgaben **einmal von Hand ausführen**, eine **Sicherung erstellen** und Sicherungen **herunterladen**. Lade sie regelmäßig herunter und lege sie außerhalb des Servers ab. Wiederherstellen: phpMyAdmin → Datenbank wählen → Importieren → die `.sql.gz`-Datei (vorher ist keine Migration nötig). Übe das einmal mit einer leeren Test-Datenbank.
+
+## Regalbretter, Signaturen, Inventarnummern
+
+Regalbretter, Signaturen und Themenbereiche pflegst du unter **Verwaltung**; das Einsortieren der Bücher macht die Schüler-AG am Arbeitsplatz („Medien einsortieren“). Alte Inventarnummern stellst du nur unter **Inventarnummern** bewusst auf siebenstellige um; nichts wird automatisch überschrieben.
+
+## Löschverlangen
+
+Verlangt eine Person die Löschung ihrer Daten: Zuerst am Ausleihkonto den **dauerhaften Austritt** buchen (nur ohne offene Ausleihen), dann **Daten jetzt anonymisieren** (nur Verwaltung). Name, Mail, Klasse, Onlinekonto und Ausweis verlieren den Bezug zur Person; das lässt sich nicht rückgängig machen. Ohne Verlangen anonymisiert die Anwendung nach drei Jahren von selbst.

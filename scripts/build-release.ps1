@@ -31,15 +31,22 @@ Write-Host '2/4 Dateien kopieren ...'
 if (Test-Path $stage) { Remove-Item -Recurse -Force $stage }
 New-Item -ItemType Directory -Path $stage | Out-Null
 
-$excludeDirs = @('.git', '.github', '.idea', '.vscode', 'node_modules', 'vendor', 'tests', 'dist', 'docs\altsystem',
+$excludeDirs = @('.git', '.github', '.idea', '.vscode', '.foundation', '.bootstrap', 'node_modules', 'vendor', 'tests', 'dist', 'docs\altsystem',
     'storage\logs', 'storage\app\backups', 'storage\app\public', 'storage\app\private', 'storage\framework',
     'public\covers', 'public\card-designs', 'public\storage', 'bootstrap\cache')
-$excludeFiles = @('.env', '*.sqlite', '*.patch', '.phpunit.result.cache', 'auth.json')
+$excludeFiles = @('.env', '*.sqlite', '*.patch', '.phpunit.result.cache', 'auth.json',
+    '.env.testing', '.env.backup', '.env.production', 'APPLY.md', 'CHECKSUMS.txt', 'SHA256SUMS.txt', 'TEST_FLOW.md', 'START_HERE.md',
+    'PACKAGE_NOTES.md', 'RELEASE_NOTES.md', 'FOUNDATION_CHECKLIST.md', 'CLAUDE.md', 'AGENTS.md')
 
 robocopy $root $stage /E /NFL /NDL /NJH /NJS /NP `
     /XD ($excludeDirs | ForEach-Object { Join-Path $root $_ }) `
     /XF $excludeFiles | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "Kopieren fehlgeschlagen (robocopy $LASTEXITCODE)." }
+
+# robocopy ignoriert die Groß-/Kleinschreibung: Diese Dateien deshalb gezielt im Stammordner entfernen (nicht per /XF, das würde auch public/build/manifest.json treffen).
+foreach ($file in @('MANIFEST.json', 'bootstrap.php')) {
+    Remove-Item -Path (Join-Path $stage $file) -ErrorAction SilentlyContinue
+}
 
 foreach ($dir in @('storage\logs', 'storage\app\public', 'storage\app\private', 'storage\app\backups',
         'storage\framework\cache\data', 'storage\framework\sessions', 'storage\framework\views', 'bootstrap\cache')) {

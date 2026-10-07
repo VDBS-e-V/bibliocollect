@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Surfaces\Administration\Http\Controllers\AdminHomeController;
 use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
 use App\Surfaces\Administration\Http\Controllers\CatalogShelfController;
 use App\Surfaces\Administration\Http\Controllers\CatalogSignatureController;
@@ -19,7 +20,7 @@ use App\Surfaces\Administration\Http\Controllers\UserAccountController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.administration.access'])->group(function (): void {
-    Route::view('/verwaltung', 'pages.surfaces.administration', ['preview' => false])
+    Route::get('/verwaltung', AdminHomeController::class)
         ->name('administration.home');
 
     Route::middleware('permission:content.manage')->group(function (): void {
