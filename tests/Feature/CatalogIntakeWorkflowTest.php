@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Modules\Catalog\Jobs\RefreshEditionCoverJob;
+use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\Contributor;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
@@ -13,12 +14,25 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Testing\TestResponse;
 
 uses(RefreshDatabase::class);
+
+// Die Suche nach Zusammenfassungen darf in den Tests nie ins Netz gehen.
+beforeEach(function (): void {
+    Http::fake([
+        'www.googleapis.com/*' => Http::response(['items' => []]),
+        'openlibrary.org/*' => Http::response('', 404),
+    ]);
+});
 
 function intakeUser(string $email = 'staff@demo.bibliocollect.test'): User
 {
     test()->seed(DatabaseSeeder::class);
+
+    foreach (['J 5 MORO', 'REG 1', 'HEFT'] as $order => $code) {
+        CatalogShelf::query()->create(['code' => $code, 'label' => 'Testbrett '.$code, 'sort_order' => $order]);
+    }
 
     return User::query()->where('email', $email)->firstOrFail();
 }
@@ -28,11 +42,21 @@ function intakeDnbXml(): string
     return (string) file_get_contents(__DIR__.'/../Fixtures/dnb/isbn-9783522202800.xml');
 }
 
+/** Schritt 1 (Inventarnummer) und Schritt 2 (Abfrage) nacheinander; die Antwort ist die des zweiten Schritts. */
+function intakeLookup(array $overrides = []): TestResponse
+{
+    $barcode = $overrides['barcode'] ?? '0012345';
+    unset($overrides['barcode']);
+
+    test()->post(route('pos.catalog.intake.barcode'), ['barcode' => $barcode])->assertRedirect(route('pos.catalog.intake.medium'));
+
+    return test()->post(route('pos.catalog.intake.lookup'), intakeLookupPayload($overrides));
+}
+
 /** @return array<string, string> */
 function intakeLookupPayload(array $overrides = []): array
 {
     return array_merge([
-        'barcode' => 'BC-INTAKE-001',
         'isbn' => '978-3-522-20280-0',
         'title' => '',
         'person' => '',
@@ -78,7 +102,7 @@ it('keeps the intake process behind catalog.manage', function (): void {
     $student = User::query()->where('email', 'student@demo.bibliocollect.test')->firstOrFail();
 
     $this->get(route('pos.catalog.intake.identify'))->assertRedirect(route('login'));
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload())->assertRedirect(route('login'));
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '0012345'])->assertRedirect(route('login'));
 
     $this->actingAs($technicalAdmin)->get(route('pos.catalog.intake.identify'))->assertForbidden();
     $this->actingAs($student)->get(route('pos.catalog.intake.identify'))->assertForbidden();
@@ -110,11 +134,16 @@ it('walks through all steps with DNB data and writes only on the final save', fu
 
     $this->get(route('pos.catalog.intake.identify', ['neu' => 1]))
         ->assertOk()
-        ->assertSee('Barcode / Inventarnummer')
-        ->assertSee('Bei der DNB abfragen');
+        ->assertSee('Inventarnummer')
+        ->assertDontSee('ISBN / EAN')
+        ->assertDontSee('Bei der DNB abfragen');
+
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '0012345'])->assertRedirect(route('pos.catalog.intake.medium'));
+    $this->get(route('pos.catalog.intake.medium'))->assertOk()->assertSee('ISBN / EAN')->assertSee('Bei der DNB abfragen')->assertSee('Inventarnummer 0012345');
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '0012345']);
 
     // Genau ein DNB-Treffer zur ISBN: Schritt 2 entfällt, die Daten sind vorbefüllt.
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload())
+    intakeLookup()
         ->assertRedirect(route('pos.catalog.intake.details'));
 
     $this->get(route('pos.catalog.intake.details'))
@@ -130,7 +159,7 @@ it('walks through all steps with DNB data and writes only on the final save', fu
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload())
         ->assertRedirect(route('pos.catalog.intake.copy'));
 
-    $this->get(route('pos.catalog.intake.copy'))->assertOk()->assertSee('BC-INTAKE-001');
+    $this->get(route('pos.catalog.intake.copy'))->assertOk()->assertSee('0012345');
 
     $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => 'J 5 MORO', 'status' => 'active'])
         ->assertRedirect(route('pos.catalog.intake.review'));
@@ -140,7 +169,7 @@ it('walks through all steps with DNB data and writes only on the final save', fu
         ->assertSee('Shi Yu')
         ->assertSee('Morosinotto, Davide')
         ->assertSee('J 5 MORO')
-        ->assertSee('BC-INTAKE-001')
+        ->assertSee('0012345')
         ->assertSee('Speichern');
 
     // Bis hierhin wurde nichts in den Katalog geschrieben.
@@ -180,7 +209,7 @@ it('walks through all steps with DNB data and writes only on the final save', fu
         ->and($links[0]->contributor->gnd_id)->toBe('1015211690')
         ->and($links[1]->role_key)->toBe('translator');
 
-    $copy = Copy::query()->where('barcode', 'BC-INTAKE-001')->firstOrFail();
+    $copy = Copy::query()->where('barcode', '0012345')->firstOrFail();
 
     expect($copy->edition_id)->toBe($edition->getKey())
         ->and($copy->shelf_location)->toBe('J 5 MORO')
@@ -204,7 +233,7 @@ it('lets staff continue straight to the next medium after saving', function (): 
     Queue::fake();
 
     $this->actingAs($staff);
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload());
+    intakeLookup();
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload());
     $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => '', 'status' => 'active']);
 
@@ -212,8 +241,8 @@ it('lets staff continue straight to the next medium after saving', function (): 
         ->assertRedirect(route('pos.catalog.intake.identify'))
         ->assertSessionHas('catalog_success');
 
-    $this->get(route('pos.catalog.intake.identify'))->assertOk()->assertSee('BC-INTAKE-001');
-    expect(Copy::query()->where('barcode', 'BC-INTAKE-001')->firstOrFail()->shelf_location)->toBeNull();
+    $this->get(route('pos.catalog.intake.identify'))->assertOk()->assertSee('0012345');
+    expect(Copy::query()->where('barcode', '0012345')->firstOrFail()->shelf_location)->toBeNull();
 });
 
 it('offers adding a copy to an existing edition instead of creating a duplicate', function (): void {
@@ -231,7 +260,7 @@ it('offers adding a copy to an existing edition instead of creating a duplicate'
 
     $this->actingAs($staff);
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['barcode' => 'BC-NEW-002']))
+    intakeLookup(['barcode' => '0012346'])
         ->assertRedirect(route('pos.catalog.intake.matches'));
 
     $this->get(route('pos.catalog.intake.matches'))
@@ -261,7 +290,7 @@ it('offers adding a copy to an existing edition instead of creating a duplicate'
     expect(Title::query()->count())->toBe($titles)
         ->and(Edition::query()->count())->toBe($editions)
         ->and($edition->copies()->count())->toBe(2)
-        ->and(Copy::query()->where('barcode', 'BC-NEW-002')->firstOrFail()->edition_id)->toBe($edition->getKey());
+        ->and(Copy::query()->where('barcode', '0012346')->firstOrFail()->edition_id)->toBe($edition->getKey());
 
     Queue::assertNothingPushed();
 });
@@ -278,7 +307,7 @@ it('reuses a contributor with the same GND id instead of creating a duplicate', 
     ]);
 
     $this->actingAs($staff);
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload());
+    intakeLookup();
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload());
     $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => '', 'status' => 'active']);
     $this->post(route('pos.catalog.intake.commit'), ['next' => 'open']);
@@ -294,7 +323,7 @@ it('lists several DNB hits for a title search and prefills the chosen one', func
 
     $this->actingAs($staff);
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['isbn' => '', 'title' => 'Shi Yu', 'person' => 'Morosinotto']))
+    intakeLookup(['isbn' => '', 'title' => 'Shi Yu', 'person' => 'Morosinotto'])
         ->assertRedirect(route('pos.catalog.intake.matches'));
 
     Http::assertSent(static fn (Request $request): bool => $request['query'] === 'tit=Shi and tit=Yu and per=Morosinotto');
@@ -325,7 +354,7 @@ it('continues manually and keeps the ISBN when the DNB is unreachable', function
 
     Http::fake(['services.dnb.de/*' => Http::response('', 503)]);
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload())
+    intakeLookup()
         ->assertRedirect(route('pos.catalog.intake.details'));
 
     $this->get(route('pos.catalog.intake.details'))
@@ -343,7 +372,7 @@ it('continues manually when the DNB has no record for the ISBN', function (): vo
         200,
     )]);
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload())
+    intakeLookup()
         ->assertRedirect(route('pos.catalog.intake.details'));
 
     $this->get(route('pos.catalog.intake.details'))
@@ -359,7 +388,7 @@ it('allows manual intake without asking the DNB at all', function (): void {
 
     $this->actingAs($staff);
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['isbn' => '', 'action' => 'manual']))
+    intakeLookup(['isbn' => '', 'action' => 'manual'])
         ->assertRedirect(route('pos.catalog.intake.details'));
 
     Http::assertNothingSent();
@@ -384,7 +413,7 @@ it('allows manual intake without asking the DNB at all', function (): void {
         ->and($edition->metadata_source)->toBeNull()
         ->and($edition->minimum_age)->toBe(14)
         ->and($title->contributions()->count())->toBe(0)
-        ->and(Copy::query()->where('barcode', 'BC-INTAKE-001')->firstOrFail()->status->value)->toBe('damaged');
+        ->and(Copy::query()->where('barcode', '0012345')->firstOrFail()->status->value)->toBe('damaged');
 
     // Ohne ISBN gibt es nichts, wonach ein Cover gesucht werden könnte.
     Queue::assertNothingPushed();
@@ -396,17 +425,28 @@ it('validates the identification step before any lookup happens', function (): v
 
     $this->actingAs($staff);
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['barcode' => '']))->assertSessionHasErrors('barcode');
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['isbn' => 'abc']))->assertSessionHasErrors('isbn');
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['isbn' => '']))->assertSessionHasErrors('isbn');
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['action' => 'sofort']))->assertSessionHasErrors('action');
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => ''])->assertSessionHasErrors('barcode');
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '12345'])->assertSessionHasErrors('barcode');
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '123456789'])->assertSessionHasErrors('barcode');
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => 'BC-0012'])->assertSessionHasErrors('barcode');
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '00123 5'])->assertSessionHasErrors('barcode');
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '0012345'])->assertSessionHasNoErrors();
+
+    // Ohne Inventarnummer geht es nicht zur Abfrage.
+    $this->flushSession();
+    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload())->assertRedirect(route('pos.catalog.intake.identify'));
+    $this->get(route('pos.catalog.intake.medium'))->assertRedirect(route('pos.catalog.intake.identify'));
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '0012345']);
+    intakeLookup(['isbn' => 'abc'])->assertSessionHasErrors('isbn');
+    intakeLookup(['isbn' => ''])->assertSessionHasErrors('isbn');
+    intakeLookup(['action' => 'sofort'])->assertSessionHasErrors('action');
 
     $edition = Edition::query()->create([
         'title_id' => Title::query()->create(['preferred_title' => 'Belegt'])->getKey(),
     ]);
-    $edition->copies()->create(['barcode' => 'BC-TAKEN-001', 'status' => 'active']);
+    $edition->copies()->create(['barcode' => '0012347', 'status' => 'active']);
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload(['barcode' => 'BC-TAKEN-001']))
+    $this->post(route('pos.catalog.intake.barcode'), ['barcode' => '0012347'])
         ->assertSessionHasErrors('barcode');
 
     Http::assertNothingSent();
@@ -417,7 +457,7 @@ it('validates title and edition data and ignores empty contributor rows', functi
     Http::fake(['services.dnb.de/*' => Http::response(intakeDnbXml(), 200)]);
 
     $this->actingAs($staff);
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload());
+    intakeLookup();
 
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload(['preferred_title' => '']))
         ->assertSessionHasErrors('preferred_title');
@@ -448,7 +488,7 @@ it('does not let anyone skip ahead of the steps that are still open', function (
 
     $this->post(route('pos.catalog.intake.commit'), ['next' => 'open'])->assertRedirect(route('pos.catalog.intake.identify'));
 
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload());
+    intakeLookup();
 
     $this->get(route('pos.catalog.intake.copy'))->assertRedirect(route('pos.catalog.intake.details'));
     $this->get(route('pos.catalog.intake.review'))->assertRedirect(route('pos.catalog.intake.details'));
@@ -458,7 +498,7 @@ it('does not let anyone skip ahead of the steps that are still open', function (
     $this->get(route('pos.catalog.intake.review'))->assertRedirect(route('pos.catalog.intake.copy'));
     $this->post(route('pos.catalog.intake.commit'), ['next' => 'open'])->assertRedirect(route('pos.catalog.intake.copy'));
 
-    expect(Copy::query()->where('barcode', 'BC-INTAKE-001')->exists())->toBeFalse();
+    expect(Copy::query()->where('barcode', '0012345')->exists())->toBeFalse();
 });
 
 it('rolls everything back when the barcode was taken in the meantime', function (): void {
@@ -467,13 +507,13 @@ it('rolls everything back when the barcode was taken in the meantime', function 
     Queue::fake();
 
     $this->actingAs($staff);
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload());
+    intakeLookup();
     $this->post(route('pos.catalog.intake.details.store'), intakeDetailsPayload());
     $this->post(route('pos.catalog.intake.copy.store'), ['shelf_location' => '', 'status' => 'active']);
 
     // Zwischen Prüfung und Speichern vergibt jemand anderes denselben Barcode.
     $other = Edition::query()->create(['title_id' => Title::query()->create(['preferred_title' => 'Konkurrenz'])->getKey()]);
-    $other->copies()->create(['barcode' => 'BC-INTAKE-001', 'status' => 'active']);
+    $other->copies()->create(['barcode' => '0012345', 'status' => 'active']);
 
     $titles = Title::query()->count();
     $contributors = Contributor::query()->count();
@@ -494,7 +534,7 @@ it('discards the draft when the process is cancelled', function (): void {
     Http::fake(['services.dnb.de/*' => Http::response(intakeDnbXml(), 200)]);
 
     $this->actingAs($staff);
-    $this->post(route('pos.catalog.intake.lookup'), intakeLookupPayload());
+    intakeLookup();
     $this->get(route('pos.catalog.intake.details'))->assertOk();
 
     $this->delete(route('pos.catalog.intake.cancel'))->assertRedirect(route('pos.catalog.index'));

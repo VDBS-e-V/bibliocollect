@@ -142,6 +142,13 @@ return [
                     'order' => 40,
                 ],
                 [
+                    'label' => 'Regalbretter',
+                    'route' => 'administration.shelves.index',
+                    'active' => 'administration.shelves.*',
+                    'permission' => 'shelves.manage',
+                    'order' => 32,
+                ],
+                [
                     'label' => 'Öffnungszeiten',
                     'route' => 'administration.calendar.index',
                     'active' => 'administration.calendar.*',

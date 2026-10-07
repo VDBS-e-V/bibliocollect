@@ -120,6 +120,19 @@ final class CatalogIntakeDraft
         ]);
     }
 
+    /** Woher ein automatisch vorgeschlagener Klappentext stammt (zum Beispiel „Google Books“), sonst null. */
+    public function setSummarySource(?string $source): void
+    {
+        $this->merge(['summary_source' => $source]);
+    }
+
+    public function summarySource(): ?string
+    {
+        $source = $this->all()['summary_source'] ?? null;
+
+        return is_string($source) && $source !== '' ? $source : null;
+    }
+
     public function mode(): ?string
     {
         $mode = $this->all()['mode'] ?? null;

@@ -66,21 +66,20 @@
             @method('PATCH')
             <div class="bc-catalog-form__grid">
                 <x-ui.input
-                    label="Barcode"
+                    label="Inventarnummer / Barcode"
                     name="barcode"
                     :value="old('barcode', $copy->barcode)"
-                    hint="Der Barcode muss katalogweit eindeutig sein."
+                    hint="Die Inventarnummer muss katalogweit eindeutig sein. Neue Nummern bestehen aus genau 7 Ziffern."
                     :error="$errors->first('barcode') ?: null"
                     autocomplete="off"
                     required
                 />
-                <x-ui.input
-                    label="Regalstandort"
-                    name="shelf_location"
-                    :value="old('shelf_location', $copy->shelf_location)"
-                    placeholder="z. B. J 5 ENDE"
-                    :error="$errors->first('shelf_location') ?: null"
-                />
+                <x-ui.select label="Standort (Regalbrett)" name="shelf_location" :error="$errors->first('shelf_location') ?: null">
+                    <option value="">Kein Standort</option>
+                    @foreach ($shelfOptions as $code => $display)
+                        <option value="{{ $code }}" @selected(old('shelf_location', $copy->shelf_location) === $code)>{{ $display }}</option>
+                    @endforeach
+                </x-ui.select>
                 <x-ui.select
                     label="Exemplarstatus"
                     name="status"

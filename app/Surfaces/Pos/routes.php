@@ -65,7 +65,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
         Route::prefix('/betrieb/katalog/erfassen')->group(function (): void {
             Route::get('/', [CatalogIntakeController::class, 'identify'])->name('pos.catalog.intake.identify');
-            Route::post('/', [CatalogIntakeController::class, 'lookup'])->name('pos.catalog.intake.lookup');
+            Route::post('/', [CatalogIntakeController::class, 'storeBarcode'])->name('pos.catalog.intake.barcode');
+
+            Route::get('/medium', [CatalogIntakeController::class, 'medium'])->name('pos.catalog.intake.medium');
+            Route::post('/medium', [CatalogIntakeController::class, 'lookup'])->name('pos.catalog.intake.lookup');
             Route::delete('/', [CatalogIntakeController::class, 'cancel'])->name('pos.catalog.intake.cancel');
 
             Route::get('/treffer', [CatalogIntakeController::class, 'matches'])->name('pos.catalog.intake.matches');

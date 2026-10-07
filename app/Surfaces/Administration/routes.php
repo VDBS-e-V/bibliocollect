@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
+use App\Surfaces\Administration\Http\Controllers\CatalogShelfController;
 use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
 use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
@@ -19,6 +20,13 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/seiten', [ContentPageAdminController::class, 'index'])->name('administration.pages.index');
         Route::get('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'edit'])->name('administration.pages.edit');
         Route::patch('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'update'])->name('administration.pages.update');
+    });
+
+    Route::middleware('permission:shelves.manage')->group(function (): void {
+        Route::get('/verwaltung/regalbretter', [CatalogShelfController::class, 'index'])->name('administration.shelves.index');
+        Route::post('/verwaltung/regalbretter', [CatalogShelfController::class, 'store'])->name('administration.shelves.store');
+        Route::patch('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'update'])->name('administration.shelves.update');
+        Route::delete('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'destroy'])->name('administration.shelves.destroy');
     });
 
     Route::get('/verwaltung/protokoll', AuditIndexController::class)

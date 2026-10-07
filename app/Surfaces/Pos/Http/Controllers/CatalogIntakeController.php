@@ -16,6 +16,9 @@ use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Queries\CatalogImportMatchQuery;
 use App\Modules\Catalog\Services\BibliographicLookupService;
 use App\Modules\Catalog\Services\CatalogIsbnNormalizer;
+use App\Modules\Catalog\Services\CatalogShelfOptions;
+use App\Modules\Catalog\Services\CatalogSummaryService;
+use App\Surfaces\Pos\Http\Requests\CatalogIntakeBarcodeRequest;
 use App\Surfaces\Pos\Http\Requests\CatalogIntakeChoiceRequest;
 use App\Surfaces\Pos\Http\Requests\CatalogIntakeCommitRequest;
 use App\Surfaces\Pos\Http\Requests\CatalogIntakeCopyRequest;
@@ -30,7 +33,7 @@ use Illuminate\Http\Response;
 
 /**
  * Geführter Erfassungsprozess für neue Medien:
- * 1 Identifizieren · 2 Treffer prüfen · 3 Titel & Ausgabe · 4 Exemplar · 5 Prüfen & speichern.
+ * 1 Inventarnummer · 2 Medium suchen (ISBN oder Titel) · 3 Treffer prüfen · 4 Titel & Ausgabe · 5 Exemplar · 6 Prüfen & speichern.
  *
  * Bis zum ausdrücklichen Speichern in Schritt 5 wird nichts in den Katalog geschrieben.
  */
@@ -41,6 +44,7 @@ final class CatalogIntakeController
         private readonly BibliographicLookupService $lookup,
         private readonly CatalogImportMatchQuery $matches,
         private readonly CatalogIsbnNormalizer $isbns,
+        private readonly CatalogSummaryService $summaries,
     ) {}
 
     public function identify(Request $request): Response
@@ -51,15 +55,37 @@ final class CatalogIntakeController
 
         return $this->view('identify', [
             'draftBarcode' => $this->draft->barcode(),
-            'draftQuery' => $this->draft->query(),
         ]);
+    }
+
+    /** Schritt 1 ist erledigt: Die Inventarnummer steht fest, weiter zur Suche nach dem Medium. */
+    public function storeBarcode(CatalogIntakeBarcodeRequest $request): RedirectResponse
+    {
+        $this->draft->start($request->barcode(), ['isbn' => null, 'title' => null, 'person' => null]);
+
+        return redirect()->route('pos.catalog.intake.medium');
+    }
+
+    public function medium(): Response|RedirectResponse
+    {
+        if (! $this->draft->exists()) {
+            return redirect()->route('pos.catalog.intake.identify');
+        }
+
+        return $this->view('medium', ['draftQuery' => $this->draft->query()]);
     }
 
     public function lookup(CatalogIntakeLookupRequest $request): RedirectResponse
     {
+        $barcode = $this->draft->barcode();
+
+        if ($barcode === null) {
+            return redirect()->route('pos.catalog.intake.identify');
+        }
+
         $isbn = $request->isbn();
 
-        $this->draft->start($request->barcode(), [
+        $this->draft->start($barcode, [
             'isbn' => $isbn,
             'title' => $request->searchTitle(),
             'person' => $request->searchPerson(),
@@ -180,6 +206,7 @@ final class CatalogIntakeController
         }
 
         return $this->view('details', [
+            'summarySource' => $this->draft->summarySource(),
             'details' => $this->draft->detailsOrPrefill() ?? $this->blankDetails(null, null),
             'provenance' => $this->draft->provenance(),
             'hasHits' => $this->draft->hits() !== [],
@@ -207,9 +234,12 @@ final class CatalogIntakeController
             return $guard;
         }
 
+        $copy = $this->draft->copy();
+
         return $this->view('copy', [
-            'copy' => $this->draft->copy(),
+            'copy' => $copy,
             'context' => $this->context(),
+            'shelfOptions' => app(CatalogShelfOptions::class)->forSelect($copy['shelf_location'] ?? null),
         ]);
     }
 
@@ -270,7 +300,7 @@ final class CatalogIntakeController
         } catch (DuplicateCopyBarcode) {
             return redirect()
                 ->route('pos.catalog.intake.identify')
-                ->withErrors(['barcode' => 'Dieser Barcode wurde inzwischen einem anderen Exemplar zugeordnet. Bitte vergib einen neuen Barcode.']);
+                ->withErrors(['barcode' => 'Diese Inventarnummer wurde inzwischen einem anderen Exemplar zugeordnet. Bitte vergib eine neue.']);
         } catch (ModelNotFoundException) {
             return redirect()
                 ->route('pos.catalog.intake.identify')
@@ -280,7 +310,7 @@ final class CatalogIntakeController
         $this->draft->clear();
 
         $message = $result->createdEdition
-            ? sprintf('„%s“ wurde mit dem Barcode %s erfasst.', $result->title->preferred_title, $result->copy->barcode)
+            ? sprintf('„%s“ wurde mit der Inventarnummer %s erfasst.', $result->title->preferred_title, $result->copy->barcode)
             : sprintf('Das Exemplar %s wurde zu „%s“ hinzugefügt.', $result->copy->barcode, $result->title->preferred_title);
 
         if ($request->wantsAnother()) {
@@ -301,7 +331,21 @@ final class CatalogIntakeController
 
     private function chooseHit(BibliographicRecord $hit): void
     {
-        $this->draft->chooseNew(CatalogIntakeDetails::fromRecord($hit), CatalogIntakeProvenance::fromRecord($hit));
+        $details = CatalogIntakeDetails::fromRecord($hit);
+        $summarySource = null;
+
+        // Die DNB liefert selten einen Klappentext; wenn er fehlt, wird er zur ISBN nachgeschlagen (nur als Vorschlag).
+        if ($details->summary === null && $details->isbn !== null) {
+            $found = $this->summaries->findByIsbn($details->isbn);
+
+            if ($found !== null) {
+                $details = CatalogIntakeDetails::fromArray([...$details->toArray(), 'summary' => $found['text']]);
+                $summarySource = $found['source'];
+            }
+        }
+
+        $this->draft->chooseNew($details, CatalogIntakeProvenance::fromRecord($hit));
+        $this->draft->setSummarySource($summarySource);
     }
 
     /** Vorbelegung für die manuelle Erfassung (deutschsprachiges Buch ist der Regelfall der Schulbibliothek). */

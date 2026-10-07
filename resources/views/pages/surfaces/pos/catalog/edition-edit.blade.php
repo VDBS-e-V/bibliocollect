@@ -172,13 +172,12 @@
                     autocomplete="off"
                     required
                 />
-                <x-ui.input
-                    label="Regalstandort"
-                    name="shelf_location"
-                    :value="old('shelf_location')"
-                    placeholder="z. B. J 5 ENDE"
-                    :error="$errors->first('shelf_location') ?: null"
-                />
+                <x-ui.select label="Standort (Regalbrett)" name="shelf_location" :error="$errors->first('shelf_location') ?: null">
+                    <option value="">Kein Standort</option>
+                    @foreach ($shelfOptions as $code => $display)
+                        <option value="{{ $code }}" @selected(old('shelf_location') === $code)>{{ $display }}</option>
+                    @endforeach
+                </x-ui.select>
                 <x-ui.select
                     label="Exemplarstatus"
                     name="status"

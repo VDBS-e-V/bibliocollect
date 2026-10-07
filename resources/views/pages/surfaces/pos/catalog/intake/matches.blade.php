@@ -2,10 +2,10 @@
     <x-ui.page-header
         kicker="Medium erfassen"
         title="Treffer prüfen"
-        :lead="'Barcode '.$barcode"
+        :lead="'Inventarnummer '.$barcode"
     />
 
-    <x-catalog.intake-steps :current="2" />
+    <x-catalog.intake-steps :current="3" />
 
     @if ($errors->any())
         <x-ui.alert variant="error" title="Fehler">{{ $errors->first() }}</x-ui.alert>

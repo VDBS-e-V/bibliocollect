@@ -5,11 +5,12 @@
 
 @php
     $steps = [
-        1 => 'Identifizieren',
-        2 => 'Treffer prüfen',
-        3 => 'Titel & Ausgabe',
-        4 => 'Exemplar',
-        5 => 'Prüfen & speichern',
+        1 => 'Inventarnummer',
+        2 => 'Medium suchen',
+        3 => 'Treffer prüfen',
+        4 => 'Titel & Ausgabe',
+        5 => 'Exemplar',
+        6 => 'Prüfen & speichern',
     ];
 @endphp
 
@@ -28,7 +29,7 @@
 <ol class="bc-intake-steps" aria-label="Fortschritt der Erfassung">
     @foreach ($steps as $number => $label)
         @php
-            $skipped = $number === 3 && $skipDetails && $current > 3;
+            $skipped = $number === 4 && $skipDetails && $current > 4;
             $state = $skipped ? 'skipped' : ($number < $current ? 'done' : ($number === $current ? 'current' : 'upcoming'));
         @endphp
         <li

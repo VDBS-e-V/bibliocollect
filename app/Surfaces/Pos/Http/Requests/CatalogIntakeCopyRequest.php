@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Requests;
 
 use App\Modules\Catalog\Enums\CopyStatus;
+use App\Modules\Catalog\Services\CatalogShelfOptions;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** Schritt 4 der Erfassung: Standort und Zustand des Exemplars. Der Barcode stammt aus Schritt 1. */
+/** Schritt 5 der Erfassung: Standort (ein Regalbrett aus der Liste) und Zustand des Exemplars. */
 final class CatalogIntakeCopyRequest extends FormRequest
 {
     public function authorize(): bool
@@ -20,9 +21,15 @@ final class CatalogIntakeCopyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shelf_location' => ['nullable', 'string', 'max:120'],
+            'shelf_location' => ['nullable', 'string', 'max:120', Rule::in(app(CatalogShelfOptions::class)->activeCodes())],
             'status' => ['required', Rule::enum(CopyStatus::class)],
         ];
+    }
+
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return ['shelf_location.in' => 'Bitte ein Regalbrett aus der Liste wählen.'];
     }
 
     public function shelfLocation(): ?string

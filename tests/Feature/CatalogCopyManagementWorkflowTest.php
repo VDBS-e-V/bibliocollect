@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Modules\Catalog\Enums\CopyStatus;
+use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
@@ -34,16 +35,18 @@ function catalogCopyEdition(string $title = 'Momo', ?string $isbn = '97835222028
 it('lets catalog managers create and update physical copies', function (): void {
     $manager = catalogCopyManagementUser('student_ag_extended');
     $edition = catalogCopyEdition();
+    CatalogShelf::query()->create(['code' => 'J 5 ENDE', 'label' => 'Ende und Verwandte']);
+    CatalogShelf::query()->create(['code' => 'Reparaturregal']);
 
     $this->actingAs($manager)
         ->post(route('pos.catalog.copies.store', ['editionId' => $edition->getKey()]), [
-            'barcode' => '  BC-COPY-001  ',
+            'barcode' => '  0099001  ',
             'shelf_location' => '  J 5 ENDE  ',
             'status' => 'ACTIVE',
         ])
         ->assertRedirect(route('pos.catalog.editions.edit', ['editionId' => $edition->getKey()]));
 
-    $copy = Copy::query()->where('barcode', 'BC-COPY-001')->firstOrFail();
+    $copy = Copy::query()->where('barcode', '0099001')->firstOrFail();
 
     expect($copy->edition_id)->toBe($edition->getKey())
         ->and($copy->shelf_location)->toBe('J 5 ENDE')
@@ -55,14 +58,16 @@ it('lets catalog managers create and update physical copies', function (): void 
             'copyId' => $copy->getKey(),
         ]))
         ->assertOk()
-        ->assertSee('BC-COPY-001');
+        ->assertSee('0099001')
+        ->assertSee('J 5 ENDE · Ende und Verwandte')
+        ->assertSee('Reparaturregal');
 
     $this->actingAs($manager)
         ->patch(route('pos.catalog.copies.update', [
             'editionId' => $edition->getKey(),
             'copyId' => $copy->getKey(),
         ]), [
-            'barcode' => 'BC-COPY-001',
+            'barcode' => '0099001',
             'shelf_location' => 'Reparaturregal',
             'status' => 'damaged',
         ])
@@ -76,18 +81,19 @@ it('lets catalog managers create and update physical copies', function (): void 
 
 it('rejects duplicate copy barcodes across editions', function (): void {
     $staff = catalogCopyManagementUser('staff');
+    CatalogShelf::query()->create(['code' => 'J 1 TEST']);
     $firstEdition = catalogCopyEdition('Erster Titel', '9783000000001');
     $secondEdition = catalogCopyEdition('Zweiter Titel', '9783000000002');
 
     Copy::query()->create([
         'edition_id' => $firstEdition->getKey(),
-        'barcode' => 'BC-DUP-001',
+        'barcode' => '0099002',
         'status' => CopyStatus::Active,
     ]);
 
     $this->actingAs($staff)
         ->post(route('pos.catalog.copies.store', ['editionId' => $secondEdition->getKey()]), [
-            'barcode' => 'BC-DUP-001',
+            'barcode' => '0099002',
             'shelf_location' => 'J 1 TEST',
             'status' => 'active',
         ])
@@ -96,7 +102,7 @@ it('rejects duplicate copy barcodes across editions', function (): void {
 
     $secondCopy = Copy::query()->create([
         'edition_id' => $secondEdition->getKey(),
-        'barcode' => 'BC-DUP-002',
+        'barcode' => '0099003',
         'status' => CopyStatus::Active,
     ]);
 
@@ -105,7 +111,7 @@ it('rejects duplicate copy barcodes across editions', function (): void {
             'editionId' => $secondEdition->getKey(),
             'copyId' => $secondCopy->getKey(),
         ]), [
-            'barcode' => 'BC-DUP-001',
+            'barcode' => '0099002',
             'status' => 'active',
         ])
         ->assertRedirect(route('pos.catalog.copies.edit', [
@@ -114,8 +120,8 @@ it('rejects duplicate copy barcodes across editions', function (): void {
         ]))
         ->assertSessionHasErrors('barcode');
 
-    expect(Copy::query()->where('barcode', 'BC-DUP-001')->count())->toBe(1)
-        ->and($secondCopy->fresh()->barcode)->toBe('BC-DUP-002');
+    expect(Copy::query()->where('barcode', '0099002')->count())->toBe(1)
+        ->and($secondCopy->fresh()->barcode)->toBe('0099003');
 });
 
 it('validates copy input before persistence', function (): void {
@@ -184,4 +190,32 @@ it('keeps basic student AG and technical administration out of copy maintenance'
         ->assertForbidden();
 
     expect(Copy::query()->count())->toBe(0);
+});
+
+it('requires seven digits for new inventory numbers but keeps legacy numbers editable', function (): void {
+    $staff = catalogCopyManagementUser('staff');
+    $edition = catalogCopyEdition();
+    CatalogShelf::query()->create(['code' => 'J 5 ENDE']);
+
+    foreach (['12345', '123456789', 'BC-0001', '12 34567'] as $invalid) {
+        $this->actingAs($staff)
+            ->post(route('pos.catalog.copies.store', ['editionId' => $edition->getKey()]), ['barcode' => $invalid, 'status' => 'active'])
+            ->assertSessionHasErrors('barcode');
+    }
+
+    expect(Copy::query()->count())->toBe(0);
+
+    // Ein Altbestand mit alter Nummer bleibt bearbeitbar, solange die Nummer unverändert bleibt.
+    $legacy = Copy::query()->create(['edition_id' => $edition->getKey(), 'barcode' => '12482', 'status' => CopyStatus::Active, 'shelf_location' => 'Altes Regal']);
+
+    $route = route('pos.catalog.copies.update', ['editionId' => $edition->getKey(), 'copyId' => $legacy->getKey()]);
+
+    $this->actingAs($staff)->patch($route, ['barcode' => '12482', 'shelf_location' => 'Altes Regal', 'status' => 'damaged'])->assertSessionHasNoErrors();
+    expect($legacy->refresh()->status)->toBe(CopyStatus::Damaged);
+
+    // Ändern auf eine neue Nummer verlangt wieder 7 Ziffern; ein anderer Standort muss aus der Liste kommen.
+    $this->actingAs($staff)->patch($route, ['barcode' => '999', 'status' => 'active'])->assertSessionHasErrors('barcode');
+    $this->actingAs($staff)->patch($route, ['barcode' => '12482', 'shelf_location' => 'Frei erfunden', 'status' => 'active'])->assertSessionHasErrors('shelf_location');
+    $this->actingAs($staff)->patch($route, ['barcode' => '0012482', 'shelf_location' => 'J 5 ENDE', 'status' => 'active'])->assertSessionHasNoErrors();
+    expect($legacy->refresh()->barcode)->toBe('0012482')->and($legacy->shelf_location)->toBe('J 5 ENDE');
 });

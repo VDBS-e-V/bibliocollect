@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Pos\Http\Requests;
 
-use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Services\CatalogIsbnNormalizer;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** Schritt 1 der Erfassung: Barcode plus ISBN oder Titel/Autor für die externe Abfrage. */
+/** Schritt 2 der Erfassung: ISBN oder Titel/Autor für die externe Abfrage. Die Inventarnummer steht schon im Entwurf. */
 final class CatalogIntakeLookupRequest extends FormRequest
 {
     public function authorize(): bool
@@ -22,7 +21,6 @@ final class CatalogIntakeLookupRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'barcode' => ['required', 'string', 'max:80'],
             'isbn' => ['nullable', 'string', 'max:32'],
             'title' => ['nullable', 'string', 'max:200'],
             'person' => ['nullable', 'string', 'max:200'],
@@ -37,10 +35,6 @@ final class CatalogIntakeLookupRequest extends FormRequest
                 return;
             }
 
-            if (Copy::query()->where('barcode', $this->barcode())->exists()) {
-                $validator->errors()->add('barcode', 'Dieser Barcode ist bereits einem Exemplar zugeordnet.');
-            }
-
             $isbn = $this->isbn();
 
             if ($isbn !== null && ! app(CatalogIsbnNormalizer::class)->isStandardFormat($isbn)) {
@@ -51,11 +45,6 @@ final class CatalogIntakeLookupRequest extends FormRequest
                 $validator->errors()->add('isbn', 'Gib eine ISBN oder einen Titel zur Abfrage ein – oder erfasse das Medium ohne Abfrage.');
             }
         });
-    }
-
-    public function barcode(): string
-    {
-        return trim((string) $this->input('barcode', ''));
     }
 
     /** Normalisierte ISBN, sofern eine eingegeben wurde. */

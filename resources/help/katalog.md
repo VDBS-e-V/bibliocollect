@@ -4,10 +4,11 @@ Für Mitarbeiter:innen und die Schüler-AG „Erweitert“.
 
 ## Ein neues Medium erfassen
 
-1. **Katalogpflege → Medium erfassen.**
-2. Gib die **ISBN** ein oder suche nach Titel und Autor. Die Daten kommen aus der Deutschen Nationalbibliothek.
-3. Prüfe die Vorschläge, ergänze fehlende Angaben und gib den **Barcode des Exemplars** und den Standort ein.
-4. Im letzten Schritt prüfst du alles und speicherst. **Erst jetzt** wird etwas angelegt.
+1. **Medium erfassen** in der Navigation.
+2. Scanne zuerst die **Inventarnummer** (genau 7 Ziffern, steht auf dem Etikett im Buch).
+3. Danach gibst du die **ISBN** ein oder suchst nach Titel und Autor. Die Daten kommen aus der Deutschen Nationalbibliothek; fehlt dort der Klappentext, wird er zur ISBN bei Google Books oder Open Library gesucht und nur vorgeschlagen.
+4. Prüfe die Vorschläge und ergänze fehlende Angaben. Wähle den **Standort aus der Liste der Regalbretter** (die Liste pflegt die Verwaltung unter Regalbretter).
+5. Im letzten Schritt prüfst du alles und speicherst. **Erst jetzt** wird etwas angelegt.
 
 Das Cover wird im Hintergrund geladen und erscheint nach kurzer Zeit.
 

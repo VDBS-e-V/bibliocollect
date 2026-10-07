@@ -178,6 +178,13 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Medium erfassen angepasst (Issue 2)
+
+- **Getrennte Abfragen:** Erst die Inventarnummer (Schritt 1), dann ISBN oder Titel/Autor:in (Schritt 2); Treffer prüfen, Titel & Ausgabe, Exemplar und Prüfen & speichern folgen (6 Schritte).
+- **Regel:** Neue Inventarnummern bestehen aus genau 7 Ziffern (Erfassung und Anlegen eines Exemplars; bestehende Nummern bleiben bearbeitbar, solange sie nicht geändert werden).
+- **Standort als Auswahlliste:** Tabelle `catalog_shelves` (Bezeichnung als Standort, Beschriftung, Reihenfolge, auswählbar). Die Verwaltung pflegt sie unter `/verwaltung/regalbretter` (Recht `shelves.manage`); Umbenennen zieht die Exemplare mit, Löschen nur ohne Exemplare. Die bisherigen Freitext-Standorte wurden beim Einspielen als Regalbretter übernommen. Gilt in der Erfassung, beim Anlegen und beim Bearbeiten von Exemplaren.
+- **Zusammenfassung:** Fehlt sie beim DNB-Treffer, wird sie zur ISBN bei Google Books (mit Schlüssel, falls hinterlegt) und danach Open Library nachgeschlagen und als Vorschlag mit Quellenhinweis eingetragen (`config/catalog.php`, `summaries`).
+
 ### Vorgangsorientierte Navigation und Buchwünsche (v0.12.0)
 
 - **Navigation des Bibliotheksbetriebs** nach Vorgängen: Arbeitsplatz, Ausleihe und Rückgabe, Ausweise ausgeben, Vormerkungen, Buchwünsche, Medium erfassen, Ausleihkonten, Alle Vorgänge, Hilfe. Statistik, Klassenlisten und Katalogpflege stehen auf der neuen Seite **Alle Vorgänge** (`/betrieb/vorgaenge`, definiert in `config/processes.php`; zeigt je Konto nur die erlaubten Vorgänge, in die getrennten Bereiche **Betrieb** (Ausleihe, Ausweise und Personen, Katalog, Hilfe) und **Verwaltung** (Konten und Ausweise einrichten, Bestand importieren, Auswertungen und Protokoll, Schule und Öffnungszeiten, Inhalte), jeweils nach Aufgaben gruppiert).

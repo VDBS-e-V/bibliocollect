@@ -12,7 +12,7 @@
         lead="Kontrolliere die Angaben. Erst mit dem Speichern wird das Medium in den Katalog übernommen."
     />
 
-    <x-catalog.intake-steps :current="5" :skip-details="$detailsSkipped" />
+    <x-catalog.intake-steps :current="6" :skip-details="$detailsSkipped" />
 
     @if ($errors->any())
         <x-ui.alert variant="error" title="Fehler">{{ $errors->first() }}</x-ui.alert>
@@ -126,7 +126,7 @@
         <div class="bc-section-heading"><h2 id="intake-review-copy-heading">Exemplar</h2></div>
 
         <dl class="bc-intake-summary">
-            <dt>Barcode</dt>
+            <dt>Inventarnummer</dt>
             <dd><strong>{{ $barcode }}</strong></dd>
             <dt>Signatur / Standort</dt>
             <dd>{{ $copy['shelf_location'] ?? 'nicht angegeben' }}</dd>

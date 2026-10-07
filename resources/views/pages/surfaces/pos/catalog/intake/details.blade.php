@@ -20,10 +20,10 @@
     <x-ui.page-header
         kicker="Medium erfassen"
         title="Titel & Ausgabe"
-        :lead="'Barcode '.$barcode"
+        :lead="'Inventarnummer '.$barcode"
     />
 
-    <x-catalog.intake-steps :current="3" />
+    <x-catalog.intake-steps :current="4" />
 
     @if (session('intake_notice'))
         <x-ui.alert :variant="session('intake_notice_variant', 'info')" title="Hinweis">{{ session('intake_notice') }}</x-ui.alert>
@@ -251,6 +251,9 @@
 
             <div class="bc-field">
                 <label class="bc-field__label" for="summary">Zusammenfassung</label>
+                @if ($summarySource)
+                    <p class="bc-field__hint">Automatisch von {{ $summarySource }} vorgeschlagen. Bitte lesen und bei Bedarf kürzen oder löschen.</p>
+                @endif
                 <textarea
                     id="summary"
                     name="summary"

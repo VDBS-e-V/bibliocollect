@@ -21,6 +21,12 @@ return [
         ],
     ],
 
+    // Zusammenfassungen (Klappentexte) werden bei der Erfassung per ISBN nachgeschlagen und nur vorgeschlagen.
+    'summaries' => [
+        'timeout' => (int) env('CATALOG_SUMMARY_TIMEOUT', 8),
+        'open_library' => (bool) env('CATALOG_SUMMARY_OPEN_LIBRARY', true),
+    ],
+
     'lookup' => [
         'dnb' => [
             'endpoint' => env('CATALOG_DNB_SRU_ENDPOINT', 'https://services.dnb.de/sru/dnb'),

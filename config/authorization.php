@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'shelves.manage' => [
+            'label' => 'Regalbretter pflegen',
+            'description' => 'Erlaubt, die Liste der Regalbretter (Standorte der Exemplare) anzulegen und zu ändern.',
+        ],
         'wishes.manage' => [
             'label' => 'Buchwünsche bearbeiten',
             'description' => 'Erlaubt, Buchwünsche anzusehen, selbst zu erfassen und den Stand zu setzen.',
@@ -142,6 +146,7 @@ return [
                 'circulation.reports',
                 'statistics.view',
                 'wishes.manage',
+                'shelves.manage',
             ],
         ],
         'technical_admin' => [

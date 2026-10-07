@@ -14,7 +14,7 @@
         :lead="$context['title']"
     />
 
-    <x-catalog.intake-steps :current="4" :skip-details="$detailsSkipped" />
+    <x-catalog.intake-steps :current="5" :skip-details="$detailsSkipped" />
 
     @if ($errors->any())
         <x-ui.alert variant="error" title="Fehler">Bitte prüfe die markierten Eingaben.</x-ui.alert>
@@ -35,7 +35,7 @@
             <legend>Exemplar</legend>
 
             <dl class="bc-intake-summary">
-                <dt>Barcode</dt>
+                <dt>Inventarnummer</dt>
                 <dd>
                     <strong>{{ $barcode }}</strong>
                     · <a href="{{ route('pos.catalog.intake.identify') }}">ändern</a>
@@ -43,14 +43,12 @@
             </dl>
 
             <div class="bc-intake-fieldset__grid">
-                <x-ui.input
-                    label="Signatur / Standort"
-                    name="shelf_location"
-                    :value="$currentShelf"
-                    hint="z. B. „J 5 ENDE“. Kann auch leer bleiben."
-                    :error="$errors->first('shelf_location')"
-                    maxlength="120"
-                />
+                <x-ui.select label="Standort (Regalbrett)" name="shelf_location" :error="$errors->first('shelf_location')">
+                    <option value="">Kein Standort</option>
+                    @foreach ($shelfOptions as $code => $display)
+                        <option value="{{ $code }}" @selected($currentShelf === $code)>{{ $display }}</option>
+                    @endforeach
+                </x-ui.select>
                 <x-ui.select label="Zustand im Bestand" name="status" :error="$errors->first('status')">
                     @foreach (CatalogIntakeVocabulary::copyStatuses() as $key => $label)
                         <option value="{{ $key }}" @selected($currentStatus === $key)>{{ $label }}</option>
