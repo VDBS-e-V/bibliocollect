@@ -17,6 +17,21 @@
         <x-ui.alert variant="error" title="Fehler">{{ $errors->first() }}</x-ui.alert>
     @endif
 
+    @if ($signatureCount > 0)
+        <section class="bc-content-section" aria-labelledby="sig-heading">
+            <div class="bc-section-heading"><h2 id="sig-heading">Aus den Signaturen übernehmen</h2></div>
+            <p class="bc-section-copy">
+                Im System sind {{ $signatureCount }} Signaturen mit ihren Themenbereichen hinterlegt. Daraus lassen sich die Regalbretter anlegen:
+                Die Signatur wird zur Bezeichnung, die Themenbereiche zur Beschriftung. Alte Freitext-Standorte mit anderer Schreibweise
+                („IA1d“ statt „I. A 1 d“) werden dem richtigen Brett zugeordnet. Das lässt sich gefahrlos wiederholen.
+            </p>
+            <form method="post" action="{{ route('administration.shelves.from-signatures') }}">
+                @csrf
+                <x-ui.button type="submit" variant="secondary">Regalbretter aus Signaturen anlegen</x-ui.button>
+            </form>
+        </section>
+    @endif
+
     <section class="bc-content-section" aria-labelledby="new-shelf-heading">
         <div class="bc-section-heading"><h2 id="new-shelf-heading">Regalbrett hinzufügen</h2></div>
         <form method="post" action="{{ route('administration.shelves.store') }}" class="bc-audit-filter">
@@ -53,6 +68,9 @@
                             <x-ui.button type="submit" variant="secondary">Speichern</x-ui.button>
                         </form>
                         <div class="bc-shelf__meta">
+                            @if ($shelf->signature && $shelf->signature->topics->isNotEmpty())
+                                <span>Themen: {{ $shelf->signature->topics->pluck('name')->implode(', ') }}</span>
+                            @endif
                             <span>{{ $copies }} {{ $copies === 1 ? 'Exemplar' : 'Exemplare' }}</span>
                             @if ($copies === 0)
                                 <form method="post" action="{{ route('administration.shelves.destroy', ['shelfId' => $shelf->getKey()]) }}">

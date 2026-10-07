@@ -12,7 +12,7 @@ Für Mitarbeiter:innen und die Schüler-AG „Erweitert“.
 
 ## Medien einsortieren
 
-Die Bücher vom Stapel kommen ins Regal: **Medien einsortieren** öffnen, das **Regalbrett wählen** und die **Inventarnummern der Bücher scannen**, die du dort einstellst. Mit jedem Scan wird der Standort im System vermerkt und das Buch vom Stapel genommen. Wechselst du das Brett, wählst du oben das nächste.
+Die Bücher vom Stapel kommen ins Regal: **Medien einsortieren** öffnen, die **Inventarnummer des Buchs scannen** und das **Regalbrett bestätigen**. Vorgewählt ist das zuletzt benutzte Brett (oder das der Signatur); du kannst ein anderes aus der Liste wählen oder dessen Etikett scannen. Mit „Einsortieren“ wird der Standort im System vermerkt und das Buch vom Stapel genommen. Dann das nächste Buch.
 
 ## Regalbretter und alte Inventarnummern (Mitarbeiter:innen und Verwaltung)
 

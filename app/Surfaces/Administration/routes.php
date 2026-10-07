@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::middleware('permission:shelves.manage')->group(function (): void {
         Route::get('/verwaltung/regalbretter', [CatalogShelfController::class, 'index'])->name('administration.shelves.index');
         Route::post('/verwaltung/regalbretter', [CatalogShelfController::class, 'store'])->name('administration.shelves.store');
+        Route::post('/verwaltung/regalbretter/aus-signaturen', [CatalogShelfController::class, 'fromSignatures'])->name('administration.shelves.from-signatures');
         Route::patch('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'update'])->name('administration.shelves.update');
         Route::delete('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'destroy'])->name('administration.shelves.destroy');
     });

@@ -6,6 +6,7 @@ namespace App\Modules\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Regalbrett. Der Code ist der Standort, der am Exemplar steht; die Beschriftung nennt, was dort steht.
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $id
  * @property string $code
  * @property string|null $label
+ * @property string|null $signature_id
  * @property int $sort_order
  * @property bool $is_active
  */
@@ -23,7 +25,13 @@ final class CatalogShelf extends Model
     protected $table = 'catalog_shelves';
 
     /** @var list<string> */
-    protected $fillable = ['code', 'label', 'sort_order', 'is_active'];
+    protected $fillable = ['code', 'label', 'signature_id', 'sort_order', 'is_active'];
+
+    /** @return BelongsTo<CatalogSignature, $this> */
+    public function signature(): BelongsTo
+    {
+        return $this->belongsTo(CatalogSignature::class, 'signature_id');
+    }
 
     public function display(): string
     {

@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Models\User;
 use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Catalog\Models\CatalogShelf;
+use App\Modules\Catalog\Models\CatalogSignature;
+use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
@@ -30,7 +32,7 @@ function stackCopy(string $barcode, string $title = 'Stapelbuch', bool $onStack 
     return Copy::query()->create(['edition_id' => $edition->getKey(), 'barcode' => $barcode, 'status' => 'active', 'shelf_location' => $onStack ? null : $location]);
 }
 
-it('puts new copies on the stack and shelves them with a shelf and a scan', function (): void {
+it('shelves books by scanning the book first and confirming the shelf', function (): void {
     $helper = stackUser('student_ag_basic');
     CatalogShelf::query()->create(['code' => 'R3-B2', 'label' => 'Fantasy']);
     CatalogShelf::query()->create(['code' => 'R1-B1']);
@@ -38,25 +40,46 @@ it('puts new copies on the stack and shelves them with a shelf and a scan', func
     $second = stackCopy('0020002', 'Zweites Buch', true);
     stackCopy('0020003', 'Schon im Regal', false, 'R1-B1');
 
-    $this->actingAs($helper)->get(route('pos.shelving'))->assertOk()->assertSee('Stapel „Einsortieren“')->assertSee('Erstes Buch')->assertSee('Zweites Buch')->assertDontSee('Schon im Regal')->assertDontSee('für R3-B2');
+    $this->actingAs($helper)->get(route('pos.shelving'))->assertOk()->assertSee('1. Buch scannen')->assertSee('Stapel „Einsortieren“')->assertSee('Erstes Buch')->assertSee('Zweites Buch')->assertDontSee('Schon im Regal')->assertDontSee('2. Regalbrett');
 
-    // Regalbrett gewählt: Scanfeld erscheint.
-    $this->actingAs($helper)->get(route('pos.shelving', ['regalbrett' => 'R3-B2']))->assertOk()->assertSee('Inventarnummer des Buchs für R3-B2');
+    // Buch gescannt: Titel, Standort und Regalbrettauswahl erscheinen, noch ohne Vorauswahl.
+    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0020001']))->assertOk()->assertSee('Erstes Buch')->assertSee('noch kein Standort')->assertSee('2. Regalbrett')->assertSee('R3-B2 · Fantasy')->assertDontSee('Vorgewählt ist');
 
-    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => 'R3-B2', 'code' => '0020001'])
-        ->assertRedirect(route('pos.shelving', ['regalbrett' => 'R3-B2']))->assertSessionHas('shelving_notice');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020001', 'regalbrett' => 'R3-B2'])
+        ->assertRedirect(route('pos.shelving'))->assertSessionHas('shelving_notice');
 
     $first->refresh();
-    expect($first->shelf_location)->toBe('R3-B2')->and(Copy::query()->awaitingShelving()->whereKey($first->getKey())->exists())->toBeFalse()->and($first->shelved_at)->not->toBeNull()
+    expect($first->shelf_location)->toBe('R3-B2')->and($first->shelved_at)->not->toBeNull()
+        ->and(Copy::query()->awaitingShelving()->whereKey($first->getKey())->exists())->toBeFalse()
         ->and(Copy::query()->awaitingShelving()->whereKey($second->getKey())->exists())->toBeTrue();
 
-    $this->actingAs($helper)->get(route('pos.shelving', ['regalbrett' => 'R3-B2']))->assertSee('Zuletzt einsortiert')->assertSee('Erstes Buch')->assertSee('Stapel „Einsortieren“');
+    // Das zuletzt benutzte Regalbrett ist beim nächsten Buch vorgewählt.
+    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0020002']))->assertSee('Vorgewählt ist')->assertSee('<option value="R3-B2" selected>', false);
+    $this->get(route('pos.shelving'))->assertSee('Zuletzt einsortiert')->assertSee('Erstes Buch');
 
     expect(AuditEvent::query()->where('action', 'catalog.copy.shelved')->count())->toBe(1);
 
-    // Ein Buch, das schon im Regal steht, lässt sich umstellen.
-    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => 'R1-B1', 'code' => '0020001'])->assertSessionHas('shelving_notice');
+    // Ein Buch, das schon im Regal steht, lässt sich umstellen; die Meldung nennt das alte Brett.
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020001', 'regalbrett' => 'R1-B1'])->assertSessionHas('shelving_notice', static fn (string $text): bool => str_contains($text, 'R1-B1') && str_contains($text, 'Vorher: R3-B2'));
     expect($first->refresh()->shelf_location)->toBe('R1-B1');
+});
+
+it('takes the shelf from a scanned shelf label and prefers the shelf of the copy signature', function (): void {
+    $helper = stackUser('student_ag_basic');
+    $signature = CatalogSignature::query()->create(['signature' => 'I. A 1 d']);
+    CatalogShelf::query()->create(['code' => 'I. A 1 d', 'signature_id' => $signature->getKey()]);
+    CatalogShelf::query()->create(['code' => 'R1-B1']);
+    $copy = stackCopy('0020005', 'Mit Signatur', true);
+    $copy->forceFill(['signature_id' => $signature->getKey()])->save();
+
+    // Signatur vor „zuletzt benutzt“.
+    $this->actingAs($helper)->withSession(['shelving.last_shelf' => 'R1-B1'])->get(route('pos.shelving', ['buch' => '0020005']))->assertSee('<option value="I. A 1 d" selected>', false);
+
+    // Etikett gescannt, in anderer Schreibweise: hat Vorrang vor der Auswahl.
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett' => 'R1-B1', 'regalbrett_code' => 'ia1d'])->assertSessionHas('shelving_notice');
+    expect($copy->refresh()->shelf_location)->toBe('I. A 1 d');
+
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett_code' => 'gibt es nicht'])->assertSessionHas('shelving_error');
 });
 
 it('refuses unknown books, unknown shelves and missing input while shelving', function (): void {
@@ -65,14 +88,44 @@ it('refuses unknown books, unknown shelves and missing input while shelving', fu
     CatalogShelf::query()->create(['code' => 'AUS', 'is_active' => false]);
     $copy = stackCopy('0020010', 'Stapelbuch', true);
 
-    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => 'R3-B2', 'code' => '9999999'])->assertSessionHas('shelving_error');
-    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => 'Erfunden', 'code' => '0020010'])->assertSessionHas('shelving_error');
-    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => 'AUS', 'code' => '0020010'])->assertSessionHas('shelving_error');
-    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => '', 'code' => '0020010'])->assertSessionHasErrors('regalbrett');
-    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['regalbrett' => 'R3-B2', 'code' => ''])->assertSessionHasErrors('code');
+    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '9999999']))->assertOk()->assertSee('gibt es kein Exemplar');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '9999999', 'regalbrett' => 'R3-B2'])->assertSessionHas('shelving_error');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020010', 'regalbrett' => 'Erfunden'])->assertSessionHas('shelving_error');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020010', 'regalbrett' => 'AUS'])->assertSessionHas('shelving_error');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020010', 'regalbrett' => ''])->assertSessionHas('shelving_error');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '', 'regalbrett' => 'R3-B2'])->assertSessionHasErrors('buch');
 
     expect(Copy::query()->awaitingShelving()->whereKey($copy->getKey())->exists())->toBeTrue()->and($copy->refresh()->shelf_location)->toBeNull();
+});
 
+it('creates the shelves from the signatures with their topics and merges old spellings', function (): void {
+    $admin = stackUser('management');
+    $topic = CatalogTopic::query()->create(['name' => 'Rätsel & Knobeln']);
+    $other = CatalogTopic::query()->create(['name' => 'Lesestart']);
+    $a = CatalogSignature::query()->create(['signature' => 'I. A 1 b']);
+    $a->topics()->attach($topic->getKey(), ['position' => 1]);
+    $b = CatalogSignature::query()->create(['signature' => 'I. A 1 d']);
+    $b->topics()->attach([$topic->getKey() => ['position' => 1], $other->getKey() => ['position' => 2]]);
+
+    // Ein alter Freitext-Standort mit anderer Schreibweise samt Buch.
+    CatalogShelf::query()->create(['code' => 'IA1d']);
+    $copy = stackCopy('0020020', 'Altbuch', false, 'IA1d');
+
+    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Regalbretter aus Signaturen anlegen');
+    $this->actingAs($admin)->post(route('administration.shelves.from-signatures'))->assertRedirect(route('administration.shelves.index'))->assertSessionHas('shelf_success');
+
+    $shelf = CatalogShelf::query()->where('code', 'I. A 1 d')->firstOrFail();
+    expect(CatalogShelf::query()->orderBy('sort_order')->pluck('code')->all())->toBe(['I. A 1 b', 'I. A 1 d'])
+        ->and($shelf->label)->toBe('Rätsel & Knobeln / Lesestart')
+        ->and($shelf->signature_id)->toBe($b->getKey())
+        ->and($copy->refresh()->shelf_location)->toBe('I. A 1 d');
+
+    // Wiederholbar, ändert nichts Eigenes.
+    $shelf->forceFill(['label' => 'Eigene Beschriftung', 'is_active' => false])->save();
+    $this->actingAs($admin)->post(route('administration.shelves.from-signatures'))->assertRedirect();
+    expect(CatalogShelf::query()->count())->toBe(2)->and($shelf->refresh()->label)->toBe('Eigene Beschriftung')->and($shelf->is_active)->toBeFalse();
+
+    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Themen: Rätsel &amp; Knobeln, Lesestart', false);
 });
 
 it('shows the stack on the workplace and in the menu', function (): void {
