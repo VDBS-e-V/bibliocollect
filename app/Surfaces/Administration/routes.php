@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
 use App\Surfaces\Administration\Http\Controllers\CatalogShelfController;
+use App\Surfaces\Administration\Http\Controllers\CatalogSignatureController;
+use App\Surfaces\Administration\Http\Controllers\CatalogTopicController;
 use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
 use App\Surfaces\Administration\Http\Controllers\InventoryRenumberController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
@@ -90,6 +92,15 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::middleware('permission:shelves.manage')->group(function (): void {
         Route::get('/verwaltung/regalbretter', [CatalogShelfController::class, 'index'])->name('administration.shelves.index');
         Route::post('/verwaltung/regalbretter', [CatalogShelfController::class, 'store'])->name('administration.shelves.store');
+        Route::get('/verwaltung/signaturen', [CatalogSignatureController::class, 'index'])->name('administration.signatures.index');
+        Route::post('/verwaltung/signaturen', [CatalogSignatureController::class, 'store'])->name('administration.signatures.store');
+        Route::patch('/verwaltung/signaturen/{signatureId}', [CatalogSignatureController::class, 'update'])->name('administration.signatures.update');
+        Route::delete('/verwaltung/signaturen/{signatureId}', [CatalogSignatureController::class, 'destroy'])->name('administration.signatures.destroy');
+        Route::get('/verwaltung/themenbereiche', [CatalogTopicController::class, 'index'])->name('administration.topics.index');
+        Route::post('/verwaltung/themenbereiche', [CatalogTopicController::class, 'store'])->name('administration.topics.store');
+        Route::patch('/verwaltung/themenbereiche/{topicId}', [CatalogTopicController::class, 'update'])->name('administration.topics.update');
+        Route::delete('/verwaltung/themenbereiche/{topicId}', [CatalogTopicController::class, 'destroy'])->name('administration.topics.destroy');
+
         Route::post('/verwaltung/regalbretter/aus-signaturen', [CatalogShelfController::class, 'fromSignatures'])->name('administration.shelves.from-signatures');
         Route::patch('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'update'])->name('administration.shelves.update');
         Route::delete('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'destroy'])->name('administration.shelves.destroy');

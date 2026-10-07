@@ -178,6 +178,12 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Signaturen, Themenbereiche und Regalbrett-Vorschlag (v0.19.0)
+
+- **Pflege** in der Verwaltung (Recht `shelves.manage`, Mitarbeiter:innen und Verwaltung): `/verwaltung/signaturen` (Signatur anlegen, ändern, Themenbereiche in gewählter Reihenfolge zuordnen, löschen nur ohne Exemplare) und `/verwaltung/themenbereiche` (Baum aus Haupt- und Unterbereichen mit Schlüssel und Beschreibung; Schleifen sind verboten, Löschen nur ohne Unterbereiche und Signaturen). Regalbretter lassen sich mit einer Signatur verbinden.
+- **Bücher bekommen eine Signatur** bei der Erfassung (Schritt Exemplar), beim Anlegen und beim Bearbeiten eines Exemplars („Themenbereich / Signatur“).
+- **Vorschlag beim Einsortieren**, in dieser Reihenfolge: Regalbrett der Signatur des Exemplars, Regalbrett der anderen Exemplare derselben Ausgabe, zuletzt benutztes Regalbrett. Das System lernt: Wird ein Buch ohne Signatur auf ein Regalbrett mit Signatur gestellt, bekommt es diese Signatur.
+
 ### Benutzerkonten in der Verwaltung (v0.18.0)
 
 Die Lücke war: Konten für Mitarbeitende, Verwaltung und technische Administration gab es nur über Einrichtungsseite oder Konsole, Rollen nur für Schüler-AG über die Konten der Schüler:innen, und Deaktivieren ging nur beim Austritt.

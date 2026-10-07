@@ -11,6 +11,7 @@ use App\Modules\Catalog\Exceptions\CatalogShelfInUse;
 use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogSignature;
 use App\Modules\Catalog\Models\Copy;
+use App\Modules\Catalog\Services\CatalogSignatureOptions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -31,6 +32,7 @@ final class CatalogShelfController
                 'counts' => $counts,
                 'nextOrder' => ((int) $shelves->max('sort_order')) + 1,
                 'signatureCount' => CatalogSignature::query()->count(),
+                'signatureOptions' => app(CatalogSignatureOptions::class)->forSelect(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
@@ -49,9 +51,10 @@ final class CatalogShelfController
             'code' => ['required', 'string', 'max:40', Rule::unique('catalog_shelves', 'code')],
             'label' => ['nullable', 'string', 'max:120'],
             'sort_order' => ['nullable', 'integer', 'between:0,9999'],
+            'signature_id' => ['nullable', 'string', Rule::exists('catalog_signatures', 'id')],
         ], $this->messages());
 
-        $save->execute(null, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), true);
+        $save->execute(null, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), true, $data['signature_id'] ?? null);
 
         return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.trim($data['code']).'“ ist angelegt.');
     }
@@ -65,9 +68,10 @@ final class CatalogShelfController
             'label' => ['nullable', 'string', 'max:120'],
             'sort_order' => ['nullable', 'integer', 'between:0,9999'],
             'is_active' => ['nullable', 'boolean'],
+            'signature_id' => ['nullable', 'string', Rule::exists('catalog_signatures', 'id')],
         ], $this->messages());
 
-        $save->execute($shelf, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), $request->boolean('is_active'));
+        $save->execute($shelf, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), $request->boolean('is_active'), $data['signature_id'] ?? null);
 
         return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.trim($data['code']).'“ ist gespeichert.');
     }

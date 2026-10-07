@@ -66,7 +66,7 @@
                     </div>
                 </form>
                 @if ($preselected !== '')
-                    <p class="bc-section-copy">Vorgewählt ist das zuletzt benutzte Regalbrett oder das der Signatur.</p>
+                    <p class="bc-section-copy">Vorgewählt ist das Regalbrett der Signatur, sonst das der anderen Exemplare dieser Ausgabe, sonst das zuletzt benutzte.</p>
                 @endif
             @endif
         </section>

@@ -11,6 +11,7 @@ use App\Modules\Catalog\Exceptions\DuplicateCopyBarcode;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Services\CatalogShelfOptions;
+use App\Modules\Catalog\Services\CatalogSignatureOptions;
 use App\Surfaces\Pos\Http\Requests\CatalogCopyRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
@@ -52,6 +53,7 @@ final class CatalogCopyController
                 'copy' => $copy,
                 'copyStatuses' => CopyStatus::cases(),
                 'shelfOptions' => app(CatalogShelfOptions::class)->forSelect($copy->shelf_location),
+                'signatureOptions' => app(CatalogSignatureOptions::class)->forSelect(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }

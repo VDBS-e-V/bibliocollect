@@ -21,7 +21,15 @@ final class CatalogIntakeCopyRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::enum(CopyStatus::class)],
+            'signature_id' => ['nullable', 'string', Rule::exists('catalog_signatures', 'id')],
         ];
+    }
+
+    public function signatureId(): ?string
+    {
+        $value = $this->validated()['signature_id'] ?? null;
+
+        return is_string($value) && $value !== '' ? $value : null;
     }
 
     public function status(): CopyStatus

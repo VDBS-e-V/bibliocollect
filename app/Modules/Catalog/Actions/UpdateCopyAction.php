@@ -34,6 +34,7 @@ final class UpdateCopyAction
                 'barcode' => $data->barcode,
                 'shelf_location' => $data->shelfLocation,
                 'status' => $data->status,
+                'signature_id' => $data->signatureId,
             ])->save();
 
             return $lockedCopy;

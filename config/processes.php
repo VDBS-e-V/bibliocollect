@@ -72,6 +72,7 @@ return [
                     'title' => 'Bestand',
                     'items' => [
                         ['label' => 'Regalbretter pflegen', 'text' => 'Die Liste der Regalbretter anlegen, die beim Erfassen als Standort gewählt werden.', 'route' => 'administration.shelves.index', 'permission' => 'shelves.manage'],
+                        ['label' => 'Signaturen und Themenbereiche pflegen', 'text' => 'Signaturen und ihre Themenbereiche anlegen und ändern. Daraus folgt der Vorschlag des Regalbretts beim Einsortieren.', 'route' => 'administration.signatures.index', 'permission' => 'shelves.manage'],
                         ['label' => 'Alte Inventarnummern umstellen', 'text' => 'Exemplare mit alter Nummer ausdrücklich auf neue siebenstellige Nummern umstellen und Etiketten drucken.', 'route' => 'administration.inventory.index', 'permission' => 'inventory.renumber'],
                         ['label' => 'Katalog importieren', 'text' => 'Bestandsdaten aus einer Datei einlesen.', 'route' => 'pos.catalog.import.create', 'permission' => 'catalog.import'],
                     ],

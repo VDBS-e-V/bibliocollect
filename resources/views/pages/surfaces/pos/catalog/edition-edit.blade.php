@@ -173,6 +173,12 @@
                     required
                 />
 <p class="bc-intake-note">Den Standort bekommt das Exemplar beim Einsortieren ins Regal (Vorgang „Medien einsortieren“).</p>
+                <x-ui.select label="Themenbereich / Signatur" name="signature_id" :error="$errors->first('signature_id') ?: null">
+                    <option value="">Noch nicht festgelegt</option>
+                    @foreach ($signatureOptions as $id => $display)
+                        <option value="{{ $id }}" @selected((string) old('signature_id') === $id)>{{ $display }}</option>
+                    @endforeach
+                </x-ui.select>
                 <x-ui.select
                     label="Exemplarstatus"
                     name="status"

@@ -12,5 +12,6 @@ final readonly class CopyData
         public string $barcode,
         public ?string $shelfLocation,
         public CopyStatus $status,
+        public ?string $signatureId = null,
     ) {}
 }

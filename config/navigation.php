@@ -170,6 +170,13 @@ return [
                     'order' => 32,
                 ],
                 [
+                    'label' => 'Signaturen und Themen',
+                    'route' => 'administration.signatures.index',
+                    'active' => 'administration.signatures.*',
+                    'permission' => 'shelves.manage',
+                    'order' => 31,
+                ],
+                [
                     'label' => 'Inventarnummern',
                     'route' => 'administration.inventory.index',
                     'active' => 'administration.inventory.*',

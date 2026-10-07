@@ -121,6 +121,19 @@ final class ShelvingController
             }
         }
 
+        // Andere Exemplare derselben Ausgabe stehen schon im Regal: dort gehört dieses auch hin.
+        $sibling = Copy::query()
+            ->where('edition_id', $copy->edition_id)
+            ->whereKeyNot($copy->getKey())
+            ->whereNotNull('shelf_location')
+            ->where('shelf_location', '!=', '')
+            ->orderByDesc('shelved_at')
+            ->value('shelf_location');
+
+        if (is_string($sibling) && isset($options[$sibling])) {
+            return $sibling;
+        }
+
         $last = $request->session()->get(self::LAST_SHELF);
 
         return is_string($last) && isset($options[$last]) ? $last : '';

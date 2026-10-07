@@ -39,6 +39,12 @@
             <x-ui.input label="Bezeichnung" name="code" id="new-shelf-code" :value="old('code')" maxlength="40" required hint="Das steht später am Exemplar, zum Beispiel „R3-B2“." />
             <x-ui.input label="Beschriftung am Regalbrett" name="label" id="new-shelf-label" :value="old('label')" maxlength="120" hint="Was auf dem Brett steht, zum Beispiel „Fantasy ab 10 Jahren“." />
             <x-ui.input label="Reihenfolge" name="sort_order" id="new-shelf-order" type="number" min="0" max="9999" :value="old('sort_order', $nextOrder)" />
+            <x-ui.select label="Signatur (für den Vorschlag beim Einsortieren)" name="signature_id" id="new-shelf-signature">
+                <option value="">Keine</option>
+                @foreach ($signatureOptions as $id => $display)
+                    <option value="{{ $id }}" @selected(old('signature_id') === $id)>{{ $display }}</option>
+                @endforeach
+            </x-ui.select>
             <x-ui.button type="submit">Hinzufügen</x-ui.button>
         </form>
     </section>
@@ -64,6 +70,12 @@
                             <x-ui.input label="Bezeichnung" name="code" id="code-{{ $shelf->getKey() }}" :value="$shelf->code" maxlength="40" required />
                             <x-ui.input label="Beschriftung" name="label" id="label-{{ $shelf->getKey() }}" :value="$shelf->label" maxlength="120" />
                             <x-ui.input label="Reihenfolge" name="sort_order" id="order-{{ $shelf->getKey() }}" type="number" min="0" max="9999" :value="$shelf->sort_order" />
+                            <x-ui.select label="Signatur" name="signature_id" id="signature-{{ $shelf->getKey() }}">
+                                <option value="">Keine</option>
+                                @foreach ($signatureOptions as $id => $display)
+                                    <option value="{{ $id }}" @selected($shelf->signature_id === $id)>{{ $display }}</option>
+                                @endforeach
+                            </x-ui.select>
                             <label class="bc-checkbox-line"><input type="hidden" name="is_active" value="0"><input type="checkbox" name="is_active" value="1" @checked($shelf->is_active)> Auswählbar</label>
                             <x-ui.button type="submit" variant="secondary">Speichern</x-ui.button>
                         </form>

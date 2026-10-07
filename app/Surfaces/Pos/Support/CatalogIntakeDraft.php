@@ -180,12 +180,12 @@ final class CatalogIntakeDraft
         return $this->details() ?? $this->prefill();
     }
 
-    public function setCopy(?string $shelfLocation, CopyStatus $status): void
+    public function setCopy(?string $shelfLocation, CopyStatus $status, ?string $signatureId = null): void
     {
-        $this->merge(['copy' => ['shelf_location' => $shelfLocation, 'status' => $status->value]]);
+        $this->merge(['copy' => ['shelf_location' => $shelfLocation, 'status' => $status->value, 'signature_id' => $signatureId]]);
     }
 
-    /** @return array{shelf_location: string|null, status: CopyStatus}|null */
+    /** @return array{shelf_location: string|null, status: CopyStatus, signature_id: string|null}|null */
     public function copy(): ?array
     {
         $copy = $this->all()['copy'] ?? null;
@@ -203,6 +203,7 @@ final class CatalogIntakeDraft
         return [
             'shelf_location' => is_string($copy['shelf_location'] ?? null) ? $copy['shelf_location'] : null,
             'status' => $status,
+            'signature_id' => is_string($copy['signature_id'] ?? null) && $copy['signature_id'] !== '' ? $copy['signature_id'] : null,
         ];
     }
 
