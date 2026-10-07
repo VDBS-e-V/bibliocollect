@@ -178,6 +178,16 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Benutzerkonten in der Verwaltung (v0.18.0)
+
+Die Lücke war: Konten für Mitarbeitende, Verwaltung und technische Administration gab es nur über Einrichtungsseite oder Konsole, Rollen nur für Schüler-AG über die Konten der Schüler:innen, und Deaktivieren ging nur beim Austritt.
+
+- **Seite** `/verwaltung/benutzer` (Recht `users.manage`, nur Verwaltung): Liste mit Suche, Filter nach Rolle und Stand (aktiv, eingeladen, deaktiviert).
+- **Konto anlegen und einladen:** Name, E-Mail, mindestens eine Rolle (kombinierbar). Die Person bekommt einen Link zum Festlegen des Passworts; Passwörter vergibt die Verwaltung nie. Der Link bestätigt zugleich die E-Mail-Adresse. Einladung lässt sich erneut senden, auch als „Passwort zurücksetzen“.
+- **Rollen ändern**, **Konto deaktivieren** (mit Grund; laufende Anmeldungen werden sofort beendet) und wieder aktivieren.
+- **Schutz vor Aussperren:** Das letzte aktive Konto mit dem Recht „Benutzerkonten verwalten“ kann weder deaktiviert noch seiner Rolle beraubt werden, das eigene Konto nicht deaktiviert werden.
+- Alle Schritte stehen im Protokoll (`identity.user.*`).
+
 ### Betriebsüberwachung (v0.17.0)
 
 - **Systemzustand** (`/verwaltung/systemzustand`, Recht `system.view`, Verwaltung und technische Administration): Prüfungen für Datenbank, Cron, Warteschlange, Datensicherung, Fehler der letzten 24 Stunden, Mail und Speicherplatz mit Ergebnis in Ordnung, Achtung oder Fehler, dazu die letzten 25 Fehler (gleiche zusammengefasst, nach 30 Tagen aufgeräumt) und ein Knopf „Testmeldung senden“.

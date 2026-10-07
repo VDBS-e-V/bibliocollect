@@ -142,6 +142,13 @@ return [
                     'order' => 35,
                 ],
                 [
+                    'label' => 'Benutzerkonten',
+                    'route' => 'administration.users.index',
+                    'active' => 'administration.users.*',
+                    'permission' => 'users.manage',
+                    'order' => 25,
+                ],
+                [
                     'label' => 'Systemzustand',
                     'route' => 'administration.system.index',
                     'active' => 'administration.system.*',

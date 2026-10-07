@@ -226,3 +226,24 @@
 .bc-wish-form__isbn .bc-field__control {
     flex: 1;
 }
+
+/* Rollenauswahl bei Benutzerkonten */
+.bc-role-list {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.bc-role-option {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+}
+
+.bc-role-option small {
+    display: block;
+    color: var(--text-secondary);
+}

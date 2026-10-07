@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'users.manage' => [
+            'label' => 'Benutzerkonten verwalten',
+            'description' => 'Erlaubt, Konten für Mitarbeitende anzulegen und einzuladen, Rollen zu vergeben und Konten zu deaktivieren.',
+        ],
         'system.view' => [
             'label' => 'Systemzustand einsehen',
             'description' => 'Erlaubt, den Zustand von Cron, Warteschlange, Sicherung und die letzten Fehler einzusehen.',
@@ -159,6 +163,7 @@ return [
                 'shelves.manage',
                 'inventory.renumber',
                 'system.view',
+                'users.manage',
             ],
         ],
         'technical_admin' => [

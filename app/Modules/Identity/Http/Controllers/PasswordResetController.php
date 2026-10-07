@@ -57,6 +57,11 @@ final class PasswordResetController extends Controller
                     'remember_token' => Str::random(60),
                 ])->save();
 
+                // Wer den Link aus der Mail benutzt, hat damit auch bewiesen, dass die Adresse ihm gehört (Einladung neuer Konten).
+                if (! $user->hasVerifiedEmail()) {
+                    $user->markEmailAsVerified();
+                }
+
                 event(new PasswordReset($user));
             },
         );

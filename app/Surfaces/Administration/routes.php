@@ -12,6 +12,7 @@ use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearTransitionController;
 use App\Surfaces\Administration\Http\Controllers\SystemHealthController;
+use App\Surfaces\Administration\Http\Controllers\UserAccountController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.administration.access'])->group(function (): void {
@@ -22,6 +23,17 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/seiten', [ContentPageAdminController::class, 'index'])->name('administration.pages.index');
         Route::get('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'edit'])->name('administration.pages.edit');
         Route::patch('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'update'])->name('administration.pages.update');
+    });
+
+    Route::middleware('permission:users.manage')->group(function (): void {
+        Route::get('/verwaltung/benutzer', [UserAccountController::class, 'index'])->name('administration.users.index');
+        Route::get('/verwaltung/benutzer/neu', [UserAccountController::class, 'create'])->name('administration.users.create');
+        Route::post('/verwaltung/benutzer', [UserAccountController::class, 'store'])->middleware('throttle:20,1')->name('administration.users.store');
+        Route::get('/verwaltung/benutzer/{userId}', [UserAccountController::class, 'edit'])->whereNumber('userId')->name('administration.users.edit');
+        Route::put('/verwaltung/benutzer/{userId}/rollen', [UserAccountController::class, 'updateRoles'])->whereNumber('userId')->name('administration.users.roles');
+        Route::post('/verwaltung/benutzer/{userId}/deaktivieren', [UserAccountController::class, 'disable'])->whereNumber('userId')->name('administration.users.disable');
+        Route::post('/verwaltung/benutzer/{userId}/aktivieren', [UserAccountController::class, 'enable'])->whereNumber('userId')->name('administration.users.enable');
+        Route::post('/verwaltung/benutzer/{userId}/einladen', [UserAccountController::class, 'invite'])->whereNumber('userId')->middleware('throttle:10,1')->name('administration.users.invite');
     });
 
     Route::middleware('permission:system.view')->group(function (): void {
