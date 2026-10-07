@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Vorbereitung Testeinsatz, Block 1: Deutsch und Fehlerseiten (v0.30.0)
+
+Sprache Standard ist Deutsch (Locale und Fallback). Neu: `lang/de/{validation,auth,passwords,pagination}.php` mit Feldnamen und `lang/de.json` (Mail-Fußzeilen, Fehlertitel). Die Bestätigungsmail für Onlinekonten ist deutsch („Bitte bestätige deine E-Mail-Adresse"), ebenso die Meldungen bei falschen Eingaben. Eigene Fehlerseiten (403, 404, 419, 429, 500, 503) im Aussehen der Anwendung unter `resources/views/errors/`; sie hängen nicht an Sitzung oder Datenbank. Plan und weitere Blöcke: `docs/GO_LIVE.md` (folgt in Block 8).
+
 ### Inventur (v0.22.0)
 
 `/betrieb/inventur` (Recht `inventory.count`: Mitarbeiter:innen, Verwaltung, Schüler-AG Erweitert): Eine Inventur beginnen (immer nur eine laufende), Regalbrett wählen und die Inventarnummern der dort stehenden Bücher scannen. Jeder Scan zeigt sofort: richtig einsortiert, steht laut System woanders, hat noch keinen Standort, gilt als verloren oder ausgesondert, oder Nummer unbekannt. Beim Abschließen entsteht der Bericht (auch als Zwischenstand, Druck und CSV): **Fehlt** (laut System am geprüften Regalbrett, nicht gescannt, ausgeliehene zählen nicht), **Falsch einsortiert**, **Ohne Standort**, **Verloren oder ausgesondert, aber im Regal**, **Unbekannt**. Geprüft sind nur Regalbretter, an denen gescannt wurde. „Standorte korrigieren“ setzt falsch eingetragene Standorte und fehlende auf das gefundene Regalbrett (protokolliert); mit Fehlendem passiert nichts automatisch.
