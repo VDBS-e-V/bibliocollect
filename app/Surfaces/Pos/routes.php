@@ -31,9 +31,11 @@ use App\Surfaces\Pos\Http\Controllers\PatronShowController;
 use App\Surfaces\Pos\Http\Controllers\PosHomeController;
 use App\Surfaces\Pos\Http\Controllers\PosScanController;
 use App\Surfaces\Pos\Http\Controllers\PosTerminalController;
+use App\Surfaces\Pos\Http\Controllers\ProcessesController;
 use App\Surfaces\Pos\Http\Controllers\ReservationController;
 use App\Surfaces\Pos\Http\Controllers\ReservationIndexController;
 use App\Surfaces\Pos\Http\Controllers\StatisticsController;
+use App\Surfaces\Pos\Http\Controllers\WishController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(function (): void {
@@ -151,10 +153,18 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::post('/betrieb/ausweise/{cardId}/sperren', [PatronCardController::class, 'block'])->name('pos.labels.cards.block');
     });
 
+    Route::middleware('permission:wishes.manage')->group(function (): void {
+        Route::get('/betrieb/buchwuensche', [WishController::class, 'index'])->name('pos.wishes.index');
+        Route::post('/betrieb/buchwuensche', [WishController::class, 'store'])->name('pos.wishes.store');
+        Route::patch('/betrieb/buchwuensche/{wishId}', [WishController::class, 'update'])->name('pos.wishes.update');
+    });
+
     Route::middleware('permission:statistics.view')->group(function (): void {
         Route::get('/betrieb/statistik', [StatisticsController::class, 'show'])->name('pos.statistics');
         Route::get('/betrieb/statistik.csv', [StatisticsController::class, 'download'])->name('pos.statistics.download');
     });
+
+    Route::get('/betrieb/vorgaenge', ProcessesController::class)->name('pos.processes');
 
     Route::get('/betrieb/hilfe', [HelpController::class, 'index'])->name('pos.help');
     Route::get('/betrieb/hilfe/{topic}', [HelpController::class, 'show'])->name('pos.help.show');

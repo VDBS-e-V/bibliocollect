@@ -8,6 +8,8 @@ use App\Foundation\Support\BusinessClock;
 use App\Modules\Catalog\Enums\MetadataReviewStatus;
 use App\Modules\Catalog\Models\CatalogMetadataReview;
 use App\Modules\Circulation\Enums\ReservationStatus;
+use App\Modules\Circulation\Enums\WishStatus;
+use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\School\Models\LibraryClosure;
@@ -42,6 +44,10 @@ final class PosHomeController
             $tiles[] = ['label' => 'Heute fällig', 'value' => (clone $open)->whereDate('due_on', $todayDate)->count(), 'url' => null, 'warn' => false];
             $tiles[] = ['label' => 'Zur Abholung zurückgelegt', 'value' => Reservation::query()->where('status', ReservationStatus::Ready->value)->count(), 'url' => route('pos.reservations.index'), 'warn' => false];
             $tiles[] = ['label' => 'Wartende Vormerkungen', 'value' => Reservation::query()->where('status', ReservationStatus::Waiting->value)->count(), 'url' => route('pos.reservations.index'), 'warn' => false];
+        }
+
+        if (Gate::allows('wishes.manage')) {
+            $tiles[] = ['label' => 'Neue Buchwünsche', 'value' => BookWish::query()->where('status', WishStatus::New->value)->count(), 'url' => route('pos.wishes.index'), 'warn' => false];
         }
 
         if (Gate::allows('catalog.manage')) {

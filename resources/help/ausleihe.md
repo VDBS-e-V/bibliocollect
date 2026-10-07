@@ -23,6 +23,14 @@ Fehler in der Liste kannst du mit **Entfernen** zurücknehmen, solange du nicht 
 - **Auf der Kontoseite** (Ausleihkonten, Person öffnen) siehst du alle Ausweise der Person mit Status. Dort kannst du einen Ausweis **sperren** (verloren, defekt, eingezogen) oder einen **neuen ausstellen**; der bisherige wird dabei gesperrt.
 - **Ohne Ausweis:** Namen oder Bibliotheksnummer in das Scanfeld eingeben und die Person auswählen.
 
+## Buchwünsche
+
+Leser:innen können sich in „Mein Konto“ Bücher wünschen, du kannst Wünsche auch am Tresen eintragen (**Buchwünsche** in der Navigation). Setze den Stand (angenommen, bestellt, ist da oder abgelehnt) und schreibe bei Bedarf eine kurze Antwort; die Person bekommt eine Mail und sieht beides in ihrem Konto. Der Hinweis „weitere Wünsche für diesen Titel“ zeigt, was mehrere wollen.
+
+## Alle Vorgänge
+
+Unter **Alle Vorgänge** findest du alles, was du in der Bibliothek tun kannst, nach Aufgaben geordnet, auch Statistik, Klassenlisten und Katalogpflege.
+
 ## Nur Rückgabe
 
 Auf dem Startbildschirm brauchst du keine Person. Scanne einfach die zurückgegebenen Medien nacheinander und klicke auf **Rückgaben bestätigen**. Hat jemand das Medium vorgemerkt, steht auf dem Beleg, **für wen du es zurücklegen** sollst.

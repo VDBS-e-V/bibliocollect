@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Privacy\Services;
 
 use App\Models\User;
+use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Patrons\Models\Patron;
@@ -83,6 +84,19 @@ final class PatronDataExport
                     'status' => $card->status->value,
                     'zugeordnet_am' => $card->assigned_at?->toIso8601String(),
                     'gesperrt_am' => $card->blocked_at?->toIso8601String(),
+                ])->all(),
+            'buchwuensche' => BookWish::query()
+                ->where('patron_id', $patron->getKey())
+                ->orderBy('created_at')
+                ->get()
+                ->map(static fn (BookWish $wish): array => [
+                    'titel' => $wish->title,
+                    'autor' => $wish->author,
+                    'isbn' => $wish->isbn,
+                    'anmerkung' => $wish->note,
+                    'status' => $wish->status->value,
+                    'antwort' => $wish->answer,
+                    'abgegeben_am' => $wish->created_at?->toIso8601String(),
                 ])->all(),
             'sperren' => PatronBlockEvent::query()
                 ->where('patron_id', $patron->getKey())

@@ -178,6 +178,11 @@ v0.5.0 führt den ersten Ausleih- und Rückgabe-Workflow ein:
 - Mahnungen, Gebühren und Einsicht in die Ausleihhistorie bleiben Folgeschritte.
 - Die Details stehen in `docs/T4_CIRCULATION.md`.
 
+### Vorgangsorientierte Navigation und Buchwünsche (v0.12.0)
+
+- **Navigation des Bibliotheksbetriebs** nach Vorgängen: Arbeitsplatz, Ausleihe und Rückgabe, Ausweise ausgeben, Vormerkungen, Buchwünsche, Medium erfassen, Ausleihkonten, Alle Vorgänge, Hilfe. Statistik, Klassenlisten und Katalogpflege stehen auf der neuen Seite **Alle Vorgänge** (`/betrieb/vorgaenge`, definiert in `config/processes.php`; zeigt je Konto nur die erlaubten Vorgänge, gruppiert nach Aufgaben).
+- **Buchwünsche** (Tabelle `circulation_book_wishes`, Recht `wishes.manage` für Mitarbeiter:innen und Verwaltung): Leser:innen geben Wünsche in „Mein Konto“ ab (`/konto/buchwuensche`: Titel, Autor:in, ISBN, Anmerkung; höchstens 3 offene, keine Doppelten, ISBN-Prüfung, zurückziehbar) und sehen Stand und Antwort. Am Arbeitsplatz (`/betrieb/buchwuensche`) werden sie gefiltert, gesucht, mit Hinweis auf weitere Wünsche für denselben Titel angezeigt; Stand setzen (angenommen, bestellt, ist da, abgelehnt) mit kurzer Antwort, dabei geht eine Mail an die Person. Wünsche lassen sich auch am Tresen erfassen (mit oder ohne Bibliotheksnummer). Im öffentlichen Katalog führt „Nichts gefunden“ zum Wunschformular. Abgeschlossene Wünsche verlieren nach der Aufbewahrungsfrist den Personenbezug, die Auskunft enthält die Wünsche der Person. Kachel „Neue Buchwünsche“ am Arbeitsplatz.
+
 ### Nicht personalisierte Ausweise (nach v0.9.0)
 
 - **Modell:** Ein Ausweis trägt Logo, ein Feld „Name“ zum Selbsteintragen und einen Strichcode mit zufälliger Ausweisnummer (10 Ziffern, Luhn-Prüfziffer, nie fortlaufend, nie wieder vergeben; Tabelle `patron_cards`, Nummern werden nie gelöscht). Klasse oder Bibliotheksnummer stehen nicht darauf, der Ausweis überlebt Klassenwechsel.

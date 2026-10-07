@@ -64,6 +64,10 @@ return [
             'label' => 'Informationsseiten bearbeiten',
             'description' => 'Erlaubt das Bearbeiten von Impressum, Datenschutzerklärung und Erklärung zur Barrierefreiheit.',
         ],
+        'wishes.manage' => [
+            'label' => 'Buchwünsche bearbeiten',
+            'description' => 'Erlaubt, Buchwünsche anzusehen, selbst zu erfassen und den Stand zu setzen.',
+        ],
         'statistics.view' => [
             'label' => 'Statistik einsehen',
             'description' => 'Erlaubt Kennzahlen zur Ausleihe und zum Bestand (nur Zählwerte, keine Personen).',
@@ -113,6 +117,7 @@ return [
                 'circulation.manage',
                 'circulation.reports',
                 'statistics.view',
+                'wishes.manage',
             ],
         ],
         'management' => [
@@ -136,6 +141,7 @@ return [
                 'content.manage',
                 'circulation.reports',
                 'statistics.view',
+                'wishes.manage',
             ],
         ],
         'technical_admin' => [

@@ -27,6 +27,9 @@
             <strong>Mein Konto</strong>
             <a href="#ausleihen">Ausleihen</a>
             <a href="#vormerkungen">Vormerkungen</a>
+            @if (! $preview)
+                <a href="{{ route('portal.wishes.index') }}">Buchwünsche</a>
+            @endif
         </aside>
 
         <div class="bc-work-layout__main">

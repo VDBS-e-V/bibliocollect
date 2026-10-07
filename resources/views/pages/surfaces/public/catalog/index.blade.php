@@ -124,6 +124,7 @@
                     <x-ui.button href="{{ route('public.catalog.index') }}" variant="secondary">Gesamten Katalog anzeigen</x-ui.button>
                     <x-ui.button href="{{ route('public.catalog.advanced') }}" variant="secondary">Erweiterte Suche</x-ui.button>
                 </div>
+                <p>Fehlt dir ein Buch? <a href="{{ route('portal.wishes.index', array_filter(['titel' => request('q')])) }}">Wünsch es dir.</a> (Anmeldung nötig)</p>
             </div>
         @else
             <x-catalog.pagination-controls

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Surfaces\Portal\Http\Controllers\PortalCirculationController;
 use App\Surfaces\Portal\Http\Controllers\PortalHomeController;
+use App\Surfaces\Portal\Http\Controllers\PortalWishController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'permission:surface.portal.access'])->group(function (): void {
@@ -17,6 +18,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.portal.access'])->gro
 
     Route::get('/konto/meine-daten', [PortalCirculationController::class, 'myData'])
         ->name('portal.my-data');
+
+    Route::get('/konto/buchwuensche', [PortalWishController::class, 'index'])->name('portal.wishes.index');
+    Route::post('/konto/buchwuensche', [PortalWishController::class, 'store'])->middleware('throttle:20,1')->name('portal.wishes.store');
+    Route::post('/konto/buchwuensche/{wishId}/zurueckziehen', [PortalWishController::class, 'withdraw'])->name('portal.wishes.withdraw');
 
     Route::post('/konto/vormerkungen', [PortalCirculationController::class, 'reserve'])
         ->name('portal.reservations.store');

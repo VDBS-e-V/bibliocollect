@@ -26,4 +26,7 @@ return [
     // Vormerkungen: Tage, die ein bereitgelegtes Exemplar abholbereit bleibt, und Höchstzahl offener Vormerkungen je Ausleihkonto.
     'reservation_pickup_days' => 7,
     'max_open_reservations' => 5,
+
+    // Buchwünsche: Höchstzahl offener Wünsche je Ausleihkonto.
+    'max_open_wishes' => 3,
 ];

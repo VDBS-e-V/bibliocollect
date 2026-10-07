@@ -1,6 +1,6 @@
 # Funktionen, die vor dem Echteinsatz noch fehlen
 
-Stand: nach der klassenweisen Ausweisausgabe (v0.11.0). Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
+Stand: v0.12.0 (nach Buchwünschen und vorgangsorientierter Navigation). Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
 
 Die Einstufung ist ein Vorschlag: **Muss** = ohne das würde ich nicht starten, **Sollte** = im ersten Halbjahr, **Kann** = bei Bedarf.
 
@@ -32,7 +32,7 @@ Die Einstufung ist ein Vorschlag: **Muss** = ohne das würde ich nicht starten, 
 
 | Funktion | Warum | Aufwand |
 |---|---|---|
-| **Buchwünsche und Merkliste/Favoriten** | Schön für Leser:innen, für den Start nicht nötig. | mittel |
+| **Merkliste/Favoriten** | Schön für Leser:innen, für den Start nicht nötig. (Buchwünsche sind seit v0.12.0 umgesetzt.) | mittel |
 | **Zeitraumsvormerkungen und Click & Collect** | Wird erst gebraucht, wenn die Nachfrage das zeigt. | mittel |
 | **Zählung der gedruckten Ausweise je Motiv** | Hilft bei gleichmäßigem Bestand; heute stellst du die Prozente von Hand ein. | klein |
 | **Gebührenfreie Verlustregeln** (Ersatzbeschaffung, Hinweistexte) | Nur nötig, wenn ihr Verlust regeln wollt. | klein |

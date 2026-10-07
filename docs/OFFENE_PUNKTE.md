@@ -1,6 +1,6 @@
 # Offene Punkte vor dem Start
 
-Stand: v0.11.0. Fehlende Funktionen vor dem Echteinsatz: siehe `docs/VOR_ECHTEINSATZ.md`. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
+Stand: v0.12.0. Fehlende Funktionen vor dem Echteinsatz: siehe `docs/VOR_ECHTEINSATZ.md`. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
 
 ## A. Muss vor dem Start
 
@@ -24,7 +24,7 @@ Stand: v0.11.0. Fehlende Funktionen vor dem Echteinsatz: siehe `docs/VOR_ECHTEIN
 | ✔ | Statistik | `/betrieb/statistik`: Kennzahlen, Ausleihen je Monat, beliebteste Titel, nach Klasse und Medientyp, Bestand; Zeitraum je Schuljahr, letzte 12 Monate oder gesamt; CSV-Download und Druck. Ein fertiger „Jahresbericht“ als Text fehlt |
 | ☐ | Pflege von Signaturen und Themen, Inventur | offen |
 | ☐ | Filter „nur verfügbare Titel“ | offen |
-| ☐ | Buchwünsche, Merkliste/Favoriten | offen |
+| ◐ | Buchwünsche, Merkliste/Favoriten | Buchwünsche sind da (Portal, Arbeitsplatz, Mails, Datenschutz). Merkliste/Favoriten offen |
 | ☐ | Ausleihkonten-Import: vorhandene Konten aktualisieren | offen |
 | ☐ | Schuljahreswechsel: Teilwechsel, Rückgängig | offen |
 | ☐ | Zeitraumsvormerkungen / Click & Collect | offen |
