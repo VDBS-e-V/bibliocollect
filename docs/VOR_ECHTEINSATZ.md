@@ -1,12 +1,12 @@
 # Funktionen, die vor dem Echteinsatz noch fehlen
 
-Stand: v0.20.0. Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
+Stand: v0.23.0. Diese Liste enthält nur **Funktionen, die gebaut werden müssen**. Aufgaben für den Betreiber (Texte, Zugänge, Tests auf der echten Umgebung) stehen weiter in `docs/OFFENE_PUNKTE.md`.
 
 Die Einstufung ist ein Vorschlag: **Muss** = ohne das würde ich nicht starten, **Sollte** = im ersten Halbjahr, **Kann** = bei Bedarf.
 
 ## Muss
 
-Alle Punkte der früheren „Muss“-Liste sind umgesetzt bis auf den Notbetrieb, der bewusst verschoben wurde.
+Alle Punkte der früheren „Muss“-Liste sind umgesetzt.
 
 | Funktion | Stand |
 |---|---|
@@ -14,7 +14,7 @@ Alle Punkte der früheren „Muss“-Liste sind umgesetzt bis auf den Notbetrieb
 | Benutzerverwaltung für Mitarbeitende | ✔ v0.18.0: Konten anlegen und einladen, Rollen, Deaktivieren, Schutz vor Aussperren |
 | Signaturen und Themen pflegen, Bücher zuordnen | ✔ v0.19.0, mit Regalbrett-Vorschlag beim Einsortieren |
 | Aussonderung von Exemplaren | ✔ v0.20.0 |
-| **Notbetrieb bei Ausfall** (Liste „Offene Ausleihen und Vormerkungen“ jederzeit abrufbar, Papierausleihen mit frei wählbarem Datum nachtragen) | verschoben |
+| Notbetrieb bei Ausfall (Notfallliste, Papierausleihen und -rückgaben mit Datum nachtragen) | ✔ v0.23.0 |
 
 ## Sollte
 
