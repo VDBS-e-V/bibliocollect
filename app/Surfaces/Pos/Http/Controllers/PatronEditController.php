@@ -34,6 +34,7 @@ final class PatronEditController
         UpdatePatronAction $update,
     ): RedirectResponse {
         $patron = $update->execute($findPatron->byId($patronId), $request->toData());
+        $patron->forceFill(['reminders_enabled' => $request->boolean('reminders_enabled', true)])->save();
 
         return redirect()
             ->route('pos.patrons.show', ['patronId' => $patron->getKey()])

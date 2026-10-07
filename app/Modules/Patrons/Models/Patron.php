@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property string $last_name
  * @property Carbon $birth_date
  * @property string|null $email
+ * @property bool $reminders_enabled
  * @property Carbon|null $leaving_on
  * @property Carbon|null $created_at
  * @property Carbon|null $blocked_at
@@ -40,6 +41,7 @@ final class Patron extends Model
         'last_name',
         'birth_date',
         'email',
+        'reminders_enabled',
         'school_class_id',
         'leaving_on',
         'blocked_at',
@@ -82,6 +84,7 @@ final class Patron extends Model
             'status' => PatronStatus::class,
             'birth_date' => 'date',
             'leaving_on' => 'date',
+            'reminders_enabled' => 'boolean',
             'blocked_at' => 'datetime',
         ];
     }

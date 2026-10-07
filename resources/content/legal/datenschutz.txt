@@ -17,7 +17,7 @@ Datenschutzbeauftragte:r: [BITTE ERGÄNZEN: Name und Kontakt, oder streichen, fa
 - Bibliotheksausweis: Eine zufällige Ausweisnummer und die Zuordnung zu deinem Ausleihkonto. Auf dem Ausweis stehen nur die Nummer und der Name, den du selbst einträgst.
 - Onlinekonto (nur wenn du eines hast): Name, E-Mail-Adresse, ein verschlüsseltes Passwort, deine Rollen und ob du Erinnerungen per E-Mail bekommst.
 - Ausleihen, Verlängerungen, Vormerkungen und Belege: Welches Medium du wann ausgeliehen, verlängert, zurückgegeben oder vorgemerkt hast.
-- Erinnerungen: Welche Erinnerungs-E-Mails wir dir geschickt haben, damit sie nicht doppelt kommen.
+- Erinnerungen: Welche Erinnerungs-E-Mails wir dir geschickt haben, damit sie nicht doppelt kommen, und ob am Ausleihkonto Erinnerungen an die hinterlegte Adresse gehen sollen.
 - Buchwünsche: Titel, Autor:in, ISBN und deine Bemerkung. Wenn du eingeloggt bist, gehört der Wunsch zu deinem Konto. Als Gast kannst du freiwillig Name und E-Mail angeben, damit wir dir antworten können.
 - Protokoll: Wichtige Vorgänge in der Bibliothek (zum Beispiel Ausleihe, Katalogänderungen, Kontoänderungen) mit dem handelnden Konto und der Uhrzeit, damit Änderungen nachvollziehbar bleiben.
 - Technische Daten: Beim Aufruf der Seiten entstehen kurzzeitig technische Angaben wie IP-Adresse und Zeitpunkt in den Protokolldateien des Servers. Wir nutzen sie nur, um Fehler zu finden und die Sicherheit zu gewährleisten.
@@ -54,7 +54,7 @@ Wir setzen nur technisch nötige Cookies: ein Sitzungs-Cookie, ein Schutz-Cookie
 Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15 bis 21 DSGVO). Konkret:
 
 - Alle zu dir gespeicherten Daten kannst du in deinem Konto unter „Meine gespeicherten Daten herunterladen“ abrufen.
-- Erinnerungs-E-Mails kannst du in deinem Konto abschalten.
+- Erinnerungs-E-Mails kannst du in deinem Konto abschalten. Hast du kein Onlinekonto, aber eine E-Mail-Adresse am Ausleihkonto, schicken wir die Erinnerungen an diese Adresse (Rückgabe bald fällig, überfällig, Vormerkung abholbereit). Wenn du das nicht möchtest, sag es in der Bibliothek, dann schalten wir es ab.
 - Für alles andere wende dich an die Bibliothek oder an die oben genannte Stelle.
 - Du kannst dich bei einer Datenschutzaufsichtsbehörde beschweren, zum Beispiel bei [BITTE ERGÄNZEN: zuständige Landesbeauftragte:r für den Datenschutz mit Anschrift].
 

@@ -34,6 +34,7 @@ final class PatronCreateController
         try {
             $patron = DB::transaction(function () use ($request, $create, $assignCard) {
                 $patron = $create->execute($request->toData());
+                $patron->forceFill(['reminders_enabled' => $request->boolean('reminders_enabled', true)])->save();
                 $assignCard->execute($request->cardNumber(), $patron);
 
                 return $patron;

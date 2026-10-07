@@ -15,6 +15,8 @@ final class LibraryReminder extends Notification
         public readonly string $titleName,
         public readonly string $date,
         public readonly int $daysOverdue = 0,
+        /** Vorname bei Erinnerungen an die Adresse eines Ausleihkontos ohne Onlinekonto. */
+        public readonly ?string $recipientName = null,
     ) {}
 
     /** @return list<string> */
@@ -25,13 +27,15 @@ final class LibraryReminder extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $message = (new MailMessage)->greeting('Hallo!');
+        $message = (new MailMessage)
+            ->greeting($this->recipientName !== null && $this->recipientName !== '' ? 'Hallo '.$this->recipientName.',' : 'Hallo,')
+            ->salutation('Viele Grüße, deine Schulbibliothek');
 
         return match ($this->kind) {
             'loan_due_soon' => $message
                 ->subject('Erinnerung: Rückgabe bald fällig')
                 ->line("„{$this->titleName}“ ist am {$this->date} fällig.")
-                ->line('Du kannst die Ausleihe im Portal verlängern, solange niemand den Titel vorgemerkt hat.'),
+                ->line($this->recipientName !== null ? 'Wenn du mehr Zeit brauchst, komm in der Bibliothek vorbei: Verlängern geht, solange niemand den Titel vorgemerkt hat.' : 'Du kannst die Ausleihe im Portal verlängern, solange niemand den Titel vorgemerkt hat.'),
             'loan_overdue' => $message
                 ->subject('Erinnerung: Rückgabe überfällig')
                 ->line("„{$this->titleName}“ war am {$this->date} fällig, das sind {$this->daysOverdue} Tage.")

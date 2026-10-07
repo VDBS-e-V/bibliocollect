@@ -128,6 +128,15 @@
                     :error="$errors->first('email')"
                     autocomplete="email"
                 />
+
+                <div class="bc-field">
+                    <input type="hidden" name="reminders_enabled" value="0">
+                    <label class="bc-public-catalog-filter__check" for="reminders_enabled">
+                        <input id="reminders_enabled" name="reminders_enabled" type="checkbox" value="1" @checked((bool) old('reminders_enabled', $patron?->reminders_enabled ?? true))>
+                        <span><strong>Erinnerungen an diese E-Mail-Adresse schicken</strong></span>
+                    </label>
+                    <p class="bc-field__hint">Rückgabe bald fällig, überfällig, Vormerkung abholbereit. Gilt für Konten ohne eigenes Onlinekonto; mit Onlinekonto stellt die Person das selbst ein.</p>
+                </div>
             </div>
         </section>
 

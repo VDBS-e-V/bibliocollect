@@ -12,7 +12,8 @@ use Illuminate\Support\Carbon;
  * Merkt sich, welche Erinnerung bereits verschickt wurde, damit jede nur einmal ankommt.
  *
  * @property string $id
- * @property int $user_id
+ * @property int|null $user_id
+ * @property string|null $patron_id
  * @property string $kind
  * @property string $subject_id
  * @property string $stage
@@ -25,7 +26,7 @@ final class ReminderLog extends Model
     protected $table = 'reminder_logs';
 
     /** @var list<string> */
-    protected $fillable = ['user_id', 'kind', 'subject_id', 'stage', 'sent_at'];
+    protected $fillable = ['user_id', 'patron_id', 'kind', 'subject_id', 'stage', 'sent_at'];
 
     /** @return array<string, string> */
     protected function casts(): array

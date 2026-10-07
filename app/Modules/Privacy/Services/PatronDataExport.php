@@ -41,6 +41,7 @@ final class PatronDataExport
                 'austritt_am' => $patron->leaving_on?->toDateString(),
                 'gesperrt_seit' => $patron->blocked_at?->toIso8601String(),
                 'sperrgrund' => $patron->blocked_reason,
+                'erinnerungen_an_kontoadresse' => (bool) $patron->reminders_enabled,
                 'angelegt_am' => $patron->created_at?->toIso8601String(),
             ],
             'onlinekonto' => $user instanceof User ? [
