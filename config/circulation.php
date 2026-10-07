@@ -30,6 +30,9 @@ return [
     // Puffer in Tagen für die Wartezeit einer Vormerkung: Leihfrist + eine Verlängerung + dieser Puffer.
     'reservation_buffer_days' => 7,
 
+    // Wie viele Vormerkungen je aktivem Exemplar eines Titels angenommen werden (1 = die Warteschlange ist nie länger als die Zahl der Exemplare).
+    'max_reservations_per_copy' => 1,
+
     // Buchwünsche: Höchstzahl offener Wünsche je Ausleihkonto.
     'max_open_wishes' => 3,
 ];

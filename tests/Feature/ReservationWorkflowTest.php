@@ -18,6 +18,7 @@ use App\Modules\Circulation\Exceptions\LoanStateConflict;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
+use App\Modules\Circulation\Services\LoanPolicy;
 use App\Modules\Identity\Actions\AssignRoleAction;
 use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Enums\PatronStatus;
@@ -83,6 +84,9 @@ function rsvPlace(Patron $patron, string $identifier, User $actor): Reservation
 }
 
 beforeEach(function (): void {
+    // Die Warteschlangen-Tests brauchen mehrere Wartende je Exemplar; die Grenze selbst prüft ein eigener Test.
+    config(['circulation.max_reservations_per_copy' => 5]);
+
     CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-10-05 10:00:00', 'Europe/Berlin'));
 
     foreach (range(1, 5) as $dayOfWeek) {
@@ -407,4 +411,56 @@ it('never allows two open reservations of one title for one account, even past t
     // Ist die erste Vormerkung abgeschlossen, ist eine neue wieder möglich.
     app(CancelReservationAction::class)->execute($first, $actor);
     expect(rsvPlace($waiter, $copy->barcode, $actor)->status)->toBe(ReservationStatus::Waiting);
+});
+
+it('stops reservations once the queue is as long as the number of copies and names the waiting time', function (): void {
+    config(['circulation.max_reservations_per_copy' => 1, 'circulation.reservation_buffer_days' => 7, 'circulation.default_loan_period_days' => 14, 'circulation.renewal_period_days' => null]);
+
+    [, , [$copy]] = rsvTitle('Wartebuch', 1, '9783000000100');
+    $actor = rsvActor();
+    $holder = rsvPatron('S-WZ-1');
+    $first = rsvPatron('S-WZ-2');
+    $second = rsvPatron('S-WZ-3');
+
+    rsvCheckout($holder, $copy, $actor);
+    rsvPlace($first, $copy->barcode, $actor);
+
+    // Ein Exemplar, eine Wartende: weitere Vormerkungen würden über Leihfrist (14) + Verlängerung (14) + Puffer (7) = 35 Tage dauern.
+    expect(fn () => rsvPlace($second, $copy->barcode, $actor))
+        ->toThrow(CirculationRuleViolation::class, '35 Tage');
+
+    expect(Reservation::query()->where('patron_id', $second->getKey())->exists())->toBeFalse();
+});
+
+it('allows as many reservations as there are copies and follows the rules settings', function (): void {
+    config(['circulation.max_reservations_per_copy' => 1]);
+
+    [, , $copies] = rsvTitle('Zweibuch', 2, '9783000000101');
+    $actor = rsvActor();
+    $holders = [rsvPatron('S-WZ-4'), rsvPatron('S-WZ-5')];
+    $waiters = [rsvPatron('S-WZ-6'), rsvPatron('S-WZ-7'), rsvPatron('S-WZ-8')];
+
+    rsvCheckout($holders[0], $copies[0], $actor);
+    rsvCheckout($holders[1], $copies[1], $actor);
+
+    rsvPlace($waiters[0], $copies[0]->barcode, $actor);
+    rsvPlace($waiters[1], $copies[0]->barcode, $actor);
+
+    // Zwei Exemplare, zwei Wartende: die dritte Vormerkung ist zu viel.
+    expect(fn () => rsvPlace($waiters[2], $copies[0]->barcode, $actor))->toThrow(CirculationRuleViolation::class, 'Tage Puffer');
+
+    // Die Verwaltung erlaubt zwei Wartende je Exemplar.
+    config(['circulation.max_reservations_per_copy' => 2]);
+    expect(rsvPlace($waiters[2], $copies[0]->barcode, $actor)->status)->toBe(ReservationStatus::Waiting);
+});
+
+it('calculates the waiting window from the current rules', function (): void {
+    config(['circulation.default_loan_period_days' => 10, 'circulation.renewal_period_days' => 5, 'circulation.reservation_buffer_days' => 3]);
+
+    $window = app(LoanPolicy::class)->reservationWindow(rsvPatron('S-WZ-9'));
+
+    expect($window)->toBe(['loan' => 10, 'renewal' => 5, 'buffer' => 3, 'total' => 18]);
+
+    config(['circulation.renewal_period_days' => null, 'circulation.reservation_buffer_days' => 0]);
+    expect(app(LoanPolicy::class)->reservationWindow(rsvPatron('S-WZ-10'))['total'])->toBe(20);
 });

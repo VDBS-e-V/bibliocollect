@@ -29,6 +29,20 @@ final class LoanPolicy
         return max(1, (int) ($byKind[$patron->kind->value] ?? config('circulation.default_loan_period_days', 14)));
     }
 
+    /**
+     * Wartezeit-Grenze einer Vormerkung: Leihfrist + eine Verlängerung + Puffer (alles aus den Regeln, also dynamisch).
+     *
+     * @return array{loan: int, renewal: int, buffer: int, total: int}
+     */
+    public function reservationWindow(Patron $patron, ?Edition $edition = null): array
+    {
+        $loan = $this->periodDays($patron, $edition);
+        $renewal = max(1, (int) (config('circulation.renewal_period_days') ?? $loan));
+        $buffer = max(0, (int) config('circulation.reservation_buffer_days', 7));
+
+        return ['loan' => $loan, 'renewal' => $renewal, 'buffer' => $buffer, 'total' => $loan + $renewal + $buffer];
+    }
+
     /** Höchstzahl gleichzeitig ausgeliehener Medien; 0 oder weniger bedeutet „unbegrenzt“. */
     public function maxOpenLoans(Patron $patron): int
     {

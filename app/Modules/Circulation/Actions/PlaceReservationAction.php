@@ -18,6 +18,7 @@ use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
+use App\Modules\Circulation\Services\LoanPolicy;
 use App\Modules\Patrons\Models\Patron;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,7 @@ final readonly class PlaceReservationAction
         private BusinessClock $clock,
         private CirculationRuleEvaluator $rules,
         private CopyAvailabilityService $availability,
+        private LoanPolicy $policy,
         private CatalogIsbnNormalizer $isbn,
         private AuditRecorder $audit,
     ) {}
@@ -129,12 +131,26 @@ final readonly class PlaceReservationAction
             $violations[] = 'Ein Exemplar dieses Titels ist verfügbar und kann direkt ausgeliehen werden.';
         }
 
-        if (Reservation::query()
+        $alreadyReserved = Reservation::query()
             ->where('patron_id', $patron->getKey())
             ->where('title_id', $titleId)
             ->whereIn('status', ReservationStatus::openValues())
-            ->exists()) {
+            ->exists();
+
+        if ($alreadyReserved) {
             $violations[] = 'Dieser Titel ist für das Ausleihkonto bereits vorgemerkt.';
+        }
+
+        // Wartezeit-Grenze: Es werden nur so viele Vormerkungen angenommen, wie der Titel Exemplare hat. So wartet niemand
+        // länger als Leihfrist + eine Verlängerung + Puffer.
+        if (! $alreadyReserved && $availability->hasActiveCopies() && ! $availability->isAvailable()) {
+            $queue = $availability->waitingReservations + $availability->heldCopies;
+            $perCopy = max(1, (int) config('circulation.max_reservations_per_copy', 1));
+
+            if ($queue >= $availability->activeCopies * $perCopy) {
+                $window = $this->policy->reservationWindow($patron, $editions[0] ?? null);
+                $violations[] = "Für diesen Titel sind schon {$queue} Vormerkung(en) bei {$availability->activeCopies} Exemplar(en) offen. Eine weitere würde länger als {$window['total']} Tage dauern (Leihfrist {$window['loan']} + Verlängerung {$window['renewal']} + {$window['buffer']} Tage Puffer). Bitte versuche es später noch einmal.";
+            }
         }
 
         $editionIds = array_map(static fn (Edition $edition): string => (string) $edition->getKey(), $editions);

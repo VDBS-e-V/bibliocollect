@@ -53,6 +53,7 @@ final class SettingsRegistry
                 'items' => [
                     $this->int('circulation.max_open_reservations', 'Offene Vormerkungen je Person', 0, 50, hint: '0 = Vormerken ist ausgeschaltet'),
                     $this->int('circulation.reservation_pickup_days', 'Abholfrist für zurückgelegte Medien (Tage)', 1, 30),
+                    $this->int('circulation.max_reservations_per_copy', 'Vormerkungen je Exemplar eines Titels', 1, 10, hint: 'Begrenzt die Warteschlange: 1 = nie mehr Vormerkungen als Exemplare'),
                     $this->int('circulation.reservation_buffer_days', 'Puffer für die Wartezeit einer Vormerkung (Tage)', 0, 60, hint: 'Wartezeit-Grenze = Leihfrist + eine Verlängerung + dieser Puffer'),
                 ],
             ],
