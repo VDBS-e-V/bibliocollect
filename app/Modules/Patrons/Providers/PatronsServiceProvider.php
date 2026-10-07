@@ -24,8 +24,7 @@ final class PatronsServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        if ($this->app->runningInConsole()) {
-            $this->commands([IssuePatronLinkCodeCommand::class]);
-        }
+        // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
+        $this->commands([IssuePatronLinkCodeCommand::class]);
     }
 }

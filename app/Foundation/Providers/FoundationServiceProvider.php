@@ -51,14 +51,13 @@ final class FoundationServiceProvider extends ServiceProvider
             );
         }
 
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                FoundationCheckCommand::class,
-                CronCommand::class,
-                DoctorCommand::class,
-                BackupDatabaseCommand::class,
-                MailTestCommand::class,
-            ]);
-        }
+        // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
+        $this->commands([
+            FoundationCheckCommand::class,
+            CronCommand::class,
+            DoctorCommand::class,
+            BackupDatabaseCommand::class,
+            MailTestCommand::class,
+        ]);
     }
 }

@@ -11,8 +11,7 @@ final class PrivacyServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([AnonymizeExpiredDataCommand::class]);
-        }
+        // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
+        $this->commands([AnonymizeExpiredDataCommand::class]);
     }
 }
