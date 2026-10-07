@@ -18,10 +18,22 @@
     $areas = collect([
         ['label' => 'Startseite', 'url' => route('public.home'), 'permission' => null, 'current' => request()->routeIs('public.home')],
         ['label' => 'Katalog', 'url' => route('public.catalog.index'), 'permission' => null, 'current' => $surface === 'public' && ! request()->routeIs('public.home')],
-        ['label' => 'Mein Konto', 'url' => route('portal.home'), 'permission' => 'surface.portal.access', 'current' => $surface === 'portal'],
+        ['label' => 'Mein Konto', 'url' => route('portal.home'), 'permission' => 'surface.portal.access', 'current' => $surface === 'portal', 'menu' => true],
         ['label' => 'Bibliotheksbetrieb', 'url' => route('pos.home'), 'permission' => 'surface.pos.access', 'current' => $surface === 'pos'],
         ['label' => 'Verwaltung', 'url' => route('administration.home'), 'permission' => 'surface.administration.access', 'current' => $surface === 'administration'],
     ])->filter(static fn (array $area): bool => $area['permission'] === null || Gate::allows($area['permission']))->values();
+
+    // Oben stehen die Bereiche, „Mein Konto“ gehört ins Profilmenü neben die Abmeldung.
+    $topAreas = $areas->reject(static fn (array $area): bool => ($area['menu'] ?? false) === true)->values();
+    $accountAreas = $areas->filter(static fn (array $area): bool => ($area['menu'] ?? false) === true || in_array($area['label'], ['Bibliotheksbetrieb', 'Verwaltung'], true))->values();
+
+    $profile = auth()->user();
+    $initials = '';
+
+    if ($profile !== null) {
+        $words = preg_split('/\s+/u', trim((string) $profile->name), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $initials = mb_strtoupper(mb_substr($words[0] ?? '?', 0, 1).(count($words) > 1 ? mb_substr($words[count($words) - 1], 0, 1) : ''));
+    }
 @endphp
 
 <!DOCTYPE html>
@@ -41,21 +53,10 @@
             <div class="bc-utility-bar__inner">
                 <span>VDBS e. V.</span>
                 <div class="bc-utility-bar__actions">
-                    @foreach ($areas as $area)
+                    @foreach ($topAreas as $area)
                         <a href="{{ $area['url'] }}" @if ($area['current']) aria-current="page" class="bc-utility-link--current" @endif>{{ $area['label'] }}</a>
                         <span aria-hidden="true">·</span>
                     @endforeach
-                    @auth
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="bc-utility-link">Abmelden</button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}">Anmelden</a>
-                        <span aria-hidden="true">·</span>
-                        <a href="{{ route('identity.claim.create') }}">Konto aktivieren</a>
-                        <span aria-hidden="true">·</span>
-                    @endauth
                     <button class="bc-theme-toggle" type="button" data-theme-toggle aria-pressed="false">
                         <span data-theme-label>Dunkel</span>
                     </button>
@@ -75,6 +76,39 @@
                         <small>Schulbibliothek</small>
                     </span>
                 </a>
+
+                <div class="bc-account">
+                    @auth
+                        <details class="bc-account-menu" data-account-menu>
+                            <summary class="bc-account-menu__button" aria-label="Profilmenü von {{ $profile->name }}">
+                                <span class="bc-avatar" aria-hidden="true">{{ $initials }}</span>
+                            </summary>
+                            <div class="bc-account-menu__panel">
+                                <div class="bc-account-menu__head">
+                                    <span class="bc-avatar bc-avatar--large" aria-hidden="true">{{ $initials }}</span>
+                                    <div>
+                                        <strong>{{ $profile->name }}</strong>
+                                        <small>{{ $profile->email }}</small>
+                                    </div>
+                                </div>
+                                @if ($accountAreas->isNotEmpty())
+                                    <ul class="bc-account-menu__list">
+                                        @foreach ($accountAreas as $area)
+                                            <li><a href="{{ $area['url'] }}" @if ($area['current']) aria-current="page" @endif>{{ $area['label'] }}</a></li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                                <form method="POST" action="{{ route('logout') }}" class="bc-account-menu__logout">
+                                    @csrf
+                                    <button type="submit">Abmelden</button>
+                                </form>
+                            </div>
+                        </details>
+                    @else
+                        <a class="bc-account__login" href="{{ route('login') }}">Anmelden</a>
+                        <a class="bc-account__claim" href="{{ route('identity.claim.create') }}">Konto aktivieren</a>
+                    @endauth
+                </div>
             </div>
         </div>
 

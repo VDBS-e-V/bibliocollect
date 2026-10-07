@@ -25,22 +25,64 @@ function switcherAreas(string $html): array
     return array_map('trim', $links[1]);
 }
 
+/** Linktexte im Profilmenü der Kopfzeile (ohne die Abmeldung). */
+function switcherMenu(string $html): array
+{
+    preg_match('/<ul class="bc-account-menu__list">(.*?)<\/ul>/s', $html, $match);
+    preg_match_all('/<a href="[^"]*"[^>]*>([^<]+)<\/a>/', $match[1] ?? '', $links);
+
+    return array_map('trim', $links[1]);
+}
+
 it('shows only the areas a person may use', function (string $role, array $expected): void {
     $html = $this->actingAs(switcherUser($role))->get(route('public.catalog.index'))->assertOk()->getContent();
 
     expect(switcherAreas($html))->toBe($expected);
 })->with([
-    'student' => ['student', ['Startseite', 'Katalog', 'Mein Konto']],
-    'ag basic' => ['student_ag_basic', ['Startseite', 'Katalog', 'Mein Konto', 'Bibliotheksbetrieb']],
-    'staff' => ['staff', ['Startseite', 'Katalog', 'Mein Konto', 'Bibliotheksbetrieb']],
-    'management' => ['management', ['Startseite', 'Katalog', 'Mein Konto', 'Bibliotheksbetrieb', 'Verwaltung']],
+    'student' => ['student', ['Startseite', 'Katalog']],
+    'ag basic' => ['student_ag_basic', ['Startseite', 'Katalog', 'Bibliotheksbetrieb']],
+    'staff' => ['staff', ['Startseite', 'Katalog', 'Bibliotheksbetrieb']],
+    'management' => ['management', ['Startseite', 'Katalog', 'Bibliotheksbetrieb', 'Verwaltung']],
     'technical admin' => ['technical_admin', ['Startseite', 'Katalog', 'Verwaltung']],
 ]);
+
+it('puts the account links into the profile menu instead of the top bar', function (string $role, array $expected): void {
+    $html = $this->actingAs(switcherUser($role))->get(route('public.catalog.index'))->assertOk()->getContent();
+
+    expect(switcherMenu($html))->toBe($expected);
+})->with([
+    'student' => ['student', ['Mein Konto']],
+    'staff' => ['staff', ['Mein Konto', 'Bibliotheksbetrieb']],
+    'management' => ['management', ['Mein Konto', 'Bibliotheksbetrieb', 'Verwaltung']],
+    'technical admin' => ['technical_admin', ['Verwaltung']],
+]);
+
+it('shows the initials and a logout button in the profile menu, not in the top bar', function (): void {
+    $user = switcherUser('staff');
+    $user->forceFill(['name' => 'Jan Brand'])->save();
+
+    $html = $this->actingAs($user)->get(route('public.catalog.index'))->assertOk()->getContent();
+
+    expect($html)->toContain('bc-account-menu')->and($html)->toContain('>JB<');
+    expect(substr_count($html, 'Abmelden'))->toBe(1);
+    expect(switcherAreas($html))->not->toContain('Abmelden');
+    preg_match('/<div class="bc-account-menu__panel">.*?Abmelden/s', $html, $inside);
+    expect($inside)->not->toBeEmpty();
+});
+
+it('shows a login button and the activation link in the masthead for visitors', function (): void {
+    $html = $this->get(route('public.catalog.index'))->assertOk()->getContent();
+
+    preg_match('/<div class="bc-account">(.*?)<\/div>/s', $html, $account);
+
+    expect($account[1] ?? '')->toContain('Anmelden')->toContain('Konto aktivieren');
+    expect(substr_count($html, 'Anmelden'))->toBe(1);
+});
 
 it('offers only start page and catalog to anonymous visitors', function (): void {
     $html = $this->get(route('public.catalog.index'))->assertOk()->getContent();
 
-    expect(switcherAreas($html))->toBe(['Startseite', 'Katalog', 'Anmelden', 'Konto aktivieren']);
+    expect(switcherAreas($html))->toBe(['Startseite', 'Katalog']);
 });
 
 it('marks the current area', function (): void {
