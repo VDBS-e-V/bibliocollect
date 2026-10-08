@@ -1,4 +1,7 @@
 .bc-confirm {
+    position: fixed;
+    inset: 0;
+    margin: auto;
     width: min(26rem, calc(100vw - 2rem));
     border: 1px solid var(--border-strong);
     border-radius: .5rem;
