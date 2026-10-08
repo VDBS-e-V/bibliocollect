@@ -18,6 +18,7 @@ use App\Surfaces\Pos\Http\Controllers\HelpController;
 use App\Surfaces\Pos\Http\Controllers\InventoryCountController;
 use App\Surfaces\Pos\Http\Controllers\InventoryLabelController;
 use App\Surfaces\Pos\Http\Controllers\IssuePatronLinkCodeController;
+use App\Surfaces\Pos\Http\Controllers\LegacyImportController;
 use App\Surfaces\Pos\Http\Controllers\OverdueController;
 use App\Surfaces\Pos\Http\Controllers\PatronAccountCardController;
 use App\Surfaces\Pos\Http\Controllers\PatronAgRoleController;
@@ -52,6 +53,18 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     Route::middleware('permission:catalog.import')->group(function (): void {
         Route::get('/betrieb/katalog/import', [CatalogImportController::class, 'create'])
             ->name('pos.catalog.import.create');
+
+        Route::get('/betrieb/katalog/altbestand', [LegacyImportController::class, 'create'])
+            ->name('pos.catalog.legacy.create');
+
+        Route::post('/betrieb/katalog/altbestand', [LegacyImportController::class, 'analyze'])
+            ->name('pos.catalog.legacy.analyze');
+
+        Route::post('/betrieb/katalog/altbestand/buchwuensche', [LegacyImportController::class, 'wishes'])
+            ->name('pos.catalog.legacy.wishes');
+
+        Route::post('/betrieb/katalog/altbestand/{token}', [LegacyImportController::class, 'commit'])
+            ->name('pos.catalog.legacy.commit');
 
         Route::post('/betrieb/katalog/import', [CatalogImportController::class, 'store'])
             ->name('pos.catalog.import.store');
