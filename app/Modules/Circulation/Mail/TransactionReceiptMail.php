@@ -21,6 +21,6 @@ final class TransactionReceiptMail extends Mailable
 
     public function content(): Content
     {
-        return new Content(view: 'mail.transaction-receipt');
+        return new Content(markdown: 'mail.transaction-receipt');
     }
 }

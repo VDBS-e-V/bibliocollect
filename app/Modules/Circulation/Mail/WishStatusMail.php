@@ -21,6 +21,6 @@ final class WishStatusMail extends Mailable
 
     public function content(): Content
     {
-        return new Content(view: 'mail.wish-status');
+        return new Content(markdown: 'mail.wish-status');
     }
 }

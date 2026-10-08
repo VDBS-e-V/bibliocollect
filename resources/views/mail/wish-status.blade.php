@@ -1,32 +1,33 @@
-<!DOCTYPE html>
-<html lang="de">
-<body style="font-family: Arial, Helvetica, sans-serif; color: #111; line-height: 1.5;">
-<p>Hallo{{ $wish->patron ? ' '.$wish->patron->first_name : ($wish->contact_name ? ' '.$wish->contact_name : '') }},</p>
+<x-mail::message>
+# Hallo{{ $wish->patron ? ' '.$wish->patron->first_name : ($wish->contact_name ? ' '.$wish->contact_name : '') }},
 
 @switch($wish->status->value)
-    @case('accepted')
-        <p>dein Buchwunsch <strong>„{{ $wish->title }}“</strong> ist angenommen. Wir kümmern uns darum.</p>
-        @break
-    @case('ordered')
-        <p>dein Buchwunsch <strong>„{{ $wish->title }}“</strong> ist bestellt. Sobald das Buch da ist, bekommst du Bescheid.</p>
-        @break
-    @case('fulfilled')
-        <p>gute Nachrichten: <strong>„{{ $wish->title }}“</strong> ist jetzt in der Bibliothek. Du kannst es im Katalog suchen und ausleihen oder vormerken.</p>
-        @break
-    @case('declined')
-        <p>leider können wir deinen Buchwunsch <strong>„{{ $wish->title }}“</strong> nicht erfüllen.</p>
-        @break
-    @default
-        <p>der Stand deines Buchwunsches <strong>„{{ $wish->title }}“</strong> hat sich geändert: {{ $wish->status->label() }}.</p>
+@case('accepted')
+dein Buchwunsch **„{{ $wish->title }}“** ist angenommen. Wir kümmern uns darum.
+@break
+@case('ordered')
+dein Buchwunsch **„{{ $wish->title }}“** ist bestellt. Sobald das Buch da ist, bekommst du Bescheid.
+@break
+@case('fulfilled')
+gute Nachrichten: **„{{ $wish->title }}“** ist jetzt in der Bibliothek. Du kannst es im Katalog suchen und ausleihen oder vormerken.
+@break
+@case('declined')
+leider können wir deinen Buchwunsch **„{{ $wish->title }}“** nicht erfüllen.
+@break
+@default
+der Stand deines Buchwunsches **„{{ $wish->title }}“** hat sich geändert: {{ $wish->status->label() }}.
 @endswitch
 
 @if ($wish->answer)
-    <p>Anmerkung der Bibliothek: {{ $wish->answer }}</p>
+<x-mail::panel>
+**Anmerkung der Bibliothek:** {{ $wish->answer }}
+</x-mail::panel>
 @endif
 
 @if ($wish->patron)
-    <p>Deine Wünsche findest du in deinem Konto unter „Buchwünsche“.</p>
+Deine Wünsche findest du in deinem Konto unter „Buchwünsche“.
 @endif
-<p>Viele Grüße<br>Deine Bibliothek</p>
-</body>
-</html>
+
+Viele Grüße<br>
+Deine Bibliothek
+</x-mail::message>

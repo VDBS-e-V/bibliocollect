@@ -21,6 +21,6 @@ final class AlertMail extends Mailable
 
     public function content(): Content
     {
-        return new Content(view: 'mail.alert');
+        return new Content(markdown: 'mail.alert');
     }
 }

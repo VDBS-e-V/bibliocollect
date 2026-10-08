@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### E-Mails im VDBS-Auftritt (v0.47.0)
+
+Alle Mails (Passwort festlegen, E-Mail bestätigen, Erinnerungen, Beleg, Buchwunsch-Stand, Betriebsmeldungen) nutzen ein gemeinsames Design: oben ein lila Rand, das VDBS-Logo (PNG `public/brand/vdbs/mail-logo.png`, weil viele Mailprogramme kein SVG zeigen), „BiblioCollect“ in Lila mit grünem Strich, die Karte mit grünem Streifen, der Knopf in VDBS-Grün mit dunkler Schrift, Hinweisfelder mit grüner Kante und ein lila Fuß mit Verweis auf Impressum, Datenschutz und Barrierefreiheit. Schrift ist Lato, sonst Arial. Die Vorlagen liegen unter `resources/views/vendor/mail` (Layout, Kopf, Fuß, Thema `vdbs.css`, eingestellt in `config/mail.php`); die eigenen Mails (`resources/views/mail/*`) sind Markdown-Mails im selben Rahmen. Test: `MailDesignTest`.
+
 ### Aufklapp-Design für Regale und Themenbereiche (v0.46.0)
 
 Die Seiten **Regale und Regalbretter** und **Themenbereiche** sind jetzt Aufklapp-Listen: Bereichsgruppe, Bereich und Regal sowie jeder Hauptbereich sind je eine Zeile mit Farbpunkt, Name und Zahlen (Anzahl der Regale und Regalbretter, der Unterbereiche) und klappen auf. Eine einzelne Bereichsgruppe und ihre Bereiche stehen offen, Regale und Hauptbereiche sind zu. „Alles aufklappen“ und „Alles zuklappen“ schalten alle Zeilen um (ohne JavaScript bleiben die Zeilen einzeln bedienbar). Regalbretter stehen kompakt in einer Zeile mit Standort, Beschriftung, Exemplarzahl und Themen als Chips; Unterbereiche eingerückt mit „↳“. Bearbeiten- und Hinzufügen-Formulare klappen weiter an der jeweiligen Stelle auf.

@@ -110,6 +110,20 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown-Mails
+    |--------------------------------------------------------------------------
+    | Das Design der Mails liegt in resources/views/vendor/mail (Layout, Kopf, Fuß) und im Thema „vdbs“ (VDBS-Auftritt).
+    */
+
+    'markdown' => [
+        'theme' => 'vdbs',
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
