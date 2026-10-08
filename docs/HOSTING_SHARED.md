@@ -91,6 +91,6 @@ Ohne SSH: Erinnerungen laufen erst, wenn SMTP stimmt. Teste lokal mit denselben 
 ## 9. Einschränkungen gegenüber einem eigenen Server
 
 - Cover werden nicht sofort, sondern beim nächsten Cron-Lauf geladen (maximal wenige Minuten).
-- Lange Läufe (`catalog:quality:propose` mit 700 Fällen) brauchen eine Konsole. Auf dem Webspace holt man Vorschläge in kleinen Stücken über die Oberfläche oder holt sie vorab lokal (die Prüftabelle liegt in der Datenbank, die du lokal vorbereitet und dann nach MySQL exportiert hast; das ist aber aufwendig und nur für den Start sinnvoll).
+- `catalog:quality:propose` läuft jede Nacht um 02:30 Uhr im Zeitplan (`CATALOG_QUALITY_DAILY_LIMIT`, Standard 60 Fälle) und lässt sich unter Verwaltung → Systemzustand → Zeitplan-Aufgaben jederzeit einmal ausführen. Große Mengen am Stück (700 Fälle) brauchen eine Konsole; sonst holt man die Vorschläge in kleinen Stücken oder vorab lokal (die Prüftabelle liegt in der Datenbank, die du lokal vorbereitet und dann nach MySQL exportiert hast; das ist aber aufwendig und nur für den Start sinnvoll).
 - Webspace-Tarife haben oft Begrenzungen bei Laufzeit (`max_execution_time`) und Speicher; große CSV-Importe in Teilen hochladen.
 - Mit einer VM (eigener Server) entfällt das alles: Dort laufen Queue Worker und Scheduler dauerhaft, und `php artisan` steht zur Verfügung. Der Umzug ist ein Datenbank-Export und derselbe Code.

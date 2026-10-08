@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Qualitätsvorschläge im Zeitplan (v0.43.1)
+
+`catalog:quality:propose` läuft jetzt jede Nacht um 02:30 Uhr im Zeitplan (nach der Sicherung um 01:30 Uhr) und holt DNB-Vorschläge für offene Qualitätsfälle vorab. Die Menge pro Nacht steht in `CATALOG_QUALITY_DAILY_LIMIT` (Standard 60, höchstens 500), klein gehalten, damit der Lauf auch über den Web-Cron in die Zeitgrenze des Anbieters passt. Der Befehl schreibt nur in die Prüftabelle, nie in den Katalog; die eindeutigen Vorschläge übernimmst du weiter unter `/betrieb/katalog/qualitaet/sicher`. Die Aufgabe erscheint auf Verwaltung → Systemzustand in den Zeitplan-Aufgaben und lässt sich dort einmal ausführen.
+
 ### Cover ohne Konsole (v0.43.0)
 
 Auf **Verwaltung → Systemzustand** gibt es den Abschnitt **Cover der Bücher**: Zählwerte (mit Cover, Suche steht aus, schon ergebnislos gesucht, Aufgaben in der Warteschlange) und zwei Knöpfe, „Cover jetzt suchen (bis zu 200 Titel)“ und „Auch erfolglos gesuchte erneut suchen“ (entspricht `--retry-missing`, sinnvoll nach dem Eintragen eines Google-Books-Schlüssels). Die Cover lädt der Cron im Hintergrund; „Cron-Lauf jetzt auslösen“ arbeitet ein Stück davon ab. Der nächtliche Lauf (03:30 Uhr) reiht jetzt standardmäßig 200 statt 50 Titel ein (`CATALOG_COVER_DAILY_LIMIT`, höchstens 1000). Außerdem lädt `ScheduledJobs` die Zeitplan-Aufgaben jetzt über den Konsolen-Kernel nach, damit die Liste „Zeitplan-Aufgaben“ mit den Knöpfen „Einmal ausführen“ auch im Browser auf dem Webspace gefüllt ist (dort war die Tabelle leer).

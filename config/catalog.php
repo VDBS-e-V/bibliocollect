@@ -30,6 +30,11 @@ return [
         'open_library' => (bool) env('CATALOG_SUMMARY_OPEN_LIBRARY', true),
     ],
 
+    // Qualitätsprüfung: Wie viele offene Fälle der nächtliche Lauf (02:30 Uhr) pro Nacht bei der DNB nachschlägt.
+    'quality' => [
+        'daily_proposals' => (int) env('CATALOG_QUALITY_DAILY_LIMIT', 60),
+    ],
+
     'lookup' => [
         'dnb' => [
             'endpoint' => env('CATALOG_DNB_SRU_ENDPOINT', 'https://services.dnb.de/sru/dnb'),
