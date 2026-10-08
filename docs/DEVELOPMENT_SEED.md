@@ -42,7 +42,7 @@ Bibliothek2026!
 | `student@demo.bibliocollect.test` | Schüler:in, mit aktivem Ausleihkonto verknüpft |
 | `teacher@demo.bibliocollect.test` | Lehrkraft, mit aktivem Ausleihkonto verknüpft |
 | `ag-basic@demo.bibliocollect.test` | Schüler:in + Schüler-AG Basis, inklusive `circulation.manage` |
-| `ag-extended@demo.bibliocollect.test` | Schüler:in + Schüler-AG Erweitert, inklusive `catalog.manage` und `circulation.manage`, ausdrücklich ohne `catalog.import` |
+| `ag-extended@demo.bibliocollect.test` | Schüler:in + Schüler-AG Erweitert, inklusive `catalog.manage`, `circulation.manage` und `wishes.manage` (Buchwünsche, Entscheidung des Auftraggebers), ausdrücklich ohne `catalog.import` |
 | `staff@demo.bibliocollect.test` | Mitarbeiter:in für Patron-, Katalog-, Import- und Circulation-Workflows |
 | `management@demo.bibliocollect.test` | Verwaltung für Schule, Rollen, fachliche Verwaltung, Katalogimport und Circulation |
 | `technik@demo.bibliocollect.test` | technische Administration ohne Patron-, Katalog-, Import- oder Circulation-Rechte |

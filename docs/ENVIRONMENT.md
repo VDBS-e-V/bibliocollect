@@ -4,7 +4,7 @@
 
 `.env.example` ist die Vorlage für **Struktur, Reihenfolge und Kommentare**. Die Werte gehören der jeweiligen Umgebung und werden nie überschrieben, solange du es nicht ausdrücklich verlangst. Die Befehle zeigen nur Schlüsselnamen, **nie Werte**.
 
-Welche Dateien gelten, steht in `config/foundation.php` unter `environment`: Vorlage (`.env.example`), Ziele (`.env`, `.env.testing`) und Sicherungsordner (`.foundation/env-backups`).
+Welche Dateien gelten, steht in `config/foundation.php` unter `environment`: Vorlage (`.env.example`), Ziel (`.env`; die Tests haben ihre eigenen Werte in `phpunit.xml`) und Sicherungsordner (`.foundation/env-backups`).
 
 ## Befehle
 

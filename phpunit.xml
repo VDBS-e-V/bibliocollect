@@ -27,6 +27,10 @@
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="BACKUP_BEFORE_TRANSITION" value="false"/>
         <env name="CACHE_STORE" value="array"/>
+        <env name="SETUP_TOKEN" value="" force="true"/>
+        <env name="CRON_TOKEN" value="" force="true"/>
+        <env name="STATUS_TOKEN" value="" force="true"/>
+        <env name="ALERT_EMAIL" value="" force="true"/>
         <env name="CATALOG_COVER_OPEN_LIBRARY" value="false"/>
         <env name="CATALOG_COVER_GOOGLE_BOOKS_KEY" value=""/>
         <env name="DB_CONNECTION" value="sqlite"/>

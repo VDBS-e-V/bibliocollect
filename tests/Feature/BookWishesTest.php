@@ -167,7 +167,8 @@ it('records a wish on its own page and picks the person through a name search', 
 });
 
 it('restricts wish handling to staff and management', function (): void {
-    $this->actingAs(wishUser('student_ag_extended'))->get(route('pos.wishes.index'))->assertForbidden();
+    $this->actingAs(wishUser('student_ag_basic'))->get(route('pos.wishes.index'))->assertForbidden();
+    $this->actingAs(wishUser('student_ag_extended'))->get(route('pos.wishes.index'))->assertOk();
     $this->actingAs(wishUser('student_ag_basic'))->get(route('pos.wishes.index'))->assertForbidden();
     $this->actingAs(wishUser('management'))->get(route('pos.wishes.index'))->assertOk();
 });

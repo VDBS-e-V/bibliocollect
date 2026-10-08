@@ -16,7 +16,7 @@ return [
     'environment' => [
         'root' => base_path(),
         'template' => '.env.example',
-        'targets' => ['.env', '.env.testing'],
+        'targets' => ['.env'],
         'backup_path' => '.foundation/env-backups',
     ],
 

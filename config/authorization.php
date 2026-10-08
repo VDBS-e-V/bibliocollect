@@ -130,7 +130,7 @@ return [
         ],
         'student_ag_extended' => [
             'label' => 'Schüler-AG Erweitert',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage', 'circulation.manage', 'inventory.count'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage', 'circulation.manage', 'inventory.count', 'wishes.manage'],
         ],
         'staff' => [
             'label' => 'Mitarbeiter:in',

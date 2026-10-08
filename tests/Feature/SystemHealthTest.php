@@ -84,7 +84,11 @@ it('reports the state of cron, queue and backup', function (): void {
 });
 
 it('gives monitoring a json status with the right key and answers 503 when something is broken', function (): void {
-    config(['hosting.cron_token' => 'ein-ausreichend-langes-status-token']);
+    config(['hosting.cron_token' => 'ein-ausreichend-langes-status-token', 'hosting.status_token' => null]);
+
+    // Die Statusadresse gibt es nur mit Token beim Start; für den Test die Hilfsrouten nachladen.
+    require base_path('routes/maintenance.php');
+    app('router')->getRoutes()->refreshNameLookups();
     Cache::forever(CronCommand::HEARTBEAT_KEY, now()->subMinutes(1)->toIso8601String());
     File::ensureDirectoryExists(storage_path('app/backups'));
     file_put_contents(storage_path('app/backups/neu.sqlite'), 'x');
