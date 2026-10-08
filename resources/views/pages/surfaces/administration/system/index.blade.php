@@ -132,7 +132,8 @@
         @endif
 
         @if ($statusUrl)
-            <p class="bc-section-copy">Für ein Monitoring (zum Beispiel UptimeRobot) gibt es <code>{{ $statusUrl }}</code> mit dem Schlüssel im Header <code>X-Api-Key</code>: Die Antwort ist JSON, bei Fehlern HTTP 503.</p>
+            <p class="bc-section-copy"><a href="{{ route('administration.mail-preview') }}">Alle E-Mails der Anwendung ansehen (Vorschau)</a></p>
+        <p class="bc-section-copy">Für ein Monitoring (zum Beispiel UptimeRobot) gibt es <code>{{ $statusUrl }}</code> mit dem Schlüssel im Header <code>X-Api-Key</code>: Die Antwort ist JSON, bei Fehlern HTTP 503.</p>
         @endif
     </section>
 

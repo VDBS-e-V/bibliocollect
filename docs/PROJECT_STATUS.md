@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### E-Mail-Vorschau (v0.48.0)
+
+Unter **Verwaltung → E-Mail-Vorschau** (`/verwaltung/mail-vorschau`, Recht `system.view`, verlinkt im Systemzustand und in der Prozessübersicht) lassen sich alle E-Mails der Anwendung mit erfundenen Beispielangaben ansehen: Passwort festlegen, E-Mail bestätigen, die drei Erinnerungen, Beleg, vier Buchwunsch-Stände und die Betriebsmeldung, wahlweise in Computer- oder Handybreite. Es wird nichts verschickt und nichts gespeichert.
+
 ### E-Mails im VDBS-Auftritt (v0.47.0)
 
 Alle Mails (Passwort festlegen, E-Mail bestätigen, Erinnerungen, Beleg, Buchwunsch-Stand, Betriebsmeldungen) nutzen ein gemeinsames Design: oben ein lila Rand, das VDBS-Logo (PNG `public/brand/vdbs/mail-logo.png`, weil viele Mailprogramme kein SVG zeigen), „BiblioCollect“ in Lila mit grünem Strich, die Karte mit grünem Streifen, der Knopf in VDBS-Grün mit dunkler Schrift, Hinweisfelder mit grüner Kante und ein lila Fuß mit Verweis auf Impressum, Datenschutz und Barrierefreiheit. Schrift ist Lato, sonst Arial. Die Vorlagen liegen unter `resources/views/vendor/mail` (Layout, Kopf, Fuß, Thema `vdbs.css`, eingestellt in `config/mail.php`); die eigenen Mails (`resources/views/mail/*`) sind Markdown-Mails im selben Rahmen. Test: `MailDesignTest`.
