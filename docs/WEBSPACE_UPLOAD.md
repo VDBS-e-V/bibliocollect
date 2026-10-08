@@ -23,79 +23,154 @@ Von „lokal fertig“ bis „läuft auf Strato“, in genau dieser Reihenfolge.
 2. Es entsteht `dist\bibliocollect-<Datum>.zip` (rund 13 MB, mit gebauter Oberfläche und Abhängigkeiten, ohne `.env`, Datenbank, Cover und Tests).
 3. Die ZIP-Datei in einen leeren Ordner **entpacken**.
 
-## C. Zugangsdaten und `.env` vorbereiten
+## C. Die Datei `.env` erstellen
 
-1. Drei **verschiedene** Zufallstexte erzeugen (je mindestens 24 Zeichen), je einen für `SETUP_TOKEN`, `CRON_TOKEN` und `STATUS_TOKEN`:
+Die `.env` enthält alle geheimen Einstellungen (Datenbank, Mail, Schlüssel). Sie ist **nicht** im Paket, du erstellst sie aus der Vorlage `.env.shared-hosting.example`, die im entpackten Ordner liegt.
 
-   ```text
-   php -r "echo bin2hex(random_bytes(24));"
-   ```
+### C.1 Versteckte Dateien und Endungen sichtbar machen
 
-   Dreimal ausführen und sofort in den Passwortmanager legen.
-2. **Anwendungsschlüssel** erzeugen (im Projektordner): `php artisan key:generate --show`. Ergebnis (`base64:…`) notieren.
-3. Im entpackten Ordner die Datei `.env.shared-hosting.example` nach `.env` kopieren und mit einem Texteditor ausfüllen:
-   - `APP_URL=https://deine-domain.de` (mit `https://`)
-   - `APP_KEY=` der Schlüssel aus Schritt 2
-   - `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` aus A.3
-   - `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` aus A.4
-   - `SETUP_TOKEN`, `CRON_TOKEN`, `STATUS_TOKEN` aus Schritt 1
-   - `ALERT_EMAIL=` deine E-Mail-Adresse für Fehlermeldungen
-   - `CATALOG_COVER_GOOGLE_BOOKS_KEY=` der Google-Books-Schlüssel (Google Cloud Console → Books API → API-Schlüssel), falls vorhanden
-   - **Lassen:** `SESSION_DRIVER=file` und `CACHE_STORE=file` bis zur Einrichtung.
+Im Windows-Explorer: Reiter **Ansicht → Anzeigen** und dort **Dateinamenerweiterungen** und **Ausgeblendete Elemente** einschalten. Sonst siehst du Dateien mit einem Punkt am Anfang (`.env`) nicht und Windows hängt beim Speichern leicht ein `.txt` an.
+
+### C.2 Vorlage kopieren
+
+PowerShell im entpackten Ordner öffnen (im Explorer in den Ordner gehen, in die Adresszeile `powershell` tippen, Enter). Dann:
+
+```text
+Copy-Item .env.shared-hosting.example .env
+notepad .env
+```
+
+Der erste Befehl legt die Datei `.env` an (der Explorer erlaubt es meist nicht, eine Datei so zu benennen, PowerShell schon). Der zweite öffnet sie im Editor. **Wichtig:** Beim Speichern im Editor den Namen `.env` lassen und den Dateityp „Alle Dateien“ wählen, nie `.env.txt`.
+
+### C.3 Die drei Schlüssel und den Anwendungsschlüssel bereithalten
+
+Du hast die drei Zufallstexte schon. Zusätzlich brauchst du den **Anwendungsschlüssel**. Im selben PowerShell-Fenster (im entpackten Ordner):
+
+```text
+php artisan key:generate --show
+```
+
+Die Ausgabe `base64:…` (eine lange Zeile) kopieren. Das ist der Wert für `APP_KEY`. Er darf nach dem Start nie mehr geändert werden, sonst sind alle Sitzungen und verschlüsselten Daten ungültig. Lege ihn im Passwortmanager ab.
+
+### C.4 Die Werte eintragen
+
+Zeile für Zeile, **kein Leerzeichen** vor oder nach dem `=`. Werte, die Leerzeichen, `#` oder `$` enthalten (häufig bei Passwörtern), in **doppelte Anführungszeichen** setzen: `DB_PASSWORD="ab#cd$ef"`.
+
+```text
+APP_NAME=BiblioCollect
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=base64:…                      ← aus C.3
+APP_URL=https://deine-domain.de       ← mit https://, ohne Schrägstrich am Ende
+APP_LOCALE=de
+APP_FALLBACK_LOCALE=de
+APP_TIMEZONE=Europe/Berlin
+BUSINESS_TIMEZONE=Europe/Berlin
+TRUSTED_PROXIES=*
+
+LOG_CHANNEL=daily
+LOG_LEVEL=warning
+
+DB_CONNECTION=mysql
+DB_HOST=…                             ← Datenbank-Host aus dem Strato-Kundenbereich
+DB_PORT=3306
+DB_DATABASE=…                         ← Datenbankname
+DB_USERNAME=…                         ← Datenbank-Benutzer
+DB_PASSWORD=…                         ← Datenbank-Passwort
+
+SESSION_DRIVER=file                   ← vorerst so lassen
+SESSION_LIFETIME=120
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=lax
+CACHE_STORE=file                      ← vorerst so lassen
+QUEUE_CONNECTION=database
+
+FILESYSTEM_DISK=local
+CATALOG_COVER_DISK=covers
+CATALOG_COVER_OPEN_LIBRARY=true
+CATALOG_COVER_GOOGLE_BOOKS_KEY=…      ← dein Google-Books-Schlüssel (leer lassen, wenn du noch keinen hast)
+
+MAIL_MAILER=smtp
+MAIL_SCHEME=null                      ← bei Port 587; bei Port 465 stattdessen smtps
+MAIL_HOST=…                           ← SMTP-Server (bei Strato: smtp.strato.de)
+MAIL_PORT=587                         ← oder 465
+MAIL_USERNAME=…                       ← meist die volle Mail-Adresse des Postfachs
+MAIL_PASSWORD=…
+MAIL_FROM_ADDRESS="bibliothek@deine-domain.de"   ← muss ein echtes Postfach bei deinem Anbieter sein
+MAIL_FROM_NAME="${APP_NAME}"
+
+SETUP_TOKEN=…                         ← Zufallstext 1
+CRON_TOKEN=…                          ← Zufallstext 2
+ALERT_EMAIL=deine@adresse.de          ← hier kommen Fehlermeldungen an
+STATUS_TOKEN=…                        ← Zufallstext 3
+```
+
+Die Pfeile und Hinweise rechts sind **nicht** Teil der Datei, lösche sie. Zeilen, die nicht genannt sind, lässt du wie in der Vorlage. Die SMTP-Werte stehen im Kundenbereich bei den E-Mail-Einstellungen, die Datenbankwerte bei den MySQL-Datenbanken. Speichern und den Editor schließen.
+
+### C.5 Gegenprobe
+
+Öffne die `.env` noch einmal und prüfe: `APP_URL` beginnt mit `https://`, `APP_KEY` beginnt mit `base64:`, kein Wert steht in Pfeilen oder Klammern, die drei Tokens sind verschieden und je mindestens 24 Zeichen lang. Die Datei heißt exakt `.env` (Endung nicht `.txt`).
 
 ## D. Hochladen
 
-1. Mit einem FTP-Programm (zum Beispiel FileZilla, per SFTP) verbinden.
-2. Den **gesamten Inhalt** des entpackten Ordners (einschließlich der versteckten Datei `.env`) in den Ordner `bibliocollect` auf dem Server hochladen. Das sind einige tausend kleine Dateien, mehrere parallele Verbindungen (in FileZilla 5 bis 10) sparen Zeit.
-3. Rechte prüfen: `storage` und `bootstrap/cache` samt allen Unterordnern müssen für PHP **beschreibbar** sein (FTP-Programm: Rechtsklick → Dateiberechtigungen → `775`, mit „Unterverzeichnisse einbeziehen“).
-4. Der öffentliche Ordner ist `bibliocollect/public`. Prüfe, dass `https://deine-domain.de/` eine Seite zeigt (nicht eine Dateiliste oder einen Fehler).
+1. FTP-Programm (zum Beispiel FileZilla) per **SFTP** mit den Zugangsdaten aus A verbinden. In FileZilla unter **Server → Versteckte Dateien anzeigen** einschalten, damit du `.env` und `.htaccess` siehst.
+2. Rechts auf dem Server in den Ordner `bibliocollect` wechseln, links den entpackten Ordner öffnen.
+3. Links **alles** markieren (Strg + A, einschließlich `.env`) und per Ziehen auf die rechte Seite hochladen. Es sind einige tausend kleine Dateien. Unter **Bearbeiten → Einstellungen → Übertragungen** die **maximale Anzahl gleichzeitiger Übertragungen** auf 5 bis 10 stellen. Bei der Frage nach vorhandenen Dateien „Überschreiben“ wählen.
+4. Warte, bis die Warteschlange leer ist und im Reiter „Fehlgeschlagene Übertragungen“ nichts steht. Fehlgeschlagene Dateien erneut übertragen.
+5. Prüfe auf dem Server: Im Ordner `bibliocollect` liegen `.env`, `artisan`, `app`, `vendor`, `public`, `storage`. Im Ordner `public` liegen `index.php`, `.htaccess` und `build`.
+6. **Rechte setzen:** In FileZilla Rechtsklick auf `storage` → **Dateiberechtigungen** → Zahlenwert `775`, **„In Unterverzeichnisse einbeziehen“** und „Nur auf Verzeichnisse anwenden“. Dasselbe für `bootstrap/cache`.
+7. **Prüfen:** `https://deine-domain.de/` im Browser öffnen. Es muss eine Seite erscheinen (auch eine Fehlerseite der Anwendung ist in Ordnung, nicht aber eine Dateiliste oder eine Anbieter-Fehlerseite). Zeigt der Browser eine Dateiliste, zeigt die Domain nicht auf `public` (siehe A.5).
 
 ## E. Einrichten im Browser
 
-1. `https://deine-domain.de/_setup` öffnen. Die Seite gibt es nur, wenn `SETUP_TOKEN` gesetzt ist.
-2. **„Migrationen ausführen“** (Token eingeben): legt alle Tabellen an.
-3. **„Verwaltungskonto anlegen“**: Name, deine echte E-Mail-Adresse, Passwort mit mindestens 12 Zeichen.
-4. **„Einrichtung prüfen“**: Es dürfen keine Fehler stehen. Warnungen zu Cron und Mail erledigst du in G und H.
-5. Auf dem Server in der `.env` (per FTP bearbeiten):
-   - `SETUP_TOKEN=` **leeren** (die Einrichtungsseite verschwindet)
-   - `SESSION_DRIVER=database` und `CACHE_STORE=database` setzen
-6. Auf `https://deine-domain.de/anmelden` anmelden.
+1. `https://deine-domain.de/_setup` öffnen. Die Seite erscheint nur, wenn `SETUP_TOKEN` in der `.env` steht.
+2. **„Migrationen ausführen“:** Token (SETUP_TOKEN) eintragen, Knopf drücken. Es erscheint eine Liste der angelegten Tabellen ohne Fehler.
+3. **„Verwaltungskonto anlegen“:** Token, dein Name, deine echte E-Mail-Adresse und ein Passwort mit mindestens 12 Zeichen. Das geht nur einmal.
+4. **„Einrichtung prüfen“:** Es dürfen keine Fehler stehen. Warnungen zu Cron und Mail erledigst du in G und H.
+5. **Danach die `.env` auf dem Server ändern** (in FileZilla Rechtsklick auf `.env` → Ansehen/Bearbeiten, speichern, hochladen bestätigen):
+   - `SETUP_TOKEN=` **leeren** (nur das Gleichheitszeichen stehen lassen). Die Einrichtungsseite verschwindet.
+   - `SESSION_DRIVER=database`
+   - `CACHE_STORE=database`
+6. `https://deine-domain.de/_setup` muss jetzt **404** zeigen.
+7. Unter `https://deine-domain.de/anmelden` mit deinem Verwaltungskonto anmelden.
 
 ## F. Grundeinrichtung in der Anwendung
 
-1. **Verwaltung → Schule:** Schuljahr 2026/27 anlegen und aktivieren, dann „Alle Klassen der Schule anlegen“ (47 Klassen).
-2. **Verwaltung → Öffnungszeiten:** Wochentage, Zeiten und Schließtage eintragen.
+In dieser Reihenfolge:
+
+1. **Verwaltung → Schule:** Schuljahr 2026/27 anlegen (1.8.2026 bis 31.7.2027) und aktivieren, dann **„Alle Klassen der Schule anlegen“** (47 Klassen).
+2. **Verwaltung → Öffnungszeiten:** Wochentage, Zeiten und Schließtage (Ferien) eintragen.
 3. **Verwaltung → Regeln:** Leihfristen, Höchstzahlen, Vormerken und Erinnerungen prüfen.
 4. **Verwaltung → Seiten:** Impressum, Datenschutz und Barrierefreiheit prüfen und speichern.
-5. **Verwaltung → Benutzerkonten:** Mitarbeitende einladen, Rollen vergeben.
-6. **Altbestand übernehmen** (Bestand → Altbestand übernehmen): die JSON-Exporte `mediaList`, `mediaTopicList`, `mediaSignatures` hochladen, **Prüfen**, dann **Übernehmen**; danach `bookWishes` für die Buchwünsche. Ist ein Upload zu groß, in der Strato-PHP-Konfiguration `upload_max_filesize` und `post_max_size` erhöhen.
-7. **Klassen mit Personen:** Ausleihkonten → Klassendaten importieren, Excel-Vorlage an die Klassenleitungen, pro Klasse hochladen.
+5. **Verwaltung → Benutzerkonten:** Mitarbeitende einladen und Rollen vergeben.
+6. **Bestand → Altbestand übernehmen:** Die JSON-Exporte `mediaList`, `mediaTopicList`, `mediaSignatures` aus dem alten System hochladen, **Prüfen**, dann **Übernehmen**. Danach `bookWishes` für die Buchwünsche. Ist ein Upload zu groß, beim Anbieter `upload_max_filesize` und `post_max_size` erhöhen.
+7. **Ausleihkonten → Klassendaten importieren:** Excel-Vorlage an die Klassenleitungen geben, pro Klasse hochladen, Vorschau prüfen, bestätigen. Die Ausweise gibst du später klassenweise aus.
 
 ## G. Cron einrichten
 
-1. Aufruf: `https://deine-domain.de/_cron` im Takt von höchstens 5 Minuten, mit dem Header `X-Api-Key: <CRON_TOKEN>`. Kann der Dienst keine Header, geht `https://deine-domain.de/_cron/<CRON_TOKEN>`.
+1. Aufruf: `https://deine-domain.de/_cron` höchstens alle 5 Minuten, mit dem Header `X-Api-Key: <CRON_TOKEN>`. Kann der Dienst keine Header senden, geht `https://deine-domain.de/_cron/<CRON_TOKEN>`.
 2. Der Strato-Cronjob-Manager führt in der Regel nur eigene PHP-Dateien aus. Reicht das nicht, nimm einen externen Dienst (zum Beispiel cron-job.org), der die URL aufruft.
-3. Passt das Intervall nicht zu einer Minute, `CRON_GAP_MINUTES` in der `.env` an das Intervall anpassen.
-4. Prüfen: Verwaltung → Systemzustand, Punkt „Cronjob“ zeigt „zuletzt …“. Dort kannst du eine Aufgabe auch einmalig ausführen.
+3. Läuft der Aufruf seltener als alle 15 Minuten, `CRON_GAP_MINUTES` in der `.env` entsprechend erhöhen.
+4. Prüfen: **Verwaltung → Systemzustand**, Punkt „Cronjob“ zeigt „zuletzt …“. Dort lässt sich jede Aufgabe auch einmal von Hand ausführen.
 
 ## H. Mail prüfen
 
-Verwaltung → Systemzustand → Testmeldung senden. Sie muss bei `ALERT_EMAIL` ankommen. Danach „Passwort vergessen“ mit einem Testkonto probieren.
+**Verwaltung → Systemzustand → Testmeldung senden.** Sie muss bei `ALERT_EMAIL` ankommen (auch im Spam-Ordner nachsehen). Danach „Passwort vergessen“ mit einem Testkonto auslösen. Kommt nichts an: `MAIL_HOST`, Port, `MAIL_SCHEME`, Benutzer, Passwort und die Absenderadresse prüfen.
 
 ## I. Sicherung und Wiederherstellung üben
 
-1. Verwaltung → Systemzustand → Sicherung jetzt erstellen, herunterladen und **außerhalb des Servers** ablegen.
-2. Einmal die Wiederherstellung üben: in phpMyAdmin eine **zweite, leere** Datenbank anlegen und die `.sql.gz`-Datei über „Importieren“ einspielen. Tabellen und Zeilen vergleichen.
+1. **Systemzustand → Sicherung jetzt erstellen**, die Datei herunterladen und **außerhalb des Servers** ablegen.
+2. In phpMyAdmin (Strato-Kundenbereich) eine **zweite, leere** Datenbank anlegen und die `.sql.gz`-Datei über „Importieren“ einspielen. Tabellen und Zeilen mit der Hauptdatenbank vergleichen. Danach die Test-Datenbank löschen.
 
 ## J. Smoke-Test vor dem Start
 
-Mit einem Testkonto und einem Probebuch durchklicken, siehe `docs/GO_LIVE.md`, Abschnitt 7: anmelden, Konto mit Ausweis anlegen, ausleihen, verlängern, zurückgeben, vormerken, Buchwunsch, Etikett und Ausweis drucken, Handyansicht. Zum Schluss `/_setup` muss 404 zeigen.
+Mit einem Testkonto und einem Probebuch durchklicken (siehe `docs/GO_LIVE.md`, Abschnitt 7): anmelden, Konto mit Ausweis anlegen, ausleihen, verlängern, zurückgeben, vormerken, Buchwunsch abgeben, Etikett und Ausweis drucken, Handyansicht. Zum Schluss prüfen: `/_setup` zeigt 404, `APP_DEBUG=false`, die Probekonten sind gelöscht.
 
 ## K. Updates später
 
-1. Neues Paket bauen (B).
+1. Neues Paket bauen (B) und entpacken.
 2. Hochladen, aber **nicht überschreiben**: `.env`, `public/covers`, `public/card-designs`, `storage/app/backups`.
-3. Kurz `SETUP_TOKEN` setzen, auf `/_setup` „Migrationen ausführen“, Token wieder leeren.
+3. Kurz `SETUP_TOKEN` in der `.env` setzen, auf `/_setup` „Migrationen ausführen“, Token wieder leeren.
 
 ## Wenn etwas nicht klappt
 
