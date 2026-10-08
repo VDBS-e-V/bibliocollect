@@ -8,6 +8,9 @@ return [
         'directory' => env('CATALOG_COVER_DIRECTORY', 'catalog/covers'),
         'max_bytes' => (int) env('CATALOG_COVER_MAX_BYTES', 8 * 1024 * 1024),
 
+        // Wie viele Bestandstitel der nächtliche Lauf (03:30 Uhr) pro Nacht zum Nachladen einreiht.
+        'daily_limit' => (int) env('CATALOG_COVER_DAILY_LIMIT', 200),
+
         // Quellen werden in dieser Reihenfolge abgefragt; die erste mit Treffer gewinnt.
         'open_library' => [
             'enabled' => (bool) env('CATALOG_COVER_OPEN_LIBRARY', true),

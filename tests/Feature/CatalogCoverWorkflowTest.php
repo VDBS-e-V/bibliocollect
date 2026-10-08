@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\User;
 use App\Modules\Catalog\Actions\RefreshEditionCoverAction;
 use App\Modules\Catalog\Contracts\CatalogCoverProvider;
 use App\Modules\Catalog\DTOs\CatalogCoverImage;
@@ -9,6 +10,7 @@ use App\Modules\Catalog\Jobs\RefreshEditionCoverJob;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Services\CatalogCoverService;
+use App\Modules\Identity\Actions\AssignRoleAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
@@ -190,4 +192,38 @@ it('builds local cover URLs from the current request host instead of APP_URL', f
         ->assertOk()
         ->assertSee('http://127.0.0.1:8000/storage/catalog/covers/host-test.png', false)
         ->assertDontSee('http://localhost/storage/', false);
+});
+
+it('lets the administration queue covers from the system state page, also for titles searched without result', function (): void {
+    Queue::fake();
+    $admin = User::factory()->create(['email_verified_at' => now()]);
+    app(AssignRoleAction::class)->execute($admin, 'management');
+
+    $title = Title::query()->create(['preferred_title' => 'Cover-Knopf']);
+    $open = Edition::query()->create(['title_id' => $title->getKey(), 'isbn' => '9783000000131']);
+    $missing = Edition::query()->create(['title_id' => $title->getKey(), 'isbn' => '9783000000148']);
+    $missing->forceFill(['cover_status' => 'missing'])->save();
+
+    app()->instance(CatalogCoverProvider::class, new class implements CatalogCoverProvider
+    {
+        public function configured(): bool
+        {
+            return true;
+        }
+
+        public function fetch(Edition $edition): ?CatalogCoverImage
+        {
+            return null;
+        }
+    });
+
+    $this->actingAs($admin)->get(route('administration.system.index'))->assertOk()
+        ->assertSee('Cover der Bücher')->assertSee('Einmal ausführen');
+
+    $this->actingAs($admin)->post(route('administration.system.queue-covers'))->assertRedirect(route('administration.system.index'));
+    Queue::assertPushed(RefreshEditionCoverJob::class, 1);
+
+    $this->actingAs($admin)->post(route('administration.system.queue-covers'), ['retry_missing' => '1'])->assertRedirect();
+    Queue::assertPushed(RefreshEditionCoverJob::class, static fn (RefreshEditionCoverJob $job): bool => $job->editionId === (string) $missing->getKey());
+    expect($open->getKey())->not->toBeNull();
 });

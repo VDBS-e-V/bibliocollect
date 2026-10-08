@@ -9,9 +9,12 @@ use App\Foundation\Support\AlertService;
 use App\Foundation\Support\ScheduledJobs;
 use App\Foundation\Support\SystemHealth;
 use App\Modules\Audit\Services\AuditRecorder;
+use App\Modules\Catalog\Models\Edition;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
@@ -27,12 +30,51 @@ final class SystemHealthController
             ->view('pages.surfaces.administration.system.index', [
                 'snapshot' => $health->snapshot(),
                 'jobs' => $jobs->all(),
+                'covers' => $this->coverCounts(),
                 'backups' => $this->backups(),
                 'events' => SystemErrorEvent::query()->orderByDesc('last_seen_at')->limit(25)->get(),
                 'alertAddress' => is_string($alert) && trim($alert) !== '' ? trim($alert) : null,
                 'statusUrl' => config('hosting.cron_token') || config('hosting.status_token') ? url('/_status') : null,
             ])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** @return array{with: int, open: int, missing: int, waiting: int} */
+    private function coverCounts(): array
+    {
+        $withIdentifier = static fn () => Edition::query()->where(static function ($query): void {
+            $query->whereNotNull('isbn')->orWhereNotNull('source_record_id');
+        });
+
+        return [
+            'with' => Edition::query()->whereNotNull('cover_path')->count(),
+            'open' => (clone $withIdentifier())->whereNull('cover_path')->where(static function ($query): void {
+                $query->whereNull('cover_status')->orWhere('cover_status', '!=', 'missing');
+            })->count(),
+            'missing' => (clone $withIdentifier())->whereNull('cover_path')->where('cover_status', 'missing')->count(),
+            'waiting' => (int) DB::table('jobs')->count(),
+        ];
+    }
+
+    /** Reiht Bestandstitel zum Nachladen der Cover ein (auf Wunsch auch die, bei denen schon ergebnislos gesucht wurde). */
+    public function queueCovers(Request $request, AuditRecorder $audit): RedirectResponse
+    {
+        $retry = $request->boolean('retry_missing');
+
+        try {
+            $code = Artisan::call('catalog:covers:queue', ['--limit' => 200] + ($retry ? ['--retry-missing' => true] : []));
+            $output = trim(Artisan::output());
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return redirect()->route('administration.system.index')->with('system_error', 'Die Cover konnten nicht eingereiht werden: '.$exception->getMessage());
+        }
+
+        $audit->record('system.covers.queued', 'Cover-Nachladen von Hand angestoßen'.($retry ? ' (auch erfolglos gesuchte Titel).' : '.'));
+
+        return redirect()->route('administration.system.index')->with($code === 0 ? 'system_success' : 'system_error', $code === 0
+            ? 'Die Cover-Suche ist eingereiht. Sie läuft über den Cron im Hintergrund; „Cron-Lauf jetzt auslösen“ arbeitet gleich ein Stück davon ab. '.$output
+            : ($output !== '' ? $output : 'Es ist kein Cover-Anbieter eingerichtet.'));
     }
 
     /** Erstellt jetzt eine Sicherung der Datenbank. */

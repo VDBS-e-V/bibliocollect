@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Cover ohne Konsole (v0.43.0)
+
+Auf **Verwaltung → Systemzustand** gibt es den Abschnitt **Cover der Bücher**: Zählwerte (mit Cover, Suche steht aus, schon ergebnislos gesucht, Aufgaben in der Warteschlange) und zwei Knöpfe, „Cover jetzt suchen (bis zu 200 Titel)“ und „Auch erfolglos gesuchte erneut suchen“ (entspricht `--retry-missing`, sinnvoll nach dem Eintragen eines Google-Books-Schlüssels). Die Cover lädt der Cron im Hintergrund; „Cron-Lauf jetzt auslösen“ arbeitet ein Stück davon ab. Der nächtliche Lauf (03:30 Uhr) reiht jetzt standardmäßig 200 statt 50 Titel ein (`CATALOG_COVER_DAILY_LIMIT`, höchstens 1000). Außerdem lädt `ScheduledJobs` die Zeitplan-Aufgaben jetzt über den Konsolen-Kernel nach, damit die Liste „Zeitplan-Aufgaben“ mit den Knöpfen „Einmal ausführen“ auch im Browser auf dem Webspace gefüllt ist (dort war die Tabelle leer).
+
 ### Altbestand ohne Konsole (v0.42.0)
 
 Neue Seite **Bestand → Altbestand übernehmen** (`/betrieb/katalog/altbestand`, Recht `catalog.import`): Die phpMyAdmin-JSON-Exporte des alten Systems (`mediaList`, optional `mediaTopicList`, `mediaSignatures`) werden hochgeladen, geprüft (Analyse ohne Schreibzugriff, mit Kennzahlen, Warnungen und blockierenden Konflikten) und nach Bestätigung übernommen (`ImportLegacyCatalogAction`, wie der Konsolenbefehl `catalog:legacy:import`). Dazu übernimmt `ImportLegacyWishesAction` die Tabelle `bookWishes` als offene Wünsche ohne Person (doppelte ISBN werden übersprungen, Zeitstempel bleiben). Damit lässt sich das System auf dem Webspace komplett von Null aufbauen. Der Import wird im Protokoll vermerkt (`catalog.legacy.imported`).

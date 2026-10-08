@@ -6,6 +6,7 @@ namespace App\Foundation\Support;
 
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Throwable;
 
@@ -25,14 +26,27 @@ final class ScheduledJobs
         'system:prune-errors' => 'Fehlerliste der Betriebsüberwachung nach 30 Tagen aufräumen.',
     ];
 
-    public function __construct(private readonly Schedule $schedule, private readonly Container $container) {}
+    public function __construct(private readonly Schedule $schedule, private readonly Container $container, private readonly Kernel $kernel) {}
+
+    /**
+     * Die Aufgaben stehen in routes/console.php, und die Datei wird nur beim Start der Konsole geladen. Für eine Browser-Anfrage
+     * holen wir das hier nach (läuft nur einmal und ändert nichts an der bereits gestarteten Anwendung).
+     *
+     * @return list<Event>
+     */
+    private function events(): array
+    {
+        $this->kernel->bootstrap();
+
+        return $this->schedule->events();
+    }
 
     /** @return list<array{name: string, description: string, expression: string, next_run: ?string}> */
     public function all(): array
     {
         $jobs = [];
 
-        foreach ($this->schedule->events() as $event) {
+        foreach ($this->events() as $event) {
             $name = $this->nameOf($event);
 
             if ($name === null) {
@@ -83,7 +97,7 @@ final class ScheduledJobs
 
     private function find(string $name): ?Event
     {
-        foreach ($this->schedule->events() as $event) {
+        foreach ($this->events() as $event) {
             if ($this->nameOf($event) === $name) {
                 return $event;
             }

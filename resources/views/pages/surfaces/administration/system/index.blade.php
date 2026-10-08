@@ -70,6 +70,26 @@
         <p class="bc-section-copy">Der Cron-Lauf macht dasselbe wie der Cronjob: Er führt die gerade fälligen Aufgaben aus und arbeitet danach etwa 10 Sekunden lang die Warteschlange ab.</p>
     </section>
 
+    <section class="bc-content-section" aria-labelledby="covers-heading">
+        <div class="bc-section-heading"><h2 id="covers-heading">Cover der Bücher</h2></div>
+        <p class="bc-section-copy">
+            <strong>{{ $covers['with'] }}</strong> Ausgaben haben ein Cover, bei <strong>{{ $covers['open'] }}</strong> steht die Suche noch aus, bei <strong>{{ $covers['missing'] }}</strong> wurde schon ergebnislos gesucht. In der Warteschlange warten {{ $covers['waiting'] }} Aufgaben.
+            Jede Nacht um 03:30 Uhr reiht der Zeitplan {{ (int) config('catalog.covers.daily_limit', 200) }} Titel ein (einstellbar mit <code>CATALOG_COVER_DAILY_LIMIT</code>); die Cover lädt der Cron im Hintergrund.
+        </p>
+        <div class="bc-context-actions">
+            <form method="post" action="{{ route('administration.system.queue-covers') }}">
+                @csrf
+                <x-ui.button type="submit" variant="secondary">Cover jetzt suchen (bis zu 200 Titel)</x-ui.button>
+            </form>
+            <form method="post" action="{{ route('administration.system.queue-covers') }}">
+                @csrf
+                <input type="hidden" name="retry_missing" value="1">
+                <x-ui.button type="submit" variant="secondary" data-confirm="Auch Titel erneut suchen, bei denen schon ergebnislos gesucht wurde? Das lohnt sich zum Beispiel nach dem Eintragen eines Google-Books-Schlüssels." data-confirm-label="Erneut suchen">Auch erfolglos gesuchte erneut suchen</x-ui.button>
+            </form>
+        </div>
+        <p class="bc-section-copy">Nach dem Einreihen „Cron-Lauf jetzt auslösen“ drücken oder den Cron laufen lassen. Mehrere Klicks reihen jeweils die nächsten Titel ein.</p>
+    </section>
+
     <section class="bc-content-section" aria-labelledby="backups-heading">
         <div class="bc-section-heading"><h2 id="backups-heading">Datensicherung</h2></div>
         <p class="bc-section-copy">Die Sicherung läuft täglich automatisch (siehe Zeitplan-Aufgaben). Lade sie regelmäßig herunter und lege sie <strong>außerhalb des Servers</strong> ab: Eine Sicherung nur auf dem Server hilft nicht, wenn der Server ausfällt. Sie enthält alle personenbezogenen Daten und gehört nicht in fremde Hände.</p>

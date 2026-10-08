@@ -71,7 +71,7 @@ Nach dem Speichern eines **neuen** Mediums mit ISBN wird `RefreshEditionCoverJob
 Betrieb:
 
 - Queue Worker: `php artisan queue:work` (`QUEUE_CONNECTION=database`). Ohne Worker bleibt der Status `pending`.
-- Bestandstitel nachholen: `php artisan catalog:covers:queue --limit=100`. Der Scheduler (`routes/console.php`) führt den Befehl täglich um 03:30 Uhr mit `--limit=50` aus; dafür muss `php artisan schedule:run` jede Minute laufen (Cron bzw. Windows-Aufgabe) oder `php artisan schedule:work`.
+- Bestandstitel nachholen: im Browser unter Verwaltung → Systemzustand → „Cover der Bücher“, oder `php artisan catalog:covers:queue --limit=100`. Der Scheduler (`routes/console.php`) führt den Befehl täglich um 03:30 Uhr mit `--limit=50` aus; dafür muss `php artisan schedule:run` jede Minute laufen (Cron bzw. Windows-Aufgabe) oder `php artisan schedule:work`.
 - Ausgaben, für die schon ergebnislos nach einem Cover gesucht wurde (`cover_status = missing`), werden nicht erneut eingereiht. Mit `--retry-missing` werden sie trotzdem erneut versucht, z. B. nachdem ein Google-Books-Schlüssel eingetragen wurde.
 - `php artisan storage:link` beim Standard-Disk `public`.
 - Quellen abschalten: `CATALOG_COVER_OPEN_LIBRARY=false`, Google-Key leeren.

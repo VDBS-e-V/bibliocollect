@@ -20,7 +20,7 @@ $command = static fn (string $name, array $parameters = []): Closure => static f
 };
 
 // Holt Cover für Bestandstitel nach (benötigt einen laufenden Queue Worker). Bereits ergebnislos geprüfte Ausgaben werden übersprungen.
-Schedule::call($command('catalog:covers:queue', ['--limit' => 50]))
+Schedule::call($command('catalog:covers:queue', ['--limit' => max(1, min(1000, (int) config('catalog.covers.daily_limit', 200)))]))
     ->name('catalog:covers:queue')
     ->dailyAt('03:30')
     ->withoutOverlapping()
