@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Etikett-Gestaltung (v0.39.2)
+
+Jedes Etikett (Vorrat und Exemplar) hat denselben Aufbau: **oben links das Logo (VDBS-Zeichen), oben rechts der Name „BiblioCollect“, unten mittig der Strichcode und darunter kleiner die Nummer** als Klartext für den Notfall ohne Scanner. Exemplar-Etiketten zeigen zusätzlich in der Mitte Signatur (oder Standort) und den Kurztitel, Vorratsetiketten lassen die Mitte frei. Der Strichcode ist 58 mm breit und 11 mm hoch (Modulbreite ca. 0,44 mm), die Seitenränder im Etikett betragen 4,5 mm, damit Drucker mit nicht bedruckbarem Rand nichts abschneiden. Als PDF geprüft.
+
 ### Letzte Drucke der Vorratsetiketten (v0.39.1)
 
 Auf der Seite „Etiketten auf Vorrat“ zeigt der Abschnitt **Letzte Drucke** die zehn letzten Druckaufträge (Zeit, wer, Reihe oder Lücken, Nummernbereich, Anzahl). Ein Auftrag lässt sich einzeln löschen („Auftrag löschen“): Seine Nummern gelten dann nicht mehr als gedruckt und werden wieder vergeben. „Alle gedruckten Nummern löschen“ vergisst alle gespeicherten Nummern, auch ältere ohne Auftrag. Beides fragt vorher nach, steht im Protokoll (`catalog.labels.run_deleted`, `catalog.labels.all_cleared`) und ändert nichts an Büchern oder Exemplaren. Wird eine Nummer neu gedruckt, gehört sie dem neuesten Auftrag. Tabellen: `catalog_label_runs`, `catalog_printed_labels.run_id`.

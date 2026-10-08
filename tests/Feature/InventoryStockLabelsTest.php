@@ -32,6 +32,24 @@ function stockCopy(string $barcode): Copy
     return Copy::query()->create(['edition_id' => $edition->getKey(), 'barcode' => $barcode, 'status' => CopyStatus::Active]);
 }
 
+it('lays out every label with the logo top left, the name top right, the barcode at the bottom and the number below it', function (): void {
+    $html = $this->actingAs(stockUser())->post(route('pos.labels.stock.print'), ['modus' => 'reihe', 'start' => 100001, 'anzahl' => 1])->assertOk()->getContent();
+
+    // Reihenfolge im Etikett: Kopf (Logo, Name), Strichcode, Nummer.
+    expect($html)->toContain('<img class="logo" src="/brand/vdbs/mark.svg"')
+        ->and($html)->toContain('<span class="name">BiblioCollect</span>')
+        ->and(strpos($html, 'class="logo"'))->toBeLessThan(strpos($html, 'class="name"'))
+        ->and(strpos($html, 'class="name"'))->toBeLessThan(strpos($html, '<svg'))
+        ->and(strpos($html, '<svg'))->toBeLessThan(strpos($html, '<div class="code">0100001</div>'));
+
+    $css = view('pages.surfaces.pos.labels._sheet-style')->render();
+    expect($css)->toContain('.label .head')->toContain('justify-content: space-between')->toContain('.label .code');
+
+    stockCopy('0100050');
+    $copy = $this->post(route('pos.labels.copies.print'), ['copies' => Copy::query()->pluck('id')->all()])->assertOk()->getContent();
+    expect($copy)->toContain('<span class="name">BiblioCollect</span>')->toContain('<div class="code">0100050</div>');
+});
+
 it('uses 24 labels of 70 x 36 mm per sheet for every label print', function (): void {
     $css = view('pages.surfaces.pos.labels._sheet-style')->render();
 

@@ -28,10 +28,13 @@
                 <div class="label empty"></div>
             @else
                 <div class="label">
+                    <div class="head">
+                        <img class="logo" src="/brand/vdbs/mark.svg" alt="">
+                        <span class="name">BiblioCollect</span>
+                    </div>
+                    <div class="mid"></div>
                     {!! Code128Svg::render($number) !!}
                     <div class="code">{{ $number }}</div>
-                    <div class="owner">Schulbibliothek · VDBS e. V.</div>
-                    <div class="title"></div>
                 </div>
             @endif
         @endforeach

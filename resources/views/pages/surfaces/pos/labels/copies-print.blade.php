@@ -28,10 +28,16 @@
                 <div class="label empty"></div>
             @else
                 <div class="label">
+                    <div class="head">
+                        <img class="logo" src="/brand/vdbs/mark.svg" alt="">
+                        <span class="name">BiblioCollect</span>
+                    </div>
+                    <div class="mid">
+                        <div class="sig">{{ $copy->signature?->signature ?: $copy->shelf_location }}</div>
+                        <div class="title">{{ \Illuminate\Support\Str::limit($copy->edition->title->preferred_title, 48) }}</div>
+                    </div>
                     {!! Code128Svg::render($copy->barcode) !!}
                     <div class="code">{{ $copy->barcode }}</div>
-                    <div class="sig">{{ $copy->signature?->signature ?: $copy->shelf_location }}</div>
-                    <div class="title">{{ \Illuminate\Support\Str::limit($copy->edition->title->preferred_title, 60) }}</div>
                 </div>
             @endif
         @endforeach
