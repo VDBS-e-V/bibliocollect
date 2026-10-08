@@ -39,8 +39,8 @@ Danach die Konfiguration anlegen und die benötigten Erweiterungen einschalten. 
 ```text
 cd C:\php
 Copy-Item php.ini-development php.ini
-(Get-Content php.ini) -replace '^;\\s*extension_dir = "ext"', 'extension_dir = "ext"' | Set-Content php.ini
-(Get-Content php.ini) -replace '^;extension=(curl|fileinfo|gd|intl|mbstring|openssl|pdo_sqlite|sqlite3|zip)\\s*$', 'extension=$1' | Set-Content php.ini
+(Get-Content php.ini) -replace '^;\s*extension_dir = "ext"', 'extension_dir = "ext"' | Set-Content php.ini
+(Get-Content php.ini) -replace '^;extension=(curl|fileinfo|gd|intl|mbstring|openssl|pdo_sqlite|sqlite3|zip)\s*$', 'extension=$1' | Set-Content php.ini
 ```
 
 Prüfen (neues Fenster):
