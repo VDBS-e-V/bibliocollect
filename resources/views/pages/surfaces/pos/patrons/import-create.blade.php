@@ -7,7 +7,8 @@
 
     <div class="bc-context-actions">
         <a href="{{ route('pos.patrons.index') }}">← Zurück zur Suche</a>
-        <a href="{{ route('pos.patrons.import.template') }}">Vorlage für die Klassenleitungen herunterladen</a>
+        <a href="{{ route('pos.patrons.import.template') }}">Excel-Vorlage für die Klassenleitungen herunterladen</a>
+        <a href="{{ route('pos.patrons.import.template-csv') }}">CSV-Vorlage</a>
         <a href="{{ route('pos.labels.cards.issue', ['klasse' => 'alle']) }}">Danach: Ausweise klassenweise ausgeben</a>
     </div>
 
@@ -27,7 +28,7 @@
                     <option value="{{ $schoolClass->getKey() }}" @selected(old('school_class_id') === (string) $schoolClass->getKey())>{{ $schoolClass->name }}</option>
                 @endforeach
             </x-ui.select>
-            <x-ui.input label="CSV-Datei (höchstens 2 MB)" name="file" type="file" accept=".csv,.txt" />
+            <x-ui.input label="Excel- oder CSV-Datei (höchstens 2 MB)" name="file" type="file" accept=".xlsx,.csv,.txt" />
             <x-ui.button type="submit">Vorschau erstellen</x-ui.button>
         </form>
     </section>
@@ -35,7 +36,7 @@
     <section class="bc-content-section" aria-labelledby="import-format-heading">
         <div class="bc-section-heading"><h2 id="import-format-heading">Dateiformat</h2></div>
         <p class="bc-section-copy">
-            CSV mit Kopfzeile, Trennzeichen Semikolon, Komma oder Tabulator, Zeichensatz UTF-8 (Excel-Export „CSV UTF-8“) oder Windows-1252. Höchstens {{ \App\Modules\Patrons\Import\PatronCsvParser::MAX_ROWS }} Zeilen je Datei. Die Reihenfolge der Spalten ist egal.
+            Excel-Datei (.xlsx, am einfachsten mit der Vorlage oben) oder CSV mit Kopfzeile, Trennzeichen Semikolon, Komma oder Tabulator, Zeichensatz UTF-8 oder Windows-1252. Es zählt das erste Tabellenblatt. Höchstens {{ \App\Modules\Patrons\Import\PatronCsvParser::MAX_ROWS }} Zeilen je Datei. Die Reihenfolge der Spalten ist egal.
         </p>
         <table class="bc-calendar-table">
             <thead><tr><th scope="col">Spalte</th><th scope="col">Pflicht</th><th scope="col">Inhalt</th></tr></thead>

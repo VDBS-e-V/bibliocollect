@@ -107,13 +107,16 @@
                     <form method="post" action="{{ route('portal.reservations.store') }}" class="bc-public-reserve">
                         @csrf
                         <input type="hidden" name="title_id" value="{{ $title->getKey() }}">
-                        <x-ui.button type="submit">Titel vormerken</x-ui.button>
-                        <span>Alle Exemplare sind ausgeliehen. Du wirst in der Warteschlange eingereiht.</span>
+                        @if ($titleAvailability->isAvailable())
+                            <x-ui.button type="submit">Zurücklegen lassen</x-ui.button>
+                            <span>Ein Exemplar ist da. Es wird für dich zurückgelegt, du holst es in der Abholfrist in der Bibliothek ab.</span>
+                        @else
+                            <x-ui.button type="submit">Titel vormerken</x-ui.button>
+                            <span>Alle Exemplare sind ausgeliehen. Du wirst in der Warteschlange eingereiht.</span>
+                        @endif
                     </form>
                 @elseif ($reserveState === 'reserved')
                     <p class="bc-public-reserve"><x-ui.badge variant="success">Vorgemerkt</x-ui.badge> <a href="{{ route('portal.home') }}#vormerkungen">Zu meinen Vormerkungen</a></p>
-                @elseif ($reserveState === 'available')
-                    <p class="bc-public-reserve">Ein Exemplar ist da. Komm in die Bibliothek und leih es direkt aus, vormerken ist nur nötig, wenn alle Exemplare ausgeliehen sind.</p>
                 @elseif ($reserveState === 'full')
                     <p class="bc-public-reserve">Alle Exemplare sind ausgeliehen und es gibt schon so viele Vormerkungen wie Exemplare. Versuche es später noch einmal.</p>
                 @elseif ($reserveState === 'limit')
@@ -121,7 +124,7 @@
                 @elseif ($reserveState === 'off')
                     <p class="bc-public-reserve">Vormerken ist zurzeit nicht möglich.</p>
                 @elseif ($reserveState === 'login')
-                    <p class="bc-public-reserve">Alle Exemplare sind ausgeliehen. <a href="{{ route('login') }}">Melde dich an</a>, um den Titel vorzumerken.</p>
+                    <p class="bc-public-reserve"><a href="{{ route('login') }}">Melde dich an</a>, um den Titel vorzumerken oder zurücklegen zu lassen.</p>
                 @endif
 
                 @if ($editions->isEmpty())

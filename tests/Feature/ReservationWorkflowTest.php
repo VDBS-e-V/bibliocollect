@@ -103,15 +103,17 @@ afterEach(function (): void {
     CarbonImmutable::setTestNow();
 });
 
-it('reserves a title by barcode or isbn only while every copy is out', function (): void {
+it('puts a free copy aside at once and queues the next person when every copy is out', function (): void {
     [, , [$copy]] = rsvTitle();
     $actor = rsvActor();
     $holder = rsvPatron('S-RS-1');
     $waiter = rsvPatron('S-RS-2');
 
-    expect(fn () => rsvPlace($waiter, $copy->barcode, $actor))
-        ->toThrow(CirculationRuleViolation::class, 'verfügbar');
+    $aside = rsvPlace($waiter, $copy->barcode, $actor);
 
+    expect($aside->status)->toBe(ReservationStatus::Ready)->and((string) $aside->ready_copy_id)->toBe((string) $copy->getKey());
+
+    $aside->forceFill(['status' => ReservationStatus::Cancelled, 'ready_copy_id' => null])->save();
     rsvCheckout($holder, $copy, $actor);
 
     $reservation = rsvPlace($waiter, '978-3-00-000000-3', $actor);

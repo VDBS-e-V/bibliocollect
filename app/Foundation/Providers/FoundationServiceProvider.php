@@ -16,6 +16,7 @@ use App\Foundation\Console\EnvDiffCommand;
 use App\Foundation\Console\EnvRestoreCommand;
 use App\Foundation\Console\EnvSyncCommand;
 use App\Foundation\Console\FoundationCheckCommand;
+use App\Foundation\Console\LaunchResetCommand;
 use App\Foundation\Console\MailTestCommand;
 use App\Foundation\Console\RestoreDatabaseCommand;
 use App\Foundation\Contracts\AuthorizesPermissions;
@@ -81,6 +82,7 @@ final class FoundationServiceProvider extends ServiceProvider
 
         // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
         $this->commands([
+            LaunchResetCommand::class,
             FoundationCheckCommand::class,
             CronCommand::class,
             DemoQueueCommand::class,

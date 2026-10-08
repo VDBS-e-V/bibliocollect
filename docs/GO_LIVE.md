@@ -38,9 +38,12 @@ Lokal mit denselben SMTP-Daten `php artisan mail:test deine@adresse.de`, auf dem
 
 ## 6. Bestand und Personen
 
+**Demodaten:** Auf dem Server gibt es keine Konsole. Deshalb bereitest du die Datenbank lokal vor: `php artisan app:launch-reset` entfernt alle Demo- und Testdaten (der Altbestand bleibt), danach `backup:database` und die `.sql`-Datei über phpMyAdmin in die leere Strato-Datenbank importieren. Anschließend `/_setup` öffnen und das Verwaltungskonto anlegen (die Einrichtungsseite braucht nur den `SETUP_TOKEN`, keine Konsole).
+
 - **Katalog:** Den Altbestand importierst du lokal (`php artisan catalog:legacy:import …`, siehe `docs/LEGACY_CATALOG_IMPORT.md`) und spielst die Datenbank über eine Sicherung ein (`backup:database` lokal → `.sql.gz` in phpMyAdmin importieren). Danach 364 eindeutige Qualitätsvorschläge übernehmen (Katalogqualität), den Rest nach und nach. Einsortieren läuft im Betrieb („Medien einsortieren“), eine Inventur folgt, wenn die Bücher ihre Regalbretter haben.
 - **Ausweise:** Unter Ausleihkonten → Ausweise eine Charge erzeugen, einen **Probedruck auf Normalpapier** gegen einen Kartenbogen halten, dann auf Karten drucken.
-- **Konten:** Die Klassenleitungen füllen die Vorlage aus (Vorname, Nachname, Geburtsdatum, E-Mail optional); du importierst pro Klasse unter **Ausleihkonten → Klassendaten importieren** und gibst die Ausweise klassenweise aus, wenn die Klasse da ist. Einzelne Personen legst du mit Ausweis an.
+- **Klassen:** Unter **Verwaltung → Schule** das Schuljahr anlegen und aktivieren, dann „Alle Klassen der Schule anlegen“ (47 Klassen).
+- **Konten:** Die Klassenleitungen füllen die **Excel-Vorlage** aus (Vorname, Nachname, Geburtsdatum, E-Mail optional); du importierst pro Klasse unter **Ausleihkonten → Klassendaten importieren** und gibst die Ausweise klassenweise aus, wenn die Klasse da ist. Einzelne Personen legst du mit Ausweis an.
 
 ## 7. Probelauf vor dem Start (Smoke-Test)
 

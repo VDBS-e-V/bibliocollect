@@ -285,6 +285,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::get('/betrieb/ausleihkonten/import/vorlage', [PatronImportController::class, 'template'])
             ->name('pos.patrons.import.template');
 
+        Route::get('/betrieb/ausleihkonten/import/vorlage-csv', [PatronImportController::class, 'csvTemplate'])
+            ->name('pos.patrons.import.template-csv');
+
         Route::post('/betrieb/ausleihkonten/import', [PatronImportController::class, 'store'])
             ->name('pos.patrons.import.store');
 

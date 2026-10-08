@@ -19,12 +19,14 @@ use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CirculationRuleEvaluator;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Modules\Circulation\Services\LoanPolicy;
+use App\Modules\Circulation\Services\ReservationQueueService;
 use App\Modules\Patrons\Models\Patron;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Merkt einen Titel für ein Ausleihkonto vor. Vorgemerkt wird nur, wenn kein Exemplar frei ist; sonst wird direkt ausgeliehen.
+ * Merkt einen Titel für ein Ausleihkonto vor. Ist ein Exemplar frei, wird es sofort für die Person zurückgelegt („Zurücklegen lassen“,
+ * Abholfrist wie bei jeder Vormerkung); sonst reiht sich die Vormerkung in die Warteschlange ein.
  * Der Titel wird über den Barcode eines Exemplars oder über die ISBN gefunden.
  */
 final readonly class PlaceReservationAction
@@ -36,6 +38,7 @@ final readonly class PlaceReservationAction
         private LoanPolicy $policy,
         private CatalogIsbnNormalizer $isbn,
         private AuditRecorder $audit,
+        private ReservationQueueService $queue,
     ) {}
 
     public function execute(Patron $patron, string $identifier, User $actor): Reservation
@@ -103,7 +106,22 @@ final readonly class PlaceReservationAction
                 (int) $actor->getKey(),
             );
 
-            return $reservation->load('title');
+            // Ein freies Exemplar sofort für diese Person zurücklegen.
+            if ($this->availability->forTitles([$titleId])[$titleId]->isAvailable()) {
+                $free = Copy::query()
+                    ->whereIn('edition_id', $editions->modelKeys())
+                    ->where('status', CopyStatus::Active->value)
+                    ->orderBy('barcode')
+                    ->get();
+
+                foreach ($free as $copy) {
+                    if ($this->queue->promoteForCopy($copy)?->is($reservation) === true) {
+                        break;
+                    }
+                }
+            }
+
+            return $reservation->refresh()->load('title');
         });
     }
 
@@ -127,8 +145,6 @@ final readonly class PlaceReservationAction
 
         if (! $availability->hasActiveCopies()) {
             $violations[] = 'Für diesen Titel gibt es kein ausleihbares Exemplar.';
-        } elseif ($availability->isAvailable()) {
-            $violations[] = 'Ein Exemplar dieses Titels ist verfügbar und kann direkt ausgeliehen werden.';
         }
 
         $alreadyReserved = Reservation::query()

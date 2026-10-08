@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Modules\School\Actions\CreateSchoolClassAction;
+use App\Modules\School\Actions\CreateStandardClassesAction;
 use App\Modules\School\Actions\UpdateSchoolClassAction;
 use App\Modules\School\Exceptions\SchoolClassStateConflict;
 use App\Modules\School\Models\SchoolClass;
@@ -26,6 +27,16 @@ final class SchoolClassController
         return redirect()
             ->route('administration.school.index', ['target' => $schoolYear->getKey()])
             ->with('school_success', 'Die Klasse wurde angelegt.');
+    }
+
+    public function storeStandard(string $schoolYearId, CreateStandardClassesAction $create): RedirectResponse
+    {
+        $schoolYear = SchoolYear::query()->findOrFail($schoolYearId);
+        $created = $create->execute($schoolYear);
+
+        return redirect()
+            ->route('administration.school.index', ['target' => $schoolYear->getKey()])
+            ->with('school_success', $created === 0 ? 'Alle Klassen der Schule sind schon angelegt.' : $created.' Klassen wurden angelegt.');
     }
 
     public function update(

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Modules\Patrons\Actions\ImportPatronsAction;
 use App\Modules\Patrons\Import\PatronCsvParser;
 use App\Modules\Patrons\Import\PatronImportPlanner;
+use App\Modules\Patrons\Import\XlsxTemplate;
 use App\Modules\School\Queries\ListAssignableSchoolClassesQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,13 +33,19 @@ final class PatronImportController
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function template(): StreamedResponse
+    public function template(XlsxTemplate $template): StreamedResponse
+    {
+        return response()->streamDownload(static function () use ($template): void {
+            echo $template->build();
+        }, 'klassenliste-vorlage.xlsx', ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+    }
+
+    /** Die einfache CSV-Vorlage für alle, die lieber mit CSV arbeiten. */
+    public function csvTemplate(): StreamedResponse
     {
         return response()->streamDownload(static function (): void {
             echo "\xEF\xBB\xBF";
             echo "vorname;nachname;geburtsdatum;email\r\n";
-            echo "Mia;Beispiel;14.03.2014;\r\n";
-            echo "Jonas;Muster;2012-11-02;jonas@example.invalid\r\n";
         }, 'klassenliste-vorlage.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
@@ -46,13 +53,13 @@ final class PatronImportController
     {
         $request->validate([
             'school_class_id' => ['required', 'string', Rule::in($schoolClasses->execute()->map(static fn ($class): string => (string) $class->getKey())->all())],
-            'file' => ['required', 'file', 'max:2048', 'mimes:csv,txt'],
+            'file' => ['required', 'file', 'max:2048', 'extensions:csv,txt,xlsx'],
         ], [
             'school_class_id.required' => 'Bitte wähle die Klasse, für die du importierst.',
             'school_class_id.in' => 'Diese Klasse gibt es im aktiven Schuljahr nicht.',
-            'file.required' => 'Bitte eine CSV-Datei auswählen.',
+            'file.required' => 'Bitte eine Excel- oder CSV-Datei auswählen.',
             'file.max' => 'Die Datei darf höchstens 2 MB groß sein.',
-            'file.mimes' => 'Bitte eine CSV-Datei hochladen.',
+            'file.extensions' => 'Bitte eine Excel-Datei (.xlsx) oder eine CSV-Datei hochladen.',
         ]);
 
         $token = Str::lower((string) Str::ulid());

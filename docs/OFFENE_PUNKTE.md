@@ -63,5 +63,5 @@ Stand: v0.37.0. Ablauf der Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`. 
 - Werte der Leihfristen und Obergrenzen, Verlängerungen (2×, nicht bei Überfälligkeit), Abholfrist (7 Tage), Erinnerungen (2 Tage vorher, wöchentlich bei Überfälligkeit).
 - Rollen-Matrix (besonders Schüler-AG Basis und Erweitert).
 - Texte für Impressum, Datenschutz, Barrierefreiheitserklärung, Mails.
-- Google-Bilder speichern: ja/nein.
+- ~~Google-Bilder speichern~~: entschieden, ja. Offen bleibt nur der API-Key `CATALOG_COVER_GOOGLE_BOOKS_KEY` (Google Cloud Console → Books API → API-Schlüssel) in der `.env` auf dem Server.
 - Ob Statistik, Buchwünsche und Merkliste zum Start gebraucht werden.

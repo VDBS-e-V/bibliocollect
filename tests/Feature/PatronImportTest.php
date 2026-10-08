@@ -10,6 +10,7 @@ use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Import\PatronCsvParser;
 use App\Modules\Patrons\Import\PatronImportPlanner;
+use App\Modules\Patrons\Import\XlsxTemplate;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\Patrons\Models\PatronCard;
 use App\Modules\School\Models\SchoolClass;
@@ -163,7 +164,8 @@ it('runs the upload, preview and commit workflow for staff with the class chosen
     $staff = importUser();
 
     $this->actingAs($staff)->get(route('pos.patrons.import.create'))->assertOk()->assertSee('Dateiformat')->assertSee('5a')->assertSee('6b');
-    $this->actingAs($staff)->get(route('pos.patrons.import.template'))->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    $this->actingAs($staff)->get(route('pos.patrons.import.template'))->assertOk()->assertDownload('klassenliste-vorlage.xlsx');
+    $this->actingAs($staff)->get(route('pos.patrons.import.template-csv'))->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
 
     $upload = UploadedFile::fake()->createWithContent('schueler.csv', "vorname;nachname;geburtsdatum;email\nMia;Import;14.03.2014;\n");
 
@@ -216,3 +218,63 @@ it('keeps the import away from users without patron management rights', function
     $this->actingAs($user)->get(route('pos.patrons.import.create'))->assertForbidden();
     $this->actingAs($user)->post(route('pos.patrons.import.store'), [])->assertForbidden();
 })->with(['student_ag_basic', 'student_ag_extended', 'technical_admin', 'student']);
+
+function importXlsx(array $rows): string
+{
+    $strings = [];
+    $xml = '';
+
+    foreach ($rows as $r => $cells) {
+        $xml .= '<row r="'.($r + 1).'">';
+
+        foreach ($cells as $c => $value) {
+            $ref = chr(65 + $c).($r + 1);
+
+            if (is_int($value)) {
+                $xml .= '<c r="'.$ref.'" s="1"><v>'.$value.'</v></c>';
+            } else {
+                $strings[] = $value;
+                $xml .= '<c r="'.$ref.'" t="s"><v>'.(count($strings) - 1).'</v></c>';
+            }
+        }
+
+        $xml .= '</row>';
+    }
+
+    $path = tempnam(sys_get_temp_dir(), 'xlsx');
+    $zip = new ZipArchive;
+    $zip->open($path, ZipArchive::OVERWRITE);
+    $zip->addFromString('xl/workbook.xml', '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Klassenliste" sheetId="1" r:id="rId1"/></sheets></workbook>');
+    $zip->addFromString('xl/_rels/workbook.xml.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="x" Target="worksheets/sheet1.xml"/></Relationships>');
+    $zip->addFromString('xl/sharedStrings.xml', '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'.implode('', array_map(static fn (string $t): string => '<si><t>'.htmlspecialchars($t).'</t></si>', $strings)).'</sst>');
+    $zip->addFromString('xl/worksheets/sheet1.xml', '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'.$xml.'</sheetData></worksheet>');
+    $zip->close();
+
+    return $path;
+}
+
+it('reads Excel files with date serials and refuses an empty Excel template', function (): void {
+    // 41712 = 14.03.2014 in Excel
+    $rows = app(PatronCsvParser::class)->parse(importXlsx([['Vorname', 'Nachname', 'Geburtsdatum', 'E-Mail'], ['Mia', 'Müller', 41712, 'mia@example.invalid'], ['Jonas', 'Schön', '02.11.2012', '']]));
+
+    expect($rows)->toHaveCount(2)
+        ->and($rows[0]['values'])->toBe(['vorname' => 'Mia', 'nachname' => 'Müller', 'geburtsdatum' => '2014-03-14', 'email' => 'mia@example.invalid'])
+        ->and($rows[1]['values']['geburtsdatum'])->toBe('02.11.2012');
+
+    $template = tempnam(sys_get_temp_dir(), 'tpl');
+    file_put_contents($template, (new XlsxTemplate)->build());
+
+    expect(fn () => app(PatronCsvParser::class)->parse($template))->toThrow(InvalidArgumentException::class, 'keine Datenzeilen');
+});
+
+it('accepts an Excel upload in the import workflow', function (): void {
+    Storage::fake('local');
+    [, $classes] = importSchool();
+    $staff = importUser();
+
+    $upload = UploadedFile::fake()->createWithContent('klasse.xlsx', (string) file_get_contents(importXlsx([['vorname', 'nachname', 'geburtsdatum'], ['Lena', 'Excel', 41712]])));
+    $response = $this->actingAs($staff)->post(route('pos.patrons.import.store'), ['file' => $upload, 'school_class_id' => (string) $classes['6b']->getKey()]);
+    $response->assertRedirect();
+
+    $this->actingAs($staff)->get($response->headers->get('Location'))->assertOk()->assertSee('Excel');
+});

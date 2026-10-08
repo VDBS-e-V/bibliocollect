@@ -164,18 +164,22 @@ it('reserves a fully loaned title from the title page and cancels it again', fun
     expect($reservation->fresh()->status)->toBe(ReservationStatus::Cancelled);
 });
 
-it('does not reserve a title that is available', function (): void {
+it('lets a person have an available title put aside', function (): void {
     [$title] = portalTitle();
     $user = portalUser(portalPatron('S-PO-1'));
 
     $this->actingAs($user)
         ->get(route('public.catalog.show', $title->getKey()))
-        ->assertDontSee('Titel vormerken');
+        ->assertSee('Zurücklegen lassen')->assertDontSee('Titel vormerken');
 
     $this->actingAs($user)
         ->post(route('portal.reservations.store'), ['title_id' => (string) $title->getKey()])
-        ->assertSessionHas('portal_error');
+        ->assertSessionMissing('portal_error');
 
-    expect(Reservation::query()->count())->toBe(0)
+    $reservation = Reservation::query()->firstOrFail();
+
+    expect($reservation->status)->toBe(ReservationStatus::Ready)
+        ->and($reservation->ready_copy_id)->not->toBeNull()
+        ->and($reservation->pickup_until)->not->toBeNull()
         ->and(Loan::query()->count())->toBe(0);
 });

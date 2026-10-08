@@ -55,14 +55,14 @@ final class CatalogTitleController
 
         $copyStates = $availability->forCopies($copyIds);
 
-        // Vormerken ist nur sinnvoll, solange kein Exemplar verfügbar ist. Die Seite sagt aber immer, warum der Knopf fehlt.
+        // Vormerken geht immer (bei freiem Exemplar als „Zurücklegen lassen“). Die Seite sagt, warum der Knopf fehlt.
         $reserveState = null;
 
         if ($titleAvailability->hasActiveCopies()) {
             $user = auth()->user();
 
             if (! $user instanceof User) {
-                $reserveState = $titleAvailability->isAvailable() ? null : 'login';
+                $reserveState = 'login';
             } elseif ($user->patron_id !== null) {
                 $maximum = max(0, (int) config('circulation.max_open_reservations', 5));
                 $own = Reservation::query()->where('patron_id', $user->patron_id)->whereIn('status', ReservationStatus::openValues());
@@ -71,10 +71,9 @@ final class CatalogTitleController
 
                 $reserveState = match (true) {
                     $reservedHere => 'reserved',
-                    $titleAvailability->isAvailable() => 'available',
                     $maximum === 0 => 'off',
                     (clone $own)->count() >= $maximum => 'limit',
-                    $queue >= $titleAvailability->activeCopies * max(1, (int) config('circulation.max_reservations_per_copy', 1)) => 'full',
+                    ! $titleAvailability->isAvailable() && $queue >= $titleAvailability->activeCopies * max(1, (int) config('circulation.max_reservations_per_copy', 1)) => 'full',
                     default => 'ready',
                 };
             }

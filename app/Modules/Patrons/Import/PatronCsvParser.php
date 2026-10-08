@@ -7,7 +7,7 @@ namespace App\Modules\Patrons\Import;
 use InvalidArgumentException;
 
 /**
- * Liest die Importdatei für Ausleihkonten (CSV, Trennzeichen Semikolon, Komma oder Tabulator, UTF-8 oder Windows-1252).
+ * Liest die Importdatei für Ausleihkonten: Excel (.xlsx) oder CSV (Trennzeichen Semikolon, Komma oder Tabulator, UTF-8 oder Windows-1252).
  *
  * Erwartete Spalten (Reihenfolge egal, Groß-/Kleinschreibung egal): vorname, nachname, geburtsdatum und optional email.
  * Pflicht sind vorname, nachname und geburtsdatum. Die Klasse wird beim Import gewählt; weitere Spalten (z. B. klasse)
@@ -43,28 +43,14 @@ final class PatronCsvParser
      */
     public function parse(string $path): array
     {
-        $contents = @file_get_contents($path);
+        $isExcel = XlsxReader::looksLikeXlsx($path);
+        $lines = $isExcel ? (new XlsxReader)->read($path, self::MAX_ROWS + 500) : $this->csvLines($path);
 
-        if ($contents === false || trim($contents) === '') {
+        if ($lines === []) {
             throw new InvalidArgumentException('Die Datei ist leer oder nicht lesbar.');
         }
 
-        $contents = $this->toUtf8($contents);
-        $stream = fopen('php://temp', 'r+');
-
-        if ($stream === false) {
-            throw new InvalidArgumentException('Die Datei konnte nicht gelesen werden.');
-        }
-
-        fwrite($stream, $contents);
-        rewind($stream);
-
-        $delimiter = $this->detectDelimiter($contents);
-        $header = fgetcsv($stream, 0, $delimiter, '"', '');
-
-        if ($header === false) {
-            throw new InvalidArgumentException('Die Kopfzeile fehlt.');
-        }
+        $header = array_shift($lines);
 
         $map = [];
 
@@ -85,10 +71,10 @@ final class PatronCsvParser
         $rows = [];
         $line = 1;
 
-        while (($cells = fgetcsv($stream, 0, $delimiter, '"', '')) !== false) {
+        foreach ($lines as $cells) {
             $line++;
 
-            if ($cells === [null] || implode('', array_map(static fn ($cell): string => trim((string) $cell), $cells)) === '') {
+            if (implode('', array_map(static fn ($cell): string => trim((string) $cell), $cells)) === '') {
                 continue;
             }
 
@@ -102,16 +88,50 @@ final class PatronCsvParser
                 $values[$key] = trim((string) ($cells[$index] ?? ''));
             }
 
+            // Excel speichert Datumswerte als fortlaufende Tageszahl (Tage seit 30.12.1899).
+            if ($isExcel && preg_match('/^\d{4,6}(\.0+)?$/', $values['geburtsdatum']) === 1) {
+                $values['geburtsdatum'] = gmdate('Y-m-d', (int) round(((float) $values['geburtsdatum'] - 25569) * 86400));
+            }
+
             $rows[] = ['line' => $line, 'values' => $values];
         }
-
-        fclose($stream);
 
         if ($rows === []) {
             throw new InvalidArgumentException('Die Datei enthält keine Datenzeilen.');
         }
 
         return $rows;
+    }
+
+    /** @return list<list<string>> */
+    private function csvLines(string $path): array
+    {
+        $contents = @file_get_contents($path);
+
+        if ($contents === false || trim($contents) === '') {
+            throw new InvalidArgumentException('Die Datei ist leer oder nicht lesbar.');
+        }
+
+        $contents = $this->toUtf8($contents);
+        $stream = fopen('php://temp', 'r+');
+
+        if ($stream === false) {
+            throw new InvalidArgumentException('Die Datei konnte nicht gelesen werden.');
+        }
+
+        fwrite($stream, $contents);
+        rewind($stream);
+
+        $delimiter = $this->detectDelimiter($contents);
+        $lines = [];
+
+        while (($cells = fgetcsv($stream, 0, $delimiter, '"', '')) !== false) {
+            $lines[] = array_map(static fn ($cell): string => (string) $cell, $cells === [null] ? [''] : $cells);
+        }
+
+        fclose($stream);
+
+        return $lines;
     }
 
     private function toUtf8(string $contents): string

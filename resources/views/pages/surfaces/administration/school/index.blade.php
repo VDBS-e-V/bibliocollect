@@ -111,6 +111,12 @@
                                 <p class="bc-school-empty">Noch keine Klassen angelegt.</p>
                             @endforelse
 
+                            <form method="post" action="{{ route('administration.school-classes.store-standard', ['schoolYearId' => $schoolYear->getKey()]) }}" class="bc-school-class-row">
+                                @csrf
+                                <p class="bc-section-copy">Alle Klassen der Schule auf einmal anlegen: Grundschule 1.1 bis 6.3, Mittelstufe 7.1 bis 10.5 mit 9.6, 10.6 und WiKo, Oberstufe 11.1 bis 11.4, 12 und 13. Vorhandene Klassen bleiben unverändert.</p>
+                                <div class="bc-school-form-action"><x-ui.button type="submit" variant="secondary">Alle Klassen der Schule anlegen</x-ui.button></div>
+                            </form>
+
                             <form method="post" action="{{ route('administration.school-classes.store', ['schoolYearId' => $schoolYear->getKey()]) }}" class="bc-school-class-row bc-school-class-row--new">
                                 @csrf
                                 <x-ui.input label="Neue Klasse" name="name" :id="'new-class-'.$schoolYear->getKey().'-name'" placeholder="z. B. 8a" />

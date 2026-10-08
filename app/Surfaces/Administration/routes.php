@@ -93,6 +93,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::post('/verwaltung/schuljahre/{schoolYearId}/klassen', [SchoolClassController::class, 'store'])
             ->name('administration.school-classes.store');
 
+        Route::post('/verwaltung/schuljahre/{schoolYearId}/standardklassen', [SchoolClassController::class, 'storeStandard'])
+            ->name('administration.school-classes.store-standard');
+
         Route::patch('/verwaltung/klassen/{schoolClassId}', [SchoolClassController::class, 'update'])
             ->name('administration.school-classes.update');
     });
