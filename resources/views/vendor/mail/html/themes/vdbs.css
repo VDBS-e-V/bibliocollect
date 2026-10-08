@@ -67,6 +67,12 @@ p {
     text-align: left;
 }
 
+strong,
+b {
+    color: #0f172a;
+    font-weight: 900;
+}
+
 p.sub {
     font-size: 12px;
 }

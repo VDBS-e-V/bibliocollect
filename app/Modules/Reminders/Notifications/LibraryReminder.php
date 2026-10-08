@@ -34,16 +34,16 @@ final class LibraryReminder extends Notification
         return match ($this->kind) {
             'loan_due_soon' => $message
                 ->subject('Erinnerung: Rückgabe bald fällig')
-                ->line("„{$this->titleName}“ ist am {$this->date} fällig.")
-                ->line($this->recipientName !== null ? 'Wenn du mehr Zeit brauchst, komm in der Bibliothek vorbei: Verlängern geht, solange niemand den Titel vorgemerkt hat.' : 'Du kannst die Ausleihe im Portal verlängern, solange niemand den Titel vorgemerkt hat.'),
+                ->line("**„{$this->titleName}“** ist am **{$this->date}** fällig.")
+                ->line($this->recipientName !== null ? 'Wenn du mehr Zeit brauchst, komm in der Bibliothek vorbei: **Verlängern** geht, solange niemand den Titel vorgemerkt hat.' : 'Du kannst die Ausleihe im Portal **verlängern**, solange niemand den Titel vorgemerkt hat.'),
             'loan_overdue' => $message
                 ->subject('Erinnerung: Rückgabe überfällig')
-                ->line("„{$this->titleName}“ war am {$this->date} fällig, das sind {$this->daysOverdue} Tage.")
-                ->line('Bitte gib das Medium in der Bibliothek zurück.'),
+                ->line("**„{$this->titleName}“** war am **{$this->date}** fällig, das sind **{$this->daysOverdue} Tage**.")
+                ->line('Bitte **gib das Medium in der Bibliothek zurück**.'),
             default => $message
                 ->subject('Dein vorgemerkter Titel liegt bereit')
-                ->line("„{$this->titleName}“ liegt zur Abholung für dich bereit, bis zum {$this->date}.")
-                ->line('Danach geht das Exemplar an die nächste Person weiter.'),
+                ->line("**„{$this->titleName}“** liegt zur Abholung für dich bereit, **bis zum {$this->date}**.")
+                ->line('Danach geht das Exemplar an die **nächste Person** weiter.'),
         };
     }
 }

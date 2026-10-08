@@ -3,16 +3,16 @@
 
 @switch($wish->status->value)
 @case('accepted')
-dein Buchwunsch **„{{ $wish->title }}“** ist angenommen. Wir kümmern uns darum.
+dein Buchwunsch **„{{ $wish->title }}“** ist **angenommen**. Wir kümmern uns darum.
 @break
 @case('ordered')
-dein Buchwunsch **„{{ $wish->title }}“** ist bestellt. Sobald das Buch da ist, bekommst du Bescheid.
+dein Buchwunsch **„{{ $wish->title }}“** ist **bestellt**. Sobald das Buch da ist, **bekommst du Bescheid**.
 @break
 @case('fulfilled')
-gute Nachrichten: **„{{ $wish->title }}“** ist jetzt in der Bibliothek. Du kannst es im Katalog suchen und ausleihen oder vormerken.
+gute Nachrichten: **„{{ $wish->title }}“** ist **jetzt in der Bibliothek**. Du kannst es im Katalog suchen und **ausleihen** oder **vormerken**.
 @break
 @case('declined')
-leider können wir deinen Buchwunsch **„{{ $wish->title }}“** nicht erfüllen.
+leider können wir deinen Buchwunsch **„{{ $wish->title }}“** **nicht erfüllen**.
 @break
 @default
 der Stand deines Buchwunsches **„{{ $wish->title }}“** hat sich geändert: {{ $wish->status->label() }}.
@@ -25,7 +25,7 @@ der Stand deines Buchwunsches **„{{ $wish->title }}“** hat sich geändert: {
 @endif
 
 @if ($wish->patron)
-Deine Wünsche findest du in deinem Konto unter „Buchwünsche“.
+Deine Wünsche findest du in deinem Konto unter **„Buchwünsche“**.
 @endif
 
 Viele Grüße<br>
