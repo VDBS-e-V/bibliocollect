@@ -1,6 +1,6 @@
 # Start im Testeinsatz: Einrichtung Schritt für Schritt
 
-Diese Anleitung führt von einem leeren Webspace zur laufenden Bibliothek. Sie ergänzt `docs/HOSTING_SHARED.md` (Technik) und `docs/OPERATIONS.md` (Betrieb). Die Verwaltungs-Startseite zeigt unter **„Startklar?“**, was davon schon erledigt ist.
+Die kurze, durchnummerierte Fassung zum Abarbeiten steht in `docs/WEBSPACE_UPLOAD.md`. Diese Anleitung führt von einem leeren Webspace zur laufenden Bibliothek. Sie ergänzt `docs/HOSTING_SHARED.md` (Technik) und `docs/OPERATIONS.md` (Betrieb). Die Verwaltungs-Startseite zeigt unter **„Startklar?“**, was davon schon erledigt ist.
 
 ## 0. Vorher klären
 
