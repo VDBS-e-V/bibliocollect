@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Buchwünsche: Gesamtanzahl und Liste als PDF (v0.40.0)
+
+Die Übersicht unter `/betrieb/buchwuensche` nennt oben die **Gesamtanzahl** aller erfassten Wünsche und, bei gesetztem Filter, die Anzahl zum Filter (die Bildschirmliste zeigt höchstens 200, die Druckliste immer alle). Der Knopf **Liste als PDF** öffnet `/betrieb/buchwuensche/liste` im **Querformat auf dem Briefpapier** (Farbe, Schwarz-Weiß oder ohne, Standard aus `LETTERHEAD`), mit Nr., Titel, Autor:in, ISBN, Person, Datum und Stand; die Tabellenüberschrift wiederholt sich auf jeder Seite. Gespeichert wird über den Druckdialog des Browsers („Als PDF speichern“, Querformat, Ränder „Keine“). Das Querformat-Briefpapier liegt als `public/brand/vdbs/briefpapier-quer-farbe.png` und `briefpapier-quer-sw.png`. Außerdem wurden 31 Wünsche aus dem alten System einmalig importiert (lokal, nicht im Echtsystem).
+
 ### Etikett-Gestaltung (v0.39.2, Abstände v0.39.3)
 
 Jedes Etikett (Vorrat und Exemplar) hat denselben Aufbau: **oben links das Logo (VDBS-Zeichen), oben rechts der Name „BiblioCollect“, unten mittig der Strichcode und darunter kleiner die Nummer** als Klartext für den Notfall ohne Scanner. Exemplar-Etiketten zeigen zusätzlich in der Mitte Signatur (oder Standort) und den Kurztitel, Vorratsetiketten lassen die Mitte frei. Der Strichcode ist bis zu 56 mm breit und 10,5 mm hoch (Modulbreite ca. 0,42 mm). Der Innenabstand im Etikett beträgt 3 mm oben/unten und 6 mm seitlich (`--label-pad-y`, `--label-pad-x` in der gemeinsamen Etikettenvorlage), zwischen Strichcode und Nummer liegt ein kleiner Abstand von 1,2 mm. Als PDF geprüft.

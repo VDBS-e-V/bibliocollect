@@ -307,3 +307,23 @@ it('removes the contact data of closed public wishes after the retention period'
 
     CarbonImmutable::setTestNow();
 });
+
+it('zeigt die Gesamtanzahl und bietet eine Druckliste im Querformat mit Briefpapier', function (): void {
+    $staff = wishUser('staff');
+
+    foreach (['Erster Wunsch', 'Zweiter Wunsch', 'Dritter Wunsch'] as $title) {
+        BookWish::query()->create(['title' => $title, 'status' => WishStatus::New]);
+    }
+
+    BookWish::query()->create(['title' => 'Erledigter Wunsch', 'status' => WishStatus::Declined]);
+
+    $this->actingAs($staff)->get(route('pos.wishes.index'))->assertOk()
+        ->assertSee('Insgesamt')->assertSee('4')->assertSee('Liste als PDF');
+
+    $print = $this->actingAs($staff)->get(route('pos.wishes.print'))->assertOk();
+    $print->assertSee('A4 landscape', false)->assertSee('briefpapier-quer-farbe.png', false)
+        ->assertSee('Erster Wunsch')->assertDontSee('Erledigter Wunsch')->assertSee('insgesamt erfasst: 4');
+
+    $this->actingAs($staff)->get(route('pos.wishes.print', ['status' => 'alle', 'briefpapier' => 'sw']))
+        ->assertSee('briefpapier-quer-sw.png', false)->assertSee('Erledigter Wunsch');
+});

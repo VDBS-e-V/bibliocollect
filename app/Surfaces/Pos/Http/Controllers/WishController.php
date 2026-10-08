@@ -13,6 +13,7 @@ use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\Patrons\Queries\SearchPatronsQuery;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -23,23 +24,9 @@ final class WishController
 {
     public function index(Request $request): Response
     {
-        $filter = (string) $request->query('status', 'offen');
-        $term = trim((string) $request->query('q', ''));
+        [$filter, $term] = $this->filters($request);
 
-        $wishes = BookWish::query()
-            ->with('patron.schoolClass')
-            ->when($filter === 'offen', static fn ($query) => $query->whereIn('status', WishStatus::openValues()))
-            ->when(WishStatus::tryFrom($filter) !== null, static fn ($query) => $query->where('status', $filter))
-            ->when($term !== '', static function ($query) use ($term): void {
-                $like = '%'.$term.'%';
-                $query->where(static function ($inner) use ($like): void {
-                    $inner->where('title', 'like', $like)->orWhere('author', 'like', $like)->orWhere('isbn', 'like', $like);
-                });
-            })
-            ->orderByRaw("case status when 'new' then 0 when 'accepted' then 1 when 'ordered' then 2 else 3 end")
-            ->orderBy('created_at')
-            ->limit(200)
-            ->get();
+        $wishes = $this->filtered($filter, $term)->limit(200)->get();
 
         // Wie oft wird derselbe Titel noch gewünscht? Mehrere Wünsche sprechen für eine Anschaffung.
         $similar = [];
@@ -66,8 +53,55 @@ final class WishController
                 'term' => $term,
                 'statuses' => WishStatus::cases(),
                 'counts' => BookWish::query()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status')->all(),
+                'total' => BookWish::query()->count(),
+                'matching' => $this->filtered($filter, $term)->count(),
             ])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Druckfassung der Liste (Querformat, Briefpapier): alle Wünsche zum gewählten Filter, ohne die 200er-Grenze der Übersicht. */
+    public function print(Request $request): Response
+    {
+        [$filter, $term] = $this->filters($request);
+        $wishes = $this->filtered($filter, $term)->get();
+
+        return response()
+            ->view('pages.surfaces.pos.wishes.print', [
+                'wishes' => $wishes,
+                'filterLabel' => match (true) {
+                    $filter === 'offen' => 'Offene Wünsche',
+                    $filter === 'alle' => 'Alle Wünsche',
+                    WishStatus::tryFrom($filter) !== null => WishStatus::from($filter)->label(),
+                    default => 'Wünsche',
+                },
+                'term' => $term,
+                'total' => BookWish::query()->count(),
+                'letterhead' => (string) $request->query('briefpapier', (string) config('foundation.letterhead', 'farbe')),
+            ])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function filters(Request $request): array
+    {
+        return [(string) $request->query('status', 'offen'), trim((string) $request->query('q', ''))];
+    }
+
+    /** @return Builder<BookWish> */
+    private function filtered(string $filter, string $term): Builder
+    {
+        return BookWish::query()
+            ->with('patron.schoolClass')
+            ->when($filter === 'offen', static fn ($query) => $query->whereIn('status', WishStatus::openValues()))
+            ->when(WishStatus::tryFrom($filter) !== null, static fn ($query) => $query->where('status', $filter))
+            ->when($term !== '', static function ($query) use ($term): void {
+                $like = '%'.$term.'%';
+                $query->where(static function ($inner) use ($like): void {
+                    $inner->where('title', 'like', $like)->orWhere('author', 'like', $like)->orWhere('isbn', 'like', $like);
+                });
+            })
+            ->orderByRaw("case status when 'new' then 0 when 'accepted' then 1 when 'ordered' then 2 else 3 end")
+            ->orderBy('created_at');
     }
 
     /** Eigene Seite zum Erfassen: ISBN-Abfrage und Namenssuche für die Person (ohne Skript über „Person suchen“). */

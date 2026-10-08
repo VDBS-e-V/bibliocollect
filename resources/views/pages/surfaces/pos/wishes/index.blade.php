@@ -15,6 +15,7 @@
 
     <div class="bc-context-actions">
         <x-ui.button href="{{ route('pos.wishes.create') }}">Buchwunsch erfassen</x-ui.button>
+        <x-ui.button variant="secondary" href="{{ route('pos.wishes.print', array_filter(['status' => $filter, 'q' => $term])) }}" target="_blank" rel="noopener">Liste als PDF</x-ui.button>
     </div>
 
     <form method="get" action="{{ route('pos.wishes.index') }}" class="bc-audit-filter" role="search">
@@ -34,6 +35,12 @@
             <h2 id="wishes-heading">Wünsche</h2>
             <span>{{ $wishes->count() }}</span>
         </div>
+        <p class="bc-section-copy">
+            Insgesamt <strong>{{ $total }}</strong> {{ $total === 1 ? 'Wunsch' : 'Wünsche' }} erfasst{!! ($filter !== 'alle' || $term !== '') ? ', davon <strong>'.e((string) $matching).'</strong> zum gewählten Filter' : '' !!}.
+            @if ($matching > $wishes->count())
+                Angezeigt werden die ersten {{ $wishes->count() }}, die PDF-Liste enthält alle.
+            @endif
+        </p>
 
         @if ($wishes->isEmpty())
             <p class="bc-section-copy">Keine Wünsche gefunden.</p>
