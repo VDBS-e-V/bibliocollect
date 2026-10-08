@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Letzte Drucke der Vorratsetiketten (v0.39.1)
+
+Auf der Seite „Etiketten auf Vorrat“ zeigt der Abschnitt **Letzte Drucke** die zehn letzten Druckaufträge (Zeit, wer, Reihe oder Lücken, Nummernbereich, Anzahl). Ein Auftrag lässt sich einzeln löschen („Auftrag löschen“): Seine Nummern gelten dann nicht mehr als gedruckt und werden wieder vergeben. „Alle gedruckten Nummern löschen“ vergisst alle gespeicherten Nummern, auch ältere ohne Auftrag. Beides fragt vorher nach, steht im Protokoll (`catalog.labels.run_deleted`, `catalog.labels.all_cleared`) und ändert nichts an Büchern oder Exemplaren. Wird eine Nummer neu gedruckt, gehört sie dem neuesten Auftrag. Tabellen: `catalog_label_runs`, `catalog_printed_labels.run_id`.
+
 ### Etiketten auf Vorrat, Format 70 × 36 mm (v0.39.0, Issue 9)
 
 - **Format:** Alle Exemplar-Etiketten gehen jetzt auf Bögen mit 3 × 8 = **24 Etiketten (70 × 36 mm)**, weißer Hintergrund (Avery Zweckform 3490 oder gleichwertig), vorher 21 je Bogen. Auf der Druckseite gibt es einen Feinabgleich (rechts/unten in Millimetern) und die Wahl des ersten freien Platzes.

@@ -105,21 +105,103 @@ final class InventoryLabelPlanner
     }
 
     /**
-     * Merkt sich, dass diese Nummern gedruckt wurden.
+     * Merkt sich einen Druckauftrag und seine Nummern als gedruckt.
      *
      * @param  list<string>  $numbers
+     * @return int Nummer des Druckauftrags
      */
-    public function markPrinted(array $numbers, ?int $userId): void
+    public function markPrinted(array $numbers, ?int $userId, string $mode = 'reihe'): int
     {
         $now = now();
+        sort($numbers);
 
-        foreach (array_chunk($numbers, 200) as $chunk) {
-            DB::table('catalog_printed_labels')->upsert(
-                array_map(static fn (string $number): array => ['number' => $number, 'printed_at' => $now, 'printed_by_user_id' => $userId], $chunk),
-                ['number'],
-                ['printed_at', 'printed_by_user_id'],
-            );
-        }
+        return DB::transaction(function () use ($numbers, $userId, $mode, $now): int {
+            $runId = (int) DB::table('catalog_label_runs')->insertGetId([
+                'printed_at' => $now,
+                'printed_by_user_id' => $userId,
+                'mode' => $mode,
+                'label_count' => count($numbers),
+                'first_number' => $numbers[0],
+                'last_number' => $numbers[count($numbers) - 1],
+            ]);
+
+            foreach (array_chunk($numbers, 200) as $chunk) {
+                DB::table('catalog_printed_labels')->upsert(
+                    array_map(static fn (string $number): array => ['number' => $number, 'run_id' => $runId, 'printed_at' => $now, 'printed_by_user_id' => $userId], $chunk),
+                    ['number'],
+                    ['run_id', 'printed_at', 'printed_by_user_id'],
+                );
+            }
+
+            return $runId;
+        });
+    }
+
+    /**
+     * Die letzten Druckaufträge, neueste zuerst.
+     *
+     * @return list<array{id: int, printed_at: string, by: ?string, mode: string, count: int, first: string, last: string, remaining: int}>
+     */
+    public function runs(int $limit = 10): array
+    {
+        $rows = DB::table('catalog_label_runs')
+            ->leftJoin('users', 'users.id', '=', 'catalog_label_runs.printed_by_user_id')
+            ->orderByDesc('catalog_label_runs.id')
+            ->limit($limit)
+            ->get(['catalog_label_runs.*', 'users.name as user_name']);
+
+        $remaining = DB::table('catalog_printed_labels')->whereIn('run_id', $rows->pluck('id')->all())->selectRaw('run_id, count(*) as total')->groupBy('run_id')->pluck('total', 'run_id');
+
+        return $rows->map(static fn (object $row): array => [
+            'id' => (int) $row->id,
+            'printed_at' => (string) $row->printed_at,
+            'by' => $row->user_name !== null ? (string) $row->user_name : null,
+            'mode' => (string) $row->mode,
+            'count' => (int) $row->label_count,
+            'first' => (string) $row->first_number,
+            'last' => (string) $row->last_number,
+            'remaining' => (int) ($remaining[$row->id] ?? 0),
+        ])->all();
+    }
+
+    /** Anzahl aller als gedruckt gespeicherten Nummern. */
+    public function printedCount(): int
+    {
+        return (int) DB::table('catalog_printed_labels')->count();
+    }
+
+    /**
+     * Nimmt einen Druckauftrag zurück: Seine Nummern gelten nicht mehr als gedruckt und werden wieder vergeben.
+     *
+     * @return int Anzahl freigegebener Nummern, -1 wenn es den Auftrag nicht gibt
+     */
+    public function deleteRun(int $runId): int
+    {
+        return DB::transaction(function () use ($runId): int {
+            if (! DB::table('catalog_label_runs')->where('id', $runId)->exists()) {
+                return -1;
+            }
+
+            $released = DB::table('catalog_printed_labels')->where('run_id', $runId)->delete();
+            DB::table('catalog_label_runs')->where('id', $runId)->delete();
+
+            return $released;
+        });
+    }
+
+    /**
+     * Vergisst alle gedruckten Nummern und alle Druckaufträge.
+     *
+     * @return int Anzahl freigegebener Nummern
+     */
+    public function clearAll(): int
+    {
+        return DB::transaction(function (): int {
+            $released = DB::table('catalog_printed_labels')->delete();
+            DB::table('catalog_label_runs')->delete();
+
+            return $released;
+        });
     }
 
     public function format(int $number): string

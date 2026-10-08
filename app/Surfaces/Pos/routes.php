@@ -148,6 +148,8 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::get('/betrieb/etiketten', [CopyLabelController::class, 'index'])->name('pos.labels.copies');
         Route::post('/betrieb/etiketten', [CopyLabelController::class, 'print'])->name('pos.labels.copies.print');
         Route::get('/betrieb/etiketten/vorrat', [InventoryLabelController::class, 'index'])->name('pos.labels.stock');
+        Route::delete('/betrieb/etiketten/vorrat/druck/{runId}', [InventoryLabelController::class, 'destroyRun'])->whereNumber('runId')->middleware('throttle:30,1')->name('pos.labels.stock.run.destroy');
+        Route::delete('/betrieb/etiketten/vorrat/alle', [InventoryLabelController::class, 'clear'])->middleware('throttle:10,1')->name('pos.labels.stock.clear');
         Route::post('/betrieb/etiketten/vorrat', [InventoryLabelController::class, 'print'])->middleware('throttle:30,1')->name('pos.labels.stock.print');
     });
 

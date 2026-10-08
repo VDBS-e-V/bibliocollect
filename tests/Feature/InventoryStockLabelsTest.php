@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Catalog\Enums\CopyStatus;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
@@ -119,4 +120,66 @@ it('keeps the stock labels away from roles without catalog rights', function ():
     $this->actingAs(stockUser('student_ag_basic'))->get(route('pos.labels.stock'))->assertForbidden();
     $this->actingAs(stockUser('teacher'))->post(route('pos.labels.stock.print'), ['modus' => 'reihe'])->assertForbidden();
     $this->actingAs(stockUser('student_ag_extended'))->get(route('pos.labels.stock'))->assertOk();
+});
+
+it('lists the latest print jobs and takes a single job back so that its numbers become free again', function (): void {
+    $staff = stockUser();
+    $this->actingAs($staff);
+
+    $this->post(route('pos.labels.stock.print'), ['modus' => 'reihe', 'start' => 100001, 'anzahl' => 3])->assertOk();
+    $this->post(route('pos.labels.stock.print'), ['modus' => 'reihe', 'start' => 100001, 'anzahl' => 2])->assertOk();
+
+    expect(DB::table('catalog_label_runs')->count())->toBe(2)
+        ->and(DB::table('catalog_printed_labels')->count())->toBe(5);
+
+    $page = $this->get(route('pos.labels.stock'))->assertOk();
+    $page->assertSee('Letzte Drucke')->assertSee('0100001 bis 0100003')->assertSee('0100004 bis 0100005')->assertSee('5 Nummern als gedruckt gespeichert')->assertSee('Reihe fortgesetzt')->assertSee($staff->name);
+
+    // Den zweiten Auftrag zurücknehmen: nur seine Nummern werden frei.
+    $second = DB::table('catalog_label_runs')->orderByDesc('id')->value('id');
+    $this->delete(route('pos.labels.stock.run.destroy', ['runId' => $second]))->assertRedirect(route('pos.labels.stock'))->assertSessionHas('stock_notice');
+
+    expect(DB::table('catalog_label_runs')->count())->toBe(1)
+        ->and(DB::table('catalog_printed_labels')->orderBy('number')->pluck('number')->all())->toBe(['0100001', '0100002', '0100003']);
+    expect(app(InventoryLabelPlanner::class)->sequence(100001, 2)['numbers'])->toBe(['0100004', '0100005']);
+
+    expect(AuditEvent::query()->where('action', 'catalog.labels.run_deleted')->count())->toBe(1);
+
+    $this->delete(route('pos.labels.stock.run.destroy', ['runId' => 9999]))->assertNotFound();
+});
+
+it('deletes all numbers saved as printed at once, including old ones without a print job', function (): void {
+    $staff = stockUser();
+    $this->actingAs($staff);
+
+    $this->post(route('pos.labels.stock.print'), ['modus' => 'reihe', 'start' => 100001, 'anzahl' => 3])->assertOk();
+    DB::table('catalog_printed_labels')->insert(['number' => '0100100', 'printed_at' => now()]);
+
+    $this->get(route('pos.labels.stock'))->assertSee('Alle gedruckten Nummern löschen (4)');
+
+    $this->delete(route('pos.labels.stock.clear'))->assertRedirect(route('pos.labels.stock'))->assertSessionHas('stock_notice', static fn (string $text): bool => str_contains($text, 'Alle 4'));
+
+    expect(DB::table('catalog_printed_labels')->count())->toBe(0)->and(DB::table('catalog_label_runs')->count())->toBe(0);
+    expect(app(InventoryLabelPlanner::class)->sequence(100001, 3)['numbers'])->toBe(['0100001', '0100002', '0100003']);
+    expect(AuditEvent::query()->where('action', 'catalog.labels.all_cleared')->count())->toBe(1);
+
+    // Leere Liste: kein Knopf, kein Fehler.
+    $this->get(route('pos.labels.stock'))->assertOk()->assertDontSee('Alle gedruckten Nummern löschen')->assertSee('noch nichts auf Vorrat gedruckt');
+});
+
+it('keeps a reprinted number with the newest job and keeps the delete functions away from other roles', function (): void {
+    $this->actingAs(stockUser());
+    $this->post(route('pos.labels.stock.print'), ['modus' => 'reihe', 'start' => 100001, 'anzahl' => 2])->assertOk();
+    $this->post(route('pos.labels.stock.print'), ['modus' => 'reihe', 'start' => 100001, 'anzahl' => 2, 'erneut' => 1])->assertOk();
+
+    $first = DB::table('catalog_label_runs')->orderBy('id')->value('id');
+    $this->delete(route('pos.labels.stock.run.destroy', ['runId' => $first]));
+
+    // Der Neudruck gehört dem zweiten Auftrag; das Zurücknehmen des ersten lässt die Nummern gedruckt.
+    expect(DB::table('catalog_printed_labels')->count())->toBe(2);
+
+    foreach (['student_ag_basic', 'teacher'] as $role) {
+        $this->actingAs(stockUser($role))->delete(route('pos.labels.stock.clear'))->assertForbidden();
+        $this->actingAs(stockUser($role))->delete(route('pos.labels.stock.run.destroy', ['runId' => 1]))->assertForbidden();
+    }
 });

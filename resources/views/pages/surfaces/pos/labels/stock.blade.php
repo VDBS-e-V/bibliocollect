@@ -13,6 +13,10 @@
         <a href="{{ route('pos.labels.copies') }}">← Zurück zu den Exemplar-Etiketten</a>
     </div>
 
+    @if (session('stock_notice'))
+        <x-ui.alert variant="success" title="Erledigt">{{ session('stock_notice') }}</x-ui.alert>
+    @endif
+
     @if ($errors->any())
         <x-ui.alert variant="error" title="Fehler">{{ $errors->first() }}</x-ui.alert>
     @endif
@@ -60,6 +64,57 @@
             <div class="bc-action-row"><x-ui.button type="submit" variant="secondary">Prüfen</x-ui.button></div>
         </section>
     </form>
+
+    <section class="bc-content-section" aria-labelledby="stock-runs-heading">
+        <div class="bc-section-heading bc-section-heading--with-meta">
+            <h2 id="stock-runs-heading">Letzte Drucke</h2>
+            <span>{{ $printedCount }} Nummern als gedruckt gespeichert</span>
+        </div>
+
+        @if ($runs === [])
+            <p class="bc-section-copy">Es wurde noch nichts auf Vorrat gedruckt.@if ($printedCount > 0) {{ $printedCount }} ältere Nummern sind ohne Druckauftrag als gedruckt gespeichert.@endif</p>
+        @else
+            <table class="bc-calendar-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Gedruckt</th>
+                        <th scope="col">Von</th>
+                        <th scope="col">Art</th>
+                        <th scope="col">Nummern</th>
+                        <th scope="col">Etiketten</th>
+                        <th scope="col"><span class="sr-only">Aktion</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($runs as $run)
+                        <tr>
+                            <td class="bc-tabular">{{ \Illuminate\Support\Carbon::parse($run['printed_at'])->timezone(config('app.timezone'))->format('d.m.Y H:i') }}</td>
+                            <td>{{ $run['by'] ?? '—' }}</td>
+                            <td>{{ $run['mode'] === 'luecken' ? 'Lücken gefüllt' : 'Reihe fortgesetzt' }}</td>
+                            <td class="bc-tabular">{{ $run['first'] }} bis {{ $run['last'] }}</td>
+                            <td class="bc-tabular">{{ $run['count'] }}@if ($run['remaining'] !== $run['count']) <small>({{ $run['remaining'] }} noch gespeichert)</small>@endif</td>
+                            <td>
+                                <form method="post" action="{{ route('pos.labels.stock.run.destroy', ['runId' => $run['id']]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <x-ui.button type="submit" variant="secondary" data-confirm="Diesen Druckauftrag löschen? Seine Nummern gelten dann nicht mehr als gedruckt und werden wieder vergeben." aria-label="Druckauftrag {{ $run['first'] }} bis {{ $run['last'] }} löschen">Auftrag löschen</x-ui.button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
+        @if ($printedCount > 0)
+            <form method="post" action="{{ route('pos.labels.stock.clear') }}">
+                @csrf
+                @method('DELETE')
+                <x-ui.button type="submit" variant="secondary" data-confirm="Alle {{ $printedCount }} als gedruckt gespeicherten Nummern löschen? Sie werden danach wieder vergeben und können noch einmal gedruckt werden.">Alle gedruckten Nummern löschen ({{ $printedCount }})</x-ui.button>
+            </form>
+            <p class="bc-section-copy">Das Löschen ändert nichts an Büchern oder Exemplaren. Es betrifft nur die Merkliste, welche Nummern schon auf Etiketten gedruckt wurden.</p>
+        @endif
+    </section>
 
     @if ($plan !== null)
         <section class="bc-content-section" aria-labelledby="stock-plan-heading">

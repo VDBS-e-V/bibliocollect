@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Pos\Http\Controllers;
 
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Services\InventoryLabelPlanner;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -41,11 +43,13 @@ final class InventoryLabelController
                 ],
                 'perSheet' => CopyLabelController::PER_SHEET,
                 'max' => InventoryLabelPlanner::MAX_LABELS,
+                'runs' => $planner->runs(10),
+                'printedCount' => $planner->printedCount(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function print(Request $request, InventoryLabelPlanner $planner): Response
+    public function print(Request $request, InventoryLabelPlanner $planner, AuditRecorder $audit): Response
     {
         $data = $request->validate([
             'modus' => ['required', 'in:reihe,luecken'],
@@ -63,7 +67,9 @@ final class InventoryLabelController
         abort_if($plan['numbers'] === [], 422, 'Es gibt keine freien Nummern zum Drucken.');
 
         // Die Nummern sind jetzt auf Papier: Beim nächsten Vorratsdruck werden sie übersprungen.
-        $planner->markPrinted($plan['numbers'], $request->user()?->getAuthIdentifier() !== null ? (int) $request->user()->getAuthIdentifier() : null);
+        $userId = $request->user()?->getAuthIdentifier() !== null ? (int) $request->user()->getAuthIdentifier() : null;
+        $runId = $planner->markPrinted($plan['numbers'], $userId, $data['modus']);
+        $audit->record('catalog.labels.stock_printed', count($plan['numbers']).' Etiketten auf Vorrat gedruckt ('.$plan['numbers'][0].' bis '.$plan['numbers'][count($plan['numbers']) - 1].').', null, ['run' => $runId, 'count' => count($plan['numbers'])]);
 
         return response()
             ->view('pages.surfaces.pos.labels.stock-print', [
@@ -72,6 +78,28 @@ final class InventoryLabelController
                 'perSheet' => CopyLabelController::PER_SHEET,
             ])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Einen Druckauftrag zurücknehmen: Seine Nummern werden wieder frei. */
+    public function destroyRun(int $runId, InventoryLabelPlanner $planner, AuditRecorder $audit): RedirectResponse
+    {
+        $released = $planner->deleteRun($runId);
+
+        abort_if($released < 0, 404);
+
+        $audit->record('catalog.labels.run_deleted', "Druckauftrag {$runId} zurückgenommen, {$released} Nummern wieder frei.", null, ['run' => $runId, 'released' => $released]);
+
+        return redirect()->route('pos.labels.stock')->with('stock_notice', "Der Druckauftrag ist gelöscht. {$released} Nummern gelten nicht mehr als gedruckt und werden wieder vergeben.");
+    }
+
+    /** Alle als gedruckt gespeicherten Nummern vergessen. */
+    public function clear(InventoryLabelPlanner $planner, AuditRecorder $audit): RedirectResponse
+    {
+        $released = $planner->clearAll();
+
+        $audit->record('catalog.labels.all_cleared', "Alle als gedruckt gespeicherten Nummern gelöscht ({$released}).", null, ['released' => $released]);
+
+        return redirect()->route('pos.labels.stock')->with('stock_notice', "Alle {$released} als gedruckt gespeicherten Nummern sind gelöscht. Sie werden wieder vergeben.");
     }
 
     /**
