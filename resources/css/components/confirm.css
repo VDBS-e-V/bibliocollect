@@ -1,0 +1,13 @@
+.bc-confirm {
+    width: min(26rem, calc(100vw - 2rem));
+    border: 1px solid var(--border-strong);
+    border-radius: .5rem;
+    padding: 1.4rem;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    box-shadow: 0 .75rem 2rem rgb(0 0 0 / .25);
+}
+
+.bc-confirm::backdrop { background: rgb(20 10 22 / .55); }
+.bc-confirm__text { margin: 0 0 1.2rem; line-height: 1.5; }
+.bc-confirm__actions { display: flex; justify-content: flex-end; gap: .6rem; flex-wrap: wrap; }

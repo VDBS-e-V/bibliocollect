@@ -97,7 +97,7 @@
                                 <form method="post" action="{{ route('pos.labels.stock.run.destroy', ['runId' => $run['id']]) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <x-ui.button type="submit" variant="secondary" data-confirm="Diesen Druckauftrag löschen? Seine Nummern gelten dann nicht mehr als gedruckt und werden wieder vergeben." aria-label="Druckauftrag {{ $run['first'] }} bis {{ $run['last'] }} löschen">Auftrag löschen</x-ui.button>
+                                    <x-ui.button type="submit" variant="secondary" data-confirm-label="Löschen" data-confirm="Diesen Druckauftrag löschen? Seine Nummern gelten dann nicht mehr als gedruckt und werden wieder vergeben." aria-label="Druckauftrag {{ $run['first'] }} bis {{ $run['last'] }} löschen">Auftrag löschen</x-ui.button>
                                 </form>
                             </td>
                         </tr>
@@ -110,7 +110,7 @@
             <form method="post" action="{{ route('pos.labels.stock.clear') }}">
                 @csrf
                 @method('DELETE')
-                <x-ui.button type="submit" variant="secondary" data-confirm="Alle {{ $printedCount }} als gedruckt gespeicherten Nummern löschen? Sie werden danach wieder vergeben und können noch einmal gedruckt werden.">Alle gedruckten Nummern löschen ({{ $printedCount }})</x-ui.button>
+                <x-ui.button type="submit" variant="secondary" data-confirm-label="Alle löschen" data-confirm="Alle {{ $printedCount }} als gedruckt gespeicherten Nummern löschen? Sie werden danach wieder vergeben und können noch einmal gedruckt werden.">Alle gedruckten Nummern löschen ({{ $printedCount }})</x-ui.button>
             </form>
             <p class="bc-section-copy">Das Löschen ändert nichts an Büchern oder Exemplaren. Es betrifft nur die Merkliste, welche Nummern schon auf Etiketten gedruckt wurden.</p>
         @endif

@@ -205,9 +205,11 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
-### Etikett-Gestaltung (v0.39.2)
+### Etikett-Gestaltung (v0.39.2, Abstände v0.39.3)
 
-Jedes Etikett (Vorrat und Exemplar) hat denselben Aufbau: **oben links das Logo (VDBS-Zeichen), oben rechts der Name „BiblioCollect“, unten mittig der Strichcode und darunter kleiner die Nummer** als Klartext für den Notfall ohne Scanner. Exemplar-Etiketten zeigen zusätzlich in der Mitte Signatur (oder Standort) und den Kurztitel, Vorratsetiketten lassen die Mitte frei. Der Strichcode ist 58 mm breit und 11 mm hoch (Modulbreite ca. 0,44 mm), die Seitenränder im Etikett betragen 4,5 mm, damit Drucker mit nicht bedruckbarem Rand nichts abschneiden. Als PDF geprüft.
+Jedes Etikett (Vorrat und Exemplar) hat denselben Aufbau: **oben links das Logo (VDBS-Zeichen), oben rechts der Name „BiblioCollect“, unten mittig der Strichcode und darunter kleiner die Nummer** als Klartext für den Notfall ohne Scanner. Exemplar-Etiketten zeigen zusätzlich in der Mitte Signatur (oder Standort) und den Kurztitel, Vorratsetiketten lassen die Mitte frei. Der Strichcode ist bis zu 56 mm breit und 10,5 mm hoch (Modulbreite ca. 0,42 mm). Der Innenabstand im Etikett beträgt 3 mm oben/unten und 6 mm seitlich (`--label-pad-y`, `--label-pad-x` in der gemeinsamen Etikettenvorlage), zwischen Strichcode und Nummer liegt ein kleiner Abstand von 1,2 mm. Als PDF geprüft.
+
+**Bestätigungen:** Rückfragen („Auftrag löschen“ usw.) erscheinen nicht mehr als Standard-Browserfenster, sondern als eigener Dialog im Design der Anwendung (Abbrechen/Bestätigen, Escape bricht ab, Beschriftung über `data-confirm-label`).
 
 ### Letzte Drucke der Vorratsetiketten (v0.39.1)
 

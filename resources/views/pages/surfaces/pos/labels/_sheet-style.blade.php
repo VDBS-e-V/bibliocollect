@@ -1,6 +1,6 @@
     <style>
         /* Etikettenbogen 70 × 36 mm, 3 × 8 = 24 Stück, randlos nach links und rechts (Avery Zweckform 3490 oder gleichwertig). */
-        :root { --label-x: 0mm; --label-y: 0mm; }
+        :root { --label-x: 0mm; --label-y: 0mm; --label-pad-y: 3mm; --label-pad-x: 6mm; }
         @page { size: A4; margin: 0; }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
@@ -12,14 +12,14 @@
         .sheet:last-child { break-after: auto; }
 
         /* Aufbau: oben links das Logo, oben rechts der Name, unten mittig der Strichcode und darunter klein die Nummer (für den Notfall ohne Scanner). */
-        .label { padding: 2mm 4.5mm 1.6mm; display: grid; grid-template-rows: 9mm 1fr auto auto; gap: .4mm; overflow: hidden; background: #fff; }
+        .label { padding: var(--label-pad-y) var(--label-pad-x) calc(var(--label-pad-y) - .4mm); display: grid; grid-template-rows: 8mm 1fr auto auto; gap: .4mm; overflow: hidden; background: #fff; }
         .label .head { display: flex; align-items: center; justify-content: space-between; }
-        .label .logo { height: 9mm; width: auto; display: block; }
+        .label .logo { height: 8mm; width: auto; display: block; }
         .label .name { font: bold 14pt/1 Arial, Helvetica, sans-serif; color: #58275a; letter-spacing: -.2px; }
         .label .mid { text-align: center; overflow: hidden; align-self: center; width: 100%; }
         .label .sig { font: bold 9pt/1.1 Arial, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .label .title { font: 6.5pt/1.15 Arial, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .label svg { width: 58mm; height: 11mm; display: block; margin: 0 auto; }
+        .label svg { width: 100%; max-width: 56mm; height: 10.5mm; display: block; margin: 0 auto 1.2mm; }
         .label .code { font: bold 8.5pt/1 'Courier New', monospace; color: #000; text-align: center; letter-spacing: 1px; }
         .empty { visibility: hidden; }
         @media print { .bar { display: none; } .sheet { margin: 0; } .label * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
