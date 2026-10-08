@@ -65,7 +65,7 @@ final class SearchCatalogTitlesQuery
         return Title::query()
             ->with([
                 'contributions.contributor',
-                'editions.copies.signature.topics',
+                'editions.copies.shelf.topics',
             ])
             ->withMax('editions', 'publication_year');
     }
@@ -133,7 +133,7 @@ final class SearchCatalogTitlesQuery
                     $editionQuery->where(function (Builder $topicOrClassificationQuery) use ($like): void {
                         $topicOrClassificationQuery
                             ->where('local_classification', 'like', $like)
-                            ->orWhereHas('copies.signature.topics', function (Builder $topicQuery) use ($like): void {
+                            ->orWhereHas('copies.shelf.topics', function (Builder $topicQuery) use ($like): void {
                                 $topicQuery->where(function (Builder $nested) use ($like): void {
                                     $nested
                                         ->whereAny(['name', 'description'], 'like', $like)
@@ -285,7 +285,7 @@ final class SearchCatalogTitlesQuery
                                 'like',
                                 $like,
                             )
-                            ->orWhereHas('copies.signature.topics', function (Builder $topicQuery) use ($like): void {
+                            ->orWhereHas('copies.shelf.topics', function (Builder $topicQuery) use ($like): void {
                                 $topicQuery->whereAny(['name', 'description', 'public_key'], 'like', $like);
                             });
                     });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Console;
 
+use App\Modules\Catalog\Actions\ImportCatalogShelvesFromSignaturesAction;
 use App\Modules\Catalog\Actions\ImportLegacyCatalogAction;
 use App\Modules\Catalog\Exceptions\LegacyCatalogImportException;
 use Illuminate\Console\Command;
@@ -17,7 +18,7 @@ final class ImportLegacyCatalogCommand extends Command
 
     protected $description = 'Importiert den alten BiblioCollect-Katalog transaktional in das aktuelle Catalog-Modell.';
 
-    public function handle(ImportLegacyCatalogAction $import): int
+    public function handle(ImportLegacyCatalogAction $import, ImportCatalogShelvesFromSignaturesAction $shelves): int
     {
         try {
             $report = $import->execute(
@@ -30,6 +31,8 @@ final class ImportLegacyCatalogCommand extends Command
 
             return self::FAILURE;
         }
+
+        $shelves->execute();
 
         $this->table(
             ['Kennzahl', 'Wert'],

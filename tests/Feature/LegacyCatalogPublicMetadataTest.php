@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Catalog\Enums\CopyStatus;
-use App\Modules\Catalog\Models\CatalogSignature;
+use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Contributor;
 use App\Modules\Catalog\Models\Copy;
@@ -53,15 +53,14 @@ it('shows rich bibliographic metadata and classification publicly without exposi
     ]);
 
     $topic = CatalogTopic::query()->create(['name' => 'Sachmedien']);
-    $signature = CatalogSignature::query()->create(['signature' => 'I. A 1 a']);
-    $signature->topics()->attach($topic->getKey(), ['position' => 1]);
+    $shelf = CatalogShelf::query()->create(['code' => 'I. A 1 a']);
+    $shelf->topics()->attach($topic->getKey(), ['position' => 1]);
 
     Copy::query()->create([
         'edition_id' => $edition->getKey(),
         'barcode' => 'PRIVATE-BARCODE-001',
         'status' => CopyStatus::Active,
         'shelf_location' => 'I. A 1 a',
-        'signature_id' => $signature->getKey(),
         'purchase_price' => '19.90',
         'internal_notes' => 'NICHT ÖFFENTLICH',
         'legacy_media_id' => '42',

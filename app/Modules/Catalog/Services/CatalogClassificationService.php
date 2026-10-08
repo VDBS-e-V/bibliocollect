@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Services;
 
+use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\Edition;
 
 final class CatalogClassificationService
@@ -11,15 +12,17 @@ final class CatalogClassificationService
     /** @return list<string> */
     public function topicNamesForEdition(Edition $edition): array
     {
-        $edition->loadMissing('copies.signature.topics');
-        $names = [];
+        $edition->loadMissing('copies.shelf.topics');
+        $names = [(string) $edition->local_classification];
 
         foreach ($edition->copies as $copy) {
-            if ($copy->signature === null) {
+            $shelf = $copy->shelf;
+
+            if (! $shelf instanceof CatalogShelf) {
                 continue;
             }
 
-            foreach ($copy->signature->topics as $topic) {
+            foreach ($shelf->topics as $topic) {
                 $names[] = $topic->name;
             }
         }

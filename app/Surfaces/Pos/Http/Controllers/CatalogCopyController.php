@@ -43,7 +43,7 @@ final class CatalogCopyController
     {
         $edition = Edition::query()->with('title')->findOrFail($editionId);
         $copy = Copy::query()
-            ->with('signature.topics')
+            ->with('shelf.topics')
             ->where('edition_id', $edition->getKey())
             ->findOrFail($copyId);
 

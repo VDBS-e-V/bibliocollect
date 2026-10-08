@@ -7,6 +7,7 @@ namespace App\Modules\Catalog\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Regalbrett. Der Code ist der Standort, der am Exemplar steht; die Beschriftung nennt, was dort steht.
@@ -27,7 +28,17 @@ final class CatalogShelf extends Model
     /** @var list<string> */
     protected $fillable = ['code', 'label', 'signature_id', 'sort_order', 'is_active'];
 
-    /** @return BelongsTo<CatalogSignature, $this> */
+    /** @return BelongsToMany<CatalogTopic, $this> */
+    public function topics(): BelongsToMany
+    {
+        return $this->belongsToMany(CatalogTopic::class, 'catalog_shelf_topics', 'shelf_id', 'topic_id')->withPivot('position')->orderByPivot('position');
+    }
+
+    /**
+     * Nur noch für den Import aus dem Altsystem.
+     *
+     * @return BelongsTo<CatalogSignature, $this>
+     */
     public function signature(): BelongsTo
     {
         return $this->belongsTo(CatalogSignature::class, 'signature_id');

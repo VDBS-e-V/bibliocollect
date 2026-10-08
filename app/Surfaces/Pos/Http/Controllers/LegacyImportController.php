@@ -6,6 +6,7 @@ namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Audit\Services\AuditRecorder;
+use App\Modules\Catalog\Actions\ImportCatalogShelvesFromSignaturesAction;
 use App\Modules\Catalog\Actions\ImportLegacyCatalogAction;
 use App\Modules\Catalog\Exceptions\LegacyCatalogImportException;
 use App\Modules\Catalog\Legacy\LegacyCatalogImportAnalyzer;
@@ -62,7 +63,7 @@ final class LegacyImportController
         return response()->view('pages.surfaces.pos.catalog.import.legacy', ['report' => $report, 'token' => $token])->header('Cache-Control', 'private, no-store');
     }
 
-    public function commit(Request $request, string $token, ImportLegacyCatalogAction $import, AuditRecorder $audit): RedirectResponse
+    public function commit(Request $request, string $token, ImportLegacyCatalogAction $import, ImportCatalogShelvesFromSignaturesAction $shelves, AuditRecorder $audit): RedirectResponse
     {
         $request->validate(['confirm' => ['accepted']], ['confirm.accepted' => 'Bitte bestätige den Import.']);
         $actor = $request->user();
@@ -78,6 +79,7 @@ final class LegacyImportController
         }
 
         $this->forget($token);
+        $shelves->execute();
         $audit->record('catalog.legacy.imported', 'Altbestand übernommen.', null, $report->summary, (int) $actor->getKey());
 
         return redirect()->route('pos.catalog.legacy.create')

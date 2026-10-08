@@ -13,9 +13,9 @@ final class CatalogTaxonomyInUse extends RuntimeException
         return new self("Die Signatur „{$code}“ ist noch bei {$copies} Exemplaren eingetragen und kann nicht gelöscht werden.");
     }
 
-    public static function topic(string $name, int $children, int $signatures): self
+    public static function topic(string $name, int $children, int $shelves): self
     {
-        $parts = array_filter([$children > 0 ? "{$children} Unterbereich(e)" : null, $signatures > 0 ? "{$signatures} Signatur(en)" : null]);
+        $parts = array_filter([$children > 0 ? "{$children} Unterbereich(e)" : null, $shelves > 0 ? "{$shelves} Regalbrett(er)" : null]);
 
         return new self("Der Themenbereich „{$name}“ hat noch ".implode(' und ', $parts).' und kann nicht gelöscht werden.');
     }

@@ -45,7 +45,7 @@ return [
                         ['label' => 'Inventur', 'text' => 'Bestand und Regal abgleichen: Regalbrett wählen, Bücher scannen, Bericht über Fehlendes, falsch Einsortiertes und Unbekanntes.', 'route' => 'pos.inventory', 'permission' => 'inventory.count'],
                         ['label' => 'Bücher aussondern', 'text' => 'Alte, beschädigte oder doppelte Bücher mit Grund und Verbleib aus dem Bestand nehmen; Liste für den Jahresbericht.', 'route' => 'pos.withdrawal', 'permission' => 'catalog.withdraw'],
                         ['label' => 'Etiketten auf Vorrat drucken', 'text' => 'Inventarnummern im Voraus drucken (Vorlauf). Das System überspringt vergebene Nummern; einmalig lassen sich die Lücken der laufenden Reihe füllen.', 'route' => 'pos.labels.stock', 'permission' => 'catalog.manage'],
-                        ['label' => 'Etiketten drucken', 'text' => 'Exemplar-Etiketten mit Strichcode und Signatur auf Etikettenbögen.', 'route' => 'pos.labels.copies', 'permission' => 'catalog.manage'],
+                        ['label' => 'Etiketten drucken', 'text' => 'Exemplar-Etiketten mit Strichcode und Standort auf Etikettenbögen.', 'route' => 'pos.labels.copies', 'permission' => 'catalog.manage'],
                         ['label' => 'Öffentlichen Katalog öffnen', 'text' => 'So sehen Leser:innen den Katalog.', 'route' => 'public.catalog.index', 'permission' => null],
                     ],
                 ],
@@ -77,7 +77,7 @@ return [
                     'title' => 'Bestand',
                     'items' => [
                         ['label' => 'Regalbretter pflegen', 'text' => 'Die Liste der Regalbretter anlegen, die beim Erfassen als Standort gewählt werden.', 'route' => 'administration.shelves.index', 'permission' => 'shelves.manage'],
-                        ['label' => 'Signaturen und Themenbereiche pflegen', 'text' => 'Signaturen und ihre Themenbereiche anlegen und ändern. Daraus folgt der Vorschlag des Regalbretts beim Einsortieren.', 'route' => 'administration.signatures.index', 'permission' => 'shelves.manage'],
+                        ['label' => 'Themenbereiche pflegen', 'text' => 'Die Themenbereiche anlegen und ändern, die ein Medium beim Erfassen bekommt. Welche Regalbretter dazu gehören, stellst du bei den Regalbrettern ein.', 'route' => 'administration.topics.index', 'permission' => 'shelves.manage'],
                         ['label' => 'Alte Inventarnummern umstellen', 'text' => 'Exemplare mit alter Nummer ausdrücklich auf neue siebenstellige Nummern umstellen und Etiketten drucken.', 'route' => 'administration.inventory.index', 'permission' => 'inventory.renumber'],
                         ['label' => 'Katalog importieren', 'text' => 'Bestandsdaten aus einer Datei einlesen.', 'route' => 'pos.catalog.import.create', 'permission' => 'catalog.import'],
                         ['label' => 'Altbestand übernehmen', 'text' => 'Den Katalog und die Buchwünsche aus dem alten BiblioCollect (JSON-Export) hochladen, prüfen und übernehmen.', 'route' => 'pos.catalog.legacy.create', 'permission' => 'catalog.import'],

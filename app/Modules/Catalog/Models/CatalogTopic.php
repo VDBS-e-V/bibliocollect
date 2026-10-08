@@ -47,7 +47,17 @@ final class CatalogTopic extends Model
         return $this->hasMany(self::class, 'parent_id')->orderBy('name');
     }
 
-    /** @return BelongsToMany<CatalogSignature, $this> */
+    /** @return BelongsToMany<CatalogShelf, $this> */
+    public function shelves(): BelongsToMany
+    {
+        return $this->belongsToMany(CatalogShelf::class, 'catalog_shelf_topics', 'topic_id', 'shelf_id')->withPivot('position');
+    }
+
+    /**
+     * Nur noch für den Import aus dem Altsystem.
+     *
+     * @return BelongsToMany<CatalogSignature, $this>
+     */
     public function signatures(): BelongsToMany
     {
         return $this->belongsToMany(

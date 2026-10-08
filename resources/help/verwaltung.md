@@ -40,9 +40,9 @@ Unter **Verwaltung → Benutzerkonten** lädst du Mitarbeitende per E-Mail ein (
 
 **Verwaltung → Systemzustand** zeigt, ob Cronjob, Warteschlange und Sicherung laufen, und die letzten Fehler. Dort kannst du Zeitplan-Aufgaben **einmal von Hand ausführen**, eine **Sicherung erstellen** und Sicherungen **herunterladen**. Lade sie regelmäßig herunter und lege sie außerhalb des Servers ab. Wiederherstellen: phpMyAdmin → Datenbank wählen → Importieren → die `.sql.gz`-Datei (vorher ist keine Migration nötig). Übe das einmal mit einer leeren Test-Datenbank.
 
-## Regalbretter, Signaturen, Inventarnummern
+## Regalbretter, Themenbereiche, Inventarnummern
 
-Regalbretter, Signaturen und Themenbereiche pflegst du unter **Verwaltung**; das Einsortieren der Bücher macht die Schüler-AG am Arbeitsplatz („Medien einsortieren“). Alte Inventarnummern stellst du nur unter **Inventarnummern** bewusst auf siebenstellige um; nichts wird automatisch überschrieben.
+Themenbereiche und Regalbretter pflegst du unter **Verwaltung**: Jedes Medium bekommt beim Erfassen ein Thema, und unter „Regalbretter“ legst du fest, zu welchen Themenbereichen ein Brett gehört (ein Thema kann auf mehreren Brettern stehen, daraus entsteht der Vorschlag beim Einsortieren); das Einsortieren der Bücher macht die Schüler-AG am Arbeitsplatz („Medien einsortieren“). Alte Inventarnummern stellst du nur unter **Inventarnummern** bewusst auf siebenstellige um; nichts wird automatisch überschrieben.
 
 ## Löschverlangen
 

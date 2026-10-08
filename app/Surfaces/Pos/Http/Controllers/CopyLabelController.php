@@ -8,7 +8,7 @@ use App\Modules\Catalog\Models\Copy;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-/** Etiketten für Exemplare: Strichcode, Signatur und Kurztitel auf Bögen mit 3 × 8 Etiketten (70 × 36 mm). */
+/** Etiketten für Exemplare: Strichcode, Standort und Kurztitel auf Bögen mit 3 × 8 Etiketten (70 × 36 mm). */
 final class CopyLabelController
 {
     public const PER_SHEET = 24;
@@ -54,7 +54,7 @@ final class CopyLabelController
         ], ['copies.required' => 'Bitte mindestens ein Exemplar auswählen.']);
 
         $copies = Copy::query()
-            ->with(['edition.title', 'signature'])
+            ->with('edition.title')
             ->whereIn('id', $data['copies'])
             ->orderBy('barcode')
             ->get();

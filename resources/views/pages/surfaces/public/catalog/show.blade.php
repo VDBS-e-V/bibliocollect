@@ -169,7 +169,6 @@
                                                 <tr>
                                                     <th scope="col">Exemplar</th>
                                                     <th scope="col">Standort</th>
-                                                    <th scope="col">Signatur</th>
                                                     <th scope="col">Status</th>
                                                 </tr>
                                             </thead>
@@ -181,7 +180,6 @@
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td>{{ $copy->shelf_location ?: '—' }}</td>
-                                                        <td>{{ $copy->signature?->signature ?: '—' }}</td>
                                                         <td>
                                                             <x-ui.badge :variant="$presenter->copyStateVariant($state)">{{ $presenter->copyStateLabel($state) }}</x-ui.badge>
                                                             @if (\App\Modules\Catalog\Enums\CopyAccess::noteFor($copy->access_status))

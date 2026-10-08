@@ -33,7 +33,7 @@
                         <span class="name">BiblioCollect</span>
                     </div>
                     <div class="mid">
-                        <div class="sig">{{ $copy->signature?->signature ?: $copy->shelf_location }}</div>
+                        <div class="sig">{{ $copy->shelf_location }}</div>
                         <div class="title">{{ \Illuminate\Support\Str::limit($copy->edition->title->preferred_title, 48) }}</div>
                     </div>
                     {!! Code128Svg::render($copy->barcode) !!}

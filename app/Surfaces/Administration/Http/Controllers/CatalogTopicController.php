@@ -13,15 +13,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
-/** Themenbereiche mit Unterbereichen, wie sie im öffentlichen Katalog und bei den Signaturen erscheinen. */
+/** Themenbereiche mit Unterbereichen, wie sie beim Erfassen, im öffentlichen Katalog und bei den Regalbrettern erscheinen. */
 final class CatalogTopicController
 {
     public function index(): Response
     {
-        $topics = CatalogTopic::query()->withCount(['children', 'signatures'])->orderBy('name')->get();
+        $topics = CatalogTopic::query()->withCount(['children', 'shelves'])->orderBy('name')->get();
 
         return response()
-            ->view('pages.surfaces.administration.signatures.topics', [
+            ->view('pages.surfaces.administration.topics.index', [
                 'roots' => $topics->whereNull('parent_id')->values(),
                 'topics' => $topics,
             ])

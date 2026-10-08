@@ -1,4 +1,4 @@
-{{-- Auswahl der Themenbereiche einer Signatur, gruppiert nach Hauptbereich. --}}
+{{-- Auswahl der Themenbereiche eines Regalbretts, gruppiert nach Hauptbereich. --}}
 <div class="bc-topic-checklist">
     @foreach ($topicGroups as $group)
         <fieldset>

@@ -38,6 +38,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $depreciated_at
  * @property string|null $further_use
  * @property array<string, mixed>|null $legacy_metadata
+ * @property-read CatalogShelf|null $shelf
  * @property-read CatalogSignature|null $signature
  */
 final class Copy extends Model
@@ -96,7 +97,21 @@ final class Copy extends Model
         return $this->belongsTo(Edition::class, 'edition_id');
     }
 
-    /** @return BelongsTo<CatalogSignature, $this> */
+    /**
+     * Das Regalbrett, auf dem das Exemplar steht (der Standort ist der Code des Regalbretts).
+     *
+     * @return BelongsTo<CatalogShelf, $this>
+     */
+    public function shelf(): BelongsTo
+    {
+        return $this->belongsTo(CatalogShelf::class, 'shelf_location', 'code');
+    }
+
+    /**
+     * Nur noch aus dem Import des Altsystems.
+     *
+     * @return BelongsTo<CatalogSignature, $this>
+     */
     public function signature(): BelongsTo
     {
         return $this->belongsTo(CatalogSignature::class, 'signature_id');

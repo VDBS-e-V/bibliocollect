@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Modules\Catalog\Actions\ShelveCopyAction;
-use App\Modules\Catalog\Models\CatalogShelf;
+use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Services\CatalogShelfOptions;
 use Illuminate\Http\RedirectResponse;
@@ -14,7 +14,8 @@ use Illuminate\Http\Response;
 
 /**
  * Medien einsortieren: Neu erfasste Bücher (und alles ohne Standort) liegen auf einem Stapel. Erst das Buch scannen, dann
- * das Regalbrett bestätigen oder scannen; das zuletzt benutzte Brett ist vorgewählt, ebenso das Brett der Signatur des Exemplars.
+ * das Regalbrett bestätigen oder scannen. Vorgeschlagen werden die Regalbretter zum Thema des Mediums; vorgewählt ist das Brett, auf dem schon
+ * ein anderes Exemplar derselben Ausgabe steht, sonst das erste passende Brett, sonst das zuletzt benutzte.
  * So geht es auch mit dem Handy: Buch fotografieren, bestätigen, nächstes Buch.
  */
 final class ShelvingController
@@ -31,7 +32,7 @@ final class ShelvingController
         $error = null;
 
         if ($code !== '') {
-            $copy = Copy::query()->with(['edition.title', 'signature'])->where('barcode', $code)->first();
+            $copy = Copy::query()->with('edition.title')->where('barcode', $code)->first();
 
             if (! $copy instanceof Copy) {
                 $error = 'Zur Inventarnummer „'.$code.'“ gibt es kein Exemplar.';
@@ -44,6 +45,8 @@ final class ShelvingController
                 'error' => $error,
                 'scanned' => $code,
                 'shelfOptions' => $options,
+                'suggested' => $copy instanceof Copy ? $this->suggestions($copy, $options) : [],
+                'topicName' => $copy instanceof Copy ? $this->topicNameOf($copy) : null,
                 'preselected' => $copy instanceof Copy ? $this->preselect($request, $copy, $options) : '',
                 'stack' => Copy::query()->with('edition.title')->awaitingShelving()->orderBy('barcode')->limit(self::STACK_LIMIT)->get(),
                 'stackTotal' => Copy::query()->awaitingShelving()->count(),
@@ -104,6 +107,44 @@ final class ShelvingController
         return in_array(trim($selected), $active, true) ? trim($selected) : null;
     }
 
+    /** Das Thema des Mediums (bei der Erfassung gewählt), sofern es im Themenverzeichnis steht. */
+    private function topicNameOf(Copy $copy): ?string
+    {
+        $name = trim((string) $copy->edition->local_classification);
+
+        return $name !== '' ? $name : null;
+    }
+
+    /**
+     * Regalbretter zum Thema des Mediums (Code zu Anzeigetext). Gibt es zum Thema keines, zählen die Bretter des übergeordneten Themenbereichs.
+     *
+     * @param  array<string, string>  $options  auswählbare Regalbretter
+     * @return array<string, string>
+     */
+    private function suggestions(Copy $copy, array $options): array
+    {
+        $name = $this->topicNameOf($copy);
+
+        if ($name === null) {
+            return [];
+        }
+
+        $topic = CatalogTopic::query()->where('name', $name)->first();
+
+        while ($topic instanceof CatalogTopic) {
+            $codes = $topic->shelves()->where('is_active', true)->orderBy('sort_order')->orderBy('code')->pluck('code')->all();
+            $codes = array_values(array_filter($codes, static fn (string $code): bool => isset($options[$code])));
+
+            if ($codes !== []) {
+                return array_combine($codes, array_map(static fn (string $code): string => $options[$code], $codes));
+            }
+
+            $topic = $topic->parent_id !== null ? CatalogTopic::query()->find($topic->parent_id) : null;
+        }
+
+        return [];
+    }
+
     /** @param array<string, string> $options */
     private function preselect(Request $request, Copy $copy, array $options): string
     {
@@ -111,14 +152,6 @@ final class ShelvingController
 
         if (isset($options[$wanted])) {
             return $wanted;
-        }
-
-        if ($copy->signature_id !== null) {
-            $bySignature = CatalogShelf::query()->where('is_active', true)->where('signature_id', $copy->signature_id)->value('code');
-
-            if (is_string($bySignature) && isset($options[$bySignature])) {
-                return $bySignature;
-            }
         }
 
         // Andere Exemplare derselben Ausgabe stehen schon im Regal: dort gehört dieses auch hin.
@@ -132,6 +165,12 @@ final class ShelvingController
 
         if (is_string($sibling) && isset($options[$sibling])) {
             return $sibling;
+        }
+
+        $suggested = array_key_first($this->suggestions($copy, $options));
+
+        if (is_string($suggested)) {
+            return $suggested;
         }
 
         $last = $request->session()->get(self::LAST_SHELF);

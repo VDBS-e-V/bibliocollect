@@ -2,11 +2,12 @@
     <x-ui.page-header
         kicker="Verwaltung"
         title="Themenbereiche"
-        lead="Die Themenbereiche mit ihren Unterbereichen. Sie erscheinen bei den Signaturen und im Katalog."
+        lead="Die Themenbereiche mit ihren Unterbereichen. Jedes Medium bekommt beim Erfassen ein Thema; die Regalbretter ordnest du den Themenbereichen unter „Regalbretter“ zu."
     />
 
     <div class="bc-context-actions">
-        <a href="{{ route('administration.signatures.index') }}">← Zurück zu den Signaturen</a>
+        <a href="{{ route('administration.home') }}">← Zurück zur Verwaltung</a>
+        <a href="{{ route('administration.shelves.index') }}">Regalbretter und ihre Themen</a>
     </div>
 
     @if (session('taxonomy_success'))
@@ -57,8 +58,8 @@
                             <x-ui.button type="submit" variant="secondary">Speichern</x-ui.button>
                         </form>
                         <div class="bc-shelf__meta">
-                            <span>{{ $topic->signatures_count }} Signatur(en)@if ($topic->children_count > 0), {{ $topic->children_count }} Unterbereich(e)@endif</span>
-                            @if ($topic->signatures_count === 0 && $topic->children_count === 0)
+                            <span>{{ $topic->shelves_count }} Regalbrett(er)@if ($topic->children_count > 0), {{ $topic->children_count }} Unterbereich(e)@endif</span>
+                            @if ($topic->shelves_count === 0 && $topic->children_count === 0)
                                 <form method="post" action="{{ route('administration.topics.destroy', ['topicId' => $topic->getKey()]) }}">
                                     @csrf
                                     @method('DELETE')

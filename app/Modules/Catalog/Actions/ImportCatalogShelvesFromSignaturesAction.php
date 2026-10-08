@@ -11,8 +11,8 @@ use App\Modules\Catalog\Models\Copy;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Legt zu jeder Signatur ein Regalbrett an (Bezeichnung = Signatur, Beschriftung = die Themenbereiche) und merkt sich die
- * Verbindung zur Signatur. Wiederholbar: Vorhandene Regalbretter behalten Reihenfolge und Schalter. Alte Freitext-Standorte,
+ * Übernimmt die Signaturen des Altsystems als Regalbretter (Bezeichnung = Signatur, Beschriftung = die Themenbereiche) samt
+ * Themenbereichen für den Vorschlag beim Einsortieren. Wiederholbar: Vorhandene Regalbretter behalten Reihenfolge und Schalter. Alte Freitext-Standorte,
  * die nur anders geschrieben sind („IA1d“ statt „I. A 1 d“), werden dem Regalbrett zugeordnet und doppelte Einträge entfernt.
  */
 final readonly class ImportCatalogShelvesFromSignaturesAction
@@ -44,6 +44,8 @@ final readonly class ImportCatalogShelvesFromSignaturesAction
                     $shelf->forceFill(['label' => $shelf->label ?? $label, 'signature_id' => $signature->getKey()])->save();
                     $updated++;
                 }
+
+                $shelf->topics()->syncWithoutDetaching($signature->topics->values()->mapWithKeys(static fn ($topic, int $index): array => [(string) $topic->getKey() => ['position' => $index + 1]])->all());
 
                 // Gleich geschriebene Standorte ohne Punkte, Leerzeichen und Groß-/Kleinschreibung zusammenführen.
                 foreach (CatalogShelf::query()->where('id', '!=', $shelf->getKey())->get() as $other) {

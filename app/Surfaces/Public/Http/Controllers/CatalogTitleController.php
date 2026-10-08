@@ -28,7 +28,7 @@ final class CatalogTitleController
         PublicCatalogPresenter $presenter,
     ): Response {
         $title = Title::query()
-            ->with(['contributions.contributor', 'editions.copies.signature.topics'])
+            ->with(['contributions.contributor', 'editions.copies.shelf.topics'])
             ->findOrFail($titleId);
 
         /** @var array<string, HoldingSummary> $editionSummaries */

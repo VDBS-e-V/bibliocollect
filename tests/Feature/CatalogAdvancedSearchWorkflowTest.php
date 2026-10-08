@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Modules\Catalog\Enums\CopyStatus;
-use App\Modules\Catalog\Models\CatalogSignature;
+use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Contributor;
 use App\Modules\Catalog\Models\Copy;
@@ -50,11 +50,11 @@ it('combines public advanced filters on the same bibliographic edition', functio
     ]);
 
     $topic = CatalogTopic::query()->create(['name' => 'Astronomie']);
-    $signature = CatalogSignature::query()->create(['signature' => 'NAT ASTRO']);
-    $signature->topics()->attach($topic->getKey(), ['position' => 1]);
+    $shelf = CatalogShelf::query()->create(['code' => 'NAT ASTRO']);
+    $shelf->topics()->attach($topic->getKey(), ['position' => 1]);
     Copy::query()->create([
         'edition_id' => $edition->getKey(),
-        'signature_id' => $signature->getKey(),
+        'shelf_location' => 'NAT ASTRO',
         'barcode' => 'ADV-PUBLIC-001',
         'status' => CopyStatus::Active,
     ]);

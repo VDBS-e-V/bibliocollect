@@ -16,10 +16,10 @@ final readonly class DeleteCatalogTopicAction
     public function execute(CatalogTopic $topic): void
     {
         $children = $topic->children()->count();
-        $signatures = $topic->signatures()->count();
+        $shelves = $topic->shelves()->count();
 
-        if ($children > 0 || $signatures > 0) {
-            throw CatalogTaxonomyInUse::topic($topic->name, $children, $signatures);
+        if ($children > 0 || $shelves > 0) {
+            throw CatalogTaxonomyInUse::topic($topic->name, $children, $shelves);
         }
 
         $this->audit->record('catalog.topic.deleted', 'Themenbereich gelöscht.', $topic);

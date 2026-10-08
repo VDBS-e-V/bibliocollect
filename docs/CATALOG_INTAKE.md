@@ -11,7 +11,7 @@ Der Einstieg ist der Link „Medium erfassen“ in der Katalogpflege. Das Recht 
 | 1 Identifizieren | Barcode des Exemplars, dann ISBN **oder** Titel/Autor:in für die DNB-Abfrage – oder „ohne Abfrage manuell erfassen“ |
 | 2 Treffer prüfen | Nur wenn nötig: DNB-Treffer, bereits vorhandene Ausgaben mit gleicher ISBN, manuelle Erfassung |
 | 3 Titel & Ausgabe | Titel, Verantwortliche, Veröffentlichung, Einordnung – vorbefüllt, vollständig änderbar |
-| 4 Exemplar | Signatur/Standort und Zustand im Bestand |
+| 4 Exemplar | Zugänglichkeit und Zustand; den Standort bekommt das Exemplar beim Einsortieren |
 | 5 Prüfen & speichern | Zusammenfassung, danach „Speichern & nächstes Medium“ oder „Speichern & Titel öffnen“ |
 
 Gegenüber dem Altsystem (sieben Schritte) sind Primärdaten, Veröffentlichungsdaten und Normen/Klassen in **einen** Schritt zusammengefasst. Felder, die nur Legacy-Historie sind (Ausleihzähler, letzte Ausleihe, Dateigröße), werden bei der Erfassung nicht abgefragt.

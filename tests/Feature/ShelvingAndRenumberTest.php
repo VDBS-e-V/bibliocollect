@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Modules\Audit\Models\AuditEvent;
+use App\Modules\Catalog\Actions\ImportCatalogShelvesFromSignaturesAction;
 use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogSignature;
 use App\Modules\Catalog\Models\CatalogTopic;
@@ -64,20 +65,28 @@ it('shelves books by scanning the book first and confirming the shelf', function
     expect($first->refresh()->shelf_location)->toBe('R1-B1');
 });
 
-it('takes the shelf from a scanned shelf label and prefers the shelf of the copy signature', function (): void {
+it('takes the shelf from a scanned shelf label and suggests the shelves of the topic', function (): void {
     $helper = stackUser('student_ag_basic');
-    $signature = CatalogSignature::query()->create(['signature' => 'I. A 1 d']);
-    CatalogShelf::query()->create(['code' => 'I. A 1 d', 'signature_id' => $signature->getKey()]);
+    $topic = CatalogTopic::query()->create(['name' => 'Rätsel & Knobeln']);
+    $a = CatalogShelf::query()->create(['code' => 'I. A 1 d', 'sort_order' => 2]);
+    $b = CatalogShelf::query()->create(['code' => 'I. A 1 e', 'sort_order' => 1]);
+    $a->topics()->attach($topic->getKey(), ['position' => 1]);
+    $b->topics()->attach($topic->getKey(), ['position' => 1]);
     CatalogShelf::query()->create(['code' => 'R1-B1']);
-    $copy = stackCopy('0020005', 'Mit Signatur', true);
-    $copy->forceFill(['signature_id' => $signature->getKey()])->save();
+    $copy = stackCopy('0020005', 'Mit Thema', true);
+    $copy->edition->forceFill(['local_classification' => 'Rätsel & Knobeln'])->save();
 
-    // Signatur vor „zuletzt benutzt“.
-    $this->actingAs($helper)->withSession(['shelving.last_shelf' => 'R1-B1'])->get(route('pos.shelving', ['buch' => '0020005']))->assertSee('<option value="I. A 1 d" selected>', false);
+    // Das Thema hat zwei Regalbretter: beide werden genannt, das erste in der Reihenfolge ist vorgewählt, vor „zuletzt benutzt“.
+    $page = $this->actingAs($helper)->withSession(['shelving.last_shelf' => 'R1-B1'])->get(route('pos.shelving', ['buch' => '0020005']));
+    $page->assertSee('<option value="I. A 1 e" selected>', false)->assertSee('Rätsel &amp; Knobeln', false)->assertSee('I. A 1 e, I. A 1 d');
+
+    // Ohne Thema gibt es keinen Vorschlag, aber den Hinweis darauf.
+    stackCopy('0020006', 'Ohne Thema', true);
+    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0020006']))->assertSee('noch kein Thema');
 
     // Etikett gescannt, in anderer Schreibweise: hat Vorrang vor der Auswahl.
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett' => 'R1-B1', 'regalbrett_code' => 'ia1d'])->assertSessionHas('shelving_notice');
-    expect($copy->refresh()->shelf_location)->toBe('I. A 1 d');
+    expect($copy->refresh()->shelf_location)->toBe('I. A 1 d')->and($copy->signature_id)->toBeNull();
 
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett_code' => 'gibt es nicht'])->assertSessionHas('shelving_error');
 });
@@ -98,7 +107,7 @@ it('refuses unknown books, unknown shelves and missing input while shelving', fu
     expect(Copy::query()->awaitingShelving()->whereKey($copy->getKey())->exists())->toBeTrue()->and($copy->refresh()->shelf_location)->toBeNull();
 });
 
-it('creates the shelves from the signatures with their topics and merges old spellings', function (): void {
+it('takes the shelves of the old system over with their topics and merges old spellings', function (): void {
     $admin = stackUser('management');
     $topic = CatalogTopic::query()->create(['name' => 'Rätsel & Knobeln']);
     $other = CatalogTopic::query()->create(['name' => 'Lesestart']);
@@ -111,21 +120,20 @@ it('creates the shelves from the signatures with their topics and merges old spe
     CatalogShelf::query()->create(['code' => 'IA1d']);
     $copy = stackCopy('0020020', 'Altbuch', false, 'IA1d');
 
-    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Regalbretter aus Signaturen anlegen');
-    $this->actingAs($admin)->post(route('administration.shelves.from-signatures'))->assertRedirect(route('administration.shelves.index'))->assertSessionHas('shelf_success');
+    app(ImportCatalogShelvesFromSignaturesAction::class)->execute();
 
     $shelf = CatalogShelf::query()->where('code', 'I. A 1 d')->firstOrFail();
     expect(CatalogShelf::query()->orderBy('sort_order')->pluck('code')->all())->toBe(['I. A 1 b', 'I. A 1 d'])
         ->and($shelf->label)->toBe('Rätsel & Knobeln / Lesestart')
-        ->and($shelf->signature_id)->toBe($b->getKey())
+        ->and($shelf->topics->pluck('name')->all())->toBe(['Rätsel & Knobeln', 'Lesestart'])
         ->and($copy->refresh()->shelf_location)->toBe('I. A 1 d');
 
     // Wiederholbar, ändert nichts Eigenes.
     $shelf->forceFill(['label' => 'Eigene Beschriftung', 'is_active' => false])->save();
-    $this->actingAs($admin)->post(route('administration.shelves.from-signatures'))->assertRedirect();
+    app(ImportCatalogShelvesFromSignaturesAction::class)->execute();
     expect(CatalogShelf::query()->count())->toBe(2)->and($shelf->refresh()->label)->toBe('Eigene Beschriftung')->and($shelf->is_active)->toBeFalse();
 
-    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Themen: Rätsel &amp; Knobeln, Lesestart', false);
+    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Themen: Rätsel &amp; Knobeln, Lesestart', false)->assertDontSee('Signatur');
 });
 
 it('shows the stack on the workplace and in the menu', function (): void {

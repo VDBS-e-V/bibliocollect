@@ -5,24 +5,22 @@ declare(strict_types=1);
 namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Modules\Catalog\Actions\DeleteCatalogShelfAction;
-use App\Modules\Catalog\Actions\ImportCatalogShelvesFromSignaturesAction;
 use App\Modules\Catalog\Actions\SaveCatalogShelfAction;
 use App\Modules\Catalog\Exceptions\CatalogShelfInUse;
 use App\Modules\Catalog\Models\CatalogShelf;
-use App\Modules\Catalog\Models\CatalogSignature;
+use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
-use App\Modules\Catalog\Services\CatalogSignatureOptions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
-/** Regalbretter: die Liste, aus der beim Erfassen und Bearbeiten der Standort eines Exemplars gewählt wird. */
+/** Regalbretter: die Liste, aus der beim Einsortieren und Bearbeiten der Standort eines Exemplars gewählt wird, samt Themenbereichen für den Vorschlag. */
 final class CatalogShelfController
 {
     public function index(): Response
     {
-        $shelves = CatalogShelf::query()->with('signature.topics')->orderBy('sort_order')->orderBy('code')->get();
+        $shelves = CatalogShelf::query()->with('topics')->orderBy('sort_order')->orderBy('code')->get();
 
         $counts = Copy::query()->whereNotNull('shelf_location')->selectRaw('shelf_location, count(*) as total')->groupBy('shelf_location')->pluck('total', 'shelf_location')->all();
 
@@ -31,18 +29,9 @@ final class CatalogShelfController
                 'shelves' => $shelves,
                 'counts' => $counts,
                 'nextOrder' => ((int) $shelves->max('sort_order')) + 1,
-                'signatureCount' => CatalogSignature::query()->count(),
-                'signatureOptions' => app(CatalogSignatureOptions::class)->forSelect(),
+                'topicGroups' => $this->topicGroups(),
             ])
             ->header('Cache-Control', 'private, no-store');
-    }
-
-    /** Zu jeder Signatur ein Regalbrett anlegen (wiederholbar). */
-    public function fromSignatures(ImportCatalogShelvesFromSignaturesAction $import): RedirectResponse
-    {
-        $result = $import->execute();
-
-        return redirect()->route('administration.shelves.index')->with('shelf_success', "Aus den Signaturen übernommen: {$result['created']} neue Regalbretter, {$result['updated']} aktualisiert, {$result['merged']} doppelte Schreibweisen zusammengeführt.");
     }
 
     public function store(Request $request, SaveCatalogShelfAction $save): RedirectResponse
@@ -51,10 +40,11 @@ final class CatalogShelfController
             'code' => ['required', 'string', 'max:40', Rule::unique('catalog_shelves', 'code')],
             'label' => ['nullable', 'string', 'max:120'],
             'sort_order' => ['nullable', 'integer', 'between:0,9999'],
-            'signature_id' => ['nullable', 'string', Rule::exists('catalog_signatures', 'id')],
+            'topics' => ['nullable', 'array'],
+            'topics.*' => ['string', Rule::exists('catalog_topics', 'id')],
         ], $this->messages());
 
-        $save->execute(null, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), true, $data['signature_id'] ?? null);
+        $save->execute(null, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), true, array_values($data['topics'] ?? []));
 
         return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.trim($data['code']).'“ ist angelegt.');
     }
@@ -68,10 +58,11 @@ final class CatalogShelfController
             'label' => ['nullable', 'string', 'max:120'],
             'sort_order' => ['nullable', 'integer', 'between:0,9999'],
             'is_active' => ['nullable', 'boolean'],
-            'signature_id' => ['nullable', 'string', Rule::exists('catalog_signatures', 'id')],
+            'topics' => ['nullable', 'array'],
+            'topics.*' => ['string', Rule::exists('catalog_topics', 'id')],
         ], $this->messages());
 
-        $save->execute($shelf, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), $request->boolean('is_active'), $data['signature_id'] ?? null);
+        $save->execute($shelf, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), $request->boolean('is_active'), array_values($data['topics'] ?? []));
 
         return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.trim($data['code']).'“ ist gespeichert.');
     }
@@ -87,6 +78,23 @@ final class CatalogShelfController
         }
 
         return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.$shelf->code.'“ ist gelöscht.');
+    }
+
+    /**
+     * Themenbereiche als Gruppen: Hauptbereich mit seinen Unterbereichen, für die Auswahl.
+     *
+     * @return list<array{root: CatalogTopic, children: list<CatalogTopic>}>
+     */
+    private function topicGroups(): array
+    {
+        $topics = CatalogTopic::query()->orderBy('name')->get();
+        $groups = [];
+
+        foreach ($topics->whereNull('parent_id') as $root) {
+            $groups[] = ['root' => $root, 'children' => $topics->where('parent_id', $root->getKey())->values()->all()];
+        }
+
+        return $groups;
     }
 
     /** @return array<string, string> */

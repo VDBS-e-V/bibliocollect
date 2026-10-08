@@ -53,6 +53,13 @@
                 <form method="post" action="{{ route('pos.shelving.scan') }}" class="bc-shelving-form">
                     @csrf
                     <input type="hidden" name="buch" value="{{ $copy->barcode }}">
+                    @if ($suggested !== [])
+                        <p class="bc-section-copy">Thema „{{ $topicName }}“: Vorschlag @if (count($suggested) === 1) ist das Regalbrett @else sind die Regalbretter @endif<strong>{{ implode(', ', array_keys($suggested)) }}</strong>.</p>
+                    @elseif ($topicName)
+                        <p class="bc-section-copy">Thema „{{ $topicName }}“: Dafür ist noch kein Regalbrett eingetragen (Verwaltung → Regalbretter).</p>
+                    @else
+                        <p class="bc-section-copy">Dieses Medium hat noch kein Thema, deshalb gibt es keinen Vorschlag.</p>
+                    @endif
                     <x-ui.select label="2. Regalbrett" name="regalbrett" id="shelving-shelf">
                         <option value="">Bitte wählen …</option>
                         @foreach ($shelfOptions as $code => $display)
@@ -66,7 +73,7 @@
                     </div>
                 </form>
                 @if ($preselected !== '')
-                    <p class="bc-section-copy">Vorgewählt ist das Regalbrett der Signatur, sonst das der anderen Exemplare dieser Ausgabe, sonst das zuletzt benutzte.</p>
+                    <p class="bc-section-copy">Vorgewählt ist das Regalbrett der anderen Exemplare dieser Ausgabe, sonst das erste passende zum Thema, sonst das zuletzt benutzte.</p>
                 @endif
             @endif
         </section>

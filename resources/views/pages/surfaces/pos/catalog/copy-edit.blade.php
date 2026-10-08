@@ -34,8 +34,7 @@
             || $copy->legacy_condition
             || $copy->depreciation_reason
             || $copy->depreciated_at
-            || $copy->further_use
-            || $copy->signature;
+            || $copy->further_use;
     @endphp
 
     <section class="bc-content-section" aria-labelledby="catalog-copy-context-heading">
@@ -109,15 +108,9 @@
         <section class="bc-content-section" aria-labelledby="catalog-copy-legacy-heading">
             <div class="bc-section-heading"><h2 id="catalog-copy-legacy-heading">Bestands- und Legacy-Metadaten</h2></div>
             <p class="bc-section-copy">
-                Diese Angaben stammen aus dem historischen Bestand oder aus strukturierten Signaturen. Alte Verfügbarkeit und Ausleihzähler sind reine Historie und steuern die aktuelle Circulation nicht.
+                Diese Angaben stammen aus dem historischen Bestand. Alte Verfügbarkeit und Ausleihzähler sind reine Historie und steuern die aktuelle Circulation nicht.
             </p>
             <dl class="bc-detail-list">
-                @if ($copy->signature)
-                    <div><dt>Strukturierte Signatur</dt><dd>{{ $copy->signature->signature }}</dd></div>
-                    @if ($copy->signature->topics->isNotEmpty())
-                        <div><dt>Themen</dt><dd>{{ $copy->signature->topics->pluck('name')->implode(', ') }}</dd></div>
-                    @endif
-                @endif
                 @if ($copy->access_status && ! \App\Modules\Catalog\Enums\CopyAccess::tryFrom($copy->access_status))<div><dt>Zugangsstatus (Altsystem)</dt><dd>{{ $copy->access_status }}</dd></div>@endif
                 @if ($copy->condition_code)<div><dt>Zustand</dt><dd>{{ $copy->condition_code }}</dd></div>@endif
                 @if ($copy->purchase_date)<div><dt>Erwerbungsdatum</dt><dd>{{ $copy->purchase_date->format('d.m.Y') }}</dd></div>@endif

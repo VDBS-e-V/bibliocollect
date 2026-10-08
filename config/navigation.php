@@ -177,9 +177,9 @@ return [
                     'order' => 32,
                 ],
                 [
-                    'label' => 'Signaturen und Themen',
-                    'route' => 'administration.signatures.index',
-                    'active' => 'administration.signatures.*',
+                    'label' => 'Themenbereiche',
+                    'route' => 'administration.topics.index',
+                    'active' => 'administration.topics.*',
                     'permission' => 'shelves.manage',
                     'order' => 31,
                 ],
