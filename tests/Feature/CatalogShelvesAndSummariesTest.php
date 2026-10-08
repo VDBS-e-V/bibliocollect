@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Modules\Catalog\Models\CatalogShelf;
+use App\Modules\Catalog\Models\CatalogShelfSection;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
+use App\Modules\Catalog\Services\CatalogShelfStructure;
 use App\Modules\Catalog\Services\CatalogSummaryService;
 use App\Modules\Identity\Actions\AssignRoleAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -44,7 +46,7 @@ it('lets the administration manage the list of shelves', function (): void {
 
     $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('R3-B2')->assertSee('Fantasy ab 10 Jahren');
 
-    $this->actingAs($admin)->post(route('administration.shelves.store'), ['code' => 'R3-B2'])->assertSessionHasErrors('code');
+    $this->actingAs($admin)->post(route('administration.shelves.store'), ['code' => 'R3-B2'])->assertSessionHasErrors('shelf');
     $this->actingAs($admin)->post(route('administration.shelves.store'), ['code' => ''])->assertSessionHasErrors('code');
     $this->actingAs($admin)->post(route('administration.shelves.store'), ['code' => str_repeat('x', 41)])->assertSessionHasErrors('code');
 });
@@ -159,4 +161,69 @@ it('prefills the summary in the intake when the DNB record has none', function (
 
     $this->get(route('pos.catalog.intake.details'))->assertOk()->assertSee('Der Klappentext zu diesem Buch')->assertSee('Automatisch von Google Books vorgeschlagen');
 
+});
+
+it('builds the location from group, area, rack and board and keeps it in step when a level is renamed', function (): void {
+    $admin = shelfUser('management');
+
+    $this->actingAs($admin)->post(route('administration.sections.store'), ['kind' => 'group', 'code' => 'I', 'name' => 'Kinderbibliothek'])->assertSessionHas('shelf_success');
+    $group = CatalogShelfSection::query()->where('kind', 'group')->firstOrFail();
+    $this->actingAs($admin)->post(route('administration.sections.store'), ['kind' => 'area', 'parent_id' => (string) $group->getKey(), 'code' => 'A'])->assertSessionHas('shelf_success');
+    $area = CatalogShelfSection::query()->where('kind', 'area')->firstOrFail();
+    $this->actingAs($admin)->post(route('administration.sections.store'), ['kind' => 'rack', 'parent_id' => (string) $area->getKey(), 'code' => '1', 'name' => 'Wand links'])->assertSessionHas('shelf_success');
+    $rack = CatalogShelfSection::query()->where('kind', 'rack')->firstOrFail();
+
+    $this->actingAs($admin)->post(route('administration.shelves.store'), ['rack_id' => (string) $rack->getKey(), 'board' => 'a', 'label' => 'Lesestart'])->assertSessionHas('shelf_success');
+    $shelf = CatalogShelf::query()->firstOrFail();
+    expect($shelf->code)->toBe('I. A 1 a')->and($shelf->board)->toBe('a')->and($shelf->section_id)->toBe((string) $rack->getKey());
+
+    $page = $this->actingAs($admin)->get(route('administration.shelves.index'))->assertOk();
+    $page->assertSee('Kinderbibliothek')->assertSee('Wand links')->assertSee('I. A 1 a')->assertSee('Bereichsgruppe')->assertSee('Regalbrett');
+
+    // Gleicher Standort doppelt, Regal ohne Bezeichnung des Bretts, falsche Ebene.
+    $this->actingAs($admin)->post(route('administration.shelves.store'), ['rack_id' => (string) $rack->getKey(), 'board' => 'a'])->assertSessionHasErrors('shelf');
+    $this->actingAs($admin)->post(route('administration.shelves.store'), ['rack_id' => (string) $rack->getKey()])->assertSessionHasErrors('board');
+    $this->actingAs($admin)->post(route('administration.shelves.store'), ['rack_id' => (string) $area->getKey(), 'board' => 'b'])->assertSessionHasErrors('rack_id');
+    $this->actingAs($admin)->post(route('administration.sections.store'), ['kind' => 'area', 'parent_id' => (string) $rack->getKey(), 'code' => 'X'])->assertSessionHasErrors('shelf');
+    $this->actingAs($admin)->post(route('administration.sections.store'), ['kind' => 'rack', 'parent_id' => (string) $area->getKey(), 'code' => '1'])->assertSessionHasErrors('shelf');
+
+    // Das Exemplar zieht mit, wenn das Regal umbenannt wird.
+    $copy = shelfCopy('0010100', 'I. A 1 a');
+    $this->actingAs($admin)->patch(route('administration.sections.update', ['sectionId' => $rack->getKey()]), ['code' => '2', 'name' => 'Wand links'])->assertSessionHas('shelf_success');
+    expect($shelf->refresh()->code)->toBe('I. A 2 a')->and($copy->refresh()->shelf_location)->toBe('I. A 2 a');
+
+    $this->actingAs($admin)->patch(route('administration.sections.update', ['sectionId' => $group->getKey()]), ['code' => 'II'])->assertSessionHas('shelf_success');
+    expect($shelf->refresh()->code)->toBe('II. A 2 a')->and($copy->refresh()->shelf_location)->toBe('II. A 2 a');
+
+    // Nur leere Ebenen lassen sich löschen.
+    $this->actingAs($admin)->delete(route('administration.sections.destroy', ['sectionId' => $rack->getKey()]))->assertSessionHasErrors('shelf');
+    $this->actingAs($admin)->delete(route('administration.sections.destroy', ['sectionId' => $group->getKey()]))->assertSessionHasErrors('shelf');
+});
+
+it('assigns shelves with an old location code to their rack', function (): void {
+    $admin = shelfUser('management');
+    CatalogShelf::query()->create(['code' => 'I. B 2 c']);
+    CatalogShelf::query()->create(['code' => 'I. B 2 d']);
+    CatalogShelf::query()->create(['code' => 'Sonderregal']);
+
+    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Regalbretter ohne Regal');
+    $this->actingAs($admin)->post(route('administration.sections.assign'))->assertSessionHas('shelf_success', '2 Regalbretter wurden ihrem Regal zugeordnet.');
+
+    expect(CatalogShelfSection::query()->where('kind', 'group')->count())->toBe(1)
+        ->and(CatalogShelfSection::query()->where('kind', 'area')->count())->toBe(1)
+        ->and(CatalogShelfSection::query()->where('kind', 'rack')->count())->toBe(1)
+        ->and(CatalogShelf::query()->where('code', 'I. B 2 d')->firstOrFail()->board)->toBe('d')
+        ->and(CatalogShelf::query()->whereNull('section_id')->pluck('code')->all())->toBe(['Sonderregal']);
+});
+
+it('lists the shelves grouped by rack when shelving', function (): void {
+    $helper = shelfUser('student_ag_basic');
+    $structure = app(CatalogShelfStructure::class);
+    CatalogShelf::query()->create(['code' => 'I. A 1 a']);
+    CatalogShelf::query()->create(['code' => 'Sonderregal']);
+    $structure->assignAll();
+    shelfCopy('0010200', null);
+
+    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0010200']))->assertOk()
+        ->assertSee('<optgroup label="I › A › 1">', false)->assertSee('<optgroup label="Ohne Regal">', false);
 });

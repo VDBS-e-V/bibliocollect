@@ -211,12 +211,17 @@
                 />
                 @php
                     $topicOptions = app(\App\Modules\Catalog\Services\CatalogTopicOptions::class)->forSelect();
+                    $topicGroups = app(\App\Modules\Catalog\Services\CatalogTopicOptions::class)->grouped();
                     $currentTopic = (string) old('local_classification', $details->localClassification ?? '');
                 @endphp
                 <x-ui.select label="Themenbereich" name="local_classification" :error="$errors->first('local_classification')">
                     <option value="">– nicht angegeben –</option>
-                    @foreach ($topicOptions as $name => $display)
-                        <option value="{{ $name }}" @selected($currentTopic === $name)>{{ $display }}</option>
+                    @foreach ($topicGroups as $group)
+                        <optgroup label="{{ $group['root'] }}">
+                            @foreach ($group['options'] as $name => $display)
+                                <option value="{{ $name }}" @selected($currentTopic === $name)>{{ $display }}</option>
+                            @endforeach
+                        </optgroup>
                     @endforeach
                     @if ($currentTopic !== '' && ! isset($topicOptions[$currentTopic]))
                         <option value="{{ $currentTopic }}" selected>{{ $currentTopic }}</option>

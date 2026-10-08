@@ -62,8 +62,12 @@
                     @endif
                     <x-ui.select label="2. Regalbrett" name="regalbrett" id="shelving-shelf">
                         <option value="">Bitte wählen …</option>
-                        @foreach ($shelfOptions as $code => $display)
-                            <option value="{{ $code }}" @selected($preselected === $code)>{{ $display }}</option>
+                        @foreach ($shelfGroups as $group)
+                            <optgroup label="{{ $group['label'] }}">
+                                @foreach ($group['options'] as $code => $display)
+                                    <option value="{{ $code }}" @selected($preselected === $code)>{{ $display }}</option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </x-ui.select>
                     <x-ui.input label="oder Etikett des Regalbretts scannen" name="regalbrett_code" id="shelving-shelf-code" autocomplete="off" hint="Hat Vorrang vor der Auswahl." />

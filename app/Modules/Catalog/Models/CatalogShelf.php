@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $code
  * @property string|null $label
  * @property string|null $signature_id
+ * @property string|null $section_id
+ * @property string|null $board
  * @property int $sort_order
  * @property bool $is_active
  */
@@ -26,7 +28,17 @@ final class CatalogShelf extends Model
     protected $table = 'catalog_shelves';
 
     /** @var list<string> */
-    protected $fillable = ['code', 'label', 'signature_id', 'sort_order', 'is_active'];
+    protected $fillable = ['code', 'label', 'signature_id', 'section_id', 'board', 'sort_order', 'is_active'];
+
+    /**
+     * Das Regal, in dem das Regalbrett liegt.
+     *
+     * @return BelongsTo<CatalogShelfSection, $this>
+     */
+    public function rack(): BelongsTo
+    {
+        return $this->belongsTo(CatalogShelfSection::class, 'section_id');
+    }
 
     /** @return BelongsToMany<CatalogTopic, $this> */
     public function topics(): BelongsToMany

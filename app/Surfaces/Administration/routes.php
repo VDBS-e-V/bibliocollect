@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Surfaces\Administration\Http\Controllers\AdminHomeController;
 use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
 use App\Surfaces\Administration\Http\Controllers\CatalogShelfController;
+use App\Surfaces\Administration\Http\Controllers\CatalogShelfSectionController;
 use App\Surfaces\Administration\Http\Controllers\CatalogTopicController;
 use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
 use App\Surfaces\Administration\Http\Controllers\InventoryRenumberController;
@@ -111,6 +112,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('/verwaltung/themenbereiche', [CatalogTopicController::class, 'store'])->name('administration.topics.store');
         Route::patch('/verwaltung/themenbereiche/{topicId}', [CatalogTopicController::class, 'update'])->name('administration.topics.update');
         Route::delete('/verwaltung/themenbereiche/{topicId}', [CatalogTopicController::class, 'destroy'])->name('administration.topics.destroy');
+
+        Route::post('/verwaltung/standorte', [CatalogShelfSectionController::class, 'store'])->name('administration.sections.store');
+        Route::post('/verwaltung/standorte/zuordnen', [CatalogShelfSectionController::class, 'assign'])->name('administration.sections.assign');
+        Route::patch('/verwaltung/standorte/{sectionId}', [CatalogShelfSectionController::class, 'update'])->name('administration.sections.update');
+        Route::delete('/verwaltung/standorte/{sectionId}', [CatalogShelfSectionController::class, 'destroy'])->name('administration.sections.destroy');
 
         Route::patch('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'update'])->name('administration.shelves.update');
         Route::delete('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'destroy'])->name('administration.shelves.destroy');

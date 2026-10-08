@@ -133,7 +133,7 @@ it('takes the shelves of the old system over with their topics and merges old sp
     app(ImportCatalogShelvesFromSignaturesAction::class)->execute();
     expect(CatalogShelf::query()->count())->toBe(2)->and($shelf->refresh()->label)->toBe('Eigene Beschriftung')->and($shelf->is_active)->toBeFalse();
 
-    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Themen: Rätsel &amp; Knobeln, Lesestart', false)->assertDontSee('Signatur');
+    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('Rätsel &amp; Knobeln', false)->assertSee('Lesestart')->assertSee('Bereichsgruppe')->assertDontSee('Signatur');
 });
 
 it('shows the stack on the workplace and in the menu', function (): void {

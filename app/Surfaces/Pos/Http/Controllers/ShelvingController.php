@@ -45,6 +45,7 @@ final class ShelvingController
                 'error' => $error,
                 'scanned' => $code,
                 'shelfOptions' => $options,
+                'shelfGroups' => $shelves->grouped(),
                 'suggested' => $copy instanceof Copy ? $this->suggestions($copy, $options) : [],
                 'topicName' => $copy instanceof Copy ? $this->topicNameOf($copy) : null,
                 'preselected' => $copy instanceof Copy ? $this->preselect($request, $copy, $options) : '',

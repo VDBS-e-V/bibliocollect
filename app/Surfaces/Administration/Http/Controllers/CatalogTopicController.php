@@ -18,7 +18,7 @@ final class CatalogTopicController
 {
     public function index(): Response
     {
-        $topics = CatalogTopic::query()->withCount(['children', 'shelves'])->orderBy('name')->get();
+        $topics = CatalogTopic::query()->with('shelves')->withCount(['children', 'shelves'])->orderBy('name')->get();
 
         return response()
             ->view('pages.surfaces.administration.topics.index', [

@@ -6,8 +6,11 @@ namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Modules\Catalog\Actions\DeleteCatalogShelfAction;
 use App\Modules\Catalog\Actions\SaveCatalogShelfAction;
+use App\Modules\Catalog\Enums\ShelfSectionKind;
 use App\Modules\Catalog\Exceptions\CatalogShelfInUse;
+use App\Modules\Catalog\Exceptions\CatalogShelfStructureConflict;
 use App\Modules\Catalog\Models\CatalogShelf;
+use App\Modules\Catalog\Models\CatalogShelfSection;
 use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use Illuminate\Http\RedirectResponse;
@@ -15,20 +18,38 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
-/** Regalbretter: die Liste, aus der beim Einsortieren und Bearbeiten der Standort eines Exemplars gewählt wird, samt Themenbereichen für den Vorschlag. */
+/** Regale und Regalbretter: Bereichsgruppe › Bereich › Regal › Regalbrett, samt Themenbereichen für den Vorschlag beim Einsortieren. */
 final class CatalogShelfController
 {
     public function index(): Response
     {
-        $shelves = CatalogShelf::query()->with('topics')->orderBy('sort_order')->orderBy('code')->get();
+        $groups = CatalogShelfSection::query()
+            ->where('kind', ShelfSectionKind::Group->value)
+            ->orderBy('sort_order')->orderBy('code')
+            ->with(['children.children.shelves.topics'])
+            ->get();
+
+        $unassigned = CatalogShelf::query()->whereNull('section_id')->with('topics')->orderBy('sort_order')->orderBy('code')->get();
 
         $counts = Copy::query()->whereNotNull('shelf_location')->selectRaw('shelf_location, count(*) as total')->groupBy('shelf_location')->pluck('total', 'shelf_location')->all();
 
+        $racks = [];
+
+        foreach ($groups as $group) {
+            foreach ($group->children as $area) {
+                foreach ($area->children as $rack) {
+                    $racks[(string) $rack->getKey()] = $group->code.' › '.$area->code.' › '.$rack->code.($rack->name ? ' · '.$rack->name : '');
+                }
+            }
+        }
+
         return response()
             ->view('pages.surfaces.administration.shelves.index', [
-                'shelves' => $shelves,
+                'groups' => $groups,
+                'unassigned' => $unassigned,
                 'counts' => $counts,
-                'nextOrder' => ((int) $shelves->max('sort_order')) + 1,
+                'rackOptions' => $racks,
+                'shelfTotal' => CatalogShelf::query()->count(),
                 'topicGroups' => $this->topicGroups(),
             ])
             ->header('Cache-Control', 'private, no-store');
@@ -36,35 +57,29 @@ final class CatalogShelfController
 
     public function store(Request $request, SaveCatalogShelfAction $save): RedirectResponse
     {
-        $data = $request->validate([
-            'code' => ['required', 'string', 'max:40', Rule::unique('catalog_shelves', 'code')],
-            'label' => ['nullable', 'string', 'max:120'],
-            'sort_order' => ['nullable', 'integer', 'between:0,9999'],
-            'topics' => ['nullable', 'array'],
-            'topics.*' => ['string', Rule::exists('catalog_topics', 'id')],
-        ], $this->messages());
+        $data = $this->validated($request);
 
-        $save->execute(null, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), true, array_values($data['topics'] ?? []));
+        try {
+            $shelf = $save->execute(null, $data['code'] ?? null, $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), true, array_values($data['topics'] ?? []), $data['rack_id'] ?? null, $data['board'] ?? null);
+        } catch (CatalogShelfStructureConflict $exception) {
+            return redirect()->route('administration.shelves.index')->withErrors(['shelf' => $exception->getMessage()])->withInput();
+        }
 
-        return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.trim($data['code']).'“ ist angelegt.');
+        return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.$shelf->code.'“ ist angelegt.');
     }
 
     public function update(Request $request, string $shelfId, SaveCatalogShelfAction $save): RedirectResponse
     {
         $shelf = CatalogShelf::query()->findOrFail($shelfId);
+        $data = $this->validated($request);
 
-        $data = $request->validate([
-            'code' => ['required', 'string', 'max:40', Rule::unique('catalog_shelves', 'code')->ignore($shelf->getKey())],
-            'label' => ['nullable', 'string', 'max:120'],
-            'sort_order' => ['nullable', 'integer', 'between:0,9999'],
-            'is_active' => ['nullable', 'boolean'],
-            'topics' => ['nullable', 'array'],
-            'topics.*' => ['string', Rule::exists('catalog_topics', 'id')],
-        ], $this->messages());
+        try {
+            $shelf = $save->execute($shelf, $data['code'] ?? null, $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), $request->boolean('is_active'), array_values($data['topics'] ?? []), $data['rack_id'] ?? null, $data['board'] ?? null);
+        } catch (CatalogShelfStructureConflict $exception) {
+            return redirect()->route('administration.shelves.index')->withErrors(['shelf' => $exception->getMessage()]);
+        }
 
-        $save->execute($shelf, $data['code'], $data['label'] ?? null, (int) ($data['sort_order'] ?? 0), $request->boolean('is_active'), array_values($data['topics'] ?? []));
-
-        return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.trim($data['code']).'“ ist gespeichert.');
+        return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.$shelf->code.'“ ist gespeichert.');
     }
 
     public function destroy(string $shelfId, DeleteCatalogShelfAction $delete): RedirectResponse
@@ -97,13 +112,34 @@ final class CatalogShelfController
         return $groups;
     }
 
+    /**
+     * Mit Regal und Bezeichnung des Bretts setzt sich der Standort selbst zusammen, sonst braucht das Regalbrett einen freien Code.
+     *
+     * @return array<string, mixed>
+     */
+    private function validated(Request $request): array
+    {
+        $hasRack = $request->filled('rack_id');
+
+        return $request->validate([
+            'rack_id' => ['nullable', 'string', Rule::exists('catalog_shelf_sections', 'id')->where('kind', ShelfSectionKind::Rack->value)],
+            'board' => [$hasRack ? 'required' : 'nullable', 'string', 'max:20'],
+            'code' => [$hasRack ? 'nullable' : 'required', 'string', 'max:40'],
+            'label' => ['nullable', 'string', 'max:120'],
+            'sort_order' => ['nullable', 'integer', 'between:0,9999'],
+            'is_active' => ['nullable', 'boolean'],
+            'topics' => ['nullable', 'array'],
+            'topics.*' => ['string', Rule::exists('catalog_topics', 'id')],
+        ], $this->messages());
+    }
+
     /** @return array<string, string> */
     private function messages(): array
     {
         return [
-            'code.required' => 'Bitte eine Bezeichnung für das Regalbrett angeben.',
-            'code.unique' => 'Ein Regalbrett mit dieser Bezeichnung gibt es schon.',
-            'code.max' => 'Die Bezeichnung darf höchstens 40 Zeichen lang sein.',
+            'board.required' => 'Bitte die Bezeichnung des Regalbretts im Regal angeben, zum Beispiel „a“.',
+            'code.required' => 'Bitte einen Standort-Code angeben (oder ein Regal wählen).',
+            'code.max' => 'Der Standort-Code darf höchstens 40 Zeichen lang sein.',
         ];
     }
 }

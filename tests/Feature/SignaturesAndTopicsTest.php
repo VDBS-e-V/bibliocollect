@@ -167,7 +167,7 @@ it('offers topics only in the details step and the access in the copy step of th
         ->assertSee('Themenbereich')
         ->assertDontSee('Lokale Klassifikation')
         ->assertSee('Geschichten')
-        ->assertSee('– Manga')
+        ->assertSee('↳ Manga')
         ->assertDontSee('I. A 5 b');
 
     $this->post(route('pos.catalog.intake.details.store'), ['preferred_title' => 'Ein Manga', 'media_type' => 'book', 'language_code' => 'de', 'local_classification' => 'Manga']);

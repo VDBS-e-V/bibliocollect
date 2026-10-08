@@ -8,6 +8,7 @@ use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogSignature;
 use App\Modules\Catalog\Models\Copy;
+use App\Modules\Catalog\Services\CatalogShelfStructure;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\DB;
  */
 final readonly class ImportCatalogShelvesFromSignaturesAction
 {
-    public function __construct(private AuditRecorder $audit) {}
+    public function __construct(private AuditRecorder $audit, private CatalogShelfStructure $structure) {}
 
     /** @return array{created: int, updated: int, merged: int} */
     public function execute(): array
@@ -56,6 +57,8 @@ final readonly class ImportCatalogShelvesFromSignaturesAction
                     }
                 }
             }
+
+            $this->structure->assignAll();
 
             $this->audit->record('catalog.shelf.imported', 'Regalbretter aus den Signaturen übernommen.', null, ['created' => $created, 'updated' => $updated, 'merged' => $merged]);
 
