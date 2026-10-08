@@ -2,18 +2,17 @@
     $copies = (int) ($counts[$shelf->code] ?? 0);
 @endphp
 <li class="bc-board {{ $shelf->is_active ? '' : 'bc-board--off' }}">
-    <div class="bc-board__main">
+    <div class="bc-board__row">
         <span class="bc-loc-code">{{ $shelf->code }}</span>
-        @if ($shelf->label)<span class="bc-board__label">{{ $shelf->label }}</span>@endif
-        @unless ($shelf->is_active)<x-ui.badge>ausgeschaltet</x-ui.badge>@endunless
+        <span class="bc-board__label">{{ $shelf->label ?: 'ohne Beschriftung' }}@unless ($shelf->is_active) <x-ui.badge>ausgeschaltet</x-ui.badge>@endunless</span>
         <span class="bc-board__count">{{ $copies }} {{ $copies === 1 ? 'Exemplar' : 'Exemplare' }}</span>
-    </div>
-    <div class="bc-board__topics">
-        @forelse ($shelf->topics as $topic)
-            <span class="bc-chip">{{ $topic->name }}</span>
-        @empty
-            <span class="bc-board__none">Kein Thema zugeordnet, deshalb kein Vorschlag beim Einsortieren.</span>
-        @endforelse
+        <span class="bc-board__topics">
+            @forelse ($shelf->topics as $topic)
+                <span class="bc-chip">{{ $topic->name }}</span>
+            @empty
+                <span class="bc-board__none">Kein Thema zugeordnet (kein Vorschlag beim Einsortieren)</span>
+            @endforelse
+        </span>
     </div>
     <details class="bc-loc__edit">
         <summary>Regalbrett bearbeiten</summary>
