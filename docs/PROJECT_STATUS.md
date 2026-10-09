@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Update-Pakete mit Rückwärtsstrichen (v0.57.3)
+
+Ein mit dem Windows-PowerShell (`Compress-Archive`) gebautes Paket speichert Pfade mit Rückwärtsstrichen („app\Http\“). Die Update-Seite lehnte so ein Paket als „unzulässigen Dateinamen“ ab. Jetzt behandelt sie Rückwärtsstriche wie Schrägstriche (Prüfung und Entpacken Datei für Datei, damit auf Linux echte Ordner entstehen; ausbrechende Pfade wie `..\x` bleiben verboten), und `scripts/build-release.ps1` erzeugt die ZIP mit .NET (`ZipFile::CreateFromDirectory`) mit Schrägstrichen.
+
 ### Vorlagen für GitHub-Issues (v0.57.2)
 
 Unter `.github/ISSUE_TEMPLATE` gibt es vier Formulare (Issue-Forms): **Fehler melden** (Label `bug`), **Neues Feature oder Änderungswunsch** (`enhancement`), **Frage oder Entscheidung nötig** (`question`) und **Problem im Betrieb** (`betrieb`: Einrichtung, Hochladen, Update, Mail, Cron, Datenbank, Cover, Wartungsmodus). Leere Issues sind ausgeschaltet; `config.yml` verweist auf die Anleitungen (`GO_LIVE`, `WEBSPACE_UPLOAD`, `LOKALE_EINRICHTUNG`). Da das Repository öffentlich ist, warnt jede Vorlage davor, Passwörter, Tokens, `.env`-Inhalte oder echte Personendaten einzutragen (Pflicht-Kästchen). Außerdem läuft der Test „seeds shelves from the free text locations“ nur noch auf SQLite, weil er die Tabelle löscht und neu anlegt (auf MariaDB blockiert der Fremdschlüssel der Regalbrett-Themen).
