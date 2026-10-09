@@ -95,6 +95,7 @@ it('takes the shelf from a scanned shelf label and suggests the shelves of the t
     expect($copy->refresh()->shelf_location)->toBe('I. A 1 d');
 
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett_code' => 'gibt es nicht'])->assertSessionHas('shelving_error');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett_code' => 'https://bibliocollect.de/thema/Raetsel-Knobeln'])->assertSessionHas('shelving_error', static fn (string $m): bool => str_contains($m, 'zum Thema'));
 });
 
 it('refuses unknown books, unknown shelves and missing input while shelving', function (): void {

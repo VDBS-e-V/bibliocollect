@@ -94,7 +94,11 @@ final class ShelvingController
         $shelf = $this->resolveShelf((string) ($data['regalbrett_code'] ?? ''), (string) ($data['regalbrett'] ?? ''), $shelves->activeCodes());
 
         if ($shelf === null) {
-            return redirect()->route('pos.shelving', ['buch' => $book])->with('shelving_error', 'Bitte ein Regalbrett aus der Liste wählen oder dessen Etikett scannen.');
+            $topicLink = preg_match('~thema\W+~iu', (string) ($data['regalbrett_code'] ?? '')) === 1 && strlen((string) ($data['regalbrett_code'] ?? '')) > 12;
+
+            return redirect()->route('pos.shelving', ['buch' => $book])->with('shelving_error', $topicLink
+                ? 'Dieser QR-Code führt zum Thema, nicht zu einem Regalbrett. Bitte den Strichcode oder einen QR-Code „Dieses Regalbrett“ scannen oder das Brett aus der Liste wählen.'
+                : 'Bitte ein Regalbrett aus der Liste wählen oder dessen Etikett scannen.');
         }
 
         $moved = $copy->shelf_location !== null && $copy->shelf_location !== '' && $copy->shelf_location !== $shelf;

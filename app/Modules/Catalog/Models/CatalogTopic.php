@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,37 @@ final class CatalogTopic extends Model
         'name',
         'description',
     ];
+
+    /** Lesbarer Pfadteil für Links auf die Themenseite: „Rätsel & Knobeln“ wird zu „Rätsel-Knobeln“. */
+    public function publicSlug(): string
+    {
+        return rawurlencode(trim((string) preg_replace('/[^\p{L}\p{N}]+/u', '-', $this->name), '-'));
+    }
+
+    /** Vergleichsform eines Namens oder Pfadteils: nur Buchstaben und Ziffern, klein. */
+    public static function normalizeKey(string $value): string
+    {
+        return mb_strtolower((string) preg_replace('/[^\p{L}\p{N}]/u', '', rawurldecode($value)));
+    }
+
+    /**
+     * Dieses Thema und alle Unterthemen.
+     *
+     * @return Collection<int, CatalogTopic>
+     */
+    public function family(): Collection
+    {
+        $all = new Collection([$this]);
+        $level = [$this->getKey()];
+
+        for ($depth = 0; $depth < 6 && $level !== []; $depth++) {
+            $children = self::query()->whereIn('parent_id', $level)->get();
+            $all = $all->concat($children);
+            $level = $children->pluck('id')->all();
+        }
+
+        return $all->unique('id')->values();
+    }
 
     /** @return BelongsTo<CatalogTopic, $this> */
     public function parent(): BelongsTo

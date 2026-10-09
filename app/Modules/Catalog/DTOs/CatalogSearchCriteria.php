@@ -17,6 +17,7 @@ final readonly class CatalogSearchCriteria
         public ?string $series = null,
         public ?string $topic = null,
         public ?string $shelf = null,
+        public ?string $theme = null,
         public ?string $classification = null,
         public ?string $targetAudience = null,
         public ?string $sourceRecordId = null,
@@ -43,6 +44,7 @@ final readonly class CatalogSearchCriteria
             || $this->series !== null
             || $this->topic !== null
             || $this->shelf !== null
+            || $this->theme !== null
             || $this->classification !== null
             || $this->targetAudience !== null
             || $this->sourceRecordId !== null

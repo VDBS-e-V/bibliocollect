@@ -40,6 +40,25 @@
         </section>
     @endif
 
+    @if ($criteria->theme)
+        <section class="bc-public-advanced-active" role="status" aria-label="Thema">
+            <strong>Thema {{ $theme?->name ?? $criteria->theme }}</strong>
+            @if ($theme && trim((string) $theme->description) !== '')
+                <span>{{ $theme->description }}</span>
+            @endif
+            @if ($theme && $theme->shelves->isNotEmpty())
+                <span>Zu finden auf:
+                    @foreach ($theme->shelves->sortBy('code', SORT_NATURAL) as $themeShelf)
+                        <a href="{{ route('public.shelf', ['code' => $themeShelf->publicSlug()]) }}">{{ $themeShelf->code }}</a>@if (trim((string) $themeShelf->label) !== '') <small>({{ $themeShelf->label }})</small>@endif@if (! $loop->last), @endif
+                    @endforeach
+                </span>
+            @else
+                <span>Für dieses Thema ist noch kein Regalbrett eingetragen.</span>
+            @endif
+            <a href="{{ route('public.catalog.index') }}">Ganzen Katalog zeigen</a>
+        </section>
+    @endif
+
     <section class="bc-public-catalog-search" aria-labelledby="public-catalog-filter-heading">
         <div class="bc-public-catalog-search__heading">
             <div>
@@ -55,6 +74,9 @@
             @endif
             @if ($criteria->shelf)
                 <input type="hidden" name="regalbrett" value="{{ $criteria->shelf }}">
+            @endif
+            @if ($criteria->theme)
+                <input type="hidden" name="thema" value="{{ $criteria->theme }}">
             @endif
             @foreach (['title', 'contributor', 'subject', 'identifier', 'publisher', 'topic'] as $advancedField)
                 @php

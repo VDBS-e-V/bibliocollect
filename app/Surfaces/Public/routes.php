@@ -8,6 +8,7 @@ use App\Surfaces\Public\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Public\Http\Controllers\ContentPageController;
 use App\Surfaces\Public\Http\Controllers\PublicHomeController;
 use App\Surfaces\Public\Http\Controllers\ShelfLinkController;
+use App\Surfaces\Public\Http\Controllers\TopicLinkController;
 use App\Surfaces\Public\Http\Controllers\WishController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,8 @@ Route::get('/katalog', CatalogIndexController::class)
     ->name('public.catalog.index');
 
 Route::get('/regal/{code}', ShelfLinkController::class)->where('code', '.+')->name('public.shelf');
+
+Route::get('/thema/{key}', TopicLinkController::class)->where('key', '.+')->name('public.topic');
 
 Route::get('/katalog/erweiterte-suche', CatalogAdvancedSearchController::class)
     ->name('public.catalog.advanced');

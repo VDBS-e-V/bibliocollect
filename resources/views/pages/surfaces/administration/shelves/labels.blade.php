@@ -78,6 +78,10 @@
                 <option value="qr">QR-Code</option>
                 <option value="keiner">Kein Code (nur Standort)</option>
             </x-ui.select>
+            <x-ui.select label="QR-Code zeigt auf" name="ziel" id="label-target" hint="Nur bei QR-Code. „Thema“ führt Nutzer:innen zu allen Regalbrettern und Medien des Themas; für das Einsortieren eignet sich „Regalbrett“.">
+                <option value="regalbrett">Dieses Regalbrett</option>
+                <option value="thema">Das Thema des Regalbretts (alle Bretter des Themas)</option>
+            </x-ui.select>
             <label class="bc-checkbox-line"><input type="checkbox" name="themen" value="1"> Themenbereiche des Bretts klein mit aufdrucken</label>
             <label class="bc-checkbox-line"><input type="checkbox" name="inaktive" value="1"> Auch ausgeschaltete Regalbretter</label>
         </section>

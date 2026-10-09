@@ -6,6 +6,8 @@ namespace App\Modules\Catalog\Queries;
 
 use App\Modules\Catalog\DTOs\CatalogSearchCriteria;
 use App\Modules\Catalog\Enums\CopyStatus;
+use App\Modules\Catalog\Models\CatalogShelf;
+use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -151,6 +153,10 @@ final class SearchCatalogTitlesQuery
                 });
             }
 
+            if ($criteria->theme !== null) {
+                $this->applyThemeFilter($editionQuery, $criteria->theme);
+            }
+
             if ($criteria->yearFrom !== null) {
                 $editionQuery->where('publication_year', '>=', $criteria->yearFrom);
             }
@@ -190,6 +196,37 @@ final class SearchCatalogTitlesQuery
         });
     }
 
+    /**
+     * Ein Thema samt Unterthemen: Ausgaben mit diesem Thema (örtliche Klassifikation) oder Exemplare auf einem Regalbrett des Themas.
+     *
+     * @param  Builder<Edition>  $editionQuery
+     */
+    private function applyThemeFilter(Builder $editionQuery, string $theme): void
+    {
+        $topic = CatalogTopic::query()->whereRaw('LOWER(name) = ?', [mb_strtolower($theme)])->first();
+
+        if (! $topic instanceof CatalogTopic) {
+            $editionQuery->whereRaw('1 = 0');
+
+            return;
+        }
+
+        $family = $topic->family();
+        $names = $family->map(static fn (CatalogTopic $item): string => mb_strtolower($item->name))->all();
+        $codes = CatalogShelf::query()
+            ->whereHas('topics', static fn (Builder $topics) => $topics->whereIn('catalog_topics.id', $family->pluck('id')->all()))
+            ->pluck('code')
+            ->all();
+
+        $editionQuery->where(static function (Builder $match) use ($names, $codes): void {
+            $match->whereRaw('LOWER(local_classification) IN ('.implode(',', array_fill(0, count($names), '?')).')', $names);
+
+            if ($codes !== []) {
+                $match->orWhereHas('copies', static fn (Builder $copies) => $copies->whereIn('shelf_location', $codes));
+            }
+        });
+    }
+
     private function hasEditionFilters(CatalogSearchCriteria $criteria): bool
     {
         return $criteria->subject !== null
@@ -199,6 +236,7 @@ final class SearchCatalogTitlesQuery
             || $criteria->series !== null
             || $criteria->topic !== null
             || $criteria->shelf !== null
+            || $criteria->theme !== null
             || $criteria->classification !== null
             || $criteria->targetAudience !== null
             || $criteria->sourceRecordId !== null

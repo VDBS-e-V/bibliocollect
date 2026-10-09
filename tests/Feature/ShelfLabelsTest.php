@@ -137,3 +137,45 @@ it('links the QR code to the public catalog showing only the media of that shelf
 
     $this->get(route('public.catalog.index', ['regalbrett' => 'I. A 1 a']))->assertOk()->assertSee('Regalbrett I. A 1 a')->assertSee('Rätselbuch')->assertDontSee('Kochbuch');
 });
+
+it('links a topic to the catalog showing its shelves and media including sub topics', function (): void {
+    shelfLabelSetup();
+    $parent = CatalogTopic::query()->where('name', 'Rätsel & Knobeln')->firstOrFail();
+    $child = CatalogTopic::query()->create(['name' => 'Logicals', 'parent_id' => $parent->getKey()]);
+    $other = CatalogTopic::query()->create(['name' => 'Kochen']);
+    CatalogShelf::query()->where('code', 'I. A 2 a')->firstOrFail()->topics()->attach($other->getKey(), ['position' => 1]);
+
+    $make = function (string $name, ?string $classification, ?string $where): void {
+        $title = Title::query()->create(['preferred_title' => $name, 'sort_title' => $name]);
+        $edition = Edition::query()->create(['title_id' => $title->getKey(), 'media_type' => 'book', 'local_classification' => $classification]);
+        Copy::query()->create(['edition_id' => $edition->getKey(), 'barcode' => md5($name), 'status' => 'active', 'shelf_location' => $where]);
+    };
+    $make('Rätselheft', 'Rätsel & Knobeln', null);
+    $make('Logikbuch', 'Logicals', null);
+    $make('Brettbuch', null, 'I. A 1 a');
+    $make('Kochbuch', 'Kochen', 'I. A 2 a');
+
+    expect($parent->publicSlug())->toBe('R%C3%A4tsel-Knobeln');
+
+    $this->get('/thema/'.$parent->publicSlug())->assertRedirect(route('public.catalog.index', ['thema' => 'Rätsel & Knobeln']));
+    $this->get('/thema/gibt-es-nicht')->assertRedirect(route('public.catalog.index'));
+
+    $page = $this->get(route('public.catalog.index', ['thema' => 'Rätsel & Knobeln']))->assertOk();
+    $page->assertSee('Thema Rätsel &amp; Knobeln', false)->assertSee('I. A 1 a')->assertSee('/regal/I-A-1-a', false)
+        ->assertSee('Rätselheft')->assertSee('Logikbuch')->assertSee('Brettbuch')->assertDontSee('Kochbuch');
+
+    $this->get(route('public.catalog.index', ['thema' => 'Unbekannt']))->assertOk()->assertSee('Keine passenden Titel');
+});
+
+it('lets the QR code point to the topic of the shelf instead of the shelf', function (): void {
+    shelfLabelSetup();
+    $admin = shelfLabelUser();
+    $post = fn (array $extra) => $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'alle', 'code' => 'qr', ...$extra])->assertOk()->getContent();
+
+    $shelf = $post([]);
+    $topic = $post(['ziel' => 'thema']);
+
+    // Der QR-Inhalt ist nicht lesbar im HTML, aber das SVG unterscheidet sich, sobald das Ziel ein anderes ist.
+    expect($topic)->not->toBe($shelf)->and($topic)->toContain('aria-label="QR-Code I. A 1 a"');
+    $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'alle', 'ziel' => 'quatsch'])->assertSessionHasErrors('ziel');
+});

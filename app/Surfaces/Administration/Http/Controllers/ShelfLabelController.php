@@ -55,6 +55,7 @@ final class ShelfLabelController
             'inaktive' => ['nullable', 'boolean'],
             'themen' => ['nullable', 'boolean'],
             'code' => ['nullable', 'in:strich,qr,keiner'],
+            'ziel' => ['nullable', 'in:regalbrett,thema'],
         ]);
 
         $shelves = $this->shelves($data, $request->boolean('inaktive'));
@@ -74,7 +75,7 @@ final class ShelfLabelController
 
         foreach ($shelves as $shelf) {
             for ($i = 0; $i < $copies; $i++) {
-                $labels[] = $this->label($shelf);
+                $labels[] = $this->label($shelf, (string) ($data['ziel'] ?? 'regalbrett'));
             }
         }
 
@@ -141,7 +142,7 @@ final class ShelfLabelController
     }
 
     /** @return array{code: string, url: string, headline: string, label: string, where: string, topics: string, barcode: bool} */
-    private function label(CatalogShelf $shelf): array
+    private function label(CatalogShelf $shelf, string $target = 'regalbrett'): array
     {
         $rack = $shelf->rack;
         $area = $rack?->parent;
@@ -159,7 +160,10 @@ final class ShelfLabelController
         return [
             'code' => $shelf->code,
             // Ziel des QR-Codes: Wer ihn mit dem Handy scannt, sieht im Katalog die Medien dieses Bretts.
-            'url' => route('public.shelf', ['code' => $shelf->publicSlug()]),
+            // Auf Wunsch zeigt er auf das (erste) Thema des Bretts: alle Bretter und Medien dieses Themas.
+            'url' => $target === 'thema' && $shelf->topics->isNotEmpty()
+                ? route('public.topic', ['key' => $shelf->topics->first()->publicSlug()])
+                : route('public.shelf', ['code' => $shelf->publicSlug()]),
             // Das Thema steht groß: die Beschriftung des Bretts, sonst die Themenbereiche, sonst der Standort.
             'headline' => mb_substr($label !== '' ? $label : ($topics !== '' ? $topics : $shelf->code), 0, 90),
             'label' => mb_substr($label, 0, 80),

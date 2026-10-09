@@ -6,6 +6,7 @@ namespace App\Surfaces\Public\Http\Controllers;
 
 use App\Modules\Catalog\DTOs\HoldingSummary;
 use App\Modules\Catalog\Models\CatalogShelf;
+use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Queries\CatalogSearchFilterOptionsQuery;
@@ -70,8 +71,13 @@ final class CatalogIndexController
             ? CatalogShelf::query()->with(['topics', 'rack.parent.parent'])->whereRaw('LOWER(code) = ?', [mb_strtolower($criteria->shelf)])->first()
             : null;
 
+        $theme = $criteria->theme !== null
+            ? CatalogTopic::query()->with(['shelves.rack.parent.parent'])->whereRaw('LOWER(name) = ?', [mb_strtolower($criteria->theme)])->first()
+            : null;
+
         return response()->view('pages.surfaces.public.catalog.index', [
             'shelf' => $shelf,
+            'theme' => $theme,
             'criteria' => $criteria,
             'titles' => $titles,
             'filterOptions' => $filterOptions->execute(),
