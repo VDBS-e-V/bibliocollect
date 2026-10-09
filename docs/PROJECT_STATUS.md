@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Klassenlisten als PDF mit Briefpapier (v0.53.0)
+
+Auf der Seite Klassenlisten öffnet „Als PDF speichern (Briefpapier)“ eine Druckfassung (`/betrieb/klassenlisten/pdf`) mit denselben Filtern: je Klasse eine Seite (bei vielen Zeilen mehrere, Tabellenkopf wiederholt sich) auf dem Briefpapier, wahlweise **Hochformat oder Querformat**, Farbe, Schwarz-Weiß oder ohne Briefpapier. Gespeichert wird über den Druckdialog („Als PDF speichern“, Ränder „Keine“).
+
 ### Einsortieren: Vorschlag nach Schlagwörtern und Stapel nach Thema (v0.52.0)
 
 Beim Einsortieren nennt die Seite zusätzlich zum Thema-Vorschlag die Regalbretter, die **nach Schlagwörtern und weiteren Angaben zum Buch** passen (`CatalogShelfSuggester`): Schlagwörter, Titel, Reihe, Thema, Zielgruppe und Inhaltsangabe werden mit Beschriftung, Themenbereichen (samt Hauptbereich und Beschreibung) und Altersangaben des Bretts („Kl. 2–3“, „ab 10“) verglichen, mit den Treffwörtern als Begründung. Vorgewählt wird jetzt: Brett der anderen Exemplare derselben Ausgabe, sonst Brett zum Thema, sonst der beste Vorschlag nach Schlagwörtern, sonst das zuletzt benutzte. Der **Stapel** zeigt die Bücher je Thema mit Zahl; „Nach Thema einsortieren“ nimmt ein Buch nach dem anderen aus einem Thema (oder ohne Thema) dran, das Formular merkt sich das Thema.

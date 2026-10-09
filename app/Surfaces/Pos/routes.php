@@ -226,6 +226,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         ->middleware('permission:circulation.reports')
         ->name('pos.reports.class-loans');
 
+    Route::get('/betrieb/klassenlisten/pdf', [ClassLoanReportController::class, 'print'])
+        ->middleware('permission:circulation.reports')
+        ->name('pos.reports.class-loans.print');
+
     Route::middleware('permission:circulation.manage')->group(function (): void {
         Route::post('/betrieb/scan', PosScanController::class)
             ->name('pos.scan');

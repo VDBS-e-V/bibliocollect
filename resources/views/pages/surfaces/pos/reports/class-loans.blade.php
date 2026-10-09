@@ -18,6 +18,7 @@
                 @endforeach
             </x-ui.select>
             <button type="button" class="bc-button bc-button--primary" data-print>Drucken</button>
+            <a class="bc-button bc-button--secondary" href="{{ route('pos.reports.class-loans.print', array_filter(['modus' => $mode, 'klasse' => $classId])) }}" target="_blank" rel="noopener">Als PDF speichern (Briefpapier)</a>
         </form>
     </div>
 

@@ -97,3 +97,23 @@ it('shows a friendly message without overdue loans', function (): void {
 it('keeps the class lists away from the student AG and other roles', function (string $role): void {
     $this->actingAs(reportUser($role))->get(route('pos.reports.class-loans'))->assertForbidden();
 })->with(['student_ag_basic', 'student_ag_extended', 'technical_admin', 'student', 'teacher']);
+
+it('offers the class lists as a letterhead print in portrait and landscape', function (): void {
+    $year = SchoolYear::query()->create(['name' => '2026/27', 'starts_on' => '2026-08-01', 'ends_on' => '2027-07-31', 'is_active' => true]);
+    $a5 = SchoolClass::query()->create(['school_year_id' => $year->getKey(), 'name' => '5a', 'grade_level' => 5, 'is_active' => true, 'homeroom_teacher' => 'Frau Albrecht']);
+    $b10 = SchoolClass::query()->create(['school_year_id' => $year->getKey(), 'name' => '10b', 'grade_level' => 10, 'is_active' => true]);
+    reportLoan('Mia', 'Zander', $a5, 'Buch Eins', '2026-10-10');
+    reportLoan('Eva', 'Mitte', $b10, 'Buch Drei', '2026-10-01');
+    $staff = reportUser('staff');
+
+    $this->actingAs($staff)->get(route('pos.reports.class-loans'))->assertSee('Als PDF speichern');
+
+    $portrait = $this->actingAs($staff)->get(route('pos.reports.class-loans.print'))->assertOk();
+    $portrait->assertSee('A4 portrait', false)->assertSee('briefpapier-farbe.png', false)->assertSee('Klasse 5a')->assertSee('Klasse 10b')->assertSee('Frau Albrecht')->assertSee('Zander, Mia');
+    expect(substr_count($portrait->getContent(), '<section class="class">'))->toBe(2);
+
+    $this->actingAs($staff)->get(route('pos.reports.class-loans.print', ['format' => 'quer', 'briefpapier' => 'sw', 'klasse' => (string) $b10->getKey()]))
+        ->assertOk()->assertSee('A4 landscape', false)->assertSee('briefpapier-quer-sw.png', false)->assertSee('Mitte, Eva')->assertDontSee('Zander, Mia');
+
+    $this->actingAs(reportUser('student_ag_extended'))->get(route('pos.reports.class-loans.print'))->assertForbidden();
+});
