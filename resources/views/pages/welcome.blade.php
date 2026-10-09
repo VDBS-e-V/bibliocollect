@@ -40,6 +40,52 @@
         </div>
     </section>
 
+    @foreach ([
+        'recommended' => ['title' => 'Empfohlene Medien', 'id' => 'recommended-heading', 'lead' => 'Von der Bibliothek ausgesucht und beliebt bei euch.'],
+        'new' => ['title' => 'Neue Medien', 'id' => 'new-heading', 'lead' => 'Frisch ins Regal gekommen.'],
+    ] as $key => $block)
+        @if (($showcase[$key] ?? []) !== [])
+            <section class="bc-showcase" aria-labelledby="{{ $block['id'] }}">
+                <div class="bc-section-heading bc-section-heading--with-meta">
+                    <h2 id="{{ $block['id'] }}">{{ $block['title'] }}</h2>
+                    <span>{{ $block['lead'] }}</span>
+                </div>
+                <ul class="bc-showcase__grid">
+                    @foreach ($showcase[$key] as $tile)
+                        <li class="bc-showcase__tile">
+                            <a href="{{ route('public.catalog.show', ['titleId' => $tile['id']]) }}" class="bc-showcase__link">
+                                <span class="bc-showcase__cover"><img src="{{ $tile['cover'] }}" alt="" loading="lazy"></span>
+                                <strong class="bc-showcase__title">{{ $tile['title'] }}</strong>
+                                @if ($tile['authors'] !== '')<span class="bc-showcase__authors">{{ $tile['authors'] }}</span>@endif
+                            </a>
+                            <x-ui.badge :variant="$tile['variant']">{{ $tile['badge'] }}</x-ui.badge>
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+    @endforeach
+
+    @if (($showcase['topics'] ?? []) !== [])
+        <section class="bc-showcase" aria-labelledby="topics-heading">
+            <div class="bc-section-heading bc-section-heading--with-meta">
+                <h2 id="topics-heading">Empfohlene Themen</h2>
+                <span>Stöbern nach Thema.</span>
+            </div>
+            <ul class="bc-showcase__topics">
+                @foreach ($showcase['topics'] as $topic)
+                    <li>
+                        <a href="{{ route('public.topic', ['key' => $topic['key']]) }}" class="bc-showcase__topic">
+                            <strong>{{ $topic['name'] }}</strong>
+                            @if (! empty($topic['description']))<span>{{ \Illuminate\Support\Str::limit($topic['description'], 90) }}</span>@endif
+                            <small>{{ $topic['count'] }} Titel</small>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     <div class="bc-home-layout">
         <div class="bc-home-layout__main">
             <section class="bc-content-section" aria-labelledby="quick-heading">

@@ -21,6 +21,16 @@
         <x-ui.alert variant="error" title="Fehler">Bitte prüfe die markierten Eingaben.</x-ui.alert>
     @endif
 
+    <form method="post" action="{{ route('pos.catalog.titles.feature', ['titleId' => $title->getKey()]) }}" class="bc-feature-form">
+        @csrf
+        @if ($title->featured_position !== null)
+            <x-ui.badge variant="success">Auf der Startseite empfohlen</x-ui.badge>
+            <button type="submit" class="bc-intake-linkbutton">Empfehlung zurücknehmen</button>
+        @else
+            <button type="submit" class="bc-intake-linkbutton">Auf der Startseite empfehlen</button>
+        @endif
+    </form>
+
     <section class="bc-content-section" id="exemplare" aria-labelledby="catalog-copies-heading">
         <div class="bc-section-heading bc-section-heading--with-meta">
             <h2 id="catalog-copies-heading">Exemplare</h2>

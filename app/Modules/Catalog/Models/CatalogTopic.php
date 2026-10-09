@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $parent_id
  * @property string $name
  * @property string|null $description
+ * @property int|null $featured_position
  */
 final class CatalogTopic extends Model
 {
@@ -39,7 +40,7 @@ final class CatalogTopic extends Model
     /** Lesbarer Pfadteil für Links auf die Themenseite: „Rätsel & Knobeln“ wird zu „Rätsel-Knobeln“. */
     public function publicSlug(): string
     {
-        return rawurlencode(trim((string) preg_replace('/[^\p{L}\p{N}]+/u', '-', $this->name), '-'));
+        return trim((string) preg_replace('/[^\p{L}\p{N}]+/u', '-', $this->name), '-');
     }
 
     /** Vergleichsform eines Namens oder Pfadteils: nur Buchstaben und Ziffern, klein. */

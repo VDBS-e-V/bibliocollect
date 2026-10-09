@@ -7,6 +7,7 @@ namespace App\Surfaces\Public\Http\Controllers;
 use App\Foundation\Support\BusinessClock;
 use App\Modules\School\Models\LibraryClosure;
 use App\Modules\School\Models\LibraryOpeningHour;
+use App\Surfaces\Public\Support\HomeShowcase;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Response;
 
@@ -15,7 +16,7 @@ final class PublicHomeController
 {
     private const DAYS = [1 => 'Montag', 2 => 'Dienstag', 3 => 'Mittwoch', 4 => 'Donnerstag', 5 => 'Freitag', 6 => 'Samstag', 7 => 'Sonntag'];
 
-    public function __invoke(BusinessClock $clock): Response
+    public function __invoke(BusinessClock $clock, HomeShowcase $showcase): Response
     {
         // Die Startseite soll auch erscheinen, wenn die Datenbank gerade nicht erreichbar ist.
         try {
@@ -38,7 +39,14 @@ final class PublicHomeController
             $closures = [];
         }
 
+        try {
+            $shelves = $showcase->build();
+        } catch (QueryException) {
+            $shelves = ['recommended' => [], 'new' => [], 'topics' => []];
+        }
+
         return response()->view('pages.welcome', [
+            'showcase' => $shelves,
             'hours' => $hours,
             'closures' => $closures,
             'loanDays' => (int) config('circulation.default_loan_period_days', 14),

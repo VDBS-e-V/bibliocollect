@@ -126,6 +126,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('/verwaltung/themenbereiche', [CatalogTopicController::class, 'store'])->name('administration.topics.store');
         Route::patch('/verwaltung/themenbereiche/{topicId}', [CatalogTopicController::class, 'update'])->name('administration.topics.update');
         Route::delete('/verwaltung/themenbereiche/{topicId}', [CatalogTopicController::class, 'destroy'])->name('administration.topics.destroy');
+        Route::post('/verwaltung/themenbereiche/{topicId}/empfohlen', [CatalogTopicController::class, 'feature'])->name('administration.topics.feature');
 
         Route::post('/verwaltung/standorte', [CatalogShelfSectionController::class, 'store'])->name('administration.sections.store');
         Route::post('/verwaltung/standorte/zuordnen', [CatalogShelfSectionController::class, 'assign'])->name('administration.sections.assign');

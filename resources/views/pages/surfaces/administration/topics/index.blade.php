@@ -37,6 +37,7 @@
             <div class="bc-acc__body">
                 @if ($root->description)<p class="bc-loc__note">{{ $root->description }}</p>@endif
                 <p class="bc-topic__shelves">@include('pages.surfaces.administration.topics._shelves', ['topic' => $root])</p>
+                @include('pages.surfaces.administration.topics._feature', ['topic' => $root])
 
                 <ul class="bc-sub-list">
                     @foreach ($children as $topic)
@@ -48,6 +49,7 @@
                                 <span class="bc-sub__shelves">@include('pages.surfaces.administration.topics._shelves', ['topic' => $topic])</span>
                             </div>
                             @if ($topic->description)<p class="bc-loc__note">{{ $topic->description }}</p>@endif
+                            @include('pages.surfaces.administration.topics._feature', ['topic' => $topic])
                             <details class="bc-loc__edit">
                                 <summary>Unterbereich bearbeiten</summary>
                                 @include('pages.surfaces.administration.topics._form', ['topic' => $topic, 'roots' => $roots])

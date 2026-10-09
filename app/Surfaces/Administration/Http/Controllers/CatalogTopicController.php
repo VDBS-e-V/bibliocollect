@@ -6,6 +6,7 @@ namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Modules\Catalog\Actions\DeleteCatalogTopicAction;
 use App\Modules\Catalog\Actions\SaveCatalogTopicAction;
+use App\Modules\Catalog\Actions\ToggleFeaturedAction;
 use App\Modules\Catalog\Exceptions\CatalogTaxonomyInUse;
 use App\Modules\Catalog\Models\CatalogTopic;
 use Illuminate\Http\RedirectResponse;
@@ -26,6 +27,15 @@ final class CatalogTopicController
                 'topics' => $topics,
             ])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Thema auf der Startseite empfehlen oder die Empfehlung zurücknehmen. */
+    public function feature(string $topicId, ToggleFeaturedAction $toggle): RedirectResponse
+    {
+        $topic = CatalogTopic::query()->findOrFail($topicId);
+        $featured = $toggle->execute($topic);
+
+        return redirect()->route('administration.topics.index')->with('taxonomy_success', $featured ? 'Das Thema „'.$topic->name.'“ wird auf der Startseite empfohlen.' : 'Die Empfehlung für „'.$topic->name.'“ ist zurückgenommen.');
     }
 
     public function store(Request $request, SaveCatalogTopicAction $save): RedirectResponse

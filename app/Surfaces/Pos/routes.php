@@ -125,6 +125,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::patch('/betrieb/katalog/titel/{titleId}', [CatalogTitleController::class, 'update'])
             ->name('pos.catalog.titles.update');
 
+        Route::post('/betrieb/katalog/titel/{titleId}/empfohlen', [CatalogTitleController::class, 'feature'])
+            ->name('pos.catalog.titles.feature');
+
         Route::post('/betrieb/katalog/titel/{titleId}/verantwortliche', [CatalogContributionController::class, 'store'])
             ->name('pos.catalog.contributions.store');
 

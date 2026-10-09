@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Pos\Http\Controllers;
 
 use App\Modules\Catalog\Actions\CreateTitleAction;
+use App\Modules\Catalog\Actions\ToggleFeaturedAction;
 use App\Modules\Catalog\Actions\UpdateTitleAction;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
@@ -34,6 +35,17 @@ final class CatalogTitleController
         return response()
             ->view('pages.surfaces.pos.catalog.show', ['title' => $title, 'copyStates' => $availability->forCopies($copyIds)])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Titel auf der Startseite empfehlen oder die Empfehlung zurücknehmen. */
+    public function feature(string $titleId, ToggleFeaturedAction $toggle): RedirectResponse
+    {
+        $title = Title::query()->findOrFail($titleId);
+        $featured = $toggle->execute($title);
+
+        return redirect()
+            ->route('pos.catalog.titles.show', ['titleId' => $title->getKey()])
+            ->with('catalog_success', $featured ? 'Der Titel wird auf der Startseite empfohlen.' : 'Die Empfehlung wurde zurückgenommen.');
     }
 
     public function update(

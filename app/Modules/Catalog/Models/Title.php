@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $preferred_title
  * @property string|null $subtitle
  * @property string|null $sort_title
+ * @property int|null $featured_position
  */
 final class Title extends Model
 {

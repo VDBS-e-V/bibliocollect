@@ -55,3 +55,7 @@ Die Bibliothek ist so aufgebaut: **Bereichsgruppe › Bereich › Regal › Rega
 ## Löschverlangen
 
 Verlangt eine Person die Löschung ihrer Daten: Zuerst am Ausleihkonto den **dauerhaften Austritt** buchen (nur ohne offene Ausleihen), dann **Daten jetzt anonymisieren** (nur Verwaltung). Name, Mail, Klasse, Onlinekonto und Ausweis verlieren den Bezug zur Person; das lässt sich nicht rückgängig machen. Ohne Verlangen anonymisiert die Anwendung nach drei Jahren von selbst.
+
+## Startseite: empfohlene Medien und Themen
+
+Die Startseite zeigt **Empfohlene Medien**, **Neue Medien** und **Empfohlene Themen**. Empfehlen kannst du einen Titel auf seiner Seite in der Katalogpflege („Auf der Startseite empfehlen“) und ein Thema unter **Themenbereiche**. Was du markierst, steht zuerst. Freie Plätze füllt das System: bei Medien mit den meistausgeliehenen Titeln der letzten 90 Tage, bei Themen mit den Themen mit den meisten Titeln. **Neue Medien** sind die Bücher, die in den letzten 60 Tagen ins Regal gekommen sind. Abschnitte ohne Inhalt bleiben verborgen. Änderungen sind sofort sichtbar.

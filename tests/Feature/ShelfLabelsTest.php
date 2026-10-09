@@ -155,9 +155,9 @@ it('links a topic to the catalog showing its shelves and media including sub top
     $make('Brettbuch', null, 'I. A 1 a');
     $make('Kochbuch', 'Kochen', 'I. A 2 a');
 
-    expect($parent->publicSlug())->toBe('R%C3%A4tsel-Knobeln');
+    expect($parent->publicSlug())->toBe('Rätsel-Knobeln');
 
-    $this->get('/thema/'.$parent->publicSlug())->assertRedirect(route('public.catalog.index', ['thema' => 'Rätsel & Knobeln']));
+    $this->get(route('public.topic', ['key' => $parent->publicSlug()]))->assertRedirect(route('public.catalog.index', ['thema' => 'Rätsel & Knobeln']));
     $this->get('/thema/gibt-es-nicht')->assertRedirect(route('public.catalog.index'));
 
     $page = $this->get(route('public.catalog.index', ['thema' => 'Rätsel & Knobeln']))->assertOk();

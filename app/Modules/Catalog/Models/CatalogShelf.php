@@ -46,7 +46,7 @@ final class CatalogShelf extends Model
     {
         $slug = trim((string) preg_replace('/\s+/u', '-', str_replace('.', '', $this->code)), '-');
 
-        return rawurlencode($slug);
+        return $slug;
     }
 
     /** Vergleichsform eines Codes oder Pfadteils: nur Buchstaben und Ziffern, klein. */
