@@ -49,7 +49,7 @@ it('builds navigation for all four surfaces', function (): void {
 
     expect($navigation->allForSurface('public'))->toHaveCount(3);
     expect($navigation->allForSurface('portal'))->toHaveCount(1);
-    expect($navigation->allForSurface('pos'))->toHaveCount(10);
+    expect($navigation->allForSurface('pos'))->toHaveCount(11);
     expect($navigation->allForSurface('administration'))->toHaveCount(12);
 });
 

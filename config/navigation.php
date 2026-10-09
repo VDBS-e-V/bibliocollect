@@ -94,6 +94,13 @@ return [
                     'order' => 32,
                 ],
                 [
+                    'label' => 'Bücher aussortieren',
+                    'route' => 'pos.withdrawal',
+                    'active' => 'pos.withdrawal*',
+                    'permission' => 'catalog.withdraw',
+                    'order' => 34,
+                ],
+                [
                     'label' => 'Ausleihkonten',
                     'route' => 'pos.patrons.index',
                     'active' => 'pos.patrons.*',
