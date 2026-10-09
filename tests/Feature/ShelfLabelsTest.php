@@ -45,26 +45,40 @@ it('offers the shelf label page and keeps it away from roles without shelf right
     $this->actingAs(shelfLabelUser())->get(route('administration.shelves.index'))->assertSee('Etiketten für Regalbretter drucken');
 });
 
-it('prints the location big with barcode, label, rack and area names on 22 places per sheet', function (): void {
+it('prints the topic big with the location small, a barcode and rack and area names on 22 places per sheet', function (): void {
     shelfLabelSetup();
 
     $html = $this->actingAs(shelfLabelUser())->post(route('administration.shelves.labels.print'), ['umfang' => 'alle', 'themen' => '1'])->assertOk()->getContent();
 
     // 5 aktive Regalbretter (ein ausgeschaltetes fehlt)
     expect(substr_count($html, 'class="label"'))->toBe(5)
-        ->and($html)->toContain('<div class="loc">I. A 1 a</div>')
+        ->and($html)->toContain('<div class="loc ">I. A 1 a</div>')
         ->and($html)->toContain('Rätsel &amp; Knobeln')
         ->and($html)->toContain('Regal 1 · Wand links')->toContain('Bereich A')->toContain('Bereichsgruppe I')
         ->and($html)->toContain('Themen: Rätsel &amp; Knobeln')
         ->and($html)->toContain('aria-label="Strichcode I. A 1 a"')
         ->and($html)->toContain('repeat(2, 105mm)')->toContain('grid-auto-rows: 26mm')
-        ->and($html)->not->toContain('<div class="loc">AUS</div>')
+        ->and($html)->not->toContain('<div class="loc ">AUS</div>')
         // Umlaut lässt sich nicht als Code 128 darstellen
         ->and($html)->toContain('Kein Strichcode');
 
     expect(ShelfLabelController::PER_SHEET)->toBe(22);
     $without = $this->actingAs(shelfLabelUser())->post(route('administration.shelves.labels.print'), ['umfang' => 'alle'])->getContent();
     expect($without)->not->toContain('Themen: ');
+});
+
+it('lets the code type be chosen: barcode, QR code or none', function (): void {
+    shelfLabelSetup();
+    $admin = shelfLabelUser();
+    $post = fn (array $extra) => $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'alle', ...$extra])->getContent();
+
+    $qr = $post(['code' => 'qr']);
+    expect($qr)->toContain('aria-label="QR-Code I. A 1 a"')->not->toContain('aria-label="Strichcode')->not->toContain('Kein Strichcode');
+
+    $none = $post(['code' => 'keiner']);
+    expect($none)->not->toContain('aria-label="Strichcode')->not->toContain('aria-label="QR-Code')->toContain('<div class="loc big">I. A 1 a</div>');
+
+    $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'alle', 'code' => 'quatsch'])->assertSessionHasErrors('code');
 });
 
 it('limits the print to a rack, an area or single shelves and repeats the labels', function (): void {
@@ -82,7 +96,7 @@ it('limits the print to a rack, an area or single shelves and repeats the labels
 
     // Einzelne Regalbretter haben Vorrang, zweimal je Brett.
     $singles = $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'alle', 'bretter' => [(string) $single->getKey()], 'anzahl' => 2])->getContent();
-    expect(substr_count($singles, 'class="label"'))->toBe(2)->and(substr_count($singles, '<div class="loc">I. A 1 b</div>'))->toBe(2);
+    expect(substr_count($singles, 'class="label"'))->toBe(2)->and(substr_count($singles, '<div class="loc ">I. A 1 b</div>'))->toBe(2);
 
     // Ohne Regal, mit ausgeschalteten.
     $loose = $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'lose', 'inaktive' => '1'])->getContent();

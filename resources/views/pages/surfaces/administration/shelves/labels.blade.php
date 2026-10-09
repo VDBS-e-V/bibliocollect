@@ -2,7 +2,7 @@
     <x-ui.page-header
         kicker="Verwaltung"
         title="Etiketten für Regalbretter"
-        :lead="'Etiketten mit dem Standort in großer Schrift und einem Strichcode, den das Einsortieren scannt. Format 105 × 26 mm, '.$perSheet.' Etiketten je A4-Bogen (2 × 11), weißer Hintergrund.'"
+        :lead="'Etiketten mit dem Thema in großer Schrift, dem Standort klein unten rechts und einem Code, den das Einsortieren scannt. Format 105 × 26 mm, '.$perSheet.' Etiketten je A4-Bogen (2 × 11), weißer Hintergrund.'"
     />
 
     <div class="bc-context-actions">
@@ -73,6 +73,11 @@
                 <x-ui.input label="Etiketten je Regalbrett" name="anzahl" id="label-copies" type="number" min="1" max="4" value="1" hint="Zum Beispiel 2: eines links und eines rechts am Brett." />
                 <x-ui.input label="Erster freier Platz auf dem Bogen" name="startplatz" id="label-start" type="number" min="1" :max="$perSheet" value="1" hint="Von links nach rechts und oben nach unten gezählt, für angebrochene Bögen." />
             </div>
+            <x-ui.select label="Code zum Scannen" name="code" id="label-code" hint="Der Scanner am Tresen liest beide. Der QR-Code lässt sich auch mit der Handykamera lesen und braucht weniger Platz.">
+                <option value="strich">Strichcode</option>
+                <option value="qr">QR-Code</option>
+                <option value="keiner">Kein Code (nur Standort)</option>
+            </x-ui.select>
             <label class="bc-checkbox-line"><input type="checkbox" name="themen" value="1"> Themenbereiche des Bretts klein mit aufdrucken</label>
             <label class="bc-checkbox-line"><input type="checkbox" name="inaktive" value="1"> Auch ausgeschaltete Regalbretter</label>
         </section>

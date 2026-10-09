@@ -14,8 +14,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 
 /**
- * Etiketten für Regalbretter: Standort groß, Strichcode zum Scannen beim Einsortieren, Beschriftung und die Namen von Regal und Bereich.
- * Format 105 × 26 mm, 2 × 11 = 22 Etiketten je A4-Bogen.
+ * Etiketten für Regalbretter: Das Thema steht groß, der Standort klein unten rechts, dazu ein Strichcode oder QR-Code zum Scannen beim
+ * Einsortieren (einstellbar). Format 105 × 26 mm, 2 × 11 = 22 Etiketten je A4-Bogen.
  */
 final class ShelfLabelController
 {
@@ -54,6 +54,7 @@ final class ShelfLabelController
             'startplatz' => ['nullable', 'integer', 'between:1,'.self::PER_SHEET],
             'inaktive' => ['nullable', 'boolean'],
             'themen' => ['nullable', 'boolean'],
+            'code' => ['nullable', 'in:strich,qr,keiner'],
         ]);
 
         $shelves = $this->shelves($data, $request->boolean('inaktive'));
@@ -85,6 +86,7 @@ final class ShelfLabelController
                 'skip' => max(0, ((int) ($data['startplatz'] ?? 1)) - 1),
                 'perSheet' => self::PER_SHEET,
                 'withTopics' => $request->boolean('themen'),
+                'codeType' => (string) ($data['code'] ?? 'strich'),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
@@ -138,7 +140,7 @@ final class ShelfLabelController
         return CatalogShelfSection::query()->whereIn('parent_id', $areaIds)->where('kind', ShelfSectionKind::Rack->value)->pluck('id')->map(static fn (mixed $v): string => (string) $v)->all();
     }
 
-    /** @return array{code: string, label: string, where: string, topics: string, barcode: bool} */
+    /** @return array{code: string, headline: string, label: string, where: string, topics: string, barcode: bool} */
     private function label(CatalogShelf $shelf): array
     {
         $rack = $shelf->rack;
@@ -151,9 +153,14 @@ final class ShelfLabelController
             $group?->display(),
         ]));
 
+        $topics = $shelf->topics->pluck('name')->implode(' / ');
+        $label = trim((string) $shelf->label);
+
         return [
             'code' => $shelf->code,
-            'label' => mb_substr((string) $shelf->label, 0, 80),
+            // Das Thema steht groß: die Beschriftung des Bretts, sonst die Themenbereiche, sonst der Standort.
+            'headline' => mb_substr($label !== '' ? $label : ($topics !== '' ? $topics : $shelf->code), 0, 90),
+            'label' => mb_substr($label, 0, 80),
             'where' => implode('  ›  ', $where),
             'topics' => mb_substr($shelf->topics->pluck('name')->implode(', '), 0, 100),
             'barcode' => preg_match('/^[\x20-\x7E]+$/', $shelf->code) === 1

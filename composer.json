@@ -13,6 +13,7 @@
   "license": "proprietary",
   "require": {
     "php": "^8.4",
+    "bacon/bacon-qr-code": "^3.1",
     "laravel/framework": "^13.23",
     "laravel/tinker": "^3.0",
     "livewire/livewire": "^4.4"
