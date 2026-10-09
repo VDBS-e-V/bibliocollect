@@ -130,11 +130,11 @@ return [
         ],
         'student_ag_basic' => [
             'label' => 'Schüler-AG Basis',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'circulation.manage'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'circulation.manage', 'catalog.withdraw'],
         ],
         'student_ag_extended' => [
             'label' => 'Schüler-AG Erweitert',
-            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage', 'circulation.manage', 'inventory.count', 'wishes.manage'],
+            'permissions' => ['surface.portal.access', 'surface.pos.access', 'patrons.lookup', 'catalog.manage', 'circulation.manage', 'inventory.count', 'wishes.manage', 'catalog.withdraw'],
         ],
         'staff' => [
             'label' => 'Mitarbeiter:in',

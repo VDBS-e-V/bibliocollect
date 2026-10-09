@@ -38,11 +38,12 @@ function weedCopy(string $barcode, string $title = 'Altes Buch'): Copy
 }
 
 it('keeps weeding for staff and administration', function (): void {
-    foreach (['staff', 'management'] as $role) {
-        $this->actingAs(weedUser($role))->get(route('pos.withdrawal'))->assertOk()->assertSee('Inventarnummern');
+    foreach (['staff', 'management', 'student_ag_basic', 'student_ag_extended'] as $role) {
+        $this->actingAs(weedUser($role))->get(route('pos.withdrawal'))->assertOk()->assertSee('Inventarnummer des Buchs');
+        $this->actingAs(weedUser($role))->get(route('pos.withdrawal.batch'))->assertOk()->assertSee('Inventarnummern');
     }
 
-    foreach (['student_ag_basic', 'student_ag_extended', 'teacher'] as $role) {
+    foreach (['teacher'] as $role) {
         $this->actingAs(weedUser($role))->get(route('pos.withdrawal'))->assertForbidden();
         $this->actingAs(weedUser($role))->post(route('pos.withdrawal.preview'), ['numbers' => '0040001'])->assertForbidden();
     }
@@ -72,7 +73,7 @@ it('validates reason, fate and date and refuses to withdraw nothing', function (
     $copy = weedCopy('0040010');
 
     $this->actingAs($staff)->post(route('pos.withdrawal.preview'), ['numbers' => ''])->assertSessionHasErrors('numbers');
-    $this->actingAs($staff)->post(route('pos.withdrawal.preview'), ['numbers' => '1111111'])->assertRedirect(route('pos.withdrawal'))->assertSessionHasErrors('numbers')->assertSessionHas('withdrawal_report');
+    $this->actingAs($staff)->post(route('pos.withdrawal.preview'), ['numbers' => '1111111'])->assertRedirect(route('pos.withdrawal.batch'))->assertSessionHasErrors('numbers')->assertSessionHas('withdrawal_report');
 
     $base = ['copies' => [(string) $copy->getKey()], 'reason' => 'damaged', 'fate' => 'disposed', 'date' => now()->toDateString()];
     $this->actingAs($staff)->post(route('pos.withdrawal.store'), [...$base, 'reason' => 'weil-ich-will'])->assertSessionHasErrors('reason');
@@ -103,7 +104,7 @@ it('does not withdraw books that are on loan or reserved for someone', function 
 
     expect($loaned->refresh()->status)->toBe(CopyStatus::Active)->and($free->refresh()->status)->toBe(CopyStatus::Withdrawn);
 
-    $this->actingAs($staff)->post(route('pos.withdrawal.preview'), ['numbers' => '0040021'])->assertRedirect(route('pos.withdrawal'))->assertSessionHas('withdrawal_report', static fn (array $report): bool => $report['already'] === ['0040021']);
+    $this->actingAs($staff)->post(route('pos.withdrawal.preview'), ['numbers' => '0040021'])->assertRedirect(route('pos.withdrawal.batch'))->assertSessionHas('withdrawal_report', static fn (array $report): bool => $report['already'] === ['0040021']);
 });
 
 it('lists the weeded books by period and reason, exports them and brings a book back', function (): void {
@@ -142,4 +143,38 @@ it('shows legacy free text reasons unchanged and counts weeded books in the stat
 
     $this->actingAs($staff)->get(route('pos.withdrawal.list'))->assertSee('Wasserschaden')->assertSee('Altpapier');
     $this->actingAs($staff)->get(route('pos.statistics', ['zeitraum' => 'letzte12']))->assertOk()->assertSee('Im Zeitraum ausgesondert');
+});
+
+it('weeds out a scanned book at once by the chosen kind and reports problems without changing anything', function (): void {
+    $helper = weedUser('student_ag_basic');
+    $book = weedCopy('0040050', 'Aussortiertes Buch');
+    $loaned = weedCopy('0040051', 'Ausgeliehenes Buch');
+    foreach (range(1, 5) as $day) {
+        LibraryOpeningHour::query()->create(['day_of_week' => $day, 'is_open' => true, 'opens_at' => '08:00', 'closes_at' => '16:00']);
+    }
+    $patron = Patron::query()->create(['library_number' => 'W-50', 'kind' => PatronKind::Student, 'status' => PatronStatus::Active, 'first_name' => 'Leihende', 'last_name' => 'Person', 'birth_date' => '2010-01-01']);
+    app(CheckoutCopyAction::class)->execute($patron, $loaned->barcode, weedUser('staff'));
+
+    $this->actingAs($helper)->get(route('pos.withdrawal'))->assertSee('Entsorgung (Müll)')->assertSee('Zum Verschenken')->assertSee('Verkauf');
+
+    $this->actingAs($helper)->post(route('pos.withdrawal.scan'), ['code' => '0040050'])->assertSessionHasErrors('art');
+    expect($book->refresh()->status)->toBe(CopyStatus::Active);
+
+    $this->actingAs($helper)->post(route('pos.withdrawal.scan'), ['art' => 'donated', 'code' => ' 0040050 '])
+        ->assertRedirect(route('pos.withdrawal', ['art' => 'donated']))->assertSessionHas('withdrawal_notice');
+    $book->refresh();
+    expect($book->status)->toBe(CopyStatus::Withdrawn)->and($book->further_use)->toBe('donated')->and($book->depreciation_reason)->toBe('unused')
+        ->and(AuditEvent::query()->where('action', 'catalog.copy.withdrawn')->count())->toBe(1);
+
+    $this->actingAs($helper)->get(route('pos.withdrawal', ['art' => 'donated']))->assertSee('Zuletzt aussortiert')->assertSee('Aussortiertes Buch')->assertSee('Zurückholen')->assertSee('value="donated" checked', false);
+
+    $this->actingAs($helper)->post(route('pos.withdrawal.scan'), ['art' => 'sold', 'code' => '0040050'])->assertSessionHasErrors('code');
+    $this->actingAs($helper)->post(route('pos.withdrawal.scan'), ['art' => 'sold', 'code' => '0040051'])->assertSessionHasErrors('code');
+    $this->actingAs($helper)->post(route('pos.withdrawal.scan'), ['art' => 'sold', 'code' => '9999999'])->assertSessionHasErrors('code');
+    $this->actingAs($helper)->post(route('pos.withdrawal.scan'), ['art' => 'quatsch', 'code' => '0040051'])->assertSessionHasErrors('art');
+    expect($loaned->refresh()->status)->toBe(CopyStatus::Active);
+
+    // Rückgängig aus der Liste heraus.
+    $this->actingAs($helper)->from(route('pos.withdrawal'))->post(route('pos.withdrawal.restore', ['copyId' => $book->getKey()]))->assertRedirect(route('pos.withdrawal'));
+    expect($book->refresh()->status)->toBe(CopyStatus::Active);
 });

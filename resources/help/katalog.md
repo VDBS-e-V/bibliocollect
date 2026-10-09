@@ -14,9 +14,9 @@ Für Mitarbeiter:innen und die Schüler-AG „Erweitert“.
 
 **Inventur** unter „Alle Vorgänge“: eine Inventur beginnen, das **Regalbrett wählen**, die **Inventarnummern der Bücher scannen**, die dort stehen, dann das nächste Brett. Jeder Scan zeigt gleich, ob das Buch richtig steht. Zum Schluss **Inventur abschließen**: Der Bericht nennt, was fehlt, falsch einsortiert ist oder unbekannt ist. Mit „Standorte korrigieren“ übernimmst du die gefundenen Regalbretter. Geprüft sind nur die Bretter, an denen du gescannt hast.
 
-## Bücher aussondern (Mitarbeiter:innen und Verwaltung)
+## Bücher aussortieren (Schüler-AG, Mitarbeiter:innen und Verwaltung)
 
-**Bücher aussondern** unter „Alle Vorgänge“: Inventarnummern scannen oder eintippen, prüfen lassen, Grund und Verbleib wählen, bestätigen. Ausgeliehene Bücher werden nicht ausgesondert. Die **Liste der Aussonderungen** zeigt, was wann und warum ausgesondert wurde, und lässt sich als CSV für den Jahresbericht herunterladen. Aus Versehen Ausgesondertes holst du dort mit „Zurückholen“ zurück.
+**Bücher aussortieren** unter „Alle Vorgänge“: Erst die **Art** wählen (Entsorgung, zum Verschenken oder Verkauf), dann die **Inventarnummer des Buchs scannen**. Das Buch ist sofort als aussortiert vermerkt, das Feld ist für das nächste Buch frei. Ausgeliehene oder zurückgelegte Bücher werden nicht aussortiert, das System sagt es dir. Unter „Zuletzt aussortiert“ holst du ein Buch mit **Zurückholen** wieder in den Bestand. Für viele Bücher mit genauem Grund gibt es den Weg **Mehrere Bücher mit Grund aussondern**. Die **Liste der Aussonderungen** zeigt, was wann und warum ausgesondert wurde, und lässt sich als CSV für den Jahresbericht herunterladen.
 
 ## Medien einsortieren
 

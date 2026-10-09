@@ -191,6 +191,8 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
 
     Route::middleware('permission:catalog.withdraw')->group(function (): void {
         Route::get('/betrieb/aussondern', [WithdrawalController::class, 'index'])->name('pos.withdrawal');
+        Route::post('/betrieb/aussondern/scan', [WithdrawalController::class, 'scan'])->middleware('throttle:120,1')->name('pos.withdrawal.scan');
+        Route::get('/betrieb/aussondern/mehrere', [WithdrawalController::class, 'batch'])->name('pos.withdrawal.batch');
         Route::post('/betrieb/aussondern/pruefen', [WithdrawalController::class, 'preview'])->name('pos.withdrawal.preview');
         Route::post('/betrieb/aussondern', [WithdrawalController::class, 'store'])->name('pos.withdrawal.store');
         Route::get('/betrieb/aussondern/liste', [WithdrawalController::class, 'list'])->name('pos.withdrawal.list');

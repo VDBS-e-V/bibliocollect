@@ -29,10 +29,69 @@ final class WithdrawalController
 {
     private const MAX_NUMBERS = 200;
 
+    /** Arten des Aussortierens im schnellen Ablauf: Verbleib des Buchs. */
+    private const QUICK_FATES = [
+        'disposed' => ['label' => 'Entsorgung (Müll)', 'text' => 'Das Buch kommt in den Müll oder ins Altpapier.'],
+        'donated' => ['label' => 'Zum Verschenken', 'text' => 'Das Buch kommt in die Mitnehm-Kiste für die Schüler:innen.'],
+        'sold' => ['label' => 'Verkauf', 'text' => 'Das Buch wird verkauft.'],
+    ];
+
+    /** Schneller Ablauf: Art wählen, Bücher nacheinander scannen; jedes Buch wird sofort als ausgesondert vermerkt. */
     public function index(Request $request): Response
     {
+        $art = (string) $request->query('art', '');
+
         return response()
-            ->view('pages.surfaces.pos.withdrawal.index', ['numbers' => (string) $request->query('nummern', '')])
+            ->view('pages.surfaces.pos.withdrawal.index', [
+                'fates' => self::QUICK_FATES,
+                'art' => array_key_exists($art, self::QUICK_FATES) ? $art : '',
+                'recent' => Copy::query()->with('edition.title')->where('status', CopyStatus::Withdrawn->value)->orderByDesc('updated_at')->limit(10)->get(),
+            ])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Ein gescanntes Buch aussondern (Grund: „Wird nicht mehr gelesen“, Datum heute). Bei einem Problem bleibt alles unverändert. */
+    public function scan(Request $request, WithdrawCopiesAction $withdraw, CopyWithdrawalCheck $check, BusinessClock $clock): RedirectResponse
+    {
+        $data = $request->validate([
+            'art' => ['required', Rule::in(array_keys(self::QUICK_FATES))],
+            'code' => ['required', 'string', 'max:80'],
+        ], [
+            'art.required' => 'Bitte zuerst die Art des Aussortierens wählen.',
+            'art.in' => 'Bitte zuerst die Art des Aussortierens wählen.',
+            'code.required' => 'Bitte die Inventarnummer scannen oder eingeben.',
+        ]);
+
+        $back = redirect()->route('pos.withdrawal', ['art' => $data['art']]);
+        $code = trim($data['code']);
+        $copy = Copy::query()->with('edition.title')->where('barcode', $code)->first();
+
+        if (! $copy instanceof Copy) {
+            return $back->withErrors(['code' => 'Zur Nummer „'.$code.'“ gibt es kein Buch.']);
+        }
+
+        $title = '„'.$copy->edition->title->preferred_title.'“ ('.$copy->barcode.')';
+
+        if ($copy->status === CopyStatus::Withdrawn) {
+            return $back->withErrors(['code' => $title.' ist schon ausgesondert.']);
+        }
+
+        $problems = $check->problems($copy);
+
+        if ($problems !== []) {
+            return $back->withErrors(['code' => $title.' '.implode(' und ', $problems).' und bleibt im Bestand.']);
+        }
+
+        $withdraw->execute([(string) $copy->getKey()], WithdrawalReason::Unused, WithdrawalFate::from($data['art']), $clock->now()->toDateString());
+
+        return $back->with('withdrawal_notice', $title.' ist aussortiert: '.self::QUICK_FATES[$data['art']]['label'].'.');
+    }
+
+    /** Mehrere Nummern auf einmal prüfen und mit Grund und Verbleib aussondern. */
+    public function batch(Request $request): Response
+    {
+        return response()
+            ->view('pages.surfaces.pos.withdrawal.batch', ['numbers' => (string) $request->query('nummern', '')])
             ->header('Cache-Control', 'private, no-store');
     }
 
@@ -81,7 +140,7 @@ final class WithdrawalController
         }
 
         if ($ready === []) {
-            return redirect()->route('pos.withdrawal')->withInput()->with('withdrawal_report', ['unknown' => $unknown, 'blocked' => array_map(static fn (array $row): string => $row['copy']->barcode.' '.implode(' und ', $row['problems']), $blocked), 'already' => array_map(static fn (Copy $copy): string => $copy->barcode, $already)])
+            return redirect()->route('pos.withdrawal.batch')->withInput()->with('withdrawal_report', ['unknown' => $unknown, 'blocked' => array_map(static fn (array $row): string => $row['copy']->barcode.' '.implode(' und ', $row['problems']), $blocked), 'already' => array_map(static fn (Copy $copy): string => $copy->barcode, $already)])
                 ->withErrors(['numbers' => 'Keines der Exemplare kann jetzt ausgesondert werden.']);
         }
 
@@ -170,7 +229,7 @@ final class WithdrawalController
 
         $done = $restore->execute($copy);
 
-        return redirect()->route('pos.withdrawal.list')->with('withdrawal_notice', $done
+        return back()->with('withdrawal_notice', $done
             ? '„'.$copy->edition->title->preferred_title.'“ ('.$copy->barcode.') ist wieder im Bestand.'
             : 'Dieses Exemplar war nicht ausgesondert.');
     }
