@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Protokoll: Suche nach Personen, mehr Filter, CSV-Export (v0.57.0)
+
+Das Protokoll (`/verwaltung/protokoll`) filtert nach Bereich, **Ereignis** (genaue Aktion), **Person** (Name oder Bibliotheksnummer; gefunden werden Ereignisse zum Konto selbst und solche, die sich im Kontext auf die Person beziehen, etwa Ausleihen und Vormerkungen), **Konto, das das Ereignis ausgelöst hat**, **Zeitraum** (von, bis) und Text. Die Tabelle zeigt eine Spalte „Person“ (Name und Nummer, aus den Konten aufgelöst; gespeichert werden weiter nur Kennungen). „Diese Auswahl als CSV exportieren“ liefert bis zu 20.000 Einträge mit Formelschutz, der Export steht selbst im Protokoll (`audit.exported`). Zugriff nur mit dem Recht „Protokoll einsehen“ (Verwaltung).
+
 ### Systemzustand: Installation und Cover-Fortschritt (v0.56.0)
 
 Neuer Abschnitt **Installation** auf dem Systemzustand: installierte Version, PHP (mindestens 8.4), Umgebung (Warnung bei Debug im Echtbetrieb), Adresse (https), Datenbank, **offene Migrationen**, Schreibrechte auf `storage`, `storage/logs`, `bootstrap/cache` und `public/covers`, Mailversand, Warteschlange, bereitliegende Update-Pakete und Wartungsmodus, je mit Hinweis und Ergebnis (In Ordnung, Hinweis, Fehler). Der Abschnitt **Cover der Bücher** ist ausgebaut: Fortschrittsbalken mit Prozent, Zahlen (mit Cover, Suche steht aus, erfolglos gesucht, Fehler, ohne ISBN), Prognose in Nächten bei der eingestellten Menge pro Nacht, Cover-Aufgaben in der Warteschlange und fehlgeschlagene, Stand der Quellen (Open Library, Google-Books-Schlüssel), die Knöpfe zum Nachladen und die acht zuletzt geholten Cover als Vorschau.

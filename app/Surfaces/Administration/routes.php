@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
     Route::get('/verwaltung/protokoll', AuditIndexController::class)
         ->middleware('permission:audit.view')
         ->name('administration.audit.index');
+    Route::get('/verwaltung/protokoll/export', [AuditIndexController::class, 'export'])->middleware(['permission:audit.view', 'throttle:10,1'])->name('administration.audit.export');
 
     Route::middleware('permission:school.manage')->group(function (): void {
         Route::get('/verwaltung/schule', SchoolIndexController::class)
