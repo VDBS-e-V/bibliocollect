@@ -1,7 +1,7 @@
 @php
     $counts = $plan['counts'];
-    $statusLabels = ['new' => 'Wird angelegt', 'existing' => 'Schon vorhanden', 'duplicate' => 'Doppelt in der Datei', 'error' => 'Fehler'];
-    $statusVariants = ['new' => 'success', 'existing' => 'neutral', 'duplicate' => 'neutral', 'error' => 'danger'];
+    $statusLabels = ['new' => 'Wird angelegt', 'update' => 'Wird aktualisiert', 'existing' => 'Schon vorhanden', 'duplicate' => 'Doppelt in der Datei', 'error' => 'Fehler'];
+    $statusVariants = ['new' => 'success', 'update' => 'warning', 'existing' => 'neutral', 'duplicate' => 'neutral', 'error' => 'danger'];
 @endphp
 
 <x-app-shell surface="pos" title="Import prüfen">
@@ -30,6 +30,7 @@
         </div>
         <p class="bc-section-copy">
             <x-ui.badge variant="success">{{ $counts['new'] }} neu</x-ui.badge>
+            @if ($update)<x-ui.badge variant="warning">{{ $counts['update'] }} werden aktualisiert</x-ui.badge>@endif
             <x-ui.badge>{{ $counts['existing'] }} schon vorhanden</x-ui.badge>
             <x-ui.badge>{{ $counts['duplicate'] }} doppelt</x-ui.badge>
             <x-ui.badge :variant="$counts['error'] > 0 ? 'danger' : 'neutral'">{{ $counts['error'] }} mit Fehler</x-ui.badge>
@@ -40,16 +41,16 @@
 
         @if ($counts['error'] > 0)
             <x-ui.alert variant="error" title="Import gesperrt">Solange es Fehler gibt, wird nichts angelegt. Korrigiere die Datei und lade sie erneut hoch.</x-ui.alert>
-        @elseif ($counts['new'] === 0)
-            <x-ui.alert title="Nichts zu tun">Alle Personen sind bereits vorhanden.</x-ui.alert>
+        @elseif ($counts['new'] === 0 && $counts['update'] === 0)
+            <x-ui.alert title="Nichts zu tun">Alle Personen sind bereits vorhanden{{ $update ? ' und aktuell' : '' }}.</x-ui.alert>
         @else
             <form method="post" action="{{ route('pos.patrons.import.commit', ['token' => $token]) }}">
                 @csrf
                 <label class="bc-public-catalog-filter__check" for="confirm">
                     <input id="confirm" name="confirm" type="checkbox" value="1">
-                    <span><strong>Ich habe die Vorschau geprüft und möchte {{ $counts['new'] }} Ausleihkonten anlegen.</strong></span>
+                    <span><strong>Ich habe die Vorschau geprüft und möchte {{ $counts['new'] }} Ausleihkonten anlegen@if ($counts['update'] > 0) und {{ $counts['update'] }} aktualisieren@endif.</strong></span>
                 </label>
-                <x-ui.button type="submit">Ausleihkonten anlegen</x-ui.button>
+                <x-ui.button type="submit">{{ $counts['update'] > 0 ? 'Anlegen und aktualisieren' : 'Ausleihkonten anlegen' }}</x-ui.button>
             </form>
         @endif
     </section>
@@ -78,6 +79,9 @@
                         <td>
                             @foreach ($row['messages'] as $message)
                                 <small class="bc-public-metadata-source">{{ $message }}</small>
+                            @endforeach
+                            @foreach ($row['changes'] as $change)
+                                <small class="bc-public-metadata-source">{{ $change }}</small>
                             @endforeach
                         </td>
                     </tr>

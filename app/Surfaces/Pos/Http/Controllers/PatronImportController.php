@@ -45,17 +45,17 @@ final class PatronImportController
     {
         return response()->streamDownload(static function (): void {
             echo "\xEF\xBB\xBF";
-            echo "vorname;nachname;geburtsdatum;email\r\n";
+            echo "vorname;nachname;geburtsdatum;email;klasse\r\n";
         }, 'klassenliste-vorlage.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public function store(Request $request, ListAssignableSchoolClassesQuery $schoolClasses): RedirectResponse
     {
         $request->validate([
-            'school_class_id' => ['required', 'string', Rule::in($schoolClasses->execute()->map(static fn ($class): string => (string) $class->getKey())->all())],
+            'school_class_id' => ['nullable', 'string', Rule::in($schoolClasses->execute()->map(static fn ($class): string => (string) $class->getKey())->all())],
+            'update' => ['nullable', 'boolean'],
             'file' => ['required', 'file', 'max:2048', 'extensions:csv,txt,xlsx'],
         ], [
-            'school_class_id.required' => 'Bitte wähle die Klasse, für die du importierst.',
             'school_class_id.in' => 'Diese Klasse gibt es im aktiven Schuljahr nicht.',
             'file.required' => 'Bitte eine Excel- oder CSV-Datei auswählen.',
             'file.max' => 'Die Datei darf höchstens 2 MB groß sein.',
@@ -64,7 +64,7 @@ final class PatronImportController
 
         $token = Str::lower((string) Str::ulid());
         $request->file('file')?->storeAs(self::DIRECTORY, $token.'.csv', 'local');
-        Storage::disk('local')->put(self::DIRECTORY.'/'.$token.'.json', json_encode(['class_id' => (string) $request->input('school_class_id')], JSON_THROW_ON_ERROR));
+        Storage::disk('local')->put(self::DIRECTORY.'/'.$token.'.json', json_encode(['class_id' => (string) $request->input('school_class_id', ''), 'update' => $request->boolean('update')], JSON_THROW_ON_ERROR));
 
         return redirect()->route('pos.patrons.import.show', ['token' => $token]);
     }
@@ -80,7 +80,8 @@ final class PatronImportController
         return response()
             ->view('pages.surfaces.pos.patrons.import-preview', [
                 'token' => $token,
-                'plan' => $planner->plan($rows, $this->classId($token)),
+                'plan' => $planner->plan($rows, $this->classId($token), $this->update($token)),
+                'update' => $this->update($token),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
@@ -93,7 +94,7 @@ final class PatronImportController
         abort_unless($actor instanceof User, 403);
 
         try {
-            $result = $import->execute($parser->parse($this->path($token)), $this->classId($token), $actor);
+            $result = $import->execute($parser->parse($this->path($token)), $this->classId($token), $actor, $this->update($token));
         } catch (InvalidArgumentException $exception) {
             return redirect()->route('pos.patrons.import.show', ['token' => $token])->with('workspace_error', $exception->getMessage());
         }
@@ -102,7 +103,7 @@ final class PatronImportController
 
         return redirect()
             ->route('pos.patrons.index')
-            ->with('workspace_success', "Import abgeschlossen: {$result['created']} Ausleihkonten angelegt, {$result['skipped']} übersprungen. Die Ausweise gibst du unter „Ausweise klassenweise ausgeben“ aus, sobald die Schüler:innen da sind.");
+            ->with('workspace_success', "Import abgeschlossen: {$result['created']} Ausleihkonten angelegt, {$result['updated']} aktualisiert, {$result['skipped']} übersprungen. Die Ausweise gibst du unter „Ausweise klassenweise ausgeben“ aus, sobald die Schüler:innen da sind.");
     }
 
     private function classId(string $token): string
@@ -112,6 +113,15 @@ final class PatronImportController
         $meta = json_decode((string) Storage::disk('local')->get(self::DIRECTORY.'/'.$token.'.json'), true);
 
         return is_array($meta) && is_string($meta['class_id'] ?? null) ? $meta['class_id'] : '';
+    }
+
+    private function update(string $token): bool
+    {
+        $this->path($token);
+
+        $meta = json_decode((string) Storage::disk('local')->get(self::DIRECTORY.'/'.$token.'.json'), true);
+
+        return is_array($meta) && ($meta['update'] ?? false) === true;
     }
 
     private function path(string $token): string

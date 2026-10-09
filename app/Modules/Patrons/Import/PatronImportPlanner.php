@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Patrons\Import;
 
 use App\Modules\Patrons\Enums\PatronKind;
+use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\School\Models\SchoolClass;
 use App\Modules\School\Models\SchoolYear;
@@ -15,35 +16,56 @@ use Carbon\Exceptions\InvalidFormatException;
  * Prüft die gelesenen Zeilen einer Klassenliste gegen Schule und Bestand und legt fest, was passieren würde. Schreibt nichts.
  * Alle Zeilen gehören zu der Klasse, die beim Import gewählt wurde, und sind Schüler:innen.
  *
- * Status je Zeile: `new` (wird angelegt), `existing` (gleiche Person ist schon vorhanden, wird übersprungen),
- * `duplicate` (in der Datei doppelt, wird übersprungen) oder `error` (blockiert den Import).
+ * Status je Zeile: `new` (wird angelegt), `update` (Person ist vorhanden, E-Mail oder Klasse ändern sich; nur wenn Aktualisieren
+ * gewählt ist), `existing` (gleiche Person ist schon vorhanden, nichts zu tun), `duplicate` (in der Datei doppelt, wird übersprungen)
+ * oder `error` (blockiert den Import). Ohne gewählte Klasse steht die Klasse je Zeile in der Spalte `klasse`.
  */
 final class PatronImportPlanner
 {
     /**
      * @param  list<array{line: int, values: array<string, string>}>  $rows
-     * @return array{rows: list<array<string, mixed>>, counts: array{new: int, existing: int, duplicate: int, error: int}, year: ?SchoolYear, class: ?SchoolClass}
+     * @return array{rows: list<array<string, mixed>>, counts: array{new: int, update: int, existing: int, duplicate: int, error: int}, year: ?SchoolYear, class: ?SchoolClass}
      */
-    public function plan(array $rows, ?string $classId): array
+    public function plan(array $rows, ?string $classId, bool $update = false): array
     {
         $year = SchoolYear::query()->where('is_active', true)->first();
+        $fromFile = $classId === null || $classId === '';
 
-        $class = $year !== null && $classId !== null && $classId !== ''
+        $class = $year !== null && ! $fromFile
             ? SchoolClass::query()->where('school_year_id', $year->getKey())->where('is_active', true)->find($classId)
             : null;
 
-        $existingPeople = Patron::query()->get(['first_name', 'last_name', 'birth_date'])
-            ->mapWithKeys(fn (Patron $patron): array => [$this->personKey($patron->first_name, $patron->last_name, $patron->birth_date->toDateString()) => true]);
+        $classesByName = $year !== null
+            ? SchoolClass::query()->where('school_year_id', $year->getKey())->where('is_active', true)->get()->keyBy(fn (SchoolClass $schoolClass): string => $this->key($schoolClass->name))
+            : collect();
+
+        $classNames = SchoolClass::query()->pluck('name', 'id')->all();
+
+        $existingPeople = Patron::query()->get()
+            ->mapWithKeys(fn (Patron $patron): array => [$this->personKey($patron->first_name, $patron->last_name, $patron->birth_date->toDateString()) => $patron]);
 
         $seenPeople = [];
         $planned = [];
-        $counts = ['new' => 0, 'existing' => 0, 'duplicate' => 0, 'error' => 0];
+        $counts = ['new' => 0, 'update' => 0, 'existing' => 0, 'duplicate' => 0, 'error' => 0];
 
         foreach ($rows as $row) {
             $values = $row['values'];
             $messages = [];
 
-            if (! $class instanceof SchoolClass) {
+            $rowClass = $class;
+
+            if ($fromFile) {
+                $name = trim($values['klasse'] ?? '');
+                $rowClass = $name !== '' ? $classesByName->get($this->key($name)) : null;
+
+                if ($year === null) {
+                    $messages[] = 'Es ist kein Schuljahr aktiv, daher kann keine Klasse zugeordnet werden.';
+                } elseif ($name === '') {
+                    $messages[] = 'In der Spalte klasse fehlt die Klasse (oder wähle beim Hochladen eine Klasse).';
+                } elseif (! $rowClass instanceof SchoolClass) {
+                    $messages[] = 'Die Klasse „'.$name.'“ gibt es im aktiven Schuljahr '.$year->name.' nicht.';
+                }
+            } elseif (! $rowClass instanceof SchoolClass) {
                 $messages[] = $year === null
                     ? 'Es ist kein Schuljahr aktiv, daher kann keine Klasse zugeordnet werden.'
                     : 'Die gewählte Klasse gibt es im aktiven Schuljahr '.$year->name.' nicht (mehr).';
@@ -64,6 +86,8 @@ final class PatronImportPlanner
             }
 
             $status = 'new';
+            $changes = [];
+            $patronId = null;
 
             if ($messages !== []) {
                 $status = 'error';
@@ -72,6 +96,26 @@ final class PatronImportPlanner
 
                 if (isset($existingPeople[$personKey])) {
                     $status = 'existing';
+                    $patron = $existingPeople[$personKey];
+
+                    if ($update) {
+                        if ($patron->status !== PatronStatus::Active) {
+                            $changes[] = 'Ausgeschieden oder archiviert: wird nicht verändert.';
+                        } else {
+                            if ($values['email'] !== '' && mb_strtolower($values['email']) !== mb_strtolower((string) $patron->email)) {
+                                $changes[] = 'E-Mail: '.($patron->email ?: '—').' → '.$values['email'];
+                            }
+
+                            if ($rowClass instanceof SchoolClass && (string) $patron->school_class_id !== (string) $rowClass->getKey()) {
+                                $changes[] = 'Klasse: '.($classNames[(string) $patron->school_class_id] ?? '—').' → '.$rowClass->name;
+                            }
+
+                            if ($changes !== []) {
+                                $status = 'update';
+                                $patronId = (string) $patron->getKey();
+                            }
+                        }
+                    }
                 } elseif (isset($seenPeople[$personKey])) {
                     $status = 'duplicate';
                 } else {
@@ -90,9 +134,11 @@ final class PatronImportPlanner
                 'last_name' => $values['nachname'],
                 'birth_date' => $birth,
                 'email' => $values['email'] !== '' ? $values['email'] : null,
-                'school_class_id' => $class instanceof SchoolClass ? (string) $class->getKey() : null,
-                'class_name' => $class instanceof SchoolClass ? $class->name : null,
+                'school_class_id' => $rowClass instanceof SchoolClass ? (string) $rowClass->getKey() : null,
+                'class_name' => $rowClass instanceof SchoolClass ? $rowClass->name : null,
                 'library_number' => null,
+                'changes' => $changes,
+                'patron_id' => $patronId,
             ];
         }
 

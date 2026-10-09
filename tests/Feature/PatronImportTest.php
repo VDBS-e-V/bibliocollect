@@ -72,7 +72,7 @@ it('ignores columns that are not part of the class list format', function (): vo
     $rows = importRows("vorname;nachname;geburtsdatum;klasse;art;bibliotheksnummer\nMia;Meier;14.03.2014;9z;Lehrkraft;S-1\n");
 
     expect(array_keys($rows[0]['values']))->toBe(PatronCsvParser::COLUMNS)
-        ->and(PatronCsvParser::COLUMNS)->toBe(['vorname', 'nachname', 'geburtsdatum', 'email']);
+        ->and(PatronCsvParser::COLUMNS)->toBe(['vorname', 'nachname', 'geburtsdatum', 'email', 'klasse']);
 });
 
 it('rejects files without required columns, data or with too many rows', function (): void {
@@ -111,7 +111,7 @@ it('classifies rows as new, existing, duplicate or error without writing', funct
         ->and($byLine[6]['status'])->toBe('error')
         ->and($byLine[7]['status'])->toBe('error')
         ->and($byLine[8]['status'])->toBe('error')
-        ->and($plan['counts'])->toBe(['new' => 1, 'existing' => 1, 'duplicate' => 1, 'error' => 4])
+        ->and($plan['counts'])->toBe(['new' => 1, 'update' => 0, 'existing' => 1, 'duplicate' => 1, 'error' => 4])
         ->and(Patron::query()->count())->toBe(1);
 });
 
@@ -120,7 +120,7 @@ it('treats every row as an error when the chosen class does not exist in the act
 
     $plan = app(PatronImportPlanner::class)->plan(importRows("vorname;nachname;geburtsdatum\nMia;Neu;14.03.2014\n"), 'gibt-es-nicht');
 
-    expect($plan['counts'])->toBe(['new' => 0, 'existing' => 0, 'duplicate' => 0, 'error' => 1])
+    expect($plan['counts'])->toBe(['new' => 0, 'update' => 0, 'existing' => 0, 'duplicate' => 0, 'error' => 1])
         ->and($plan['rows'][0]['messages'][0])->toContain('Klasse');
 });
 
@@ -138,7 +138,7 @@ it('imports new students into the chosen class with random numbers and no card',
     $mia = Patron::query()->where('first_name', 'Mia')->where('last_name', 'Neu')->firstOrFail();
     $jonas = Patron::query()->where('first_name', 'Jonas')->firstOrFail();
 
-    expect($result)->toBe(['created' => 2, 'skipped' => 1])
+    expect($result)->toBe(['created' => 2, 'updated' => 0, 'skipped' => 1])
         ->and($mia->kind)->toBe(PatronKind::Student)
         ->and($mia->library_number)->toMatch('/^[1-9]\d{5}$/')
         ->and($mia->library_number)->not->toBe($jonas->library_number)
@@ -169,8 +169,6 @@ it('runs the upload, preview and commit workflow for staff with the class chosen
 
     $upload = UploadedFile::fake()->createWithContent('schueler.csv', "vorname;nachname;geburtsdatum;email\nMia;Import;14.03.2014;\n");
 
-    // ohne Klasse geht es nicht
-    $this->actingAs($staff)->post(route('pos.patrons.import.store'), ['file' => $upload])->assertSessionHasErrors('school_class_id');
     $this->actingAs($staff)->post(route('pos.patrons.import.store'), ['file' => $upload, 'school_class_id' => 'fremd'])->assertSessionHasErrors('school_class_id');
 
     $response = $this->actingAs($staff)->post(route('pos.patrons.import.store'), ['file' => $upload, 'school_class_id' => (string) $classes['6b']->getKey()]);
@@ -258,7 +256,7 @@ it('reads Excel files with date serials and refuses an empty Excel template', fu
     $rows = app(PatronCsvParser::class)->parse(importXlsx([['Vorname', 'Nachname', 'Geburtsdatum', 'E-Mail'], ['Mia', 'Müller', 41712, 'mia@example.invalid'], ['Jonas', 'Schön', '02.11.2012', '']]));
 
     expect($rows)->toHaveCount(2)
-        ->and($rows[0]['values'])->toBe(['vorname' => 'Mia', 'nachname' => 'Müller', 'geburtsdatum' => '2014-03-14', 'email' => 'mia@example.invalid'])
+        ->and($rows[0]['values'])->toBe(['vorname' => 'Mia', 'nachname' => 'Müller', 'geburtsdatum' => '2014-03-14', 'email' => 'mia@example.invalid', 'klasse' => ''])
         ->and($rows[1]['values']['geburtsdatum'])->toBe('02.11.2012');
 
     $template = tempnam(sys_get_temp_dir(), 'tpl');
@@ -277,4 +275,68 @@ it('accepts an Excel upload in the import workflow', function (): void {
     $response->assertRedirect();
 
     $this->actingAs($staff)->get($response->headers->get('Location'))->assertOk()->assertSee('Excel');
+});
+
+it('reads the class from the file when no class is chosen and flags unknown or missing classes', function (): void {
+    [, $classes] = importSchool();
+    $rows = importRows("vorname;nachname;geburtsdatum;klasse\nMia;Eins;14.03.2014;5a\nBen;Zwei;01.02.2013;6 B\nEva;Drei;03.03.2012;9z\nUwe;Vier;04.04.2012;\n");
+
+    $plan = app(PatronImportPlanner::class)->plan($rows, null);
+
+    expect($plan['rows'][0]['class_name'])->toBe('5a')->and($plan['rows'][0]['status'])->toBe('new')
+        ->and($plan['rows'][1]['class_name'])->toBe('6b')
+        ->and($plan['rows'][2]['status'])->toBe('error')->and($plan['rows'][2]['messages'][0])->toContain('9z')
+        ->and($plan['rows'][3]['status'])->toBe('error')->and($plan['rows'][3]['messages'][0])->toContain('fehlt')
+        ->and($plan['counts'])->toBe(['new' => 2, 'update' => 0, 'existing' => 0, 'duplicate' => 0, 'error' => 2]);
+
+    // Fehlerfreie Datei mit zwei Klassen: beide Klassen werden bedient.
+    $ok = importRows("vorname;nachname;geburtsdatum;klasse\nMia;Eins;14.03.2014;5a\nBen;Zwei;01.02.2013;6b\n");
+    $result = app(ImportPatronsAction::class)->execute($ok, null, importUser(), false);
+
+    expect($result)->toBe(['created' => 2, 'updated' => 0, 'skipped' => 0])
+        ->and(Patron::query()->where('first_name', 'Mia')->firstOrFail()->school_class_id)->toBe((string) $classes['5a']->getKey())
+        ->and(Patron::query()->where('first_name', 'Ben')->firstOrFail()->school_class_id)->toBe((string) $classes['6b']->getKey());
+});
+
+it('updates existing people only on request: new e-mail and class change, never name or birth date', function (): void {
+    [, $classes] = importSchool();
+    $staff = importUser();
+    $mia = Patron::query()->create(['library_number' => '111111', 'kind' => PatronKind::Student, 'status' => PatronStatus::Active, 'first_name' => 'Mia', 'last_name' => 'Alt', 'birth_date' => '2014-03-14', 'email' => 'alt@example.invalid', 'school_class_id' => $classes['5a']->getKey()]);
+    $gone = Patron::query()->create(['library_number' => '222222', 'kind' => PatronKind::Student, 'status' => PatronStatus::Departed, 'first_name' => 'Ben', 'last_name' => 'Weg', 'birth_date' => '2013-02-01', 'school_class_id' => $classes['5a']->getKey()]);
+    $same = Patron::query()->create(['library_number' => '333333', 'kind' => PatronKind::Student, 'status' => PatronStatus::Active, 'first_name' => 'Eva', 'last_name' => 'Gleich', 'birth_date' => '2012-03-03', 'email' => 'eva@example.invalid', 'school_class_id' => $classes['6b']->getKey()]);
+    $rows = importRows("vorname;nachname;geburtsdatum;email;klasse\nMia;Alt;14.03.2014;neu@example.invalid;6b\nBen;Weg;01.02.2013;ben@example.invalid;6b\nEva;Gleich;03.03.2012;;6b\n");
+
+    // Ohne Aktualisieren bleibt alles, wie es ist.
+    $plain = app(PatronImportPlanner::class)->plan($rows, null);
+    expect($plain['counts'])->toBe(['new' => 0, 'update' => 0, 'existing' => 3, 'duplicate' => 0, 'error' => 0]);
+    app(ImportPatronsAction::class)->execute($rows, null, $staff, false);
+    expect($mia->refresh()->email)->toBe('alt@example.invalid');
+
+    $plan = app(PatronImportPlanner::class)->plan($rows, null, true);
+    expect($plan['counts'])->toBe(['new' => 0, 'update' => 1, 'existing' => 2, 'duplicate' => 0, 'error' => 0])
+        ->and($plan['rows'][0]['changes'])->toBe(['E-Mail: alt@example.invalid → neu@example.invalid', 'Klasse: 5a → 6b']);
+
+    $result = app(ImportPatronsAction::class)->execute($rows, null, $staff, true);
+
+    expect($result)->toBe(['created' => 0, 'updated' => 1, 'skipped' => 2])
+        ->and($mia->refresh()->email)->toBe('neu@example.invalid')
+        ->and($mia->school_class_id)->toBe((string) $classes['6b']->getKey())
+        ->and($mia->last_name)->toBe('Alt')->and($mia->library_number)->toBe('111111')
+        ->and($gone->refresh()->school_class_id)->toBe((string) $classes['5a']->getKey())
+        ->and($same->refresh()->email)->toBe('eva@example.invalid');
+});
+
+it('offers the update option and class column on the import page and shows the changes in the preview', function (): void {
+    Storage::fake('local');
+    [, $classes] = importSchool();
+    $staff = importUser();
+    Patron::query()->create(['library_number' => '111111', 'kind' => PatronKind::Student, 'status' => PatronStatus::Active, 'first_name' => 'Mia', 'last_name' => 'Alt', 'birth_date' => '2014-03-14', 'email' => 'alt@example.invalid', 'school_class_id' => $classes['5a']->getKey()]);
+
+    $this->actingAs($staff)->get(route('pos.patrons.import.create'))->assertSee('Vorhandene Personen aktualisieren')->assertSee('Die Klasse steht in der Datei');
+
+    $upload = UploadedFile::fake()->createWithContent('liste.csv', "vorname;nachname;geburtsdatum;email;klasse\nMia;Alt;14.03.2014;neu@example.invalid;6b\n");
+    $response = $this->actingAs($staff)->post(route('pos.patrons.import.store'), ['file' => $upload, 'update' => '1']);
+    $response->assertRedirect();
+
+    $this->actingAs($staff)->get($response->headers->get('Location'))->assertOk()->assertSee('Wird aktualisiert')->assertSee('alt@example.invalid → neu@example.invalid')->assertSee('Anlegen und aktualisieren');
 });
