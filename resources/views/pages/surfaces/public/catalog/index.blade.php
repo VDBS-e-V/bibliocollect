@@ -26,6 +26,20 @@
         </form>
     </header>
 
+    @if ($criteria->shelf)
+        <section class="bc-public-advanced-active" role="status" aria-label="Regalbrett">
+            <strong>Regalbrett {{ $shelf?->code ?? $criteria->shelf }}@if ($shelf && trim((string) $shelf->label) !== ''): {{ $shelf->label }}@endif</strong>
+            @if ($shelf)
+                @php
+                    $where = array_values(array_filter([$shelf->rack?->display(), $shelf->rack?->parent?->display(), $shelf->rack?->parent?->parent?->display()]));
+                @endphp
+                @if ($where !== [])<span>{{ implode(' › ', $where) }}</span>@endif
+            @endif
+            <span>Das sind die Medien, die auf diesem Brett stehen.</span>
+            <a href="{{ route('public.catalog.index') }}">Ganzen Katalog zeigen</a>
+        </section>
+    @endif
+
     <section class="bc-public-catalog-search" aria-labelledby="public-catalog-filter-heading">
         <div class="bc-public-catalog-search__heading">
             <div>
@@ -38,6 +52,9 @@
         <form method="get" action="{{ route('public.catalog.index') }}" class="bc-public-catalog-filter">
             @if ($criteria->term)
                 <input type="hidden" name="q" value="{{ $criteria->term }}">
+            @endif
+            @if ($criteria->shelf)
+                <input type="hidden" name="regalbrett" value="{{ $criteria->shelf }}">
             @endif
             @foreach (['title', 'contributor', 'subject', 'identifier', 'publisher', 'topic'] as $advancedField)
                 @php

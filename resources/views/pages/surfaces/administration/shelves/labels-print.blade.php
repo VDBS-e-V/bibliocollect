@@ -77,7 +77,7 @@
                     <div class="side">
                         @if ($codeType !== 'qr')<div class="brand"><img src="/brand/vdbs/mark.svg" alt=""><span>BiblioCollect</span></div>@endif
                         @if ($codeType === 'qr')
-                            <div class="scan qr">{!! QrSvg::render($label['code']) !!}</div>
+                            <div class="scan qr">{!! QrSvg::render($label['url'], 'QR-Code '.$label['code']) !!}</div>
                         @elseif ($codeType === 'strich' && $label['barcode'])
                             <div class="scan">{!! str_replace('<svg ', '<svg class="bar128" ', Code128Svg::render($label['code'])) !!}</div>
                         @elseif ($codeType === 'strich')

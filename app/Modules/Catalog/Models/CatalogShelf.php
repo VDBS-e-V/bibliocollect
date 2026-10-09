@@ -41,6 +41,20 @@ final class CatalogShelf extends Model
         return $this->belongsTo(CatalogShelfSection::class, 'section_id');
     }
 
+    /** Lesbarer Pfadteil für den QR-Code auf dem Etikett: „I. A 1 a“ wird zu „I-A-1-a“. */
+    public function publicSlug(): string
+    {
+        $slug = trim((string) preg_replace('/\s+/u', '-', str_replace('.', '', $this->code)), '-');
+
+        return rawurlencode($slug);
+    }
+
+    /** Vergleichsform eines Codes oder Pfadteils: nur Buchstaben und Ziffern, klein. */
+    public static function normalizeCode(string $value): string
+    {
+        return mb_strtolower((string) preg_replace('/[^\p{L}\p{N}]/u', '', rawurldecode($value)));
+    }
+
     /** @return BelongsToMany<CatalogTopic, $this> */
     public function topics(): BelongsToMany
     {

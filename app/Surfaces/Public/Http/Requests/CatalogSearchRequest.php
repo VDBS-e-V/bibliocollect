@@ -26,6 +26,7 @@ final class CatalogSearchRequest extends FormRequest
             'identifier' => ['nullable', 'string', 'max:120'],
             'publisher' => ['nullable', 'string', 'max:180'],
             'topic' => ['nullable', 'string', 'max:180'],
+            'regalbrett' => ['nullable', 'string', 'max:60'],
             'year_from' => ['nullable', 'integer', 'min:1000', 'max:2100'],
             'year_to' => ['nullable', 'integer', 'min:1000', 'max:2100', Rule::when($this->filled('year_from'), ['gte:year_from'])],
             'media_type' => ['nullable', 'string', 'max:80'],
@@ -51,6 +52,7 @@ final class CatalogSearchRequest extends FormRequest
             identifier: $this->nullableString($data['identifier'] ?? null),
             publisher: $this->nullableString($data['publisher'] ?? null),
             topic: $this->nullableString($data['topic'] ?? null),
+            shelf: $this->nullableString($data['regalbrett'] ?? null),
             yearFrom: isset($data['year_from']) ? (int) $data['year_from'] : null,
             yearTo: isset($data['year_to']) ? (int) $data['year_to'] : null,
             mediaType: $this->nullableString($data['media_type'] ?? null),
@@ -65,7 +67,7 @@ final class CatalogSearchRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        foreach (['q', 'title', 'contributor', 'subject', 'identifier', 'publisher', 'topic', 'sort'] as $field) {
+        foreach (['q', 'title', 'contributor', 'subject', 'identifier', 'publisher', 'topic', 'regalbrett', 'sort'] as $field) {
             $this->merge([$field => $this->normalizeNullable($this->input($field))]);
         }
 

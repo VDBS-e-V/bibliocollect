@@ -88,6 +88,12 @@ it('takes the shelf from a scanned shelf label and suggests the shelves of the t
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett' => 'R1-B1', 'regalbrett_code' => 'ia1d'])->assertSessionHas('shelving_notice');
     expect($copy->refresh()->shelf_location)->toBe('I. A 1 d')->and($copy->signature_id)->toBeNull();
 
+    // QR-Code vom Etikett: ein Link auf die Katalogseite des Bretts (auch wenn der Scanner Zeichen verändert).
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett_code' => 'https://bibliocollect.de/regal/I-A-1-e'])->assertSessionHas('shelving_notice');
+    expect($copy->refresh()->shelf_location)->toBe('I. A 1 e');
+    $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett_code' => 'https---bibliocollect.de-regal-I-A-1-d'])->assertSessionHas('shelving_notice');
+    expect($copy->refresh()->shelf_location)->toBe('I. A 1 d');
+
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020005', 'regalbrett_code' => 'gibt es nicht'])->assertSessionHas('shelving_error');
 });
 

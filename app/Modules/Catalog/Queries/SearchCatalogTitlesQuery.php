@@ -144,6 +144,13 @@ final class SearchCatalogTitlesQuery
                 }
             }
 
+            if ($criteria->shelf !== null) {
+                $shelf = $criteria->shelf;
+                $editionQuery->whereHas('copies', static function (Builder $copyQuery) use ($shelf): void {
+                    $copyQuery->whereRaw('LOWER(shelf_location) = ?', [mb_strtolower($shelf)]);
+                });
+            }
+
             if ($criteria->yearFrom !== null) {
                 $editionQuery->where('publication_year', '>=', $criteria->yearFrom);
             }
@@ -191,6 +198,7 @@ final class SearchCatalogTitlesQuery
             || $criteria->publicationPlace !== null
             || $criteria->series !== null
             || $criteria->topic !== null
+            || $criteria->shelf !== null
             || $criteria->classification !== null
             || $criteria->targetAudience !== null
             || $criteria->sourceRecordId !== null

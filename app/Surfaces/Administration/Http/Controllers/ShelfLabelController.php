@@ -140,7 +140,7 @@ final class ShelfLabelController
         return CatalogShelfSection::query()->whereIn('parent_id', $areaIds)->where('kind', ShelfSectionKind::Rack->value)->pluck('id')->map(static fn (mixed $v): string => (string) $v)->all();
     }
 
-    /** @return array{code: string, headline: string, label: string, where: string, topics: string, barcode: bool} */
+    /** @return array{code: string, url: string, headline: string, label: string, where: string, topics: string, barcode: bool} */
     private function label(CatalogShelf $shelf): array
     {
         $rack = $shelf->rack;
@@ -158,6 +158,8 @@ final class ShelfLabelController
 
         return [
             'code' => $shelf->code,
+            // Ziel des QR-Codes: Wer ihn mit dem Handy scannt, sieht im Katalog die Medien dieses Bretts.
+            'url' => route('public.shelf', ['code' => $shelf->publicSlug()]),
             // Das Thema steht groß: die Beschriftung des Bretts, sonst die Themenbereiche, sonst der Standort.
             'headline' => mb_substr($label !== '' ? $label : ($topics !== '' ? $topics : $shelf->code), 0, 90),
             'label' => mb_substr($label, 0, 80),

@@ -46,7 +46,7 @@ Unter **Verwaltung → Update** spielst du eine neue Version ein: Das Paket (ZIP
 
 ## Etiketten für Regalbretter
 
-Unter **Regale und Regalbretter → Etiketten für Regalbretter drucken** wählst du, für welche Regalbretter du Etiketten brauchst (alle, ein Regal, ein Bereich oder einzelne Bretter). Das Etikett (105 × 26 mm) zeigt das **Thema** groß, den Standort klein unten rechts und einen Code zum Scannen: Beim Einsortieren scannst du erst das Buch und dann das Etikett am Regalbrett. Als Code wählst du **Strichcode**, **QR-Code** oder keinen. Drucke in **tatsächlicher Größe**; sitzt der Druck um einen Millimeter daneben, stellst du ihn oben im Feinabgleich nach.
+Unter **Regale und Regalbretter → Etiketten für Regalbretter drucken** wählst du, für welche Regalbretter du Etiketten brauchst (alle, ein Regal, ein Bereich oder einzelne Bretter). Das Etikett (105 × 26 mm) zeigt das **Thema** groß, den Standort klein unten rechts und einen Code zum Scannen: Beim Einsortieren scannst du erst das Buch und dann das Etikett am Regalbrett. Als Code wählst du **Strichcode**, **QR-Code** oder keinen. Der QR-Code enthält einen **Link**: Wer ihn mit dem Handy scannt, landet im Katalog und sieht genau die Medien, die auf diesem Regalbrett stehen. Das Einsortieren erkennt diesen Link ebenfalls, du kannst also mit demselben Etikett arbeiten. Der Link nutzt die Adresse, unter der du die Seite zum Drucken geöffnet hast; drucke die Etiketten also von der echten Adresse (nicht von einer lokalen). Drucke in **tatsächlicher Größe**; sitzt der Druck um einen Millimeter daneben, stellst du ihn oben im Feinabgleich nach.
 
 ## Regalbretter, Themenbereiche, Inventarnummern
 

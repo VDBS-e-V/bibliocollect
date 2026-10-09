@@ -7,6 +7,9 @@ use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogShelfSection;
 use App\Modules\Catalog\Models\CatalogTopic;
+use App\Modules\Catalog\Models\Copy;
+use App\Modules\Catalog\Models\Edition;
+use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Services\CatalogShelfStructure;
 use App\Modules\Identity\Actions\AssignRoleAction;
 use App\Surfaces\Administration\Http\Controllers\ShelfLabelController;
@@ -116,4 +119,21 @@ it('starts at the chosen place, adds new sheets after 22 labels and records the 
     $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'r:'.str_repeat('0', 26)])->assertStatus(422)->assertSee('Nichts zu drucken');
     $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'quatsch'])->assertSessionHasErrors('umfang');
     $this->actingAs($admin)->post(route('administration.shelves.labels.print'), ['umfang' => 'alle', 'anzahl' => 9])->assertSessionHasErrors('anzahl');
+});
+
+it('links the QR code to the public catalog showing only the media of that shelf', function (): void {
+    shelfLabelSetup();
+    foreach (['Rätselbuch' => 'I. A 1 a', 'Kochbuch' => 'I. A 2 a'] as $name => $where) {
+        $title = Title::query()->create(['preferred_title' => $name, 'sort_title' => $name]);
+        $edition = Edition::query()->create(['title_id' => $title->getKey(), 'media_type' => 'book']);
+        Copy::query()->create(['edition_id' => $edition->getKey(), 'barcode' => md5($name), 'status' => 'active', 'shelf_location' => $where]);
+    }
+
+    $shelf = CatalogShelf::query()->where('code', 'I. A 1 a')->firstOrFail();
+    expect($shelf->publicSlug())->toBe('I-A-1-a');
+
+    $this->get('/regal/I-A-1-a')->assertRedirect(route('public.catalog.index', ['regalbrett' => 'I. A 1 a']));
+    $this->get('/regal/gibt-es-nicht')->assertRedirect(route('public.catalog.index'));
+
+    $this->get(route('public.catalog.index', ['regalbrett' => 'I. A 1 a']))->assertOk()->assertSee('Regalbrett I. A 1 a')->assertSee('Rätselbuch')->assertDontSee('Kochbuch');
 });

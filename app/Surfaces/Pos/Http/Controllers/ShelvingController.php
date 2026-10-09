@@ -80,7 +80,7 @@ final class ShelvingController
         $data = $request->validate([
             'buch' => ['required', 'string', 'max:80'],
             'regalbrett' => ['nullable', 'string', 'max:40'],
-            'regalbrett_code' => ['nullable', 'string', 'max:60'],
+            'regalbrett_code' => ['nullable', 'string', 'max:200'],
             'thema' => ['nullable', 'string', 'max:120'],
         ], ['buch.required' => 'Bitte zuerst das Buch scannen.']);
 
@@ -114,6 +114,11 @@ final class ShelvingController
     private function resolveShelf(string $scanned, string $selected, array $active): ?string
     {
         $scanned = trim($scanned);
+
+        // Der QR-Code auf dem Etikett enthält einen Link („…/regal/I-A-1-a“); aus ihm wird der Code gelesen.
+        if (strlen($scanned) > 12 && preg_match('~regal\W+(.+)$~iu', $scanned, $m) === 1) {
+            $scanned = $m[1];
+        }
 
         if ($scanned !== '') {
             foreach ($active as $code) {
