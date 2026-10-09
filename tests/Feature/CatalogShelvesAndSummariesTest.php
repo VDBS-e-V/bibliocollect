@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\User;
 use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogShelfSection;
+use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
@@ -226,4 +227,39 @@ it('lists the shelves grouped by rack when shelving', function (): void {
 
     $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0010200']))->assertOk()
         ->assertSee('<optgroup label="I › A › 1">', false)->assertSee('<optgroup label="Ohne Regal">', false);
+});
+
+it('searches the shelves by location, label, topic and rack name and filters shelves without a topic', function (): void {
+    $admin = shelfUser('management');
+    $topic = CatalogTopic::query()->create(['name' => 'Weltraum']);
+    $a = CatalogShelf::query()->create(['code' => 'I. A 1 a', 'label' => 'Rätsel & Knobeln']);
+    $b = CatalogShelf::query()->create(['code' => 'I. A 2 b', 'label' => 'Sterne und Planeten']);
+    $b->topics()->attach($topic->getKey(), ['position' => 1]);
+    CatalogShelf::query()->create(['code' => 'Sonderregal', 'label' => 'Lose Bücher']);
+    app(CatalogShelfStructure::class)->assignAll();
+    CatalogShelfSection::query()->where('kind', 'rack')->where('code', '2')->update(['name' => 'Wand links']);
+
+    $page = fn (array $query) => $this->actingAs($admin)->get(route('administration.shelves.index', $query))->assertOk();
+
+    $page([])->assertSee('Rätsel &amp; Knobeln', false)->assertSee('Sterne und Planeten')->assertSee('Lose Bücher');
+    $page(['q' => 'knobeln'])->assertSee('Rätsel &amp; Knobeln', false)->assertDontSee('Sterne und Planeten')->assertDontSee('Lose Bücher')->assertSeeText('1 Regalbrett passt');
+    $page(['q' => 'weltraum'])->assertSee('Sterne und Planeten')->assertDontSee('Rätsel &amp; Knobeln', false);
+    $page(['q' => 'wand links'])->assertSee('Sterne und Planeten')->assertDontSee('Lose Bücher');
+    $page(['q' => 'I. A'])->assertSee('Sterne und Planeten')->assertSee('Rätsel &amp; Knobeln', false)->assertDontSee('Lose Bücher');
+    $page(['ohne_thema' => 1])->assertSee('Rätsel &amp; Knobeln', false)->assertSee('Lose Bücher')->assertDontSee('Sterne und Planeten')->assertSeeText('2 Regalbretter passen');
+    $page(['q' => 'gibt es nicht'])->assertSeeText('0 Regalbretter passen');
+});
+
+it('shows how full a shelf is when a capacity is set', function (): void {
+    $admin = shelfUser('management');
+    $this->actingAs($admin)->post(route('administration.shelves.store'), ['code' => 'R1', 'capacity' => 2])->assertSessionHas('shelf_success');
+    shelfCopy('0010300', 'R1');
+    shelfCopy('0010301', 'R1');
+
+    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('2 von 2')->assertSee('voll');
+
+    $shelf = CatalogShelf::query()->where('code', 'R1')->firstOrFail();
+    expect($shelf->capacity)->toBe(2);
+    $this->actingAs($admin)->patch(route('administration.shelves.update', ['shelfId' => $shelf->getKey()]), ['code' => 'R1', 'capacity' => 5, 'is_active' => 1])->assertSessionHas('shelf_success');
+    $this->actingAs($admin)->get(route('administration.shelves.index'))->assertSee('3 frei')->assertDontSee('>voll<', false);
 });

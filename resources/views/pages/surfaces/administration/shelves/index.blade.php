@@ -2,6 +2,11 @@
     use App\Modules\Catalog\Enums\ShelfSectionKind;
 
     $oneGroup = $groups->count() === 1;
+    $filtering = $match !== null;
+    $visible = static fn ($shelf): bool => $match === null || in_array((string) $shelf->getKey(), $match, true);
+    $shown = static function ($shelves) use ($visible) {
+        return $shelves->filter($visible)->values();
+    };
 @endphp
 <x-app-shell surface="administration" title="Regale und Regalbretter">
     <x-ui.page-header
@@ -34,6 +39,18 @@
         <span class="bc-loc-legend__result">= Standort <span class="bc-loc-code">I. A 1 a</span></span>
     </p>
 
+    <form method="get" action="{{ route('administration.shelves.index') }}" class="bc-audit-filter" role="search">
+        <x-ui.input label="Suchen (Standort, Beschriftung, Thema, Name von Regal oder Bereich)" name="q" id="shelf-search" :value="$term" />
+        <label class="bc-checkbox-line"><input type="checkbox" name="ohne_thema" value="1" @checked($withoutTopic)> nur Regalbretter ohne Thema</label>
+        <x-ui.button type="submit" variant="secondary">Suchen</x-ui.button>
+        @if ($filtering)
+            <a href="{{ route('administration.shelves.index') }}">Suche zurücksetzen</a>
+        @endif
+    </form>
+    @if ($filtering)
+        <p class="bc-section-copy"><strong>{{ count($match) }}</strong> {{ count($match) === 1 ? 'Regalbrett passt' : 'Regalbretter passen' }} von {{ $shelfTotal }}.</p>
+    @endif
+
     <div class="bc-acc-tools">
         <button type="button" class="bc-intake-linkbutton" data-acc-toggle="open">Alles aufklappen</button>
         <button type="button" class="bc-intake-linkbutton" data-acc-toggle="close">Alles zuklappen</button>
@@ -41,9 +58,10 @@
 
     @forelse ($groups as $group)
         @php
-            $boardTotal = $group->children->sum(fn ($area) => $area->children->sum(fn ($rack) => $rack->shelves->count()));
+            $boardTotal = $group->children->sum(fn ($area) => $area->children->sum(fn ($rack) => $shown($rack->shelves)->count()));
         @endphp
-        <details class="bc-acc bc-acc--group" data-acc @if ($oneGroup) open @endif>
+        @continue($filtering && $boardTotal === 0)
+        <details class="bc-acc bc-acc--group" data-acc @if ($oneGroup || $filtering) open @endif>
             <summary>
                 <i class="bc-dot bc-dot--group"></i>
                 <span class="bc-acc__kind">Bereichsgruppe</span>
@@ -65,8 +83,9 @@
 
                 @foreach ($group->children as $area)
                     @php
-                        $areaBoards = $area->children->sum(fn ($rack) => $rack->shelves->count());
+                        $areaBoards = $area->children->sum(fn ($rack) => $shown($rack->shelves)->count());
                     @endphp
+                    @continue($filtering && $areaBoards === 0)
                     <details class="bc-acc bc-acc--area" data-acc open>
                         <summary>
                             <i class="bc-dot bc-dot--area"></i>
@@ -88,12 +107,19 @@
                             </details>
 
                             @foreach ($area->children as $rack)
-                                <details class="bc-acc bc-acc--rack" data-acc>
+                                @php
+                                    $rackShelves = $shown($rack->shelves);
+                                    $rackUsed = $rackShelves->sum(fn ($shelf) => (int) ($counts[$shelf->code] ?? 0));
+                                    $rackCapacity = $rackShelves->sum(fn ($shelf) => (int) $shelf->capacity);
+                                    $rackSummary = $rackShelves->count().' '.($rackShelves->count() === 1 ? 'Regalbrett' : 'Regalbretter').' · '.$rackUsed.' '.($rackUsed === 1 ? 'Buch' : 'Bücher').($rackCapacity > 0 ? ' von '.$rackCapacity.' Plätzen' : '');
+                                @endphp
+                                @continue($filtering && $rackShelves->isEmpty())
+                                <details class="bc-acc bc-acc--rack" data-acc @if ($filtering) open @endif>
                                     <summary>
                                         <i class="bc-dot bc-dot--rack"></i>
                                         <span class="bc-acc__kind">Regal</span>
                                         <h4 class="bc-acc__title">{{ $group->code }} › {{ $area->code }} › {{ $rack->code }}<span class="bc-acc__name">{{ $rack->name ?: 'noch ohne Namen' }}</span></h4>
-                                        <span class="bc-acc__meta">{{ $rack->shelves->count() }} {{ $rack->shelves->count() === 1 ? 'Regalbrett' : 'Regalbretter' }}</span>
+                                        <span class="bc-acc__meta">{{ $rackSummary }}</span>
                                     </summary>
                                     <div class="bc-acc__body">
                                         @if ($rack->description)<p class="bc-loc__note">{{ $rack->description }}</p>@endif
@@ -108,9 +134,9 @@
                                             @endif
                                         </details>
 
-                                        @if ($rack->shelves->isNotEmpty())
+                                        @if ($rackShelves->isNotEmpty())
                                             <ul class="bc-board-list">
-                                                @foreach ($rack->shelves as $shelf)
+                                                @foreach ($rackShelves as $shelf)
                                                     @include('pages.surfaces.administration.shelves._shelf-row', ['shelf' => $shelf])
                                                 @endforeach
                                             </ul>
@@ -149,23 +175,26 @@
         @include('pages.surfaces.administration.shelves._section-form', ['section' => null, 'kind' => ShelfSectionKind::Group, 'parentId' => null, 'nextOrder' => ((int) $groups->max('sort_order')) + 1, 'hint' => 'Zum Beispiel „I“ oder „II“.'])
     </details>
 
-    @if ($unassigned->isNotEmpty() || $shelfTotal === 0)
+    @php
+        $looseShown = $shown($unassigned);
+    @endphp
+    @if ((! $filtering && ($unassigned->isNotEmpty() || $shelfTotal === 0)) || ($filtering && $looseShown->isNotEmpty()))
         <details class="bc-acc bc-acc--loose" data-acc open>
             <summary>
                 <i class="bc-dot bc-dot--board"></i>
                 <span class="bc-acc__kind">Ohne Regal</span>
                 <h2 class="bc-acc__title">Regalbretter ohne Regal<span class="bc-acc__name">noch keinem Regal zugeordnet</span></h2>
-                <span class="bc-acc__meta">{{ $unassigned->count() }}</span>
+                <span class="bc-acc__meta">{{ $looseShown->count() }}</span>
             </summary>
             <div class="bc-acc__body">
                 <p class="bc-loc__note">Diese Regalbretter haben einen freien Standort-Code. Wähle bei „bearbeiten“ ein Regal, damit sie in den Aufbau passen. Codes der Form „I. A 1 a“ lassen sich auch automatisch zuordnen.</p>
-                @if ($unassigned->isNotEmpty())
+                @if ($looseShown->isNotEmpty())
                     <form method="post" action="{{ route('administration.sections.assign') }}">
                         @csrf
                         <x-ui.button type="submit" variant="secondary">Anhand des Standort-Codes zuordnen</x-ui.button>
                     </form>
                     <ul class="bc-board-list">
-                        @foreach ($unassigned as $shelf)
+                        @foreach ($looseShown as $shelf)
                             @include('pages.surfaces.administration.shelves._shelf-row', ['shelf' => $shelf])
                         @endforeach
                     </ul>

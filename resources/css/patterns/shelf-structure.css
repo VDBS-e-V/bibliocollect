@@ -196,3 +196,8 @@
 ol.bc-section-copy { list-style: decimal; padding-left: 1.5rem; }
 ol.bc-section-copy li { margin: .3rem 0; }
 .bc-update-package .bc-checkbox-line { display: flex; align-items: flex-start; gap: .5rem; }
+
+/* Füllstand eines Regalbretts */
+.bc-meter { display: inline-block; vertical-align: middle; width: 5rem; height: .55rem; margin-right: .4rem; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg-surface); overflow: hidden; }
+.bc-meter__bar { display: block; height: 100%; background: var(--vdbs-green); }
+.bc-meter__bar--full { background: var(--vdbs-group-orange); }

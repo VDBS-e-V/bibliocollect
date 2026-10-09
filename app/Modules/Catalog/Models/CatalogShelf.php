@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string|null $signature_id
  * @property string|null $section_id
  * @property string|null $board
+ * @property int|null $capacity
  * @property int $sort_order
  * @property bool $is_active
  */
@@ -28,7 +29,7 @@ final class CatalogShelf extends Model
     protected $table = 'catalog_shelves';
 
     /** @var list<string> */
-    protected $fillable = ['code', 'label', 'signature_id', 'section_id', 'board', 'sort_order', 'is_active'];
+    protected $fillable = ['code', 'label', 'signature_id', 'section_id', 'board', 'capacity', 'sort_order', 'is_active'];
 
     /**
      * Das Regal, in dem das Regalbrett liegt.
@@ -64,6 +65,6 @@ final class CatalogShelf extends Model
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'sort_order' => 'integer'];
+        return ['is_active' => 'boolean', 'sort_order' => 'integer', 'capacity' => 'integer'];
     }
 }

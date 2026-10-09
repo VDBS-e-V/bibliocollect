@@ -27,9 +27,9 @@ final readonly class SaveCatalogShelfAction
      *
      * @throws CatalogShelfStructureConflict
      */
-    public function execute(?CatalogShelf $shelf, ?string $code, ?string $label, int $sortOrder, bool $active, array $topicIds = [], ?string $rackId = null, ?string $board = null): CatalogShelf
+    public function execute(?CatalogShelf $shelf, ?string $code, ?string $label, int $sortOrder, bool $active, array $topicIds = [], ?string $rackId = null, ?string $board = null, ?int $capacity = null): CatalogShelf
     {
-        return DB::transaction(function () use ($shelf, $code, $label, $sortOrder, $active, $topicIds, $rackId, $board): CatalogShelf {
+        return DB::transaction(function () use ($shelf, $code, $label, $sortOrder, $active, $topicIds, $rackId, $board, $capacity): CatalogShelf {
             $label = $label !== null && trim($label) !== '' ? trim($label) : null;
             $rack = $rackId !== null && $rackId !== '' ? CatalogShelfSection::query()->with('parent.parent')->find($rackId) : null;
 
@@ -44,7 +44,7 @@ final readonly class SaveCatalogShelfAction
                 throw CatalogShelfStructureConflict::duplicate($code);
             }
 
-            $values = ['code' => $code, 'label' => $label, 'section_id' => $rack?->getKey(), 'board' => $rack !== null ? $board : null, 'sort_order' => $sortOrder, 'is_active' => $active];
+            $values = ['code' => $code, 'label' => $label, 'section_id' => $rack?->getKey(), 'board' => $rack !== null ? $board : null, 'capacity' => $capacity !== null && $capacity > 0 ? $capacity : null, 'sort_order' => $sortOrder, 'is_active' => $active];
 
             if ($shelf === null) {
                 $shelf = CatalogShelf::query()->create($values);

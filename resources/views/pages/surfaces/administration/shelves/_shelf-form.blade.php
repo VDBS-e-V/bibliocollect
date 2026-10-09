@@ -20,6 +20,7 @@
     @endif
     <x-ui.input label="Beschriftung am Regalbrett" name="label" :id="'shelf-label-'.$key" :value="$shelf?->label" maxlength="120" hint="Was dort steht, zum Beispiel „Fantasy ab 10 Jahren“." />
     <x-ui.input label="Reihenfolge" name="sort_order" :id="'shelf-order-'.$key" type="number" min="0" max="9999" :value="$shelf?->sort_order ?? $nextOrder ?? 0" />
+    <x-ui.input label="Platz für wie viele Bücher? (optional)" name="capacity" :id="'shelf-capacity-'.$key" type="number" min="1" max="9999" :value="$shelf?->capacity" hint="Damit zeigt die Übersicht, wie voll das Brett ist." />
     @if ($shelf)
         <label class="bc-checkbox-line"><input type="hidden" name="is_active" value="0"><input type="checkbox" name="is_active" value="1" @checked($shelf->is_active)> Beim Einsortieren auswählbar</label>
     @endif

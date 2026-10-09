@@ -5,7 +5,15 @@
     <div class="bc-board__row">
         <span class="bc-loc-code">{{ $shelf->code }}</span>
         <span class="bc-board__label">{{ $shelf->label ?: 'ohne Beschriftung' }}@unless ($shelf->is_active) <x-ui.badge>ausgeschaltet</x-ui.badge>@endunless</span>
-        <span class="bc-board__count">{{ $copies }} {{ $copies === 1 ? 'Exemplar' : 'Exemplare' }}</span>
+        <span class="bc-board__count">
+            @if ($shelf->capacity)
+                <span class="bc-meter" role="img" aria-label="{{ $copies }} von {{ $shelf->capacity }} Plätzen belegt"><span class="bc-meter__bar {{ $copies >= $shelf->capacity ? 'bc-meter__bar--full' : '' }}" style="width: {{ min(100, (int) round($copies / $shelf->capacity * 100)) }}%"></span></span>
+                {{ $copies }} von {{ $shelf->capacity }}
+                @if ($copies >= $shelf->capacity)<x-ui.badge variant="warning">voll</x-ui.badge>@else<small>· {{ $shelf->capacity - $copies }} frei</small>@endif
+            @else
+                {{ $copies }} {{ $copies === 1 ? 'Exemplar' : 'Exemplare' }}
+            @endif
+        </span>
         <span class="bc-board__topics">
             @forelse ($shelf->topics as $topic)
                 <span class="bc-chip">{{ $topic->name }}</span>
