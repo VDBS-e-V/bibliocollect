@@ -26,6 +26,13 @@
         </form>
     </header>
 
+    @if (session('bookmark_notice'))
+        <x-ui.alert variant="success" title="Merkliste">{{ session('bookmark_notice') }} @auth<a href="{{ route('portal.bookmarks') }}">Zur Merkliste</a>@endauth</x-ui.alert>
+    @endif
+    @if (session('bookmark_error'))
+        <x-ui.alert variant="error" title="Nicht möglich">{{ session('bookmark_error') }}</x-ui.alert>
+    @endif
+
     @if ($criteria->shelf)
         <section class="bc-public-advanced-active" role="status" aria-label="Regalbrett">
             <strong>Regalbrett {{ $shelf?->code ?? $criteria->shelf }}@if ($shelf && trim((string) $shelf->label) !== ''): {{ $shelf->label }}@endif</strong>
@@ -260,6 +267,8 @@
                             @if ($presenter->availabilityHint($availabilities[$titleId]))
                                 <span class="bc-public-result__hint">{{ $presenter->availabilityHint($availabilities[$titleId]) }}</span>
                             @endif
+
+                            <x-catalog.bookmark-button :title-id="$titleId" :marked="in_array($titleId, $bookmarked, true)" />
 
                             @if ($holding->shelfLocations !== [])
                                 <div>

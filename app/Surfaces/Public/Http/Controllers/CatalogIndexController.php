@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Public\Http\Controllers;
 
+use App\Models\User;
 use App\Modules\Catalog\DTOs\HoldingSummary;
 use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogTopic;
@@ -14,6 +15,7 @@ use App\Modules\Catalog\Queries\SearchCatalogTitlesQuery;
 use App\Modules\Catalog\Services\CatalogClassificationService;
 use App\Modules\Catalog\Services\CatalogCoverService;
 use App\Modules\Catalog\Services\CatalogHoldingService;
+use App\Modules\Circulation\Models\Bookmark;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Surfaces\Public\Http\Requests\CatalogSearchRequest;
 use App\Surfaces\Public\Support\PublicCatalogPresenter;
@@ -75,7 +77,10 @@ final class CatalogIndexController
             ? CatalogTopic::query()->with(['shelves.rack.parent.parent'])->whereRaw('LOWER(name) = ?', [mb_strtolower($criteria->theme)])->first()
             : null;
 
+        $user = auth()->user();
+
         return response()->view('pages.surfaces.public.catalog.index', [
+            'bookmarked' => $user instanceof User ? Bookmark::markedBy((int) $user->getKey(), array_map(static fn (Title $title): string => (string) $title->getKey(), $titles->items())) : [],
             'shelf' => $shelf,
             'theme' => $theme,
             'criteria' => $criteria,

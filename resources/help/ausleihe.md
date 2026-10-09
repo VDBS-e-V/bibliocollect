@@ -69,3 +69,7 @@ Auf dem Arbeitsplatz zeigt die Kachel **Überfällige Ausleihen**, wie viele es 
 ## Verloren geglaubtes Medium taucht wieder auf
 
 Scanne die Inventarnummer auf dem Arbeitsplatz. Ist das Exemplar als verloren oder beschädigt eingetragen, öffnet sich die Seite **Exemplar wieder verfügbar machen**. Ein Klick macht es wieder ausleihbar. Wartet jemand darauf, wird es gleich für die erste Person zurückgelegt; die Meldung sagt es dir.
+
+## Merkliste (Onlinekonto)
+
+Leser:innen mit Onlinekonto können sich Bücher **merken**: Im Katalog und auf der Titelseite gibt es den Knopf „Merken“ (Herz). Die Liste steht im Konto unter **Merkliste**, mit Cover und Angabe, ob das Buch gerade da ist; dort lässt sich ein Titel auch wieder entfernen. Die Liste ist privat, fasst bis zu 100 Titel und gehört zum Konto: Sie steht in der Auskunft über die eigenen Daten und wird gelöscht, wenn das Konto anonymisiert wird. Bücher, die ausgesondert wurden, verschwinden aus der Anzeige. Ohne Onlinekonto steht am Titel der Hinweis „Zum Merken anmelden“.

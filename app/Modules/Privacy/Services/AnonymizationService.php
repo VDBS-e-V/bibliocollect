@@ -10,6 +10,7 @@ use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Circulation\Enums\ReservationStatus;
 use App\Modules\Circulation\Enums\WishStatus;
+use App\Modules\Circulation\Models\Bookmark;
 use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\LoanTransaction;
@@ -304,6 +305,9 @@ final readonly class AnonymizationService
     private function anonymizeOne(Patron $patron, ?User $user): void
     {
         if ($user instanceof User) {
+            // Die Merkliste gehört zur Person und wird mit dem Konto gelöscht.
+            Bookmark::query()->where('user_id', $user->getKey())->delete();
+
             $user->forceFill([
                 'name' => 'Anonymisiert',
                 'email' => 'anonymisiert-'.Str::lower((string) Str::ulid()).'@anonym.invalid',

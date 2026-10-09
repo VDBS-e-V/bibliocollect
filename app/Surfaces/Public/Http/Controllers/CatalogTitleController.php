@@ -14,6 +14,7 @@ use App\Modules\Catalog\Services\CatalogClassificationService;
 use App\Modules\Catalog\Services\CatalogCoverService;
 use App\Modules\Catalog\Services\CatalogHoldingService;
 use App\Modules\Circulation\Enums\ReservationStatus;
+use App\Modules\Circulation\Models\Bookmark;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Circulation\Services\CopyAvailabilityService;
 use App\Surfaces\Public\Support\PublicCatalogPresenter;
@@ -92,7 +93,10 @@ final class CatalogTitleController
             }
         }
 
+        $user = auth()->user();
+
         return response()->view('pages.surfaces.public.catalog.show', [
+            'bookmarked' => $user instanceof User ? Bookmark::markedBy((int) $user->getKey(), [(string) $title->getKey()]) !== [] : false,
             'title' => $title,
             'titleSummary' => $holdings->summarizeTitle($title),
             'editionSummaries' => $editionSummaries,

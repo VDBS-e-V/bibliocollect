@@ -76,8 +76,16 @@
             @if ($titleSummary->shelfLocations !== [])
                 <p><strong>Standorte:</strong> {{ implode(', ', $titleSummary->shelfLocations) }}</p>
             @endif
+            <x-catalog.bookmark-button :title-id="(string) $title->getKey()" :marked="$bookmarked" />
         </div>
     </header>
+
+    @if (session('bookmark_notice'))
+        <x-ui.alert variant="success" title="Merkliste">{{ session('bookmark_notice') }} @auth<a href="{{ route('portal.bookmarks') }}">Zur Merkliste</a>@endauth</x-ui.alert>
+    @endif
+    @if (session('bookmark_error'))
+        <x-ui.alert variant="error" title="Nicht möglich">{{ session('bookmark_error') }}</x-ui.alert>
+    @endif
 
     <div class="bc-public-title-layout">
         <div class="bc-public-title-layout__main">

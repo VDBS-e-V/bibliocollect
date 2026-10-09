@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Surfaces\Portal\Http\Controllers\PortalBookmarkController;
 use App\Surfaces\Portal\Http\Controllers\PortalCirculationController;
 use App\Surfaces\Portal\Http\Controllers\PortalHomeController;
 use App\Surfaces\Portal\Http\Controllers\PortalWishController;
@@ -18,6 +19,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.portal.access'])->gro
 
     Route::get('/konto/meine-daten', [PortalCirculationController::class, 'myData'])
         ->name('portal.my-data');
+
+    Route::get('/konto/merkliste', [PortalBookmarkController::class, 'index'])->name('portal.bookmarks');
+    Route::post('/konto/merkliste/{titleId}', [PortalBookmarkController::class, 'toggle'])->name('portal.bookmarks.toggle');
 
     Route::get('/konto/buchwuensche', [PortalWishController::class, 'index'])->name('portal.wishes.index');
     Route::post('/konto/buchwuensche/{wishId}/zurueckziehen', [PortalWishController::class, 'withdraw'])->name('portal.wishes.withdraw');

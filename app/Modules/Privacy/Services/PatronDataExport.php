@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Privacy\Services;
 
 use App\Models\User;
+use App\Modules\Circulation\Models\Bookmark;
 use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\Reservation;
@@ -117,6 +118,10 @@ final class PatronDataExport
                     'nach' => $event->to_status,
                     'wirksam_am' => $event->effective_on?->toDateString(),
                 ])->all(),
+            'merkliste' => $user instanceof User
+                ? Bookmark::query()->where('user_id', $user->getKey())->with('title')->orderBy('created_at')->get()
+                    ->map(static fn (Bookmark $bookmark): array => ['titel' => $bookmark->title->preferred_title, 'gemerkt_am' => $bookmark->created_at?->toIso8601String()])->all()
+                : [],
             'erinnerungen' => $user instanceof User
                 ? ReminderLog::query()->where('user_id', $user->getKey())->orderBy('sent_at')->get()
                     ->map(static fn (ReminderLog $log): array => ['art' => $log->kind, 'gesendet_am' => $log->sent_at->toIso8601String()])->all()
