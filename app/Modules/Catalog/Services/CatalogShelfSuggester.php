@@ -148,7 +148,16 @@ final class CatalogShelfSuggester
             return (int) $edition->minimum_age;
         }
 
-        foreach ([(string) $edition->age_recommendation, (string) $edition->target_audience] as $text) {
+        // Die Altersempfehlung ist als JSON gespeichert (zum Beispiel {"raw": "ab 8 Jahren"}); für die Suche zählt der Text.
+        $recommendation = [];
+        $stored = (array) $edition->age_recommendation;
+        array_walk_recursive($stored, static function (mixed $value) use (&$recommendation): void {
+            if (is_scalar($value)) {
+                $recommendation[] = (string) $value;
+            }
+        });
+
+        foreach ([implode(' ', $recommendation), (string) $edition->target_audience] as $text) {
             if (preg_match('/(?:ab\s+)?(\d{1,2})\s*(?:\+|jahr|[–-]\s*\d{1,2})/iu', $text, $m) === 1) {
                 return (int) $m[1];
             }

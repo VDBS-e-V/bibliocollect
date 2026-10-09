@@ -101,3 +101,17 @@ it('goes through the stack topic by topic and carries on with the next book of t
 
     $this->actingAs($helper)->get(route('pos.shelving', ['thema' => '__ohne__']))->assertSee('Ohne Thema');
 });
+
+it('reads the stored age recommendation (JSON) without error and uses it for the age match', function (): void {
+    suggestShelves();
+    $unknown = suggestCopy('0040010', 'Reise zu den Sternen', ['subject_keywords' => 'Weltraum', 'age_recommendation' => ['raw' => 'Keine Angabe']]);
+    $aged = suggestCopy('0040011', 'Gruseliges', ['subject_keywords' => 'Grusel', 'age_recommendation' => ['raw' => 'ab 9 Jahren']]);
+
+    expect(app(CatalogShelfSuggester::class)->suggest($unknown->edition))->not->toBeEmpty();
+
+    $codes = array_column(app(CatalogShelfSuggester::class)->suggest($aged->edition), 'code');
+    expect($codes)->toContain('I. A 4 c');
+
+    $helper = suggestHelper();
+    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0040010']))->assertOk();
+});
