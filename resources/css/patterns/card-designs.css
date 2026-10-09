@@ -16,6 +16,11 @@
     background: var(--bg-surface);
 }
 
+.bc-card-design .bc-card-design__pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
 .bc-card-design img {
     width: 100%;
     height: auto;

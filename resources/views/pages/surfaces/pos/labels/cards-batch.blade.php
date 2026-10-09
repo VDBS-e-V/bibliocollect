@@ -15,27 +15,31 @@
     @endif
 
     <p class="bc-section-copy">
-        Die Motive werden zufällig und genau in den angegebenen Anteilen verteilt. Voreingestellt ist die Gleichverteilung.
-        Ändere die Prozentwerte nur, wenn von einem Motiv zu viele übrig sind; sie gelten nur für diesen Druck. Die Summe muss 100 ergeben.
+        Jeder Ausweis hat ein Motiv für Vorder- und Rückseite. Die Motive werden beim ersten Druck zufällig und genau in den angegebenen Anteilen verteilt
+        und am Ausweis gespeichert; beim Drucken der Rückseite und bei Nachdrucken bleibt das Motiv dasselbe. Voreingestellt ist die Gleichverteilung.
+        Ändere die Prozentwerte nur, wenn von einem Motiv zu viele übrig sind; sie gelten nur für diesen Druck und nur für Ausweise ohne Motiv
+        ({{ $unassigned }} in dieser Charge). Die Summe muss 100 ergeben.
     </p>
 
-    @foreach (['vorder' => ['Vorderseiten', $front, $frontShares], 'rueck' => ['Rückseiten', $back, $backShares]] as $side => [$title, $designs, $shares])
-        <section class="bc-content-section" aria-labelledby="print-{{ $side }}-heading">
-            <div class="bc-section-heading"><h2 id="print-{{ $side }}-heading">{{ $title }}</h2></div>
+    <section class="bc-content-section" aria-labelledby="print-heading">
+        <div class="bc-section-heading"><h2 id="print-heading">Drucken</h2></div>
+        @foreach (['vorder' => 'Vorderseiten', 'rueck' => 'Rückseiten'] as $side => $title)
             <form method="post" action="{{ route('pos.labels.cards.print', ['batch' => $batch]) }}" target="_blank" class="bc-audit-filter">
                 @csrf
                 <input type="hidden" name="side" value="{{ $side }}">
                 <x-ui.input label="Erste Position auf dem Bogen (1–10)" name="start" id="start-{{ $side }}" type="number" min="1" max="10" value="1" />
-                @foreach ($designs as $design)
-                    <x-ui.input :label="$design->name.' (%)'" name="motiv[{{ $design->getKey() }}]" id="motiv-{{ $side }}-{{ $design->getKey() }}" type="number" min="0" max="100" :value="$shares[(string) $design->getKey()] ?? 0" />
-                @endforeach
+                @if ($unassigned > 0)
+                    @foreach ($motifs as $motif)
+                        <x-ui.input :label="$motif->name.' (%)'" name="motiv[{{ $motif->getKey() }}]" id="motiv-{{ $side }}-{{ $motif->getKey() }}" type="number" min="0" max="100" :value="$shares[(string) $motif->getKey()] ?? 0" />
+                    @endforeach
+                @endif
                 <x-ui.button type="submit">{{ $title }} drucken</x-ui.button>
             </form>
-            @if ($designs->isEmpty())
-                <p class="bc-section-copy">Kein aktives Motiv: Die Karten werden auf weißem Grund gedruckt.</p>
-            @endif
-        </section>
-    @endforeach
+        @endforeach
+        @if ($motifs->isEmpty())
+            <p class="bc-section-copy">Kein aktives Motiv: Die Karten werden auf weißem Grund gedruckt.</p>
+        @endif
+    </section>
 
     <p class="bc-section-copy">
         Beidseitig: erst die Vorderseiten drucken, den Bogen mit der bedruckten Seite wieder einlegen (Wenden an der langen Kante) und dann die Rückseiten drucken,

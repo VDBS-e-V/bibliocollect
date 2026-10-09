@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $number
  * @property int|null $batch
+ * @property string|null $motif_id
  * @property CardStatus $status
  * @property string|null $patron_id
  * @property Carbon|null $printed_at
@@ -30,12 +31,18 @@ final class PatronCard extends Model
     use HasUlids;
 
     /** @var list<string> */
-    protected $fillable = ['number', 'batch', 'status', 'patron_id', 'printed_at', 'assigned_at', 'blocked_at', 'block_reason'];
+    protected $fillable = ['number', 'batch', 'motif_id', 'status', 'patron_id', 'printed_at', 'assigned_at', 'blocked_at', 'block_reason'];
 
     /** @return BelongsTo<Patron, $this> */
     public function patron(): BelongsTo
     {
         return $this->belongsTo(Patron::class);
+    }
+
+    /** @return BelongsTo<PatronCardMotif, $this> */
+    public function motif(): BelongsTo
+    {
+        return $this->belongsTo(PatronCardMotif::class, 'motif_id');
     }
 
     /** @return array<string, string> */

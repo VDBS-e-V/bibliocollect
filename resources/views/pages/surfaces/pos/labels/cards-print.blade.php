@@ -61,9 +61,10 @@
                 <div class="card empty"></div>
             @else
                 @php
-                    $style = $slot['design'] ? "background-image: url('".$slot['design']->url()."')" : '';
+                    $url = $slot['motif'] ? ($front ? $slot['motif']->frontUrl() : $slot['motif']->backUrl()) : null;
+                    $style = $url ? "background-image: url('".$url."')" : '';
                 @endphp
-                @if ($front && $slot['design'])
+                @if ($front && $url)
                     <div class="card" style="{{ $style }}">
                         <div class="content">
                             <div class="brand">
@@ -90,7 +91,7 @@
                             </div>
                         </div>
                     </div>
-                @elseif ($slot['design'])
+                @elseif ($url)
                     <div class="card back" style="{{ $style }}"></div>
                 @else
                     <div class="card back"><div class="badge"><img src="/brand/vdbs/logo-light.svg" alt="VDBS e.V."></div></div>

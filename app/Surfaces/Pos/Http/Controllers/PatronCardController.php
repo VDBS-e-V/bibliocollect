@@ -10,7 +10,7 @@ use App\Modules\Patrons\Actions\GeneratePatronCardsAction;
 use App\Modules\Patrons\Enums\CardBlockReason;
 use App\Modules\Patrons\Enums\CardStatus;
 use App\Modules\Patrons\Models\PatronCard;
-use App\Modules\Patrons\Models\PatronCardDesign;
+use App\Modules\Patrons\Models\PatronCardMotif;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -92,17 +92,15 @@ final class PatronCardController
             return redirect()->route('pos.labels.cards')->withErrors(['batch' => "Charge {$batch} gibt es nicht."]);
         }
 
-        $front = PatronCardDesign::query()->forSide(PatronCardDesign::FRONT)->where('is_active', true)->get();
-        $back = PatronCardDesign::query()->forSide(PatronCardDesign::BACK)->where('is_active', true)->get();
+        $motifs = PatronCardMotif::query()->usable()->get();
 
         return response()
             ->view('pages.surfaces.pos.labels.cards-batch', [
                 'batch' => $batch,
                 'free' => $free,
-                'front' => $front,
-                'back' => $back,
-                'frontShares' => self::evenShares($front),
-                'backShares' => self::evenShares($back),
+                'motifs' => $motifs,
+                'shares' => self::evenShares($motifs),
+                'unassigned' => $this->unassigned($batch)->whereNull('motif_id')->count(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
@@ -110,7 +108,7 @@ final class PatronCardController
     /**
      * Gleichverteilung in ganzen Prozent, die zusammen 100 ergeben (bei 3 Motiven 34 / 33 / 33).
      *
-     * @param  Collection<int, PatronCardDesign>  $designs
+     * @param  Collection<int, PatronCardMotif>  $designs
      * @return array<string, int>
      */
     public static function evenShares(Collection $designs): array
@@ -131,7 +129,11 @@ final class PatronCardController
         return $shares;
     }
 
-    /** Vorder- oder Rückseiten einer Charge. Drucken der Vorderseite markiert neue Ausweise als „Im Druck“. */
+    /**
+     * Vorder- oder Rückseiten einer Charge. Jeder Ausweis hat ein Motiv für beide Seiten: Es wird beim ersten Druck
+     * zugeteilt und gespeichert, damit Vorder-, Rückseite und Nachdrucke übereinstimmen. Drucken der Vorderseite markiert
+     * neue Ausweise als „Im Druck“.
+     */
     public function print(Request $request, int $batch): Response|RedirectResponse
     {
         $data = $request->validate([
@@ -145,31 +147,43 @@ final class PatronCardController
         ]);
 
         $front = $data['side'] === 'vorder';
-        $designs = PatronCardDesign::query()->forSide($front ? PatronCardDesign::FRONT : PatronCardDesign::BACK)->where('is_active', true)->get();
-
-        // Ohne Angabe gleichverteilt; sonst genau die eingegebenen Prozentwerte (einmalig, sie werden nicht gespeichert).
-        $shares = isset($data['motiv'])
-            ? $designs->mapWithKeys(static fn (PatronCardDesign $design): array => [(string) $design->getKey() => (int) ($data['motiv'][$design->getKey()] ?? 0)])->all()
-            : self::evenShares($designs);
-
-        if ($designs->isNotEmpty() && array_sum($shares) !== 100) {
-            return redirect()->route('pos.labels.cards.batch', ['batch' => $batch])->withErrors(['batch' => 'Die Verteilung der Motive muss zusammen 100 % ergeben (aktuell '.array_sum($shares).' %).']);
-        }
-
-        $cards = $this->unassigned($batch)->orderBy('number')->get();
+        $cards = $this->unassigned($batch)->orderBy('number')->with('motif')->get();
 
         if ($cards->isEmpty()) {
             return redirect()->route('pos.labels.cards')->withErrors(['batch' => "In Charge {$batch} gibt es keine freien Ausweise zum Drucken."]);
         }
 
-        $skip = max(0, ((int) ($data['start'] ?? 1)) - 1);
-        $queue = $this->designQueue($designs->keyBy(static fn (PatronCardDesign $design): string => (string) $design->getKey()), $shares, $cards->count());
+        $open = $cards->whereNull('motif_id');
+        $motifs = PatronCardMotif::query()->usable()->get();
 
-        // Platzbelegung: vorn Ausweis plus Motiv, hinten nur das Motiv.
+        if ($open->isNotEmpty() && $motifs->isNotEmpty()) {
+            // Ohne Angabe gleichverteilt; sonst genau die eingegebenen Prozentwerte (einmalig, sie werden nicht gespeichert).
+            $shares = isset($data['motiv'])
+                ? $motifs->mapWithKeys(static fn (PatronCardMotif $motif): array => [(string) $motif->getKey() => (int) ($data['motiv'][$motif->getKey()] ?? 0)])->all()
+                : self::evenShares($motifs);
+
+            if (array_sum($shares) !== 100) {
+                return redirect()->route('pos.labels.cards.batch', ['batch' => $batch])->withErrors(['batch' => 'Die Verteilung der Motive muss zusammen 100 % ergeben (aktuell '.array_sum($shares).' %).']);
+            }
+
+            $queue = $this->designQueue($motifs->keyBy(static fn (PatronCardMotif $motif): string => (string) $motif->getKey()), $shares, $open->count());
+
+            DB::transaction(static function () use ($open, $queue): void {
+                foreach ($open as $card) {
+                    $motif = array_shift($queue);
+                    $card->forceFill(['motif_id' => $motif?->getKey()])->save();
+                    $card->setRelation('motif', $motif);
+                }
+            });
+        }
+
+        $skip = max(0, ((int) ($data['start'] ?? 1)) - 1);
+
+        // Platzbelegung: vorn Ausweis plus Motiv, hinten nur das Motiv derselben Karte.
         $slots = array_fill(0, $skip, null);
 
         foreach ($cards as $card) {
-            $slots[] = ['card' => $card, 'design' => array_shift($queue)];
+            $slots[] = ['card' => $card, 'motif' => $card->motif];
         }
 
         $sheets = array_map(static fn (array $sheet): array => array_pad($sheet, self::PER_SHEET, null), array_chunk($slots, self::PER_SHEET));
@@ -178,14 +192,11 @@ final class PatronCardController
             $this->unassigned($batch)->where('status', CardStatus::Generated->value)->update(['status' => CardStatus::InPrint->value, 'printed_at' => now()]);
         } else {
             // Wenden an der langen Kante: links und rechts tauschen. Bedruckt wird nur, was vorn einen Ausweis hat.
-            // Die Motive der Rückseite sind unabhängig von den Vorderseiten, deshalb neu verteilt.
-            $backQueue = $this->designQueue($designs->keyBy(static fn (PatronCardDesign $design): string => (string) $design->getKey()), $shares, $cards->count());
-
             foreach ($sheets as $sheetIndex => $sheet) {
                 $mirrored = array_fill(0, self::PER_SHEET, null);
 
                 foreach ($sheet as $index => $slot) {
-                    $mirrored[$index ^ 1] = $slot !== null ? ['design' => array_shift($backQueue)] : null;
+                    $mirrored[$index ^ 1] = $slot;
                 }
 
                 $sheets[$sheetIndex] = $mirrored;
@@ -249,9 +260,9 @@ final class PatronCardController
     /**
      * Motive für $total Plätze: Anteile in Prozent, Rundung nach größtem Rest, dann gemischt.
      *
-     * @param  Collection<string, PatronCardDesign>  $designs  nach Id
+     * @param  Collection<string, PatronCardMotif>  $designs  nach Id
      * @param  array<string, int>  $shares
-     * @return list<PatronCardDesign|null>
+     * @return list<PatronCardMotif|null>
      */
     private function designQueue(Collection $designs, array $shares, int $total): array
     {

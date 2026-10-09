@@ -4,61 +4,67 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Pos\Http\Controllers;
 
-use App\Modules\Patrons\Actions\DeletePatronCardDesignAction;
-use App\Modules\Patrons\Actions\StorePatronCardDesignAction;
-use App\Modules\Patrons\Models\PatronCardDesign;
+use App\Modules\Patrons\Actions\DeletePatronCardMotifAction;
+use App\Modules\Patrons\Actions\StorePatronCardMotifAction;
+use App\Modules\Patrons\Models\PatronCardMotif;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\Rule;
 
-/** Hintergrundmotive für Vorder- und Rückseiten der Ausweise verwalten (Bilder hochladen, ein- und ausschalten, löschen). */
+/** Motive der Ausweise verwalten: Vorder- und Rückseite gehören zusammen (hochladen, ein- und ausschalten, löschen). */
 final class PatronCardDesignController
 {
     public function index(): Response
     {
         return response()
             ->view('pages.surfaces.pos.labels.cards-designs', [
-                'front' => PatronCardDesign::query()->forSide(PatronCardDesign::FRONT)->get(),
-                'back' => PatronCardDesign::query()->forSide(PatronCardDesign::BACK)->get(),
+                'motifs' => PatronCardMotif::query()->orderBy('sort_order')->orderBy('name')->get(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function store(Request $request, StorePatronCardDesignAction $action): RedirectResponse
+    public function store(Request $request, StorePatronCardMotifAction $action): RedirectResponse
     {
+        $image = ['required', 'file', 'mimes:png,jpg,jpeg', 'max:8192', 'dimensions:min_width=1000,ratio=85/54'];
+
         $data = $request->validate([
-            'side' => ['required', Rule::in([PatronCardDesign::FRONT, PatronCardDesign::BACK])],
             'name' => ['required', 'string', 'max:80'],
-            'image' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:8192', 'dimensions:min_width=1000,ratio=85/54'],
+            'front' => $image,
+            'back' => $image,
         ], [
-            'side.required' => 'Bitte wählen, ob das Motiv für die Vorder- oder die Rückseite gilt.',
             'name.required' => 'Bitte dem Motiv einen Namen geben.',
-            'image.required' => 'Bitte eine Bilddatei auswählen.',
-            'image.mimes' => 'Das Bild muss eine PNG- oder JPG-Datei sein.',
-            'image.max' => 'Das Bild darf höchstens 8 MB groß sein.',
-            'image.dimensions' => 'Das Bild muss im Seitenverhältnis 85 : 54 vorliegen (zum Beispiel 2008 × 1276 Pixel) und mindestens 1000 Pixel breit sein.',
+            'front.required' => 'Bitte ein Bild für die Vorderseite auswählen.',
+            'back.required' => 'Bitte ein Bild für die Rückseite auswählen.',
+            '*.mimes' => 'Das Bild muss eine PNG- oder JPG-Datei sein.',
+            '*.max' => 'Das Bild darf höchstens 8 MB groß sein.',
+            '*.dimensions' => 'Das Bild muss im Seitenverhältnis 85 : 54 vorliegen (zum Beispiel 2008 × 1276 Pixel) und mindestens 1000 Pixel breit sein.',
         ]);
 
-        $action->execute($data['side'], trim($data['name']), $request->file('image'));
+        $name = trim($data['name']);
+        $action->execute($name, $request->file('front'), $request->file('back'));
 
-        return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.trim($data['name']).'“ ist hochgeladen und aktiv.');
+        return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.$name.'“ ist hochgeladen und aktiv.');
     }
 
-    /** Ein- oder ausschalten: Nur aktive Motive kommen beim Drucken vor. */
+    /** Ein- oder ausschalten: Nur aktive, vollständige Motive kommen beim Drucken vor. */
     public function toggle(string $designId): RedirectResponse
     {
-        $design = PatronCardDesign::query()->findOrFail($designId);
-        $design->forceFill(['is_active' => ! $design->is_active])->save();
+        $motif = PatronCardMotif::query()->findOrFail($designId);
 
-        return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.$design->name.'“ ist jetzt '.($design->is_active ? 'aktiv' : 'ausgeschaltet').'.');
+        if (! $motif->is_active && ! $motif->isComplete()) {
+            return redirect()->route('pos.labels.cards.designs')->withErrors(['motif' => 'Das Motiv „'.$motif->name.'“ ist unvollständig: Es fehlt ein Bild für die Vorder- oder Rückseite. Bitte neu hochladen.']);
+        }
+
+        $motif->forceFill(['is_active' => ! $motif->is_active])->save();
+
+        return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.$motif->name.'“ ist jetzt '.($motif->is_active ? 'aktiv' : 'ausgeschaltet').'.');
     }
 
-    public function destroy(string $designId, DeletePatronCardDesignAction $action): RedirectResponse
+    public function destroy(string $designId, DeletePatronCardMotifAction $action): RedirectResponse
     {
-        $design = PatronCardDesign::query()->findOrFail($designId);
-        $action->execute($design);
+        $motif = PatronCardMotif::query()->findOrFail($designId);
+        $action->execute($motif);
 
-        return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.$design->name.'“ ist gelöscht.');
+        return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.$motif->name.'“ ist gelöscht.');
     }
 }
