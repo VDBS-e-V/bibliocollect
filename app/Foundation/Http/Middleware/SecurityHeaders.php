@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Setzt Sicherheits-Header. Die strenge Content-Security-Policy gilt nur im Produktivbetrieb, weil der Vite-Entwicklungsserver
+ * Setzt Sicherheits-Header (die Kamera ist nur für diese Seite erlaubt: Kamera-Scan beim Einsortieren). Die strenge Content-Security-Policy gilt nur im Produktivbetrieb, weil der Vite-Entwicklungsserver
  * Skripte und Verbindungen von einer eigenen Adresse nachlädt.
  */
 final class SecurityHeaders
@@ -22,7 +22,7 @@ final class SecurityHeaders
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'SAMEORIGIN',
             'Referrer-Policy' => 'strict-origin-when-cross-origin',
-            'Permissions-Policy' => 'camera=(), microphone=(), geolocation=(), payment=()',
+            'Permissions-Policy' => 'camera=(self), microphone=(), geolocation=(), payment=()',
             'Cross-Origin-Opener-Policy' => 'same-origin',
         ];
 

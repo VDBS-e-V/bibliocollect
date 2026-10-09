@@ -29,6 +29,7 @@
                     hint="Die Nummer vom Etikett scannen oder eintippen. Danach nur noch das Regalbrett bestätigen."
                     autocomplete="off"
                     inputmode="numeric"
+                    data-camera-scan="absenden"
                     autofocus
                 />
                 <x-ui.button type="submit">Weiter</x-ui.button>
@@ -80,7 +81,7 @@
                             </optgroup>
                         @endforeach
                     </x-ui.select>
-                    <x-ui.input label="oder Etikett des Regalbretts scannen" name="regalbrett_code" id="shelving-shelf-code" autocomplete="off" hint="Hat Vorrang vor der Auswahl." />
+                    <x-ui.input label="oder Etikett des Regalbretts scannen" name="regalbrett_code" id="shelving-shelf-code" autocomplete="off" data-camera-scan="absenden" hint="Hat Vorrang vor der Auswahl. Am Handy mit „Kamera“: Strichcode oder QR-Code des Etiketts." />
                     <div class="bc-shelving-form__actions">
                         <x-ui.button type="submit" autofocus>Einsortieren</x-ui.button>
                         <a href="{{ route('pos.shelving') }}">Anderes Buch</a>

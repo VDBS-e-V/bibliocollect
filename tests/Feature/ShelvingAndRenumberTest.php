@@ -41,10 +41,10 @@ it('shelves books by scanning the book first and confirming the shelf', function
     $second = stackCopy('0020002', 'Zweites Buch', true);
     stackCopy('0020003', 'Schon im Regal', false, 'R1-B1');
 
-    $this->actingAs($helper)->get(route('pos.shelving'))->assertOk()->assertSee('1. Buch scannen')->assertSee('Stapel „Einsortieren“')->assertSee('Erstes Buch')->assertSee('Zweites Buch')->assertDontSee('Schon im Regal')->assertDontSee('2. Regalbrett');
+    $this->actingAs($helper)->get(route('pos.shelving'))->assertOk()->assertSee('1. Buch scannen')->assertSee('data-camera-scan="absenden"', false)->assertSee('Stapel „Einsortieren“')->assertSee('Erstes Buch')->assertSee('Zweites Buch')->assertDontSee('Schon im Regal')->assertDontSee('2. Regalbrett');
 
     // Buch gescannt: Titel, Standort und Regalbrettauswahl erscheinen, noch ohne Vorauswahl.
-    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0020001']))->assertOk()->assertSee('Erstes Buch')->assertSee('noch kein Standort')->assertSee('2. Regalbrett')->assertSee('R3-B2 · Fantasy')->assertDontSee('Vorgewählt ist');
+    $this->actingAs($helper)->get(route('pos.shelving', ['buch' => '0020001']))->assertOk()->assertSee('Erstes Buch')->assertSee('noch kein Standort')->assertSee('2. Regalbrett')->assertSee('id="shelving-shelf-code"', false)->assertSee('data-camera-scan="absenden"', false)->assertSee('R3-B2 · Fantasy')->assertDontSee('Vorgewählt ist');
 
     $this->actingAs($helper)->post(route('pos.shelving.scan'), ['buch' => '0020001', 'regalbrett' => 'R3-B2'])
         ->assertRedirect(route('pos.shelving'))->assertSessionHas('shelving_notice');

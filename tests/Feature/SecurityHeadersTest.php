@@ -13,7 +13,7 @@ it('sends basic security headers on every response', function (): void {
     expect($response->headers->get('X-Content-Type-Options'))->toBe('nosniff')
         ->and($response->headers->get('X-Frame-Options'))->toBe('SAMEORIGIN')
         ->and($response->headers->get('Referrer-Policy'))->toBe('strict-origin-when-cross-origin')
-        ->and($response->headers->get('Permissions-Policy'))->toContain('camera=()')
+        ->and($response->headers->get('Permissions-Policy'))->toContain('camera=(self)')->toContain('microphone=()')->toContain('geolocation=()')
         ->and($response->headers->has('Content-Security-Policy'))->toBeFalse();
 });
 
