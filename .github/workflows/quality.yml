@@ -2,7 +2,13 @@ name: Quality
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+# Neuer Push auf einen PR bricht den veralteten Lauf ab. Läufe auf main nie, damit jeder Stand von main ein vollständiges Ergebnis hat (der Release-Workflow prüft es).
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   quality:

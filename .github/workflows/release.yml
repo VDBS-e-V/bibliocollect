@@ -1,0 +1,134 @@
+name: Release
+
+# Veröffentlicht einen Stand von main: setzt den Tag, baut das Update-Paket (ZIP) und legt ein GitHub Release an.
+# Das Paket spielt man in der Anwendung unter Verwaltung → Update ein (siehe CONTRIBUTING.md).
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Neue Version, zum Beispiel v0.60.0 (muss größer sein als der neueste Tag)'
+        required: true
+        type: string
+      ref:
+        description: 'Stand von main, der veröffentlicht wird (Branch main oder ein Commit auf main)'
+        required: false
+        default: main
+        type: string
+      dry_run:
+        description: 'Nur prüfen und das Paket bauen, ohne Tag und Release'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+      REF: ${{ inputs.ref }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Version und Stand prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if ! [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Die Version muss wie v0.60.0 aussehen (ist: $VERSION)."
+            exit 1
+          fi
+
+          if git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null; then
+            echo "::error::Den Tag $VERSION gibt es schon. Tags werden nie verschoben."
+            exit 1
+          fi
+
+          latest=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n 1)
+          if [ -n "$latest" ] && [ "$(printf '%s\n%s\n' "$latest" "$VERSION" | sort -V | tail -n 1)" != "$VERSION" ]; then
+            echo "::error::$VERSION ist nicht größer als der neueste Tag $latest. Die Update-Seite vergleicht Versionen."
+            exit 1
+          fi
+
+          sha=$(git rev-parse HEAD)
+          if ! git merge-base --is-ancestor "$sha" origin/main; then
+            echo "::error::Der Stand $sha liegt nicht auf main. Veröffentlicht wird nur, was per Pull Request in main ist."
+            exit 1
+          fi
+
+          echo "SHA=$sha" >> "$GITHUB_ENV"
+          echo "Veröffentlicht wird $VERSION auf Stand $sha (vorheriger Tag: ${latest:-keiner})."
+
+      - name: Prüfen, dass die Tests für diesen Stand grün sind
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for check in quality mariadb; do
+            conclusion=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs?per_page=100" \
+              --jq "[.check_runs[] | select(.name == \"$check\")] | sort_by(.started_at) | last | .conclusion // \"fehlt\"")
+            if [ "$conclusion" != "success" ]; then
+              echo "::error::Der Test '$check' ist für $SHA nicht grün (Ergebnis: $conclusion)."
+              exit 1
+            fi
+          done
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tag lokal setzen (build-release.ps1 liest die Version aus git describe)
+        shell: bash
+        run: git tag "$VERSION" "$SHA"
+
+      - name: Paket bauen
+        shell: pwsh
+        run: ./scripts/build-release.ps1
+
+      - name: Paket benennen
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip=$(ls dist/bibliocollect-*.zip | head -n 1)
+          target="dist/bibliocollect-$VERSION.zip"
+          mv "$zip" "$target"
+          echo "path=$target" >> "$GITHUB_OUTPUT"
+
+      - name: Paket als Artefakt ablegen
+        uses: actions/upload-artifact@v4
+        with:
+          name: bibliocollect-${{ inputs.version }}
+          path: ${{ steps.package.outputs.path }}
+          if-no-files-found: error
+
+      - name: Tag veröffentlichen und Release anlegen
+        if: ${{ !inputs.dry_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$VERSION" "${{ steps.package.outputs.path }}" \
+            --target "$SHA" \
+            --title "$VERSION" \
+            --generate-notes

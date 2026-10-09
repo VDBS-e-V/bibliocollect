@@ -1,0 +1,18 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: Neu
+      labels:
+        - enhancement
+    - title: Fehlerbehebungen
+      labels:
+        - bug
+    - title: Betrieb und Technik
+      labels:
+        - chore
+        - betrieb
+    - title: Weitere Änderungen
+      labels:
+        - '*'
