@@ -10,7 +10,7 @@ use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Services\InventoryLabelPlanner;
 use App\Modules\Identity\Actions\AssignRoleAction;
-use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
+use App\Surfaces\Pos\Http\Controllers\InventoryLabelController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
@@ -46,18 +46,18 @@ it('lays out every label with the logo top left, the name top right, the barcode
     expect($css)->toContain('.label .head')->toContain('justify-content: space-between')->toContain('.label .code');
 
     stockCopy('0100050');
-    $copy = $this->post(route('pos.labels.copies.print'), ['copies' => Copy::query()->pluck('id')->all()])->assertOk()->getContent();
+    $copy = $this->post(route('pos.labels.numbers.print'), ['numbers' => ['0100050']])->assertOk()->getContent();
     expect($copy)->toContain('<span class="name">BiblioCollect</span>')->toContain('<div class="code">0100050</div>');
 });
 
 it('uses 24 labels of 70 x 36 mm per sheet for every label print', function (): void {
     $css = view('pages.surfaces.pos.labels._sheet-style')->render();
 
-    expect(CopyLabelController::PER_SHEET)->toBe(24)
+    expect(InventoryLabelController::PER_SHEET)->toBe(24)
         ->and($css)->toContain('repeat(3, 70mm)')->toContain('grid-auto-rows: 36mm');
 
     stockCopy('0100001');
-    $html = $this->actingAs(stockUser())->post(route('pos.labels.copies.print'), ['copies' => Copy::query()->pluck('id')->all(), 'start' => 24])->assertOk()->getContent();
+    $html = $this->actingAs(stockUser())->post(route('pos.labels.numbers.print'), ['numbers' => ['0100001'], 'startplatz' => 24])->assertOk()->getContent();
 
     // Start auf dem letzten Platz: 23 leere Plätze, ein Etikett.
     expect(substr_count($html, 'class="label empty"'))->toBe(23)->and(substr_count($html, '<svg'))->toBe(1);

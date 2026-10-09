@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Nur noch ein Etikett: die Inventarnummer (v0.49.0)
+
+Die Exemplar-Etiketten mit Standort und Kurztitel sind entfernt (Controller, Seiten, Verweise). Es gibt nur noch das **Etikett mit Strichcode und Inventarnummer** (Logo, „BiblioCollect“, Strichcode, Nummer), gedruckt als Etiketten auf Vorrat unter Katalogpflege → Etiketten drucken (`/betrieb/etiketten/vorrat`). Nach dem Umstellen alter Inventarnummern druckt „Neue Etiketten drucken“ genau die neuen Nummern auf denselben Bögen (`POST /betrieb/etiketten/nummern`). Der Standort steht nicht mehr auf dem Etikett, er wird beim Einsortieren vermerkt.
+
 ### Fette Hervorhebungen in den E-Mails (v0.48.1)
 
 In allen Mails ist das Wichtigste fett: Titel, Fälligkeits- und Abholdaten, „7 Tage“ bei Überfälligkeit, die Gültigkeit des Passwort-Links („60 Minuten“), der neue Stand eines Buchwunsches (angenommen, bestellt, erfüllt), Hinweise wie „musst du nichts tun“ und die Handlung („gib das Medium in der Bibliothek zurück“). Im Beleg stehen die Titel fett. Fettschrift ist im Thema `vdbs.css` extra kräftig eingestellt.

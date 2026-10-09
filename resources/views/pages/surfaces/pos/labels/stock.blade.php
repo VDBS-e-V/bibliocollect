@@ -10,7 +10,7 @@
     />
 
     <div class="bc-context-actions">
-        <a href="{{ route('pos.labels.copies') }}">← Zurück zu den Exemplar-Etiketten</a>
+        <a href="{{ route('pos.catalog.index') }}">← Zurück zur Katalogpflege</a>
     </div>
 
     @if (session('stock_notice'))

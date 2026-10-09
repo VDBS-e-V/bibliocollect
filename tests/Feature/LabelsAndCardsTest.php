@@ -56,30 +56,26 @@ it('renders a scannable svg and rejects unsupported text', function (): void {
         ->and(fn () => Code128Svg::render(''))->toThrow(InvalidArgumentException::class);
 });
 
-it('lists copies and prints a label sheet that respects the first free position', function (): void {
+it('prints exactly the given inventory numbers on a sheet that respects the first free position', function (): void {
     $staff = labelUser('staff');
-    labelCopy('LB-001');
-    labelCopy('LB-002', 'Zweites Buch');
 
-    $this->actingAs($staff)->get(route('pos.labels.copies'))->assertOk()->assertSee('LB-001')->assertSee('LB-002');
-    $this->actingAs($staff)->get(route('pos.labels.copies', ['q' => 'Zweites']))->assertOk()->assertSee('LB-002')->assertDontSee('LB-001');
-
-    $ids = Copy::query()->orderBy('barcode')->pluck('id')->all();
-
-    $html = $this->actingAs($staff)->post(route('pos.labels.copies.print'), ['copies' => $ids, 'start' => 4])->assertOk()->getContent();
+    $html = $this->actingAs($staff)->post(route('pos.labels.numbers.print'), ['numbers' => ['0100002', '0100001'], 'startplatz' => 4])->assertOk()->getContent();
 
     expect(substr_count($html, 'class="label empty"'))->toBe(3)
         ->and(substr_count($html, '<svg'))->toBe(2)
-        ->and($html)->toContain('J 5 TEST')
-        ->and($html)->toContain('Strichcode LB-001');
+        ->and($html)->toContain('<div class="code">0100001</div>')
+        ->and($html)->not->toContain('J 5 TEST')
+        ->and($html)->not->toContain('class="title"')
+        ->and($html)->toContain('Strichcode 0100001');
 
-    $this->actingAs($staff)->post(route('pos.labels.copies.print'), ['copies' => []])->assertSessionHasErrors('copies');
+    $this->actingAs($staff)->post(route('pos.labels.numbers.print'), ['numbers' => []])->assertSessionHasErrors('numbers');
+    $this->actingAs($staff)->post(route('pos.labels.numbers.print'), ['numbers' => ['12']])->assertSessionHasErrors('numbers.0');
 });
 
 it('keeps labels and cards away from roles without the matching permission', function (): void {
-    $this->actingAs(labelUser('student_ag_basic'))->get(route('pos.labels.copies'))->assertForbidden();
-    $this->actingAs(labelUser('student_ag_extended'))->get(route('pos.labels.copies'))->assertOk();
+    $this->actingAs(labelUser('student_ag_basic'))->get(route('pos.labels.stock'))->assertForbidden();
+    $this->actingAs(labelUser('student_ag_extended'))->get(route('pos.labels.stock'))->assertOk();
     $this->actingAs(labelUser('student_ag_extended'))->get(route('pos.labels.cards'))->assertForbidden();
     $this->actingAs(labelUser('staff'))->get(route('pos.labels.cards'))->assertOk();
-    $this->actingAs(labelUser('technical_admin'))->get(route('pos.labels.copies'))->assertForbidden();
+    $this->actingAs(labelUser('technical_admin'))->get(route('pos.labels.stock'))->assertForbidden();
 });

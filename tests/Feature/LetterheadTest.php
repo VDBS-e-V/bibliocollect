@@ -50,7 +50,7 @@ it('keeps the letterhead out of the screen layout and away from card and label s
         ->and($css)->toContain('box-decoration-break: clone');
 
     // Ausweis- und Etikettenbögen haben ein eigenes Layout ohne den Seitenrahmen.
-    foreach (['cards-print', 'copies-print'] as $view) {
+    foreach (['cards-print', 'stock-print'] as $view) {
         expect((string) file_get_contents(resource_path('views/pages/surfaces/pos/labels/'.$view.'.blade.php')))->not->toContain('x-app-shell');
     }
 });

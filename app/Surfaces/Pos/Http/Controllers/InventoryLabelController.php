@@ -17,6 +17,9 @@ use Illuminate\Http\Response;
  */
 final class InventoryLabelController
 {
+    /** 3 × 8 Etiketten à 70 × 36 mm je Bogen. */
+    public const PER_SHEET = 24;
+
     public function index(Request $request, InventoryLabelPlanner $planner): Response
     {
         $overview = $planner->overview();
@@ -41,7 +44,7 @@ final class InventoryLabelController
                     'to' => (int) $request->query('bis', $overview['highest'] ?? 1),
                     'position' => (int) $request->query('startplatz', 1),
                 ],
-                'perSheet' => CopyLabelController::PER_SHEET,
+                'perSheet' => self::PER_SHEET,
                 'max' => InventoryLabelPlanner::MAX_LABELS,
                 'runs' => $planner->runs(10),
                 'printedCount' => $planner->printedCount(),
@@ -57,7 +60,7 @@ final class InventoryLabelController
             'anzahl' => ['nullable', 'integer', 'between:1,'.InventoryLabelPlanner::MAX_LABELS],
             'von' => ['nullable', 'integer', 'between:1,9999999'],
             'bis' => ['nullable', 'integer', 'between:1,9999999'],
-            'startplatz' => ['nullable', 'integer', 'between:1,'.CopyLabelController::PER_SHEET],
+            'startplatz' => ['nullable', 'integer', 'between:1,'.self::PER_SHEET],
         ]);
 
         $request->query->add($data);
@@ -75,7 +78,7 @@ final class InventoryLabelController
             ->view('pages.surfaces.pos.labels.stock-print', [
                 'numbers' => $plan['numbers'],
                 'skip' => max(0, ((int) ($data['startplatz'] ?? 1)) - 1),
-                'perSheet' => CopyLabelController::PER_SHEET,
+                'perSheet' => self::PER_SHEET,
             ])
             ->header('Cache-Control', 'private, no-store');
     }
@@ -111,11 +114,37 @@ final class InventoryLabelController
         if ($mode === 'luecken') {
             $gaps = $planner->gaps((int) $request->input('von', $overview['lowest'] ?? 1), (int) $request->input('bis', $overview['highest'] ?? 1), $reprint);
 
-            return ['numbers' => $gaps['numbers'], 'used' => [], 'printed' => $gaps['printed'], 'total' => $gaps['total'], 'truncated' => $gaps['truncated'], 'last' => null, 'sheets' => (int) ceil(count($gaps['numbers']) / CopyLabelController::PER_SHEET)];
+            return ['numbers' => $gaps['numbers'], 'used' => [], 'printed' => $gaps['printed'], 'total' => $gaps['total'], 'truncated' => $gaps['truncated'], 'last' => null, 'sheets' => (int) ceil(count($gaps['numbers']) / self::PER_SHEET)];
         }
 
         $sequence = $planner->sequence((int) $request->input('start', 1), (int) $request->input('anzahl', 24), $reprint);
 
-        return ['numbers' => $sequence['numbers'], 'used' => $sequence['used'], 'printed' => $sequence['printed'], 'total' => count($sequence['numbers']), 'truncated' => false, 'last' => $sequence['last'], 'sheets' => (int) ceil(count($sequence['numbers']) / CopyLabelController::PER_SHEET)];
+        return ['numbers' => $sequence['numbers'], 'used' => $sequence['used'], 'printed' => $sequence['printed'], 'total' => count($sequence['numbers']), 'truncated' => false, 'last' => $sequence['last'], 'sheets' => (int) ceil(count($sequence['numbers']) / self::PER_SHEET)];
+    }
+
+    /**
+     * Druckt genau diese Nummern (zum Beispiel nach dem Umstellen alter Inventarnummern): Strichcode und Nummer, mehr nicht.
+     * Anders als beim Vorratsdruck wird nichts übersprungen und nichts als gedruckt vermerkt, die Nummern gehören schon Exemplaren.
+     */
+    public function printNumbers(Request $request, AuditRecorder $audit): Response
+    {
+        $data = $request->validate([
+            'numbers' => ['required', 'array', 'min:1', 'max:'.InventoryLabelPlanner::MAX_LABELS],
+            'numbers.*' => ['required', 'string', 'regex:/^[0-9]{7}$/'],
+            'startplatz' => ['nullable', 'integer', 'between:1,'.self::PER_SHEET],
+        ], ['numbers.required' => 'Es gibt keine Nummern zum Drucken.', 'numbers.*.regex' => 'Inventarnummern haben genau 7 Ziffern.']);
+
+        $numbers = array_values(array_unique($data['numbers']));
+        sort($numbers, SORT_STRING);
+
+        $audit->record('catalog.labels.numbers_printed', count($numbers).' Etiketten gedruckt ('.$numbers[0].' bis '.$numbers[count($numbers) - 1].').', null, ['count' => count($numbers)]);
+
+        return response()
+            ->view('pages.surfaces.pos.labels.stock-print', [
+                'numbers' => $numbers,
+                'skip' => max(0, ((int) ($data['startplatz'] ?? 1)) - 1),
+                'perSheet' => self::PER_SHEET,
+            ])
+            ->header('Cache-Control', 'private, no-store');
     }
 }

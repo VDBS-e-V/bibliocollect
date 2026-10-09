@@ -12,7 +12,7 @@
         @can('catalog.import')
             <a href="{{ route('pos.catalog.import.create') }}">Import</a>
         @endcan
-        <a href="{{ route('pos.labels.copies') }}">Etiketten drucken</a>
+        <a href="{{ route('pos.labels.stock') }}">Etiketten drucken</a>
         <a href="{{ route('public.catalog.index') }}">Öffentlichen Katalog öffnen</a>
     </div>
 

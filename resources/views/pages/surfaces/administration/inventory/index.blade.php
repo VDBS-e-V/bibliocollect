@@ -32,10 +32,10 @@
                     @endforeach
                 </tbody>
             </table>
-            <form method="post" action="{{ route('pos.labels.copies.print') }}" target="_blank">
+            <form method="post" action="{{ route('pos.labels.numbers.print') }}" target="_blank">
                 @csrf
                 @foreach ($done as $row)
-                    <input type="hidden" name="copies[]" value="{{ $row['id'] }}">
+                    <input type="hidden" name="numbers[]" value="{{ $row['new'] }}">
                 @endforeach
                 <x-ui.button type="submit">Neue Etiketten drucken</x-ui.button>
             </form>

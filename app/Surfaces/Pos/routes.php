@@ -13,7 +13,6 @@ use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
 use App\Surfaces\Pos\Http\Controllers\CopyFoundController;
-use App\Surfaces\Pos\Http\Controllers\CopyLabelController;
 use App\Surfaces\Pos\Http\Controllers\HelpController;
 use App\Surfaces\Pos\Http\Controllers\InventoryCountController;
 use App\Surfaces\Pos\Http\Controllers\InventoryLabelController;
@@ -158,12 +157,11 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     });
 
     Route::middleware('permission:catalog.manage')->group(function (): void {
-        Route::get('/betrieb/etiketten', [CopyLabelController::class, 'index'])->name('pos.labels.copies');
-        Route::post('/betrieb/etiketten', [CopyLabelController::class, 'print'])->name('pos.labels.copies.print');
         Route::get('/betrieb/etiketten/vorrat', [InventoryLabelController::class, 'index'])->name('pos.labels.stock');
         Route::delete('/betrieb/etiketten/vorrat/druck/{runId}', [InventoryLabelController::class, 'destroyRun'])->whereNumber('runId')->middleware('throttle:30,1')->name('pos.labels.stock.run.destroy');
         Route::delete('/betrieb/etiketten/vorrat/alle', [InventoryLabelController::class, 'clear'])->middleware('throttle:10,1')->name('pos.labels.stock.clear');
         Route::post('/betrieb/etiketten/vorrat', [InventoryLabelController::class, 'print'])->middleware('throttle:30,1')->name('pos.labels.stock.print');
+        Route::post('/betrieb/etiketten/nummern', [InventoryLabelController::class, 'printNumbers'])->middleware('throttle:30,1')->name('pos.labels.numbers.print');
     });
 
     Route::middleware('permission:patrons.manage')->group(function (): void {
