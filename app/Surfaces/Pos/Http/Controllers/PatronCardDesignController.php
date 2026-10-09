@@ -10,7 +10,6 @@ use App\Modules\Patrons\Models\PatronCardMotif;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\Rule;
 
 /** Motive der Ausweise verwalten: Vorder- und Rückseite gehören zusammen (hochladen, ein- und ausschalten, löschen). */
 final class PatronCardDesignController
@@ -47,19 +46,18 @@ final class PatronCardDesignController
         return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.$name.'“ ist hochgeladen und aktiv.');
     }
 
-    /** Verteilung beim Drucken festlegen: normal, mehr von diesem Motiv oder auslassen. Ausgelassene Motive kommen beim Drucken nicht vor. */
-    public function distribution(Request $request, string $designId): RedirectResponse
+    /** Ein- oder ausschalten: Nur aktive, vollständige Motive kommen beim Drucken vor. */
+    public function toggle(string $designId): RedirectResponse
     {
-        $data = $request->validate(['verteilung' => ['required', Rule::in(array_keys(PatronCardMotif::DISTRIBUTIONS))]]);
         $motif = PatronCardMotif::query()->findOrFail($designId);
 
-        if ($data['verteilung'] !== 'skip' && ! $motif->isComplete()) {
+        if (! $motif->is_active && ! $motif->isComplete()) {
             return redirect()->route('pos.labels.cards.designs')->withErrors(['motif' => 'Das Motiv „'.$motif->name.'“ ist unvollständig: Es fehlt ein Bild für die Vorder- oder Rückseite. Bitte neu hochladen.']);
         }
 
-        $motif->forceFill(['distribution' => $data['verteilung'], 'is_active' => $data['verteilung'] !== 'skip'])->save();
+        $motif->forceFill(['is_active' => ! $motif->is_active])->save();
 
-        return redirect()->route('pos.labels.cards.designs')->with('status', 'Motiv „'.$motif->name.'“: '.$motif->distributionLabel().'.');
+        return redirect()->route('pos.labels.cards.designs')->with('status', 'Das Motiv „'.$motif->name.'“ ist jetzt '.($motif->is_active ? 'aktiv' : 'ausgeschaltet').'.');
     }
 
     public function destroy(string $designId, DeletePatronCardMotifAction $action): RedirectResponse

@@ -1,7 +1,7 @@
 @php
     use App\Foundation\Support\Code128Svg;
 
-    $modeLabel = ['beide' => 'beidseitig', 'vorder' => 'nur Vorderseiten', 'rueck' => 'nur Rückseiten'][$mode];
+    $modeLabel = ['beide' => 'beidseitig', 'vorder' => 'nur Vorderseiten', 'rueck' => 'nur Rückseiten', 'einseitig' => 'einseitig'][$mode];
 @endphp
 <!DOCTYPE html>
 <html lang="de">
@@ -50,6 +50,8 @@
     Im Druckdialog: A4, Maßstab 100 % („Tatsächliche Größe“), Ränder „Keine“, keine Kopf- und Fußzeilen, Hintergrundgrafiken an.
     @if ($mode === 'beide')
         Beidseitig: Im Druckdialog „Beidseitig“ / „Duplex“ mit „Wenden an der langen Kante“ wählen. Die Seiten folgen als Vorderseite, Rückseite, Vorderseite, Rückseite …
+    @elseif ($mode === 'einseitig')
+        Einseitig: erst alle Vorderseiten, dann alle Rückseiten. Nach den Vorderseiten den Bogen mit der bedruckten Seite wieder einlegen (Wenden an der langen Kante), dann die Rückseiten drucken; sie sind dafür gespiegelt angeordnet.
     @elseif ($mode === 'rueck')
         Zum Beidseitig-Druck von Hand: den Bogen mit der bedruckten Vorderseite wieder einlegen (Wenden an der langen Kante); die Rückseiten sind dafür gespiegelt angeordnet.
     @endif

@@ -99,40 +99,43 @@ final class PatronCardController
                 'batch' => $batch,
                 'free' => $free,
                 'motifs' => $motifs,
-                'shares' => self::shares($motifs),
                 'unassigned' => $this->unassigned($batch)->whereNull('motif_id')->count(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
 
     /**
-     * Anteile der Motive in Prozent nach ihrer Einstellung (normal = 1, mehr = 2, auslassen = 0).
+     * Anteile der Motive in Prozent nach der Wahl für diesen Druck (normal = 1, mehr = 2, auslassen = 0).
      *
      * @param  Collection<int, PatronCardMotif>  $motifs
+     * @param  array<string, string>  $choices  Motiv-Id zu normal|more|skip, fehlende Motive zählen als normal
      * @return array<string, float>
      */
-    public static function shares(Collection $motifs): array
+    public static function shares(Collection $motifs, array $choices = []): array
     {
-        $total = $motifs->sum(static fn (PatronCardMotif $motif): int => $motif->weight());
+        $weights = $motifs->mapWithKeys(static fn (PatronCardMotif $motif): array => [(string) $motif->getKey() => PatronCardMotif::WEIGHTS[$choices[(string) $motif->getKey()] ?? 'normal'] ?? 1]);
+        $total = $weights->sum();
 
         if ($total === 0) {
             return [];
         }
 
-        return $motifs->mapWithKeys(static fn (PatronCardMotif $motif): array => [(string) $motif->getKey() => $motif->weight() * 100 / $total])->all();
+        return $weights->filter(static fn (int $weight): bool => $weight > 0)->map(static fn (int $weight): float => $weight * 100 / $total)->all();
     }
 
     /**
-     * Druck einer Charge: nur Vorderseiten, nur Rückseiten oder beidseitig (je Bogen eine Vorder- und eine Rückseite hintereinander,
-     * für den Duplexdruck mit Wenden an der langen Kante). Jeder Ausweis hat ein Motiv für beide Seiten: Es wird beim ersten Druck
-     * nach der Einstellung der Motive (normal, mehr, auslassen) zugeteilt und gespeichert, damit Vorder-, Rückseite und Nachdrucke
+     * Druck einer Charge: beidseitig (je Bogen eine Vorder- und eine Rückseite hintereinander, für den Duplexdruck mit Wenden an der
+     * langen Kante) oder einseitig (erst alle Vorderseiten, dann alle Rückseiten, der Bogen wird von Hand gewendet). Jeder Ausweis hat ein Motiv für beide Seiten: Es wird beim ersten Druck
+     * nach der Wahl im Druckmenü (je Motiv normal, mehr, auslassen; gilt nur für diesen Druck) zugeteilt und gespeichert, damit Vorder-, Rückseite und Nachdrucke
      * übereinstimmen. Drucken der Vorderseite markiert neue Ausweise als „Im Druck“.
      */
     public function print(Request $request, int $batch): Response|RedirectResponse
     {
         $data = $request->validate([
-            'side' => ['required', Rule::in(['beide', 'vorder', 'rueck'])],
+            'side' => ['required', Rule::in(['beide', 'einseitig', 'vorder', 'rueck'])],
             'start' => ['nullable', 'integer', 'between:1,'.self::PER_SHEET],
+            'verteilung' => ['nullable', 'array'],
+            'verteilung.*' => ['nullable', Rule::in(array_keys(PatronCardMotif::DISTRIBUTIONS))],
         ]);
 
         $cards = $this->unassigned($batch)->orderBy('number')->with('motif')->get();
@@ -143,7 +146,11 @@ final class PatronCardController
 
         $open = $cards->whereNull('motif_id');
         $motifs = PatronCardMotif::query()->usable()->get();
-        $shares = self::shares($motifs);
+        $shares = self::shares($motifs, array_map('strval', (array) ($data['verteilung'] ?? [])));
+
+        if ($open->isNotEmpty() && $shares === [] && $motifs->isNotEmpty()) {
+            return redirect()->route('pos.labels.cards.batch', ['batch' => $batch])->withErrors(['batch' => 'Mindestens ein Motiv muss vorkommen: Es dürfen nicht alle Motive ausgelassen werden.']);
+        }
 
         if ($open->isNotEmpty() && $shares !== []) {
             $queue = $this->designQueue($motifs->keyBy(static fn (PatronCardMotif $motif): string => (string) $motif->getKey()), $shares, $open->count());
@@ -167,12 +174,21 @@ final class PatronCardController
         }
 
         $sheets = array_map(static fn (array $sheet): array => array_pad($sheet, self::PER_SHEET, null), array_chunk($slots, self::PER_SHEET));
-        $sides = $data['side'] === 'beide' ? ['vorder', 'rueck'] : [$data['side']];
+        $sides = in_array($data['side'], ['beide', 'einseitig'], true) ? ['vorder', 'rueck'] : [$data['side']];
         $pages = [];
 
-        foreach ($sheets as $sheet) {
+        if ($data['side'] === 'einseitig') {
+            // Einseitiger Druck: erst alle Vorderseiten, dann alle Rückseiten (Bogen von Hand wenden).
             foreach ($sides as $side) {
-                $pages[] = ['side' => $side, 'slots' => $side === 'vorder' ? $sheet : $this->mirrored($sheet)];
+                foreach ($sheets as $sheet) {
+                    $pages[] = ['side' => $side, 'slots' => $side === 'vorder' ? $sheet : $this->mirrored($sheet)];
+                }
+            }
+        } else {
+            foreach ($sheets as $sheet) {
+                foreach ($sides as $side) {
+                    $pages[] = ['side' => $side, 'slots' => $side === 'vorder' ? $sheet : $this->mirrored($sheet)];
+                }
             }
         }
 

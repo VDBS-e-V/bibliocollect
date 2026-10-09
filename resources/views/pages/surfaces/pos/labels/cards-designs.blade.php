@@ -2,7 +2,7 @@
     <x-ui.page-header
         kicker="Ausleihkonten"
         title="Motive der Ausweise"
-        lead="Jedes Motiv besteht aus Vorder- und Rückseite, die immer zusammengehören. Beim Drucken werden die Motive zufällig auf die Ausweise verteilt; ein Ausweis behält sein Motiv auf beiden Seiten. Je Motiv stellst du ein, wie oft es vorkommt: normal, mehr oder auslassen."
+        lead="Jedes Motiv besteht aus Vorder- und Rückseite, die immer zusammengehören. Beim Drucken werden die aktiven Motive zufällig und in den gewählten Anteilen auf die Ausweise verteilt; ein Ausweis behält sein Motiv auf beiden Seiten."
     />
 
     <div class="bc-context-actions">
@@ -37,7 +37,7 @@
     <section class="bc-content-section" aria-labelledby="designs-heading">
         <div class="bc-section-heading bc-section-heading--with-meta">
             <h2 id="designs-heading">Motive</h2>
-            <span>{{ $motifs->where('distribution', '!=', 'skip')->count() }} im Druck</span>
+            <span>{{ $motifs->where('is_active', true)->count() }} aktiv</span>
         </div>
 
         @if ($motifs->isEmpty())
@@ -45,7 +45,7 @@
         @else
             <ul class="bc-card-designs">
                 @foreach ($motifs as $motif)
-                    <li class="bc-card-design {{ $motif->distribution === 'skip' ? 'bc-card-design--off' : '' }}">
+                    <li class="bc-card-design {{ $motif->is_active ? '' : 'bc-card-design--off' }}">
                         <div class="bc-card-design__pair">
                             @if ($motif->frontUrl())
                                 <img src="{{ $motif->frontUrl() }}" alt="Vorderseite des Motivs {{ $motif->name }}" width="200" loading="lazy">
@@ -60,18 +60,13 @@
                                 @if (! $motif->isComplete())
                                     Unvollständig: {{ $motif->frontUrl() ? 'Rückseite' : 'Vorderseite' }} fehlt, bitte neu hochladen
                                 @else
-                                    {{ $motif->distributionLabel() }}
+                                    {{ $motif->is_active ? 'Aktiv' : 'Ausgeschaltet' }}
                                 @endif
                             </span>
                         </div>
-                        <form method="post" action="{{ route('pos.labels.cards.designs.distribution', ['designId' => $motif->getKey()]) }}">
+                        <form method="post" action="{{ route('pos.labels.cards.designs.toggle', ['designId' => $motif->getKey()]) }}">
                             @csrf
-                            <x-ui.select label="Verteilung beim Drucken" name="verteilung" :id="'distribution-'.$motif->getKey()" data-auto-submit>
-                                @foreach (\App\Modules\Patrons\Models\PatronCardMotif::DISTRIBUTIONS as $key => $label)
-                                    <option value="{{ $key }}" @selected($motif->distribution === $key)>{{ $label }}</option>
-                                @endforeach
-                            </x-ui.select>
-                            <noscript><button type="submit" class="bc-intake-linkbutton">Übernehmen</button></noscript>
+                            <button type="submit" class="bc-intake-linkbutton">{{ $motif->is_active ? 'Ausschalten' : 'Einschalten' }}</button>
                         </form>
                         <form method="post" action="{{ route('pos.labels.cards.designs.destroy', ['designId' => $motif->getKey()]) }}">
                             @csrf

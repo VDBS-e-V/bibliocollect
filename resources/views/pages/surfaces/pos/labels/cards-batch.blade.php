@@ -25,25 +25,18 @@
                     <input type="radio" name="side" value="beide" checked>
                     <span>
                         <strong>Beidseitig</strong>
-                        <small>Vorder- und Rückseiten in einem Druckauftrag. Im Druckdialog „Beidseitig“ mit „Wenden an der langen Kante“ wählen.</small>
+                        <small>Vorder- und Rückseiten wechseln sich je Bogen ab. Für Drucker mit Duplex: im Druckdialog „Beidseitig“ mit „Wenden an der langen Kante“ wählen.</small>
                     </span>
                 </label>
                 <label class="bc-print-mode">
-                    <input type="radio" name="side" value="vorder">
+                    <input type="radio" name="side" value="einseitig">
                     <span>
-                        <strong>Einseitig: nur Vorderseiten</strong>
-                        <small>Zum Beispiel, wenn die Rückseiten schon vorbereitet sind oder weiß bleiben.</small>
-                    </span>
-                </label>
-                <label class="bc-print-mode">
-                    <input type="radio" name="side" value="rueck">
-                    <span>
-                        <strong>Einseitig: nur Rückseiten</strong>
-                        <small>Für den zweiten Durchgang von Hand: Bogen mit bedruckter Vorderseite wieder einlegen, an der langen Kante gewendet.</small>
+                        <strong>Einseitig</strong>
+                        <small>Der Export enthält erst alle Vorderseiten, dann alle Rückseiten. Nach dem Druck der Vorderseiten den Bogen mit der bedruckten Seite wieder einlegen, an der langen Kante gewendet.</small>
                     </span>
                 </label>
             </fieldset>
-            <x-ui.input label="Erste Position auf dem Bogen (1–10)" name="start" id="start" type="number" min="1" max="10" value="1" hint="Für angebrochene Bögen: Die ersten Plätze bleiben frei. Bei beidseitigem Druck gilt die Position für beide Seiten." />
+            <x-ui.input label="Erste Position auf dem Bogen (1–10)" name="start" id="start" type="number" min="1" max="10" value="1" hint="Für angebrochene Bögen: Die ersten Plätze bleiben frei. Die Position gilt für Vorder- und Rückseiten." />
         </section>
 
         <section class="bc-content-section" aria-labelledby="motifs-heading">
@@ -55,8 +48,9 @@
                 <p class="bc-section-copy">Kein verwendbares Motiv: Die Karten werden auf weißem Grund gedruckt.</p>
             @else
                 <p class="bc-section-copy">
-                    Jeder Ausweis behält sein Motiv auf Vorder- und Rückseite und bei Nachdrucken. Neue Ausweise bekommen beim ersten Druck zufällig ein Motiv, „Mehr von diesem Motiv“ gilt doppelt, „Auslassen“ gar nicht.
-                    Die Einstellung steht bei den <a href="{{ route('pos.labels.cards.designs') }}">Motiven</a>.
+                    Jeder Ausweis behält sein Motiv auf Vorder- und Rückseite und bei Nachdrucken. Neue Ausweise bekommen beim ersten Druck zufällig ein Motiv.
+                    Hier legst du fest, wie oft ein Motiv vorkommt: „Mehr von diesem Motiv“ gilt doppelt, „Auslassen“ gar nicht. Die Wahl gilt nur für diesen Druck.
+                    Motive, die nie vorkommen sollen, schaltest du unter <a href="{{ route('pos.labels.cards.designs') }}">Motive verwalten</a> aus.
                 </p>
                 <ul class="bc-card-designs bc-card-designs--compact">
                     @foreach ($motifs as $motif)
@@ -65,13 +59,18 @@
                                 <img src="{{ $motif->frontUrl() }}" alt="Vorderseite des Motivs {{ $motif->name }}" width="120" loading="lazy">
                                 <img src="{{ $motif->backUrl() }}" alt="Rückseite des Motivs {{ $motif->name }}" width="120" loading="lazy">
                             </div>
-                            <div>
-                                <strong>{{ $motif->name }}</strong>
-                                <span>{{ $motif->distributionLabel() }}@if ($unassigned > 0 && isset($shares[(string) $motif->getKey()])) · etwa {{ (int) round($shares[(string) $motif->getKey()]) }} %@endif</span>
-                            </div>
+                            <strong>{{ $motif->name }}</strong>
+                            <x-ui.select label="Verteilung" name="verteilung[{{ $motif->getKey() }}]" :id="'distribution-'.$motif->getKey()">
+                                @foreach (\App\Modules\Patrons\Models\PatronCardMotif::DISTRIBUTIONS as $key => $label)
+                                    <option value="{{ $key }}">{{ $label }}</option>
+                                @endforeach
+                            </x-ui.select>
                         </li>
                     @endforeach
                 </ul>
+                @if ($unassigned === 0)
+                    <p class="bc-section-copy">Alle Ausweise dieser Charge haben schon ein Motiv; die Verteilung wirkt nur bei Ausweisen ohne Motiv.</p>
+                @endif
             @endif
         </section>
 

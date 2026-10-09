@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $front_path
  * @property string|null $back_path
  * @property bool $is_active
- * @property string $distribution normal|more|skip
  * @property int $sort_order
  */
 final class PatronCardMotif extends Model
@@ -26,23 +25,13 @@ final class PatronCardMotif extends Model
 
     public const UPLOAD_DIR = 'card-designs';
 
-    /** Verteilung beim Drucken: Bezeichnung und Gewicht (auslassen = 0). */
+    /** Verteilung für einen Druckvorgang: Bezeichnung und Gewicht (auslassen = 0). Wird nicht am Motiv gespeichert. */
     public const DISTRIBUTIONS = ['normal' => 'Normal', 'more' => 'Mehr von diesem Motiv', 'skip' => 'Auslassen'];
 
     public const WEIGHTS = ['normal' => 1, 'more' => 2, 'skip' => 0];
 
-    public function weight(): int
-    {
-        return self::WEIGHTS[$this->distribution] ?? 1;
-    }
-
-    public function distributionLabel(): string
-    {
-        return self::DISTRIBUTIONS[$this->distribution] ?? 'Normal';
-    }
-
     /** @var list<string> */
-    protected $fillable = ['name', 'front_path', 'back_path', 'is_active', 'distribution', 'sort_order'];
+    protected $fillable = ['name', 'front_path', 'back_path', 'is_active', 'sort_order'];
 
     public function frontUrl(): ?string
     {

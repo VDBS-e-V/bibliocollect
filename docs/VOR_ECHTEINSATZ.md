@@ -43,7 +43,7 @@ Alle Punkte der früheren „Muss“-Liste sind umgesetzt. Ein Notbetrieb (Papie
 |---|---|---|
 | **Merkliste/Favoriten** | Schön für Leser:innen, für den Start nicht nötig. (Buchwünsche sind seit v0.12.0 umgesetzt.) | mittel |
 | **Zeitraumsvormerkungen und Click & Collect** | Wird erst gebraucht, wenn die Nachfrage das zeigt. | mittel |
-| **Zählung der gedruckten Ausweise je Motiv** | Hilft bei gleichmäßigem Bestand; heute stellst du je Motiv „normal“, „mehr“ oder „auslassen“ von Hand ein. | klein |
+| **Zählung der gedruckten Ausweise je Motiv** | Hilft bei gleichmäßigem Bestand; heute wählst du je Motiv „normal“, „mehr“ oder „auslassen“ beim Drucken von Hand. | klein |
 | **Gebührenfreie Verlustregeln** (Ersatzbeschaffung, Hinweistexte) | Nur nötig, wenn ihr Verlust regeln wollt. | klein |
 
 ## Bereits erledigt (Auswahl)

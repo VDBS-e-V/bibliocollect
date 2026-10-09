@@ -301,28 +301,28 @@ function cardTestBackgrounds(string $html): array
     return $matches[1];
 }
 
-it('spreads the motifs by their setting: normal, more of this motif, skip', function (): void {
+it('spreads the motifs by the choice in the print menu: normal, more of this motif, skip', function (): void {
     $staff = cardTestUser('staff');
     cardTestNumbers(20);
 
     [$one, $two, $three, $four] = PatronCardMotif::query()->usable()->pluck('id')->all();
     $fronts = PatronCardMotif::query()->usable()->pluck('front_path')->all();
 
-    $this->actingAs($staff)->post(route('pos.labels.cards.designs.distribution', ['designId' => $one]), ['verteilung' => 'more'])->assertRedirect();
-    $this->actingAs($staff)->post(route('pos.labels.cards.designs.distribution', ['designId' => $four]), ['verteilung' => 'skip'])->assertRedirect();
-    $this->actingAs($staff)->post(route('pos.labels.cards.designs.distribution', ['designId' => $two]), ['verteilung' => 'quatsch'])->assertSessionHasErrors('verteilung');
+    // Alle ausgelassen: nicht möglich.
+    $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'vorder', 'verteilung' => [$one => 'skip', $two => 'skip', $three => 'skip', $four => 'skip']])
+        ->assertRedirect(route('pos.labels.cards.batch', ['batch' => 1]))->assertSessionHasErrors('batch');
+    $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'vorder', 'verteilung' => [$one => 'quatsch']])->assertSessionHasErrors('verteilung.'.$one);
+    expect(PatronCard::query()->whereNotNull('motif_id')->count())->toBe(0);
 
-    expect(PatronCardMotif::query()->findOrFail($one)->distribution)->toBe('more')
-        ->and(PatronCardMotif::query()->findOrFail($four)->is_active)->toBeFalse();
+    $html = $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'vorder', 'verteilung' => [$one => 'more', $four => 'skip']])->assertOk()->getContent();
 
-    $html = $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'vorder'])->assertOk()->getContent();
-
-    // Gewichte 2 : 1 : 1 : 0 ergeben 10 / 5 / 5 / 0 von 20.
+    // Gewichte 2 : 1 : 1 : 0 ergeben 10 / 5 / 5 / 0 von 20; am Motiv selbst wird nichts gespeichert.
     expect(substr_count($html, 'class="card"'))->toBe(20)
         ->and(substr_count($html, $fronts[0].'&#039;)'))->toBe(10)
         ->and(substr_count($html, $fronts[1].'&#039;)'))->toBe(5)
         ->and(substr_count($html, $fronts[2].'&#039;)'))->toBe(5)
-        ->and(substr_count($html, $fronts[3].'&#039;)'))->toBe(0);
+        ->and(substr_count($html, $fronts[3].'&#039;)'))->toBe(0)
+        ->and(PatronCardMotif::query()->usable()->count())->toBe(4);
 });
 
 it('prints one-sided or double-sided in a single job', function (): void {
@@ -337,6 +337,11 @@ it('prints one-sided or double-sided in a single job', function (): void {
         ->and(substr_count($both, 'class="card back"'))->toBe(12)
         ->and(strpos($both, 'class="card back"'))->toBeGreaterThan(strpos($both, '<svg'))
         ->and(PatronCard::query()->where('status', CardStatus::InPrint->value)->count())->toBe(12);
+
+    // Einseitig: erst alle Vorderseiten, dann alle Rückseiten.
+    $one = $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'einseitig'])->assertOk()->getContent();
+    expect(substr_count($one, 'class="sheet"'))->toBe(4)
+        ->and(strrpos($one, '<svg'))->toBeLessThan(strpos($one, 'class="card back"'));
 
     $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'quatsch'])->assertSessionHasErrors('side');
 });
@@ -377,18 +382,19 @@ it('gives front and back of a card the same motif at mirrored sheet positions an
         ->and(PatronCard::query()->orderBy('number')->pluck('motif_id')->all())->toBe($stored);
 });
 
-it('shows the shares by setting on the batch print page', function (): void {
+it('offers the distribution per motif on the batch print page', function (): void {
     $staff = cardTestUser('staff');
     cardTestNumbers(3);
 
-    $this->actingAs($staff)->get(route('pos.labels.cards.batch', ['batch' => 1]))->assertOk()->assertSee('Beidseitig')->assertSee('nur Vorderseiten')->assertSee('nur Rückseiten')->assertSee('etwa 25 %');
+    $this->actingAs($staff)->get(route('pos.labels.cards.batch', ['batch' => 1]))->assertOk()->assertSee('Beidseitig')->assertSee('Einseitig')->assertSee('Mehr von diesem Motiv')->assertSee('verteilung[', false);
     $this->actingAs($staff)->get(route('pos.labels.cards.batch', ['batch' => 9]))->assertRedirect(route('pos.labels.cards'));
 
     $three = PatronCardMotif::query()->usable()->get()->take(3);
 
-    $three->first()->forceFill(['distribution' => 'more'])->save();
+    $ids = $three->pluck('id')->all();
 
-    expect(array_map('intval', array_values(PatronCardController::shares($three->fresh()))))->toBe([50, 25, 25])
+    expect(array_map('intval', array_values(PatronCardController::shares($three, [$ids[0] => 'more']))))->toBe([50, 25, 25])
+        ->and(array_keys(PatronCardController::shares($three, [$ids[1] => 'skip'])))->toBe([$ids[0], $ids[2]])
         ->and(PatronCardController::shares(PatronCardMotif::query()->whereRaw('1 = 0')->get()))->toBe([]);
 });
 
@@ -424,8 +430,8 @@ it('lets staff upload, switch off and delete card motifs', function (): void {
     $this->actingAs($staff)->post(route('pos.labels.cards.designs.store'), ['name' => 'Text', 'front' => cardTestImage('ok3.png', 2008, 1276), 'back' => UploadedFile::fake()->create('x.pdf', 10, 'application/pdf')])
         ->assertSessionHasErrors('back');
 
-    $this->actingAs($staff)->post(route('pos.labels.cards.designs.distribution', ['designId' => $motif->getKey()]), ['verteilung' => 'skip'])->assertRedirect();
-    expect($motif->refresh()->is_active)->toBeFalse()->and($motif->distribution)->toBe('skip');
+    $this->actingAs($staff)->post(route('pos.labels.cards.designs.toggle', ['designId' => $motif->getKey()]))->assertRedirect();
+    expect($motif->refresh()->is_active)->toBeFalse();
 
     // Ausgeschaltete Motive kommen beim Drucken nicht vor.
     cardTestNumbers(4);
@@ -447,7 +453,7 @@ it('does not switch on an incomplete motif', function (): void {
     $staff = cardTestUser('staff');
     $motif = PatronCardMotif::query()->create(['name' => 'Halb', 'front_path' => 'brand/vdbs/card-defaults/front-1.png', 'back_path' => null, 'is_active' => false, 'sort_order' => 9]);
 
-    $this->actingAs($staff)->post(route('pos.labels.cards.designs.distribution', ['designId' => $motif->getKey()]), ['verteilung' => 'normal'])->assertSessionHasErrors('motif');
+    $this->actingAs($staff)->post(route('pos.labels.cards.designs.toggle', ['designId' => $motif->getKey()]))->assertSessionHasErrors('motif');
     expect($motif->refresh()->is_active)->toBeFalse();
 });
 
