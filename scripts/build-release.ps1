@@ -68,7 +68,9 @@ Pop-Location
 Write-Host '4/4 ZIP schreiben ...'
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 if (Test-Path $zip) { Remove-Item $zip }
-Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -CompressionLevel Optimal
+# Nicht Compress-Archive: Das Windows-PowerShell schreibt Pfade mit Rückwärtsstrichen („app\\Http\\“), die Linux-Server als Dateinamen lesen.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::CreateFromDirectory($stage, $zip, [System.IO.Compression.CompressionLevel]::Optimal, $false)
 
 $size = [math]::Round((Get-Item $zip).Length / 1MB, 1)
 Write-Host "Fertig: $zip ($size MB)"

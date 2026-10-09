@@ -95,9 +95,10 @@ class UpdateManager
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
-            $name = (string) ($stat['name'] ?? '');
+            // Das Windows-PowerShell legt Pfade mit Rückwärtsstrichen an („app\Http\“): Das ist gültig und wird wie „app/Http/“ behandelt.
+            $name = str_replace('\\', '/', (string) ($stat['name'] ?? ''));
 
-            if ($name === '' || str_contains($name, '..') || str_starts_with($name, '/') || str_contains($name, '\\') || preg_match('/^[A-Za-z]:/', $name) === 1) {
+            if ($name === '' || str_contains($name, '..') || str_starts_with($name, '/') || preg_match('/^[A-Za-z]:/', $name) === 1) {
                 $zip->close();
 
                 throw new UpdateException('Das Paket enthält einen unzulässigen Dateinamen („'.$name.'“) und wird nicht eingespielt.');
@@ -235,10 +236,7 @@ class UpdateManager
 
         try {
             // 3. Entpacken und über die Anwendung kopieren.
-            $zip = new ZipArchive;
-            $zip->open($path);
-            $zip->extractTo($staging);
-            $zip->close();
+            $this->extract($path, $staging);
 
             File::deleteDirectory($this->target().'/public/build');
             self::$applied = true;
@@ -319,6 +317,45 @@ class UpdateManager
         $this->writeJson('last.json', $result);
 
         return $result;
+    }
+
+    /** Entpackt das Paket Datei für Datei; Rückwärtsstriche in Pfaden werden zu Schrägstrichen (extractTo würde sie als Teil des Dateinamens anlegen). */
+    private function extract(string $path, string $to): void
+    {
+        $zip = new ZipArchive;
+
+        if ($zip->open($path) !== true) {
+            throw new UpdateException('Das Paket ist nicht lesbar.');
+        }
+
+        File::ensureDirectoryExists($to);
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = str_replace('\\', '/', (string) $zip->getNameIndex($i));
+            $destination = $to.'/'.$name;
+
+            if (str_ends_with($name, '/')) {
+                File::ensureDirectoryExists($destination);
+
+                continue;
+            }
+
+            File::ensureDirectoryExists(dirname($destination));
+            $stream = $zip->getStream((string) $zip->getNameIndex($i));
+            $target = $stream === false ? false : fopen($destination, 'wb');
+
+            if ($stream === false || $target === false) {
+                $zip->close();
+
+                throw new UpdateException('Die Datei „'.$name.'“ aus dem Paket konnte nicht entpackt werden.');
+            }
+
+            stream_copy_to_stream($stream, $target);
+            fclose($stream);
+            fclose($target);
+        }
+
+        $zip->close();
     }
 
     private function path(string $name): string

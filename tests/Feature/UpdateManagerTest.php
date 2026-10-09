@@ -159,3 +159,33 @@ it('keeps the finish address reachable while the site is in maintenance mode', f
     $this->get('/_update/abschluss/'.$token)->assertRedirect(route('administration.update.index'));
     expect(app()->isDownForMaintenance())->toBeFalse();
 });
+
+it('accepts packages made by the Windows PowerShell with backslashes in the paths and unpacks them into real folders', function (): void {
+    $updates = app(UpdateManager::class);
+    $zip = new ZipArchive;
+    $zip->open($this->root.'/updates/windows.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+    foreach (['artisan', 'composer.json', 'bootstrap\app.php', 'vendor\autoload.php', 'public\index.php', 'VERSION'] as $file) {
+        $zip->addFromString($file, $file === 'VERSION' ? 'v0.2.0' : '<?php');
+    }
+
+    $zip->addEmptyDir('app\\Http\\');
+    $zip->addFromString('app\Http\Neu.txt', 'neu');
+    $zip->close();
+
+    expect($updates->inspect($this->root.'/updates/windows.zip')['version'])->toBe('v0.2.0');
+
+    $updates->apply('windows.zip');
+
+    expect(File::get($this->root.'/target/app/Http/Neu.txt'))->toBe('neu')
+        ->and(array_filter(scandir($this->root.'/target'), static fn (string $name): bool => str_contains($name, chr(92))))->toBe([])
+        ->and(File::exists($this->root.'/target/public/index.php'))->toBeTrue();
+
+    // Ein ausbrechender Pfad bleibt auch mit Rückwärtsstrichen verboten.
+    $evil = new ZipArchive;
+    $evil->open($this->root.'/updates/evil.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    $evil->addFromString('..\boese.php', 'x');
+    $evil->close();
+
+    expect(fn () => $updates->inspect($this->root.'/updates/evil.zip'))->toThrow(UpdateException::class, 'unzulässigen');
+});
