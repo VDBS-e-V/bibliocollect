@@ -100,6 +100,7 @@ final class PatronCardController
                 'free' => $free,
                 'motifs' => $motifs,
                 'unassigned' => $this->unassigned($batch)->whereNull('motif_id')->count(),
+                'assigned' => $this->unassigned($batch)->whereNotNull('motif_id')->count(),
             ])
             ->header('Cache-Control', 'private, no-store');
     }
@@ -134,6 +135,7 @@ final class PatronCardController
         $data = $request->validate([
             'side' => ['required', Rule::in(['beide', 'einseitig', 'vorder', 'rueck'])],
             'start' => ['nullable', 'integer', 'between:1,'.self::PER_SHEET],
+            'neu' => ['nullable', 'boolean'],
             'verteilung' => ['nullable', 'array'],
             'verteilung.*' => ['nullable', Rule::in(array_keys(PatronCardMotif::DISTRIBUTIONS))],
         ]);
@@ -144,7 +146,8 @@ final class PatronCardController
             return redirect()->route('pos.labels.cards')->withErrors(['batch' => "In Charge {$batch} gibt es keine freien Ausweise zum Drucken."]);
         }
 
-        $open = $cards->whereNull('motif_id');
+        // Ausweise mit Motiv behalten es, außer „neu verteilen“ ist gewählt (zum Beispiel nach einem Probedruck).
+        $open = $request->boolean('neu') ? $cards : $cards->whereNull('motif_id');
         $motifs = PatronCardMotif::query()->usable()->get();
         $shares = self::shares($motifs, array_map('strval', (array) ($data['verteilung'] ?? [])));
 

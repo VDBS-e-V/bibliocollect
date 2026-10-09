@@ -68,8 +68,13 @@
                         </li>
                     @endforeach
                 </ul>
-                @if ($unassigned === 0)
-                    <p class="bc-section-copy">Alle Ausweise dieser Charge haben schon ein Motiv; die Verteilung wirkt nur bei Ausweisen ohne Motiv.</p>
+                @if ($assigned > 0)
+                    <div class="bc-public-advanced-active" role="note">
+                        <p class="bc-section-copy">
+                            {{ $assigned }} {{ $assigned === 1 ? 'Ausweis hat' : 'Ausweise haben' }} schon ein festes Motiv (von einem früheren Druck). Die Verteilung oben wirkt nur bei Ausweisen ohne Motiv{{ $unassigned === 0 ? ' – hier also noch nicht' : '' }}.
+                        </p>
+                        <label class="bc-checkbox-line"><input type="checkbox" name="neu" value="1"> Alle Ausweise dieser Charge neu verteilen (nur sinnvoll, wenn noch nichts gedruckt oder verteilt wurde, das auf den Ausweisen steht)</label>
+                    </div>
                 @endif
             @endif
         </section>

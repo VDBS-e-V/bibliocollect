@@ -500,3 +500,21 @@ it('issues cards class by class and lists persons without a card', function (): 
     expect($ohne->refresh()->school_class_id)->toBeNull();
     $this->actingAs(cardTestUser('student_ag_basic'))->get(route('pos.labels.cards.issue'))->assertOk();
 });
+
+it('redistributes the motifs of a batch on request after a first print', function (): void {
+    $staff = cardTestUser('staff');
+    cardTestNumbers(20);
+
+    [$one, $two, $three, $four] = PatronCardMotif::query()->usable()->pluck('id')->all();
+    $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'vorder'])->assertOk();
+    $before = PatronCard::query()->orderBy('number')->pluck('motif_id')->all();
+
+    $this->actingAs($staff)->get(route('pos.labels.cards.batch', ['batch' => 1]))->assertSee('schon ein festes Motiv')->assertSee('neu verteilen');
+
+    // Ohne „neu“ bleibt die Zuordnung, auch bei anderer Wahl.
+    $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'vorder', 'verteilung' => [$two => 'skip', $three => 'skip', $four => 'skip']]);
+    expect(PatronCard::query()->orderBy('number')->pluck('motif_id')->all())->toBe($before);
+
+    $this->actingAs($staff)->post(route('pos.labels.cards.print', ['batch' => 1]), ['side' => 'vorder', 'neu' => '1', 'verteilung' => [$two => 'skip', $three => 'skip', $four => 'skip']])->assertOk();
+    expect(PatronCard::query()->pluck('motif_id')->unique()->all())->toBe([$one]);
+});
