@@ -1,47 +1,10 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# Hinweise für Claude Code
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+Die Projektregeln stehen in `AGENTS.md`, die Zusammenarbeit in `CONTRIBUTING.md`. Bitte beides lesen, bevor du etwas änderst.
 
-## Prerequisites
+Kurzfassung für den Alltag:
 
-Verify that PHP and Composer are available:
-
-```sh
-php -v
-composer -V
-```
-
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
-
-macOS:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
-
-Windows PowerShell:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
-
-Linux:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
-
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+- Antworte auf Deutsch, auch in Berichten nach einem Arbeitsschritt.
+- Arbeite nie direkt auf `main`: Branch, `composer quality`, Pull Request, nach grünen Prüfungen Squash-Merge (`gh pr merge --squash --delete-branch`). Veröffentlichen nur über den Workflow „Release“.
+- Das Repo ist öffentlich: keine Geheimnisse, keine echten Personendaten.
+- Fragen zu Anforderungen als Kommentar im passenden Issue stellen, nicht nur im Chat.

@@ -10,9 +10,13 @@ concurrency:
   group: quality-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+permissions:
+  contents: read
+
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -42,10 +46,12 @@ jobs:
   # Dieselben Tests auf MariaDB, weil der Webspace MySQL/MariaDB nutzt (andere Zeitstempel-Regeln, Fremdschlüssel, Groß-/Kleinschreibung).
   mariadb:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     services:
       mariadb:
-        image: mariadb:10.11
+        # Spiegel von Docker Hub: dort scheitert der Abruf auf GitHub-Runnern wiederholt am Pull-Limit für anonyme Abrufe.
+        image: mirror.gcr.io/library/mariadb:10.11
         env:
           MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
           MARIADB_DATABASE: bibliocollect_test

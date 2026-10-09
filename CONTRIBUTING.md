@@ -65,5 +65,17 @@ Tags werden nie verschoben oder gelöscht. Ein fehlerhaftes Release wird durch e
 
 ## Was GitHub erzwingt
 
-- `main`: nur per Pull Request, grüne Tests, kein Force-Push, kein Löschen, lineare Historie. Ausnahmen kann nur ein Admin über einen Pull Request setzen.
-- Tags `v*`: dürfen nicht gelöscht oder verschoben werden.
+Die Regeln stehen als Dateien in `.github/rulesets/` und werden von einer Admin-Person mit `scripts/apply-github-settings.ps1` angewendet (legt Rulesets an oder aktualisiert sie, setzt die Merge-Optionen und die Sicherheitsfunktionen). Änderungen an den Regeln laufen deshalb ebenfalls über einen Pull Request.
+
+- `main` (Ruleset `main`): nur per Pull Request, Prüfungen `quality` und `mariadb` grün und Branch aktuell, nur Squash-Merge, kein Force-Push, kein Löschen, lineare Historie. Kein Pflicht-Review. Ausnahmen kann nur eine Admin-Person und nur über einen Pull Request setzen (Hotfix).
+- Tags `v*` (Ruleset `release-tags`): dürfen nicht gelöscht oder verschoben werden. Angelegt werden sie vom Workflow „Release“.
+- Merge-Optionen: nur Squash, Branch wird nach dem Merge gelöscht, „Update branch“ ist verfügbar.
+- Sicherheit: Secret-Scanning mit Push-Schutz (das Repo ist öffentlich) und Dependabot-Warnungen.
+
+## Abhängigkeiten (Dependabot)
+
+Dependabot öffnet montags Pull Requests für Composer, npm und GitHub Actions; kleine Updates sind gebündelt. Ein solcher Pull Request wird wie jeder andere behandelt: Prüfungen grün, kurz in `docs/PROJECT_STATUS.md` oder der Release-Notiz erwähnen, wenn Nutzer:innen etwas merken. Große Sprünge (Laravel, PHP, Vite) einzeln, mit lokalem `composer quality` und einem Blick auf die Oberfläche (`npm run build`).
+
+## Wenn der Branch zu `main` nicht mehr aktuell ist
+
+Auf dem Pull Request den Knopf **Update branch** drücken (oder lokal `git fetch && git rebase origin/main`, dann `git push --force-with-lease`). Danach laufen die Prüfungen neu.
