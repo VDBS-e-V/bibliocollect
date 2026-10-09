@@ -6,9 +6,11 @@ namespace App\Modules\Catalog\Services;
 
 use App\Modules\Catalog\DTOs\BibliographicLookupResult;
 use App\Modules\Catalog\DTOs\BibliographicRecord;
+use App\Modules\Catalog\DTOs\MetadataChange;
 use App\Modules\Catalog\DTOs\MetadataProposal;
 use App\Modules\Catalog\Models\CatalogMetadataReview;
 use App\Modules\Catalog\Models\Edition;
+use App\Modules\Catalog\Quality\MetadataFields;
 use App\Modules\Catalog\Quality\MetadataFingerprint;
 use App\Modules\Catalog\Quality\MetadataProposalBuilder;
 
@@ -28,6 +30,7 @@ final readonly class MetadataProposalService
         private BibliographicLookupService $lookup,
         private MetadataProposalBuilder $builder,
         private MetadataFingerprint $fingerprint,
+        private CatalogSummaryService $summaries,
     ) {}
 
     public function propose(CatalogMetadataReview $review): CatalogMetadataReview
@@ -38,7 +41,7 @@ final readonly class MetadataProposalService
 
         [$record, $source, $available, $warnings] = $this->findRecord($edition);
 
-        $proposal = $this->builder->build($edition, $record, $source, $fingerprint, $warnings);
+        $proposal = $this->withSummary($edition, $this->builder->build($edition, $record, $source, $fingerprint, $warnings));
 
         $state = match (true) {
             $proposal->changes !== [] || $record !== null => self::STATE_READY,
@@ -55,6 +58,38 @@ final readonly class MetadataProposalService
         ])->save();
 
         return $review;
+    }
+
+    /**
+     * Fehlt die Zusammenfassung und liefert die DNB keine, wird eine aus Google Books oder Open Library vorgeschlagen (Anreicherung).
+     * Der Hinweis nennt die Quelle und schließt den Fall von der gesammelten Übernahme aus: Ein Klappentext soll jemand lesen.
+     */
+    private function withSummary(Edition $edition, MetadataProposal $proposal): MetadataProposal
+    {
+        if (! config('catalog.quality.summary_enrichment', true)) {
+            return $proposal;
+        }
+
+        $has = static fn (string $key): bool => count(array_filter($proposal->changes, static fn (MetadataChange $change): bool => $change->key === $key)) > 0;
+
+        if ($has('edition.summary') || MetadataFields::value($edition, 'edition.summary') !== null || ! is_string($edition->isbn) || trim($edition->isbn) === '') {
+            return $proposal;
+        }
+
+        $found = $this->summaries->findByIsbn($edition->isbn);
+
+        if ($found === null) {
+            return $proposal;
+        }
+
+        return new MetadataProposal(
+            source: $proposal->source,
+            recordId: $proposal->recordId,
+            permalink: $proposal->permalink,
+            fingerprint: $proposal->fingerprint,
+            warnings: [...$proposal->warnings, 'Die Zusammenfassung stammt von '.$found['source'].'. Bitte kurz lesen; sie wird nicht gesammelt übernommen.'],
+            changes: [...$proposal->changes, new MetadataChange('edition.summary', MetadataChange::FILL, 'Zusammenfassung', null, $found['text'], true, ['source' => $found['source']])],
+        );
     }
 
     /** @return array{0: BibliographicRecord|null, 1: string, 2: bool, 3: list<string>} Treffer, Quelle, Quelle erreichbar, Hinweise */

@@ -33,6 +33,8 @@ return [
     // Qualitätsprüfung: Wie viele offene Fälle der nächtliche Lauf (02:30 Uhr) pro Nacht bei der DNB nachschlägt.
     'quality' => [
         'daily_proposals' => (int) env('CATALOG_QUALITY_DAILY_LIMIT', 60),
+        // Fehlt die Zusammenfassung, schlägt die Qualitätsprüfung eine aus Google Books oder Open Library vor.
+        'summary_enrichment' => (bool) env('CATALOG_QUALITY_SUMMARIES', true),
     ],
 
     'lookup' => [

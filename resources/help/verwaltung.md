@@ -59,3 +59,7 @@ Verlangt eine Person die Löschung ihrer Daten: Zuerst am Ausleihkonto den **dau
 ## Startseite: empfohlene Medien und Themen
 
 Die Startseite zeigt **Empfohlene Medien**, **Neue Medien** und **Empfohlene Themen**. Empfehlen kannst du einen Titel auf seiner Seite in der Katalogpflege („Auf der Startseite empfehlen“) und ein Thema unter **Themenbereiche**. Was du markierst, steht zuerst. Freie Plätze füllt das System: bei Medien mit den meistausgeliehenen Titeln der letzten 90 Tage, bei Themen mit den Themen mit den meisten Titeln. **Neue Medien** sind die Bücher, die in den letzten 60 Tagen ins Regal gekommen sind. Abschnitte ohne Inhalt bleiben verborgen. Änderungen sind sofort sichtbar.
+
+## Systemzustand: Datenqualität nachts vorbereiten
+
+Unter **Systemzustand → Datenqualität** siehst du, wie viele Fälle der Katalogqualität noch ohne Vorschlag sind. Hake die **Problemarten** an, die der Cron nachts **zuerst** bearbeiten soll (zum Beispiel „Zeichensatzfehler“), und stelle ein, wie viele Fälle pro Nacht drankommen. Mit „Auch Fälle nur zur Anreicherung“ holt das System außerdem Zusammenfassungen und Schlagwörter. Die Vorschläge landen in der **Katalogqualität**, dort prüfst und übernimmst du sie; der Katalog ändert sich nie von allein. Zusammenfassungen aus Google Books oder Open Library werden nicht gesammelt übernommen, du liest sie kurz. „Jetzt ein Stück abarbeiten“ startet einen Lauf sofort. Zeigt der Systemzustand „Sicherung außerhalb des Servers“ eine Warnung, lade eine Datenbanksicherung herunter und lege sie sicher ab.

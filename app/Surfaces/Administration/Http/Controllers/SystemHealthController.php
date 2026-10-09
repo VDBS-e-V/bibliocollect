@@ -10,20 +10,26 @@ use App\Foundation\Support\InstallationInfo;
 use App\Foundation\Support\ScheduledJobs;
 use App\Foundation\Support\SystemHealth;
 use App\Modules\Audit\Services\AuditRecorder;
+use App\Modules\Catalog\Enums\MetadataIssue;
+use App\Modules\Catalog\Enums\MetadataReviewStatus;
+use App\Modules\Catalog\Models\CatalogMetadataReview;
 use App\Modules\Catalog\Models\Edition;
+use App\Modules\Catalog\Services\MetadataProposalService;
+use App\Modules\Catalog\Services\QualityQueueSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
 
 /** Seite „Systemzustand“: Cron, Warteschlange, Sicherung und die letzten Fehler auf einen Blick. */
 final class SystemHealthController
 {
-    public function index(SystemHealth $health, ScheduledJobs $jobs, InstallationInfo $installation): Response
+    public function index(SystemHealth $health, ScheduledJobs $jobs, InstallationInfo $installation, QualityQueueSettings $queue): Response
     {
         $alert = config('hosting.alert_email');
 
@@ -32,6 +38,7 @@ final class SystemHealthController
                 'snapshot' => $health->snapshot(),
                 'jobs' => $jobs->all(),
                 'covers' => $this->coverStats(),
+                'quality' => $this->qualityStats($queue),
                 'installation' => $installation->rows(),
                 'backups' => $this->backups(),
                 'events' => SystemErrorEvent::query()->orderByDesc('last_seen_at')->limit(25)->get(),
@@ -82,6 +89,57 @@ final class SystemHealthController
             'google' => is_string(config('catalog.covers.google_books.key')) && trim((string) config('catalog.covers.google_books.key')) !== '',
             'recent' => Edition::query()->with('title')->whereNotNull('cover_path')->orderByDesc('cover_fetched_at')->limit(8)->get(),
         ];
+    }
+
+    /**
+     * Zahlen zur Datenqualität: offene Fälle je Problemart und wie weit die Vorschläge vorab geholt sind.
+     *
+     * @return array<string, mixed>
+     */
+    private function qualityStats(QualityQueueSettings $queue): array
+    {
+        $open = static fn () => CatalogMetadataReview::query()->where('status', MetadataReviewStatus::Open->value);
+        $rows = [];
+
+        foreach (MetadataIssue::cases() as $issue) {
+            $base = $open()->whereJsonContains('issues', $issue->value);
+            $rows[] = [
+                'issue' => $issue,
+                'open' => (clone $base)->count(),
+                'waiting' => (clone $base)->whereNull('proposal_state')->count(),
+                'ready' => (clone $base)->where('proposal_state', MetadataProposalService::STATE_READY)->count(),
+                'none' => (clone $base)->where('proposal_state', MetadataProposalService::STATE_NONE)->count(),
+                'unavailable' => (clone $base)->where('proposal_state', MetadataProposalService::STATE_UNAVAILABLE)->count(),
+            ];
+        }
+
+        $settings = $queue->get();
+
+        return [
+            'rows' => $rows,
+            'settings' => $settings,
+            'open_defects' => $open()->where('severity', '>', 0)->count(),
+            'waiting_defects' => $open()->where('severity', '>', 0)->whereNull('proposal_state')->count(),
+            'waiting_enrichment' => $open()->where('severity', 0)->whereNull('proposal_state')->count(),
+            'nights' => $settings['per_night'] > 0 ? (int) ceil(($open()->where('severity', '>', 0)->whereNull('proposal_state')->count() + ($settings['enrichment'] ? $open()->where('severity', 0)->whereNull('proposal_state')->count() : 0)) / $settings['per_night']) : 0,
+        ];
+    }
+
+    /** Speichert, was der nächtliche Lauf zuerst abarbeiten soll. */
+    public function saveQuality(Request $request, QualityQueueSettings $queue, AuditRecorder $audit): RedirectResponse
+    {
+        $valid = array_map(static fn (MetadataIssue $issue): string => $issue->value, MetadataIssue::cases());
+        $data = $request->validate([
+            'issues' => ['nullable', 'array'],
+            'issues.*' => ['string', Rule::in($valid)],
+            'enrichment' => ['nullable', 'boolean'],
+            'per_night' => ['required', 'integer', 'between:1,500'],
+        ], ['per_night.between' => 'Pro Nacht sind 1 bis 500 Fälle möglich.']);
+
+        $queue->save(array_values((array) ($data['issues'] ?? [])), $request->boolean('enrichment'), (int) $data['per_night'], $request->user()?->getAuthIdentifier() === null ? null : (int) $request->user()->getAuthIdentifier());
+        $audit->record('system.quality.queue_saved', 'Auswahl für den nächtlichen Qualitätslauf gespeichert.', null, ['issues' => $data['issues'] ?? [], 'enrichment' => $request->boolean('enrichment'), 'per_night' => (int) $data['per_night']]);
+
+        return redirect()->route('administration.system.index')->with('system_success', 'Die Auswahl für den nächtlichen Lauf ist gespeichert.');
     }
 
     /** Reiht Bestandstitel zum Nachladen der Cover ein (auf Wunsch auch die, bei denen schon ergebnislos gesucht wurde). */

@@ -71,3 +71,11 @@
         padding-block: .4rem;
     }
 }
+
+/* Tabellen mit langen Inhalten (zum Beispiel Fehlermeldungen mit Dateipfaden) verbreitern die Seite nicht: Zeilen umbrechen, breite Tabellen scrollen in sich. */
+.bc-calendar-table th,
+.bc-calendar-table td { overflow-wrap: anywhere; }
+
+@media (max-width: 70rem) {
+    .bc-calendar-table:not(.bc-stack-table) { display: block; max-width: 100%; overflow-x: auto; }
+}

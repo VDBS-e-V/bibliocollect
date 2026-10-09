@@ -26,8 +26,8 @@ Schedule::call($command('catalog:covers:queue', ['--limit' => max(1, min(1000, (
     ->withoutOverlapping()
     ->onOneServer();
 
-// Holt DNB-Vorschläge für offene Qualitätsfälle vorab (nur in die Prüftabelle, nie in den Katalog). Kleine Stücke, damit der Lauf auch als Web-Cron in die Laufzeit-Grenze des Anbieters passt.
-Schedule::call($command('catalog:quality:propose', ['--limit' => max(1, min(500, (int) config('catalog.quality.daily_proposals', 60)))]))
+// Holt DNB-Vorschläge für offene Qualitätsfälle vorab (nur in die Prüftabelle, nie in den Katalog). Kleine Stücke, damit der Lauf auch als Web-Cron in die Laufzeit-Grenze des Anbieters passt. Welche Problemarten zuerst drankommen und wie viele Fälle pro Nacht, stellt die Verwaltung im Systemzustand ein.
+Schedule::call($command('catalog:quality:propose'))
     ->name('catalog:quality:propose')
     ->dailyAt('02:30')
     ->withoutOverlapping()

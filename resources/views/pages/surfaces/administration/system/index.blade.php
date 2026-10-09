@@ -135,6 +135,60 @@
         @endif
     </section>
 
+    <section class="bc-content-section" aria-labelledby="quality-heading">
+        <div class="bc-section-heading bc-section-heading--with-meta">
+            <h2 id="quality-heading">Datenqualität</h2>
+            <span>{{ $quality['open_defects'] }} offene Mängel</span>
+        </div>
+        <p class="bc-section-copy">
+            Der Cron holt nachts Vorschläge (DNB, bei fehlender Zusammenfassung auch Google Books oder Open Library) für offene Fälle der Katalogqualität. Der Katalog selbst ändert sich dabei nie; übernommen wird in der <a href="{{ route('pos.catalog.quality.index') }}">Katalogqualität</a>.
+            Noch ohne Vorschlag: <strong>{{ $quality['waiting_defects'] }}</strong> Mängel{!! $quality['waiting_enrichment'] > 0 ? ' und <strong>'.e($quality['waiting_enrichment']).'</strong> Fälle nur zur Anreicherung' : '' !!}.
+            {!! $quality['nights'] > 0 ? 'Bei der gewählten Menge dauert das etwa <strong>'.e($quality['nights']).'</strong> '.($quality['nights'] === 1 ? 'Nacht' : 'Nächte').'.' : '' !!}
+        </p>
+
+        <form method="post" action="{{ route('administration.system.quality') }}" class="bc-quality-queue">
+            @csrf
+            <table class="bc-calendar-table bc-stack-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Zuerst nachts holen</th>
+                        <th scope="col">Problem</th>
+                        <th scope="col">Offen</th>
+                        <th scope="col">Noch ohne Vorschlag</th>
+                        <th scope="col">Vorschlag liegt vor</th>
+                        <th scope="col">Ohne Treffer</th>
+                        <th scope="col">Quelle nicht erreichbar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($quality['rows'] as $row)
+                        <tr>
+                            <td><label class="bc-checkbox-line"><input type="checkbox" name="issues[]" value="{{ $row['issue']->value }}" @checked(in_array($row['issue']->value, $quality['settings']['issues'], true))> <span class="bc-visually-hidden">{{ $row['issue']->label() }} zuerst holen</span></label></td>
+                            <th scope="row">{{ $row['issue']->label() }}@if ($row['issue']->isEnrichment()) <x-ui.badge variant="neutral">Anreicherung</x-ui.badge>@endif</th>
+                            <td class="bc-tabular" data-label="Offen">{{ $row['open'] }}</td>
+                            <td class="bc-tabular" data-label="Noch ohne Vorschlag">{{ $row['waiting'] }}</td>
+                            <td class="bc-tabular" data-label="Vorschlag liegt vor">{{ $row['ready'] }}</td>
+                            <td class="bc-tabular" data-label="Ohne Treffer">{{ $row['none'] }}</td>
+                            <td class="bc-tabular" data-label="Quelle nicht erreichbar">{{ $row['unavailable'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <label class="bc-checkbox-line"><input type="checkbox" name="enrichment" value="1" @checked($quality['settings']['enrichment'])> Auch Fälle nur zur Anreicherung (Zusammenfassung, Schlagwörter) nachts bearbeiten</label>
+            <x-ui.input label="Fälle pro Nacht" name="per_night" id="quality-per-night" type="number" min="1" max="500" :value="old('per_night', $quality['settings']['per_night'])" hint="Der Lauf um 02:30 Uhr arbeitet erst die angehakten Problemarten ab (schwerste zuerst), dann den Rest. Kleine Mengen passen auch als Web-Cron in die Laufzeit-Grenze des Anbieters." />
+            <div class="bc-context-actions">
+                <x-ui.button type="submit">Auswahl speichern</x-ui.button>
+            </div>
+        </form>
+
+        <form method="post" action="{{ route('administration.system.run-job', ['job' => 'catalog:quality:propose']) }}">
+            @csrf
+            <x-ui.button type="submit" variant="secondary" data-confirm="Jetzt einen Lauf mit der gespeicherten Auswahl starten? Er fragt externe Quellen ab und kann einige Minuten dauern.">Jetzt ein Stück abarbeiten</x-ui.button>
+        </form>
+        <p class="bc-section-copy">„Jetzt ein Stück abarbeiten“ verwendet die gespeicherte Auswahl, nicht die Haken, die du eben erst gesetzt hast. Erst speichern.</p>
+    </section>
+
     <section class="bc-content-section" aria-labelledby="backups-heading">
         <div class="bc-section-heading"><h2 id="backups-heading">Datensicherung</h2></div>
         <p class="bc-section-copy">Die Sicherung läuft täglich automatisch (siehe Zeitplan-Aufgaben). Lade sie regelmäßig herunter und lege sie <strong>außerhalb des Servers</strong> ab: Eine Sicherung nur auf dem Server hilft nicht, wenn der Server ausfällt. Sie enthält alle personenbezogenen Daten und gehört nicht in fremde Hände.</p>

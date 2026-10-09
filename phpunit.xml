@@ -33,6 +33,7 @@
         <env name="STATUS_TOKEN" value="" force="true"/>
         <env name="ALERT_EMAIL" value="" force="true"/>
         <env name="CATALOG_COVER_OPEN_LIBRARY" value="false"/>
+        <env name="CATALOG_QUALITY_SUMMARIES" value="false"/>
         <env name="CATALOG_COVER_GOOGLE_BOOKS_KEY" value=""/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>

@@ -63,6 +63,7 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/systemzustand/sicherung/{file}', [SystemHealthController::class, 'downloadBackup'])->middleware('throttle:20,1')->name('administration.system.backup.download');
         Route::post('/verwaltung/systemzustand/cron', [SystemHealthController::class, 'runCron'])->middleware('throttle:6,1')->name('administration.system.run-cron');
         Route::post('/verwaltung/systemzustand/aufgaben/{job}', [SystemHealthController::class, 'runJob'])->where('job', '[a-z0-9:_\-]+')->middleware('throttle:10,1')->name('administration.system.run-job');
+        Route::post('/verwaltung/systemzustand/datenqualitaet', [SystemHealthController::class, 'saveQuality'])->middleware('throttle:10,1')->name('administration.system.quality');
         Route::post('/verwaltung/systemzustand/cover', [SystemHealthController::class, 'queueCovers'])->middleware('throttle:6,1')->name('administration.system.queue-covers');
         Route::get('/verwaltung/mail-vorschau', [MailPreviewController::class, 'index'])->name('administration.mail-preview');
         Route::post('/verwaltung/mail-vorschau', [MailPreviewController::class, 'send'])->middleware('throttle:5,1')->name('administration.mail-preview.send');

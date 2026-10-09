@@ -32,6 +32,7 @@ final class SystemHealth
             $this->cron(),
             $this->queue(),
             $this->backup(),
+            $this->offsiteCopy(),
             $this->errors(),
             $this->mail(),
             $this->disk(),
@@ -105,6 +106,30 @@ final class SystemHealth
         $state = $hours > 72 ? self::FAIL : ($hours > 36 ? self::WARN : self::OK);
 
         return $this->row('backup', 'Datensicherung', $state, 'zuletzt vor '.$hours.' Stunde(n), '.count($files).' Sicherung(en) gespeichert');
+    }
+
+    /**
+     * Eine Sicherung nur auf dem Server hilft nicht, wenn der Server ausfällt: Der Download ist die Kopie außerhalb.
+     *
+     * @return array{key: string, label: string, state: string, detail: string}
+     */
+    private function offsiteCopy(): array
+    {
+        try {
+            $last = DB::table('audit_events')->where('action', 'system.backup.downloaded')->max('occurred_at');
+        } catch (Throwable) {
+            return $this->row('offsite', 'Sicherung außerhalb des Servers', self::OK, 'nicht prüfbar');
+        }
+
+        if ($last === null) {
+            return $this->row('offsite', 'Sicherung außerhalb des Servers', self::WARN, 'Noch nie heruntergeladen. Bitte unter „Systemzustand“ eine Sicherung herunterladen und sicher ablegen.');
+        }
+
+        $days = max(0, (int) floor(CarbonImmutable::parse((string) $last, config('app.timezone'))->diffInDays(now(), true)));
+
+        return $days > 14
+            ? $this->row('offsite', 'Sicherung außerhalb des Servers', self::WARN, 'Zuletzt vor '.$days.' Tagen heruntergeladen. Bitte eine aktuelle Sicherung herunterladen.')
+            : $this->row('offsite', 'Sicherung außerhalb des Servers', self::OK, 'zuletzt vor '.$days.' Tag(en) heruntergeladen');
     }
 
     /** @return array{key: string, label: string, state: string, detail: string} */
