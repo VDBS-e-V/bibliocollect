@@ -109,7 +109,7 @@
                     <li><a href="{{ route('pos.shelving', ['thema' => $name === '' ? '__ohne__' : $name]) }}" @if ($thema === ($name === '' ? '__ohne__' : $name)) aria-current="true" @endif>{{ $name === '' ? 'Ohne Thema' : $name }} <span class="bc-badge">{{ $total }}</span></a></li>
                 @endforeach
             </ul>
-            <table class="bc-calendar-table">
+            <table class="bc-calendar-table bc-stack-table">
                 <thead>
                     <tr><th scope="col">Inventarnummer</th><th scope="col">Titel</th><th scope="col">Thema</th><th scope="col"><span class="bc-visually-hidden">Einsortieren</span></th></tr>
                 </thead>
@@ -117,8 +117,8 @@
                     @foreach ($stack as $item)
                         <tr>
                             <th scope="row" class="bc-tabular">{{ $item->barcode }}</th>
-                            <td>{{ $item->edition->title->preferred_title }}</td>
-                            <td>{{ $item->edition->local_classification ?: '–' }}</td>
+                            <td data-label="Titel">{{ $item->edition->title->preferred_title }}</td>
+                            <td data-label="Thema">{{ $item->edition->local_classification ?: '–' }}</td>
                             <td><a href="{{ route('pos.shelving', ['buch' => $item->barcode]) }}" aria-label="{{ $item->edition->title->preferred_title }} einsortieren">Einsortieren</a></td>
                         </tr>
                     @endforeach
@@ -133,7 +133,7 @@
     @if ($recent->isNotEmpty())
         <section class="bc-content-section" aria-labelledby="recent-heading">
             <div class="bc-section-heading"><h2 id="recent-heading">Zuletzt einsortiert</h2></div>
-            <table class="bc-calendar-table">
+            <table class="bc-calendar-table bc-stack-table">
                 <thead>
                     <tr><th scope="col">Inventarnummer</th><th scope="col">Titel</th><th scope="col">Regalbrett</th></tr>
                 </thead>
@@ -141,8 +141,8 @@
                     @foreach ($recent as $item)
                         <tr>
                             <th scope="row" class="bc-tabular">{{ $item->barcode }}</th>
-                            <td>{{ $item->edition->title->preferred_title }}</td>
-                            <td>{{ $item->shelf_location }}</td>
+                            <td data-label="Titel">{{ $item->edition->title->preferred_title }}</td>
+                            <td data-label="Regalbrett">{{ $item->shelf_location }}</td>
                         </tr>
                     @endforeach
                 </tbody>

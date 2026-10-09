@@ -1,0 +1,73 @@
+/* Schmale Bildschirme (Handy): Kopfzeile, Tippflächen, lange Wörter und Tabellen zum Einsortieren. */
+
+/* Kopfzeile: Wortmarke und Anmelden-Links dürfen sich nicht überdecken. */
+@media (max-width: 44rem) {
+    .bc-masthead__inner { flex-wrap: wrap; gap: .4rem 1rem; }
+    .bc-brand-lockup { flex: 1 1 14rem; }
+    .bc-account:has(.bc-account__login) { flex: 1 1 100%; flex-wrap: wrap; gap: .4rem 1rem; }
+}
+
+@media (max-width: 34rem) {
+    .bc-utility-bar__inner > span { display: none; }
+    .bc-utility-bar__actions { justify-content: flex-start; row-gap: 0; }
+    .bc-brand-lockup { gap: .75rem; }
+    .bc-brand-lockup__text { padding-left: .75rem; }
+}
+
+/* Tippflächen: mindestens 24 px hoch (WCAG 2.2), am Touchgerät etwas mehr. */
+.bc-utility-bar a,
+.bc-utility-bar button,
+.bc-shell__footer a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+}
+
+@media (pointer: coarse), (max-width: 44rem) {
+    .bc-utility-bar a,
+    .bc-utility-bar button { min-height: 2.25rem; }
+    .bc-shell__footer a { min-height: 2.5rem; }
+    .bc-shell__footer-inner { gap: 0 1.5rem; }
+}
+
+/* Lange Wörter (zum Beispiel „Abenteuergeschichten“) brechen um, statt die Seite zu verbreitern. */
+.bc-public-result__main,
+.bc-public-result__main a,
+.bc-shell__main h1,
+.bc-shell__main h2,
+.bc-shell__main h3 {
+    overflow-wrap: anywhere;
+}
+
+/* Tabellen im Einsortieren: am Handy ein Block je Buch statt breiter Spalten. */
+@media (max-width: 40rem) {
+    .bc-stack-table,
+    .bc-stack-table tbody,
+    .bc-stack-table tr,
+    .bc-stack-table th,
+    .bc-stack-table td { display: block; width: 100%; }
+    .bc-stack-table thead { display: none; }
+    .bc-stack-table tr { padding: .6rem 0; border-bottom: 1px solid var(--border-default); }
+    .bc-stack-table th,
+    .bc-stack-table td { border: 0; padding: .1rem 0; overflow-wrap: anywhere; }
+    .bc-stack-table td[data-label]::before {
+        content: attr(data-label) ": ";
+        color: var(--text-secondary);
+        font-weight: 800;
+    }
+    .bc-stack-table td a { display: inline-flex; align-items: center; min-height: 2.5rem; font-weight: 700; }
+}
+
+/* Alleinstehende Links (Ergebnislisten, Aktionszeilen, Tabellen) bekommen eine größere Tippfläche. */
+@media (pointer: coarse), (max-width: 44rem) {
+    .bc-public-result a,
+    .bc-context-actions a,
+    .bc-public-hero-search__links a,
+    .bc-public-catalog-search__heading a,
+    .bc-shelving-form__actions a,
+    .bc-calendar-table td a,
+    .bc-content-section > p > a {
+        display: inline-block;
+        padding-block: .4rem;
+    }
+}
