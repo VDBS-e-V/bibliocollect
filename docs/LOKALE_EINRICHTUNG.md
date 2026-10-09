@@ -81,7 +81,7 @@ git clone https://github.com/VDBS-e-V/bibliocollect.git
 cd bibliocollect
 ```
 
-Das Repository ist nicht öffentlich. Beim ersten Mal öffnet Git ein Anmeldefenster für GitHub; dein GitHub-Konto braucht Zugriff auf die Organisation VDBS-e-V. Alternativ lädst du auf der GitHub-Seite des Repositorys über „Code → Download ZIP“ den Stand als Zip herunter und entpackst ihn nach `C:\Projekte\bibliocollect`; dann gibt es aber keine Versionsverwaltung und keine Updates per `git pull`.
+Das Repository ist öffentlich lesbar (<https://github.com/VDBS-e-V/bibliocollect>), zum Klonen braucht es kein Konto; zum Hochladen eigener Änderungen braucht dein GitHub-Konto Zugriff auf die Organisation VDBS-e-V. Alternativ lädst du auf der GitHub-Seite des Repositorys über „Code → Download ZIP“ den Stand als Zip herunter und entpackst ihn nach `C:\Projekte\bibliocollect`; dann gibt es aber keine Versionsverwaltung und keine Updates per `git pull`.
 
 Ein Editor ist optional; für Textdateien wie die `.env` reicht der Windows-Editor, bequemer ist Visual Studio Code (`winget install --id Microsoft.VisualStudioCode -e`).
 
