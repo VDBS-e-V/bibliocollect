@@ -6,6 +6,7 @@ namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Foundation\Models\SystemErrorEvent;
 use App\Foundation\Support\AlertService;
+use App\Foundation\Support\InstallationInfo;
 use App\Foundation\Support\ScheduledJobs;
 use App\Foundation\Support\SystemHealth;
 use App\Modules\Audit\Services\AuditRecorder;
@@ -22,7 +23,7 @@ use Throwable;
 /** Seite „Systemzustand“: Cron, Warteschlange, Sicherung und die letzten Fehler auf einen Blick. */
 final class SystemHealthController
 {
-    public function index(SystemHealth $health, ScheduledJobs $jobs): Response
+    public function index(SystemHealth $health, ScheduledJobs $jobs, InstallationInfo $installation): Response
     {
         $alert = config('hosting.alert_email');
 
@@ -30,7 +31,8 @@ final class SystemHealthController
             ->view('pages.surfaces.administration.system.index', [
                 'snapshot' => $health->snapshot(),
                 'jobs' => $jobs->all(),
-                'covers' => $this->coverCounts(),
+                'covers' => $this->coverStats(),
+                'installation' => $installation->rows(),
                 'backups' => $this->backups(),
                 'events' => SystemErrorEvent::query()->orderByDesc('last_seen_at')->limit(25)->get(),
                 'alertAddress' => is_string($alert) && trim($alert) !== '' ? trim($alert) : null,
@@ -39,20 +41,46 @@ final class SystemHealthController
             ->header('Cache-Control', 'private, no-store');
     }
 
-    /** @return array{with: int, open: int, missing: int, waiting: int} */
-    private function coverCounts(): array
+    /**
+     * Zahlen zum Nachladen der Cover für die Seite „Systemzustand“.
+     *
+     * @return array<string, mixed>
+     */
+    private function coverStats(): array
     {
-        $withIdentifier = static fn () => Edition::query()->where(static function ($query): void {
+        $total = Edition::query()->count();
+        $searchable = static fn () => Edition::query()->where(static function ($query): void {
             $query->whereNotNull('isbn')->orWhereNotNull('source_record_id');
         });
+        $without = static fn ($query) => $query->whereNull('cover_path');
+
+        $with = Edition::query()->whereNotNull('cover_path')->count();
+        $open = $without($searchable())->where(static function ($query): void {
+            $query->whereNull('cover_status')->orWhereNotIn('cover_status', ['missing', 'error']);
+        })->count();
+        $missing = $without($searchable())->where('cover_status', 'missing')->count();
+        $failed = $without($searchable())->where('cover_status', 'error')->count();
+        $noIdentifier = $total - $searchable()->count();
+        $perNight = max(1, min(1000, (int) config('catalog.covers.daily_limit', 200)));
+
+        $queued = (int) DB::table('jobs')->where('payload', 'like', '%RefreshEditionCoverJob%')->count();
+        $failedJobs = (int) DB::table('failed_jobs')->where('payload', 'like', '%RefreshEditionCoverJob%')->count();
 
         return [
-            'with' => Edition::query()->whereNotNull('cover_path')->count(),
-            'open' => (clone $withIdentifier())->whereNull('cover_path')->where(static function ($query): void {
-                $query->whereNull('cover_status')->orWhere('cover_status', '!=', 'missing');
-            })->count(),
-            'missing' => (clone $withIdentifier())->whereNull('cover_path')->where('cover_status', 'missing')->count(),
-            'waiting' => (int) DB::table('jobs')->count(),
+            'total' => $total,
+            'with' => $with,
+            'percent' => $total > 0 ? (int) floor($with / $total * 100) : 0,
+            'open' => $open,
+            'missing' => $missing,
+            'failed' => $failed,
+            'noIdentifier' => $noIdentifier,
+            'queued' => $queued,
+            'failedJobs' => $failedJobs,
+            'perNight' => $perNight,
+            'nights' => $open > 0 ? (int) ceil(max(0, $open - $queued) / $perNight) : 0,
+            'openLibrary' => (bool) config('catalog.covers.open_library.enabled', true),
+            'google' => is_string(config('catalog.covers.google_books.key')) && trim((string) config('catalog.covers.google_books.key')) !== '',
+            'recent' => Edition::query()->with('title')->whereNotNull('cover_path')->orderByDesc('cover_fetched_at')->limit(8)->get(),
         ];
     }
 

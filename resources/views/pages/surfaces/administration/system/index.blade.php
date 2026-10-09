@@ -42,6 +42,22 @@
         </table>
     </section>
 
+    <section class="bc-content-section" aria-labelledby="install-heading">
+        <div class="bc-section-heading"><h2 id="install-heading">Installation</h2></div>
+        <table class="bc-calendar-table">
+            <thead><tr><th scope="col">Was</th><th scope="col">Stand</th><th scope="col">Ergebnis</th></tr></thead>
+            <tbody>
+                @foreach ($installation as $row)
+                    <tr>
+                        <th scope="row">{{ $row['label'] }}</th>
+                        <td>{{ $row['value'] }}@if ($row['hint'])<br><small class="bc-public-metadata-source">{{ $row['hint'] }}</small>@endif</td>
+                        <td><x-ui.badge :variant="['ok' => 'success', 'warn' => 'warning', 'fail' => 'danger'][$row['state']]">{{ ['ok' => 'In Ordnung', 'warn' => 'Hinweis', 'fail' => 'Fehler'][$row['state']] }}</x-ui.badge></td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </section>
+
     <section class="bc-content-section" aria-labelledby="jobs-heading">
         <div class="bc-section-heading"><h2 id="jobs-heading">Zeitplan-Aufgaben</h2></div>
         <p class="bc-section-copy">Diese Aufgaben laufen automatisch über den Cron. Hier kannst du jede einzelne <strong>einmalig sofort</strong> ausführen, zum Beispiel wenn der Cron nicht läuft. Das ändert den Zeitplan nicht. Das Ergebnis erscheint oben, ein Eintrag im Protokoll hält fest, wer es ausgelöst hat.</p>
@@ -70,12 +86,29 @@
         <p class="bc-section-copy">Der Cron-Lauf macht dasselbe wie der Cronjob: Er führt die gerade fälligen Aufgaben aus und arbeitet danach etwa 10 Sekunden lang die Warteschlange ab.</p>
     </section>
 
-    <section class="bc-content-section" aria-labelledby="covers-heading">
-        <div class="bc-section-heading"><h2 id="covers-heading">Cover der Bücher</h2></div>
-        <p class="bc-section-copy">
-            <strong>{{ $covers['with'] }}</strong> Ausgaben haben ein Cover, bei <strong>{{ $covers['open'] }}</strong> steht die Suche noch aus, bei <strong>{{ $covers['missing'] }}</strong> wurde schon ergebnislos gesucht. In der Warteschlange warten {{ $covers['waiting'] }} Aufgaben.
-            Jede Nacht um 03:30 Uhr reiht der Zeitplan {{ (int) config('catalog.covers.daily_limit', 200) }} Titel ein (einstellbar mit <code>CATALOG_COVER_DAILY_LIMIT</code>); die Cover lädt der Cron im Hintergrund.
-        </p>
+    <section class="bc-content-section bc-covers" aria-labelledby="covers-heading">
+        <div class="bc-section-heading bc-section-heading--with-meta">
+            <h2 id="covers-heading">Cover der Bücher</h2>
+            <span>{{ $covers['percent'] }} %</span>
+        </div>
+
+        <p class="bc-covers__lead"><strong>{{ $covers['with'] }}</strong> von {{ $covers['total'] }} Ausgaben haben ein Cover.</p>
+        <div class="bc-meter bc-meter--wide" role="img" aria-label="{{ $covers['with'] }} von {{ $covers['total'] }} Ausgaben mit Cover"><span class="bc-meter__bar" style="width: {{ $covers['percent'] }}%"></span></div>
+
+        <dl class="bc-covers__stats">
+            <div><dt>Mit Cover</dt><dd>{{ $covers['with'] }}</dd></div>
+            <div><dt>Suche steht aus</dt><dd>{{ $covers['open'] }}</dd></div>
+            <div><dt>Erfolglos gesucht</dt><dd>{{ $covers['missing'] }}</dd></div>
+            <div><dt>Fehler beim Laden</dt><dd>{{ $covers['failed'] }}</dd></div>
+            <div><dt>Ohne ISBN (nicht suchbar)</dt><dd>{{ $covers['noIdentifier'] }}</dd></div>
+        </dl>
+
+        <ul class="bc-covers__facts">
+            <li><strong>Nächtlicher Lauf:</strong> um 03:30 Uhr werden {{ $covers['perNight'] }} Titel eingereiht (<code>CATALOG_COVER_DAILY_LIMIT</code>).@if ($covers['open'] > 0) Bei diesem Tempo dauert es noch etwa <strong>{{ max(1, $covers['nights']) }} {{ max(1, $covers['nights']) === 1 ? 'Nacht' : 'Nächte' }}</strong>, bis alle offenen Titel versucht wurden.@endif</li>
+            <li><strong>Warteschlange:</strong> {{ $covers['queued'] }} Cover-Aufgaben warten@if ($covers['failedJobs'] > 0), {{ $covers['failedJobs'] }} sind fehlgeschlagen@endif. Der Cron arbeitet sie ab.</li>
+            <li><strong>Quellen:</strong> Open Library <x-ui.badge :variant="$covers['openLibrary'] ? 'success' : 'neutral'">{{ $covers['openLibrary'] ? 'an' : 'aus' }}</x-ui.badge> · Google Books <x-ui.badge :variant="$covers['google'] ? 'success' : 'warning'">{{ $covers['google'] ? 'Schlüssel eingetragen' : 'ohne Schlüssel (aus)' }}</x-ui.badge></li>
+        </ul>
+
         <div class="bc-context-actions">
             <form method="post" action="{{ route('administration.system.queue-covers') }}">
                 @csrf
@@ -84,10 +117,22 @@
             <form method="post" action="{{ route('administration.system.queue-covers') }}">
                 @csrf
                 <input type="hidden" name="retry_missing" value="1">
-                <x-ui.button type="submit" variant="secondary" data-confirm="Auch Titel erneut suchen, bei denen schon ergebnislos gesucht wurde? Das lohnt sich zum Beispiel nach dem Eintragen eines Google-Books-Schlüssels." data-confirm-label="Erneut suchen">Auch erfolglos gesuchte erneut suchen</x-ui.button>
+                <x-ui.button type="submit" variant="secondary" data-confirm="Auch Titel erneut suchen, bei denen schon ergebnislos gesucht wurde? Das lohnt sich zum Beispiel nach dem Eintragen eines Google-Books-Schlüssels." data-confirm-label="Erneut suchen">Auch erfolglos gesuchte erneut suchen ({{ $covers['missing'] }})</x-ui.button>
             </form>
         </div>
         <p class="bc-section-copy">Nach dem Einreihen „Cron-Lauf jetzt auslösen“ drücken oder den Cron laufen lassen. Mehrere Klicks reihen jeweils die nächsten Titel ein.</p>
+
+        @if ($covers['recent']->isNotEmpty())
+            <h3 class="bc-covers__recent-heading">Zuletzt geholt</h3>
+            <ul class="bc-covers__recent">
+                @foreach ($covers['recent'] as $edition)
+                    <li>
+                        <img src="{{ app(\App\Modules\Catalog\Services\CatalogCoverService::class)->localUrlForEdition($edition) }}" alt="" loading="lazy" width="64" height="90">
+                        <span>{{ \Illuminate\Support\Str::limit($edition->title->preferred_title, 40) }}</span>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
     </section>
 
     <section class="bc-content-section" aria-labelledby="backups-heading">

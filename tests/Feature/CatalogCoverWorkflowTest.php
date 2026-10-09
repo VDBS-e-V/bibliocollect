@@ -227,3 +227,20 @@ it('lets the administration queue covers from the system state page, also for ti
     Queue::assertPushed(RefreshEditionCoverJob::class, static fn (RefreshEditionCoverJob $job): bool => $job->editionId === (string) $missing->getKey());
     expect($open->getKey())->not->toBeNull();
 });
+
+it('shows the cover progress and the installation state on the system state page', function (): void {
+    $admin = User::factory()->create(['email_verified_at' => now()]);
+    app(AssignRoleAction::class)->execute($admin, 'management');
+    $title = Title::query()->create(['preferred_title' => 'Mit Cover']);
+    $with = Edition::query()->create(['title_id' => $title->getKey(), 'isbn' => '9783000000155']);
+    $with->forceFill(['cover_path' => 'catalog/covers/x.jpg', 'cover_status' => 'ready', 'cover_fetched_at' => now()])->save();
+    Edition::query()->create(['title_id' => $title->getKey(), 'isbn' => '9783000000162']);
+    $none = Edition::query()->create(['title_id' => $title->getKey(), 'isbn' => '9783000000179']);
+    $none->forceFill(['cover_status' => 'missing'])->save();
+    Edition::query()->create(['title_id' => $title->getKey()]);
+
+    $page = $this->actingAs($admin)->get(route('administration.system.index'))->assertOk();
+    $page->assertSeeText('1 von 4 Ausgaben haben ein Cover')->assertSee('25 %')->assertSee('Suche steht aus')->assertSee('Erfolglos gesucht')->assertSee('Ohne ISBN')
+        ->assertSee('Nächtlicher Lauf')->assertSee('Zuletzt geholt')->assertSee('Mit Cover')
+        ->assertSee('Installation')->assertSee('Installierte Version')->assertSee('Datenbank-Aktualisierung')->assertSee('auf dem neuesten Stand')->assertSee('Schreibrechte storage');
+});
