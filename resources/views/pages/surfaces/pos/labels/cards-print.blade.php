@@ -1,7 +1,7 @@
 @php
     use App\Foundation\Support\Code128Svg;
 
-    $front = $side === 'vorder';
+    $modeLabel = ['beide' => 'beidseitig', 'vorder' => 'nur Vorderseiten', 'rueck' => 'nur Rückseiten'][$mode];
 @endphp
 <!DOCTYPE html>
 <html lang="de">
@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>Bibliotheksausweise Charge {{ $batch }}, {{ $front ? 'Vorderseite' : 'Rückseite' }}</title>
+    <title>Bibliotheksausweise Charge {{ $batch }}, {{ $modeLabel }}</title>
     <style>
         @page { size: A4; margin: 0; }
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -46,17 +46,22 @@
 <body>
 <div class="bar">
     <button type="button" data-print>Drucken</button>
-    Charge {{ $batch }} · {{ $front ? 'Vorderseite' : 'Rückseite' }} · {{ $count }} Ausweise · Avery Zweckform C32016 (85 × 54 mm, 10 Karten je Bogen), randlos.
+    Charge {{ $batch }} · {{ $modeLabel }} · {{ $count }} Ausweise · Avery Zweckform C32016 (85 × 54 mm, 10 Karten je Bogen), randlos.
     Im Druckdialog: A4, Maßstab 100 % („Tatsächliche Größe“), Ränder „Keine“, keine Kopf- und Fußzeilen, Hintergrundgrafiken an.
-    @unless ($front)
-        Zum Beidseitig-Druck: den Bogen mit der bedruckten Vorderseite wieder einlegen (Wenden an der langen Kante); die Rückseiten sind dafür gespiegelt angeordnet.
-    @endunless
+    @if ($mode === 'beide')
+        Beidseitig: Im Druckdialog „Beidseitig“ / „Duplex“ mit „Wenden an der langen Kante“ wählen. Die Seiten folgen als Vorderseite, Rückseite, Vorderseite, Rückseite …
+    @elseif ($mode === 'rueck')
+        Zum Beidseitig-Druck von Hand: den Bogen mit der bedruckten Vorderseite wieder einlegen (Wenden an der langen Kante); die Rückseiten sind dafür gespiegelt angeordnet.
+    @endif
     <label>Versatz rechts (mm) <input type="number" step="0.1" value="0" data-offset="--dx"></label>
     <label>Versatz unten (mm) <input type="number" step="0.1" value="0" data-offset="--dy"></label>
 </div>
-@foreach ($sheets as $sheet)
+@foreach ($pages as $page)
+    @php
+        $front = $page['side'] === 'vorder';
+    @endphp
     <div class="sheet">
-        @foreach ($sheet as $slot)
+        @foreach ($page['slots'] as $slot)
             @if ($slot === null)
                 <div class="card empty"></div>
             @else

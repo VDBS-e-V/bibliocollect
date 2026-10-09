@@ -168,7 +168,7 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
         Route::get('/betrieb/ausweise', [PatronCardController::class, 'index'])->name('pos.labels.cards');
         Route::get('/betrieb/ausweise/motive', [PatronCardDesignController::class, 'index'])->name('pos.labels.cards.designs');
         Route::post('/betrieb/ausweise/motive', [PatronCardDesignController::class, 'store'])->name('pos.labels.cards.designs.store');
-        Route::post('/betrieb/ausweise/motive/{designId}/umschalten', [PatronCardDesignController::class, 'toggle'])->name('pos.labels.cards.designs.toggle');
+        Route::post('/betrieb/ausweise/motive/{designId}/verteilung', [PatronCardDesignController::class, 'distribution'])->name('pos.labels.cards.designs.distribution');
         Route::delete('/betrieb/ausweise/motive/{designId}', [PatronCardDesignController::class, 'destroy'])->name('pos.labels.cards.designs.destroy');
         Route::get('/betrieb/ausweise/charge/{batch}', [PatronCardController::class, 'batch'])->whereNumber('batch')->name('pos.labels.cards.batch');
         Route::post('/betrieb/ausweise/erzeugen', [PatronCardController::class, 'generate'])->name('pos.labels.cards.generate');
