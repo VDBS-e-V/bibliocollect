@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Im Wartungsmodus bleiben der Abschluss eines Updates und der Cron erreichbar (der Cron schließt wartende Updates ab).
         $middleware->preventRequestsDuringMaintenance(except: ['_update/*', '_cron', '_cron/*', '_status', '_status/*']);
 
+        // Die Einrichtungsseite braucht keine Sitzung (sie ist durch das Token geschützt); ein abgelaufenes Formular soll nicht stören.
+        $middleware->validateCsrfTokens(except: ['_setup/*']);
+
         $middleware->alias([
             'permission' => RequirePermission::class,
         ]);

@@ -107,11 +107,14 @@ it('restores access of a locked-out administration account via the setup page', 
     $locked->forceFill(['disabled_at' => now(), 'disabled_reason' => 'manual', 'email' => 'verwaltung@example.org'])->save();
     UserRoleAssignment::query()->where('user_id', $locked->getKey())->delete();
 
-    $this->post('/_setup/recover', ['token' => 'falsch', 'email' => 'verwaltung@example.org', 'password' => 'ein-langes-passwort-1'])->assertForbidden();
-    $this->post('/_setup/recover', ['token' => str_repeat('s', 30), 'email' => 'verwaltung@example.org', 'password' => 'kurz'])->assertStatus(422);
-    $this->post('/_setup/recover', ['token' => str_repeat('s', 30), 'email' => 'gibts@example.org', 'password' => 'ein-langes-passwort-1'])->assertNotFound();
+    $this->post('/_setup/recover', ['token' => 'falsch', 'email' => 'verwaltung@example.org', 'password' => 'ein-langes-passwort-1'])->assertForbidden()->assertSee('Das Token stimmt nicht')->assertSee('SETUP_TOKEN');
+    $this->post('/_setup/recover', ['token' => ' "falsch"', 'email' => 'verwaltung@example.org', 'password' => 'x'])->assertForbidden()->assertSee('Anführungszeichen');
+    $this->post('/_setup/recover', ['email' => 'verwaltung@example.org', 'password' => 'ein-langes-passwort-1'])->assertForbidden()->assertSee('Bitte das Token');
+    $this->post('/_setup/recover', ['token' => str_repeat('s', 30), 'email' => 'verwaltung@example.org', 'password' => 'kurz'])->assertStatus(422)->assertSee('mindestens 12 Zeichen, eingegeben sind 4');
+    $this->post('/_setup/recover', ['token' => str_repeat('s', 30), 'email' => 'keine-adresse', 'password' => 'kurz'])->assertStatus(422)->assertSee('Bitte prüfen')->assertSee('ungültig')->assertSee('mindestens 12 Zeichen');
+    $this->post('/_setup/recover', ['token' => str_repeat('s', 30), 'email' => 'gibts@example.org', 'password' => 'ein-langes-passwort-1'])->assertNotFound()->assertSee('gibt es kein Konto')->assertSee('noch kein Verwaltungskonto');
 
-    $this->post('/_setup/recover', ['token' => str_repeat('s', 30), 'email' => 'verwaltung@example.org', 'password' => 'ein-langes-passwort-1'])->assertOk()->assertSee('wiederhergestellt');
+    $this->post('/_setup/recover', ['token' => str_repeat('s', 30), 'email' => 'verwaltung@example.org', 'password' => 'ein-langes-passwort-1'])->assertOk()->assertSee('wiederhergestellt')->assertSee('Konto wieder aktiviert')->assertSee('Rolle Verwaltung vergeben');
 
     $locked->refresh();
     expect($locked->disabled_at)->toBeNull()

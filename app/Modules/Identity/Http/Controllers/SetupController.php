@@ -29,8 +29,16 @@ final class SetupController
     {
         $token = (string) $request->input('token', '');
 
+        if (trim($token) === '') {
+            return $this->page('Bitte das Token (SETUP_TOKEN aus der .env) eintragen.', true, 403);
+        }
+
         if (! hash_equals((string) config('hosting.setup_token'), $token)) {
-            return $this->page('Das Token stimmt nicht.', true, 403);
+            $hint = $token !== trim($token) || str_contains($token, '"') || str_contains($token, "'")
+                ? ' Es sieht nach Leerzeichen oder Anführungszeichen aus: Das Token muss genau dem Wert in der .env entsprechen.'
+                : ' Es muss genau dem Wert von SETUP_TOKEN in der .env auf dem Server entsprechen (Groß- und Kleinschreibung zählt). Wurde die .env nach dem Hochladen geändert, übernimmt der Server sie manchmal erst nach einigen Minuten.';
+
+            return $this->page('Das Token stimmt nicht.'.$hint, true, 403);
         }
 
         try {
@@ -59,18 +67,27 @@ final class SetupController
         $validator = Validator::make($request->all(), [
             'email' => ['required', 'email:rfc', 'max:255'],
             'password' => ['required', 'string', 'min:12', 'max:200'],
-        ], ['password.min' => 'Das Passwort braucht mindestens 12 Zeichen.']);
+        ], $this->messages($request));
 
         if ($validator->fails()) {
-            return $this->page((string) $validator->errors()->first(), true, 422);
+            return $this->page($validator->errors()->all(), true, 422);
         }
 
         $data = $validator->validated();
         $user = User::query()->where('email', mb_strtolower(trim($data['email'])))->first();
 
         if (! $user instanceof User) {
-            return $this->page('Zu dieser E-Mail-Adresse gibt es kein Konto.', true, 404);
+            $known = $this->managementEmails();
+
+            return $this->page('Zu der Adresse „'.trim($data['email']).'“ gibt es kein Konto.'.($known !== [] ? ' Vorhandene Verwaltungskonten: '.implode(', ', $known).'.' : ' Es gibt noch kein Verwaltungskonto: Lege es oben unter „2. Verwaltungskonto anlegen“ an.'), true, 404);
         }
+
+        $changes = array_values(array_filter([
+            'neues Passwort gesetzt',
+            $user->disabled_at !== null ? 'Konto wieder aktiviert' : null,
+            $user->email_verified_at === null ? 'E-Mail-Adresse als bestätigt vermerkt' : null,
+            ! UserRoleAssignment::query()->where('user_id', $user->getKey())->where('role_key', 'management')->exists() ? 'Rolle Verwaltung vergeben' : null,
+        ]));
 
         $user->forceFill([
             'password' => Hash::make($data['password']),
@@ -84,26 +101,23 @@ final class SetupController
             $assign->execute($user, 'management');
         }
 
-        return $this->page('Das Konto '.$user->email.' ist wiederhergestellt: neues Passwort, aktiv, Rolle Verwaltung. Leere danach SETUP_TOKEN in der .env.');
+        return $this->page('Das Konto '.$user->email.' ist wiederhergestellt ('.implode(', ', $changes).'). Du kannst dich jetzt unter /anmelden anmelden. Leere danach SETUP_TOKEN in der .env.');
     }
 
     private function createAdmin(Request $request, AssignRoleAction $assign): Response
     {
         if (UserRoleAssignment::query()->where('role_key', 'management')->exists()) {
-            return $this->page('Es gibt bereits ein Konto mit der Rolle Verwaltung. Weitere Konten legst du in der Anwendung an.', true, 409);
+            return $this->page('Es gibt bereits ein Verwaltungskonto ('.implode(', ', $this->managementEmails()).'). Hast du das Passwort vergessen, nimm unten „Zugang wiederherstellen“ mit dieser Adresse. Weitere Konten legst du in der Anwendung an.', true, 409);
         }
 
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email:rfc', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:12', 'max:200'],
-        ], [
-            'password.min' => 'Das Passwort braucht mindestens 12 Zeichen.',
-            'email.unique' => 'Diese E-Mail-Adresse ist schon vergeben.',
-        ]);
+        ], $this->messages($request) + ['email.unique' => 'Diese E-Mail-Adresse ist schon einem Konto zugeordnet. Nimm eine andere oder stelle das Konto unten wieder her.', 'name.required' => 'Bitte den Namen eintragen.']);
 
         if ($validator->fails()) {
-            return $this->page((string) $validator->errors()->first(), true, 422);
+            return $this->page($validator->errors()->all(), true, 422);
         }
 
         $data = $validator->validated();
@@ -121,8 +135,39 @@ final class SetupController
         return $this->page('Das Verwaltungskonto wurde angelegt. Du kannst dich jetzt anmelden. Leere danach SETUP_TOKEN in der .env.');
     }
 
-    private function page(?string $message = null, bool $error = false, int $status = 200, ?string $output = null): Response
+    /** @return array<string, string> */
+    private function messages(Request $request): array
     {
+        $length = mb_strlen((string) $request->input('password', ''));
+
+        return [
+            'email.required' => 'Bitte die E-Mail-Adresse eintragen.',
+            'email.email' => 'Die E-Mail-Adresse ist ungültig. Sie braucht ein @ und eine Endung wie .de.',
+            'password.required' => 'Bitte ein Passwort eintragen.',
+            'password.min' => 'Das Passwort braucht mindestens 12 Zeichen, eingegeben sind '.$length.'.',
+            'password.max' => 'Das Passwort ist zu lang (höchstens 200 Zeichen).',
+        ];
+    }
+
+    /** @return list<string> E-Mail-Adressen der Konten mit der Rolle Verwaltung (höchstens fünf). */
+    private function managementEmails(): array
+    {
+        return User::query()
+            ->whereIn('id', UserRoleAssignment::query()->where('role_key', 'management')->select('user_id'))
+            ->orderBy('id')
+            ->limit(5)
+            ->pluck('email')
+            ->map(static fn (mixed $email): string => (string) $email)
+            ->all();
+    }
+
+    /** @param  string|list<string>|null  $message */
+    private function page(string|array|null $message = null, bool $error = false, int $status = 200, ?string $output = null): Response
+    {
+        if (is_array($message)) {
+            $message = count($message) === 1 ? $message[0] : "Bitte prüfen:\n• ".implode("\n• ", $message);
+        }
+
         $e = static fn (?string $value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 
         $html = '<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
@@ -136,7 +181,7 @@ final class SetupController
             .'<p>Diese Seite gibt es nur, solange <code>SETUP_TOKEN</code> in der <code>.env</code> gesetzt ist. Nach der Einrichtung bitte leeren.</p>';
 
         if ($message !== null) {
-            $html .= '<p class="msg'.($error ? ' err' : '').'" role="status">'.$e($message).'</p>';
+            $html .= '<p class="msg'.($error ? ' err' : '').'" role="status">'.nl2br($e($message)).'</p>';
         }
 
         if ($output !== null && $output !== '') {

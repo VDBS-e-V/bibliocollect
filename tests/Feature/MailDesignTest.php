@@ -50,3 +50,23 @@ it('shows a preview of every mail to the administration without sending anything
 
     Mail::assertNothingSent();
 });
+
+it('sends the previewed mail or all mails as a test to a chosen address', function (): void {
+    $admin = User::factory()->create(['email_verified_at' => now(), 'email' => 'verwaltung@example.org']);
+    app(AssignRoleAction::class)->execute($admin, 'management');
+    $transport = fn () => Mail::mailer('array')->getSymfonyTransport();
+
+    $this->actingAs($admin)->get(route('administration.mail-preview'))->assertSee('verwaltung@example.org')->assertSee('Diese Mail schicken');
+
+    $this->actingAs($admin)->post(route('administration.mail-preview.send'), ['mail' => 'beleg', 'an' => 'ich@example.org'])->assertSessionHas('mail_sent');
+    expect($transport()->messages())->toHaveCount(1);
+    $message = $transport()->messages()->first()->getOriginalMessage();
+    expect($message->getSubject())->toStartWith('[Vorschau] Dein Beleg')
+        ->and($message->getTo()[0]->getAddress())->toBe('ich@example.org')
+        ->and($message->getHtmlBody())->toContain('B-2026-000123')->toContain('mail-logo.png');
+
+    $this->actingAs($admin)->post(route('administration.mail-preview.send'), ['mail' => 'passwort', 'an' => 'ich@example.org', 'alle' => '1'])->assertSessionHas('mail_sent');
+    expect($transport()->messages())->toHaveCount(12);
+
+    $this->actingAs($admin)->post(route('administration.mail-preview.send'), ['mail' => 'passwort', 'an' => 'keine-adresse'])->assertSessionHasErrors('an');
+});

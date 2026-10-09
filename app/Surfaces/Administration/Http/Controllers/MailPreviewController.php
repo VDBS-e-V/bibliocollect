@@ -6,6 +6,7 @@ namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Foundation\Mail\AlertMail;
 use App\Models\User;
+use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Circulation\Enums\WishStatus;
 use App\Modules\Circulation\Mail\TransactionReceiptMail;
 use App\Modules\Circulation\Mail\WishStatusMail;
@@ -15,9 +16,12 @@ use App\Modules\Patrons\Models\Patron;
 use App\Modules\Reminders\Notifications\LibraryReminder;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 /**
  * Vorschau aller E-Mails der Anwendung mit Beispielangaben. Es wird nichts verschickt und nichts gespeichert; die Beispieldaten sind erfunden.
@@ -53,6 +57,7 @@ final class MailPreviewController
 
         // Bilder zeigen auf die Adresse, unter der die Seite gerade geöffnet ist (lokal weicht sie oft von APP_URL ab).
         $html = str_replace(url('brand/'), $request->root().'/brand/', $html);
+        $user = $request->user();
 
         return response()
             ->view('pages.surfaces.administration.mail.preview', [
@@ -62,8 +67,44 @@ final class MailPreviewController
                 'subject' => $subject,
                 'html' => $html,
                 'narrow' => $narrow,
+                'address' => $user instanceof User ? $user->email : '',
+                'mailer' => (string) config('mail.default'),
             ])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /**
+     * Schickt die gezeigte Mail (oder alle) als Test an eine Adresse. Der Betreff beginnt mit „[Vorschau]“, die Angaben sind erfunden.
+     */
+    public function send(Request $request, AuditRecorder $audit): RedirectResponse
+    {
+        $data = $request->validate([
+            'mail' => ['required', 'string', 'max:40'],
+            'an' => ['required', 'email:rfc', 'max:190'],
+            'alle' => ['nullable', 'boolean'],
+        ], ['an.required' => 'Bitte eine Adresse eintragen.', 'an.email' => 'Die Adresse ist ungültig.']);
+
+        $catalog = $this->catalog();
+        $keys = $request->boolean('alle') ? array_keys($catalog) : [isset($catalog[$data['mail']]) ? $data['mail'] : 'passwort'];
+        $sent = 0;
+
+        try {
+            foreach ($keys as $key) {
+                [$subject, $html] = $this->render($key);
+                Mail::html($html, static function ($message) use ($data, $subject): void {
+                    $message->to($data['an'])->subject('[Vorschau] '.$subject);
+                });
+                $sent++;
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return redirect()->route('administration.mail-preview', ['mail' => $data['mail']])->withErrors(['an' => 'Der Versand ist fehlgeschlagen: '.$exception->getMessage().' Prüfe die Mail-Einstellungen (Systemzustand).']);
+        }
+
+        $audit->record('system.mail.preview_sent', $sent.' Vorschau-Mail(s) verschickt.', null, ['count' => $sent], (int) $request->user()?->getAuthIdentifier());
+
+        return redirect()->route('administration.mail-preview', ['mail' => $data['mail']])->with('mail_sent', $sent === 1 ? 'Die Vorschau-Mail ist an '.$data['an'].' unterwegs.' : $sent.' Vorschau-Mails sind an '.$data['an'].' unterwegs.'.(in_array((string) config('mail.default'), ['log', 'array'], true) ? ' Hinweis: Der Mailversand steht auf „'.config('mail.default').'“, es wird nichts zugestellt (Logdatei).' : ''));
     }
 
     /** @return array{0: string, 1: string} Betreff und HTML */

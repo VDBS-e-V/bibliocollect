@@ -10,6 +10,22 @@
         <a href="{{ route('administration.system.index') }}">Systemzustand (Testmeldung senden)</a>
     </div>
 
+    @if (session('mail_sent'))
+        <x-ui.alert variant="success" title="Verschickt">{{ session('mail_sent') }}</x-ui.alert>
+    @endif
+
+    @if ($errors->any())
+        <x-ui.alert variant="error" title="Nicht möglich">{{ $errors->first() }}</x-ui.alert>
+    @endif
+
+    <form method="post" action="{{ route('administration.mail-preview.send') }}" class="bc-audit-filter">
+        @csrf
+        <input type="hidden" name="mail" value="{{ $current }}">
+        <x-ui.input label="An diese Adresse schicken" name="an" id="mail-to" type="email" :value="old('an', $address)" hint="Zum Beispiel an dich selbst, um die Mail in Gmail oder Outlook zu sehen. Der Betreff beginnt mit „[Vorschau]“." />
+        <x-ui.button type="submit" variant="secondary">Diese Mail schicken</x-ui.button>
+        <x-ui.button type="submit" variant="secondary" name="alle" value="1" data-confirm="Alle {{ count($catalog) }} Mails an diese Adresse schicken?" data-confirm-label="Alle schicken">Alle {{ count($catalog) }} Mails schicken</x-ui.button>
+    </form>
+
     <div class="bc-mailpreview">
         <nav class="bc-mailpreview__list" aria-label="E-Mails">
             @foreach ($groups as $group => $items)

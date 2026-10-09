@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Mails an mich schicken, klarere Einrichtungsseite (v0.54.0)
+
+In der **E-Mail-Vorschau** gibt es ein Adressfeld (mit der eigenen Adresse vorbelegt) und die Knöpfe „Diese Mail schicken“ und „Alle 11 Mails schicken“: Die Mails kommen mit Betreff „[Vorschau] …“ und erfundenen Beispielangaben an, so siehst du sie in Gmail oder Outlook. Steht der Mailversand auf „log“ oder „array“, sagt die Seite, dass nichts zugestellt wird. Die **Einrichtungsseite `/_setup`** nennt jetzt den Grund: fehlendes oder falsches Token (mit Hinweis auf Leerzeichen und Anführungszeichen und auf die erst später übernommene `.env`), alle Eingabefehler auf einmal (E-Mail ungültig, Passwort mit Zeichenzahl), bei „Zugang wiederherstellen“ die vorhandenen Verwaltungskonten und was geändert wurde („Konto wieder aktiviert“, „Rolle Verwaltung vergeben“); bei vorhandenem Verwaltungskonto steht dessen Adresse. Ein abgelaufenes Formular (CSRF) stört dort nicht mehr.
+
 ### Klassenlisten als PDF mit Briefpapier (v0.53.0)
 
 Auf der Seite Klassenlisten öffnet „Als PDF speichern (Briefpapier)“ eine Druckfassung (`/betrieb/klassenlisten/pdf`) mit denselben Filtern: je Klasse eine Seite (bei vielen Zeilen mehrere, Tabellenkopf wiederholt sich) auf dem Briefpapier, wahlweise **Hochformat oder Querformat**, Farbe, Schwarz-Weiß oder ohne Briefpapier. Gespeichert wird über den Druckdialog („Als PDF speichern“, Ränder „Keine“).
