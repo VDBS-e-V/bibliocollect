@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Einsortieren: Vorschlag nach Schlagwörtern und Stapel nach Thema (v0.52.0)
+
+Beim Einsortieren nennt die Seite zusätzlich zum Thema-Vorschlag die Regalbretter, die **nach Schlagwörtern und weiteren Angaben zum Buch** passen (`CatalogShelfSuggester`): Schlagwörter, Titel, Reihe, Thema, Zielgruppe und Inhaltsangabe werden mit Beschriftung, Themenbereichen (samt Hauptbereich und Beschreibung) und Altersangaben des Bretts („Kl. 2–3“, „ab 10“) verglichen, mit den Treffwörtern als Begründung. Vorgewählt wird jetzt: Brett der anderen Exemplare derselben Ausgabe, sonst Brett zum Thema, sonst der beste Vorschlag nach Schlagwörtern, sonst das zuletzt benutzte. Der **Stapel** zeigt die Bücher je Thema mit Zahl; „Nach Thema einsortieren“ nimmt ein Buch nach dem anderen aus einem Thema (oder ohne Thema) dran, das Formular merkt sich das Thema.
+
 ### Regalbrett-Suche und Füllstand (v0.51.0)
 
 Auf **Regale und Regalbretter** gibt es ein Suchfeld: Standort, Beschriftung, Thema sowie Name von Regal, Bereich und Bereichsgruppe (mehrere Wörter müssen alle vorkommen), dazu der Filter „nur Regalbretter ohne Thema“. Die Ansicht zeigt dann nur Treffer und klappt die passenden Ebenen auf. Ein Regalbrett kann eine **Kapazität** haben (freiwillig, „Platz für wie viele Bücher?“): Die Zeile zeigt „12 von 40“ mit Balken, „voll“ oder „frei“; die Regalzeile fasst „n Bücher von m Plätzen“ zusammen.

@@ -53,12 +53,22 @@
                 <form method="post" action="{{ route('pos.shelving.scan') }}" class="bc-shelving-form">
                     @csrf
                     <input type="hidden" name="buch" value="{{ $copy->barcode }}">
+                    @if ($thema !== '')
+                        <input type="hidden" name="thema" value="{{ $thema }}">
+                    @endif
                     @if ($suggested !== [])
                         <p class="bc-section-copy">Thema „{{ $topicName }}“: Vorschlag @if (count($suggested) === 1) ist das Regalbrett @else sind die Regalbretter @endif<strong>{{ implode(', ', array_keys($suggested)) }}</strong>.</p>
                     @elseif ($topicName)
                         <p class="bc-section-copy">Thema „{{ $topicName }}“: Dafür ist noch kein Regalbrett eingetragen (Verwaltung → Regalbretter).</p>
                     @else
                         <p class="bc-section-copy">Dieses Medium hat noch kein Thema, deshalb gibt es keinen Vorschlag.</p>
+                    @endif
+                    @if ($byMetadata !== [])
+                        <p class="bc-section-copy"><strong>Nach Schlagwörtern und Angaben zum Buch</strong> passt:
+                            @foreach ($byMetadata as $item)
+                                <span class="bc-loc-code">{{ $item['code'] }}</span> <small>({{ implode(', ', $item['reasons']) }})</small>@if (! $loop->last) · @endif
+                            @endforeach
+                        </p>
                     @endif
                     <x-ui.select label="2. Regalbrett" name="regalbrett" id="shelving-shelf">
                         <option value="">Bitte wählen …</option>
@@ -77,7 +87,7 @@
                     </div>
                 </form>
                 @if ($preselected !== '')
-                    <p class="bc-section-copy">Vorgewählt ist das Regalbrett der anderen Exemplare dieser Ausgabe, sonst das erste passende zum Thema, sonst das zuletzt benutzte.</p>
+                    <p class="bc-section-copy">Vorgewählt ist das Regalbrett der anderen Exemplare dieser Ausgabe, sonst das erste passende zum Thema, sonst der beste Vorschlag nach Schlagwörtern, sonst das zuletzt benutzte.</p>
                 @endif
             @endif
         </section>
@@ -92,15 +102,22 @@
         @if ($stack->isEmpty())
             <p class="bc-section-copy">Der Stapel ist leer. Alles ist einsortiert.</p>
         @else
+            <p class="bc-section-copy"><strong>Nach Thema einsortieren:</strong> Wähle ein Thema, dann kommt ein Buch nach dem anderen aus diesem Thema dran.</p>
+            <ul class="bc-topic-stack">
+                @foreach ($topicCounts as $name => $total)
+                    <li><a href="{{ route('pos.shelving', ['thema' => $name === '' ? '__ohne__' : $name]) }}" @if ($thema === ($name === '' ? '__ohne__' : $name)) aria-current="true" @endif>{{ $name === '' ? 'Ohne Thema' : $name }} <span class="bc-badge">{{ $total }}</span></a></li>
+                @endforeach
+            </ul>
             <table class="bc-calendar-table">
                 <thead>
-                    <tr><th scope="col">Inventarnummer</th><th scope="col">Titel</th><th scope="col"><span class="bc-visually-hidden">Einsortieren</span></th></tr>
+                    <tr><th scope="col">Inventarnummer</th><th scope="col">Titel</th><th scope="col">Thema</th><th scope="col"><span class="bc-visually-hidden">Einsortieren</span></th></tr>
                 </thead>
                 <tbody>
                     @foreach ($stack as $item)
                         <tr>
                             <th scope="row" class="bc-tabular">{{ $item->barcode }}</th>
                             <td>{{ $item->edition->title->preferred_title }}</td>
+                            <td>{{ $item->edition->local_classification ?: '–' }}</td>
                             <td><a href="{{ route('pos.shelving', ['buch' => $item->barcode]) }}" aria-label="{{ $item->edition->title->preferred_title }} einsortieren">Einsortieren</a></td>
                         </tr>
                     @endforeach

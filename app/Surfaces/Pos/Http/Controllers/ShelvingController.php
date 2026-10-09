@@ -8,6 +8,7 @@ use App\Modules\Catalog\Actions\ShelveCopyAction;
 use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Services\CatalogShelfOptions;
+use App\Modules\Catalog\Services\CatalogShelfSuggester;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -24,12 +25,27 @@ final class ShelvingController
 
     private const LAST_SHELF = 'shelving.last_shelf';
 
-    public function index(Request $request, CatalogShelfOptions $shelves): Response
+    private const NO_TOPIC = '__ohne__';
+
+    public function index(Request $request, CatalogShelfOptions $shelves, CatalogShelfSuggester $suggester): Response
     {
         $options = $shelves->forSelect();
         $code = trim((string) $request->query('buch', ''));
+        $topic = trim((string) $request->query('thema', ''));
         $copy = null;
         $error = null;
+
+        // „Dieses Thema einsortieren“: ohne gescanntes Buch kommt das nächste Buch des Themas an die Reihe.
+        if ($code === '' && $topic !== '') {
+            $next = $this->nextInTopic($topic);
+
+            if ($next instanceof Copy) {
+                $code = $next->barcode;
+            } else {
+                session()->now('shelving_notice', $topic === self::NO_TOPIC ? 'Alle Bücher ohne Thema sind einsortiert.' : 'Alle Bücher zum Thema „'.$topic.'“ sind einsortiert.');
+                $topic = '';
+            }
+        }
 
         if ($code !== '') {
             $copy = Copy::query()->with('edition.title')->where('barcode', $code)->first();
@@ -47,6 +63,9 @@ final class ShelvingController
                 'shelfOptions' => $options,
                 'shelfGroups' => $shelves->grouped(),
                 'suggested' => $copy instanceof Copy ? $this->suggestions($copy, $options) : [],
+                'byMetadata' => $copy instanceof Copy ? $this->metadataSuggestions($copy, $options, $suggester) : [],
+                'thema' => $topic,
+                'topicCounts' => $this->topicCounts(),
                 'topicName' => $copy instanceof Copy ? $this->topicNameOf($copy) : null,
                 'preselected' => $copy instanceof Copy ? $this->preselect($request, $copy, $options) : '',
                 'stack' => Copy::query()->with('edition.title')->awaitingShelving()->orderBy('barcode')->limit(self::STACK_LIMIT)->get(),
@@ -62,6 +81,7 @@ final class ShelvingController
             'buch' => ['required', 'string', 'max:80'],
             'regalbrett' => ['nullable', 'string', 'max:40'],
             'regalbrett_code' => ['nullable', 'string', 'max:60'],
+            'thema' => ['nullable', 'string', 'max:120'],
         ], ['buch.required' => 'Bitte zuerst das Buch scannen.']);
 
         $book = trim($data['buch']);
@@ -83,7 +103,7 @@ final class ShelvingController
         $shelve->execute($copy, $shelf);
         $request->session()->put(self::LAST_SHELF, $shelf);
 
-        return redirect()->route('pos.shelving')->with('shelving_notice', '„'.$copy->edition->title->preferred_title.'“ ('.$copy->barcode.') steht jetzt auf '.$shelf.'.'.($moved ? ' Vorher: '.$previous.'.' : ''));
+        return redirect()->route('pos.shelving', array_filter(['thema' => $data['thema'] ?? null]))->with('shelving_notice', '„'.$copy->edition->title->preferred_title.'“ ('.$copy->barcode.') steht jetzt auf '.$shelf.'.'.($moved ? ' Vorher: '.$previous.'.' : ''));
     }
 
     /**
@@ -174,9 +194,72 @@ final class ShelvingController
             return $suggested;
         }
 
+        // Kein Thema oder kein Brett dazu: der beste Vorschlag nach Schlagwörtern und Angaben zum Buch.
+        $byMetadata = $this->metadataSuggestions($copy, $options, app(CatalogShelfSuggester::class));
+
+        if ($byMetadata !== []) {
+            return $byMetadata[0]['code'];
+        }
+
         $last = $request->session()->get(self::LAST_SHELF);
 
         return is_string($last) && isset($options[$last]) ? $last : '';
+    }
+
+    /**
+     * Regalbretter nach Schlagwörtern und weiteren Angaben zum Buch (siehe CatalogShelfSuggester).
+     *
+     * @param  array<string, string>  $options
+     * @return list<array{code: string, display: string, score: int, reasons: list<string>}>
+     */
+    private function metadataSuggestions(Copy $copy, array $options, CatalogShelfSuggester $suggester): array
+    {
+        return array_values(array_filter($suggester->suggest($copy->edition), static fn (array $item): bool => isset($options[$item['code']])));
+    }
+
+    /** Das nächste Exemplar auf dem Stapel zu einem Thema (oder ohne Thema). */
+    private function nextInTopic(string $topic): ?Copy
+    {
+        return Copy::query()
+            ->with('edition.title')
+            ->awaitingShelving()
+            ->whereHas('edition', static function ($query) use ($topic): void {
+                if ($topic === self::NO_TOPIC) {
+                    $query->where(static fn ($inner) => $inner->whereNull('local_classification')->orWhere('local_classification', ''));
+
+                    return;
+                }
+
+                $query->where('local_classification', $topic);
+            })
+            ->orderBy('barcode')
+            ->first();
+    }
+
+    /**
+     * Anzahl der Bücher auf dem Stapel je Thema; ohne Thema unter dem Schlüssel „“.
+     *
+     * @return array<string, int>
+     */
+    private function topicCounts(): array
+    {
+        $rows = Copy::query()
+            ->awaitingShelving()
+            ->join('catalog_editions', 'catalog_editions.id', '=', 'catalog_copies.edition_id')
+            ->selectRaw("coalesce(catalog_editions.local_classification, '') as topic, count(*) as total")
+            ->groupBy('topic')
+            ->pluck('total', 'topic')
+            ->all();
+
+        ksort($rows, SORT_NATURAL | SORT_FLAG_CASE);
+
+        if (isset($rows[''])) {
+            $none = $rows[''];
+            unset($rows['']);
+            $rows[''] = $none;
+        }
+
+        return array_map('intval', $rows);
     }
 
     private function normalize(string $value): string

@@ -201,3 +201,8 @@ ol.bc-section-copy li { margin: .3rem 0; }
 .bc-meter { display: inline-block; vertical-align: middle; width: 5rem; height: .55rem; margin-right: .4rem; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg-surface); overflow: hidden; }
 .bc-meter__bar { display: block; height: 100%; background: var(--vdbs-green); }
 .bc-meter__bar--full { background: var(--vdbs-group-orange); }
+
+/* Stapel nach Thema */
+.bc-topic-stack { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0 1rem; padding: 0; list-style: none; }
+.bc-topic-stack a { display: inline-flex; align-items: center; gap: .4rem; border: 1px solid var(--border-strong); border-radius: 999px; padding: .15rem .7rem; text-decoration: none; }
+.bc-topic-stack a[aria-current="true"] { border-color: var(--vdbs-green); background: var(--bg-brand-soft); font-weight: 700; }
