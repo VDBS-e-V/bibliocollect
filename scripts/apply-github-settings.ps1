@@ -24,6 +24,21 @@ $root = Split-Path $PSScriptRoot -Parent
 
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { throw 'Die GitHub CLI (gh) fehlt: https://cli.github.com' }
 
+# gh liest JSON am zuverlässigsten aus einer Datei (UTF-8 ohne BOM); das Weiterleiten per Pipe scheitert im Windows-PowerShell mit "Problems parsing JSON".
+function Invoke-Gh {
+    param([string[]]$Arguments)
+    $output = & gh @Arguments 2>&1
+    if ($LASTEXITCODE -ne 0) { throw "gh $($Arguments -join ' ') ist fehlgeschlagen: $output" }
+    return $output
+}
+
+function Write-JsonFile {
+    param([string]$Json)
+    $path = [System.IO.Path]::GetTempFileName()
+    [System.IO.File]::WriteAllText($path, $Json, (New-Object System.Text.UTF8Encoding($false)))
+    return $path
+}
+
 # 1. Merge-Optionen und Sicherheit
 $settings = @{
     allow_squash_merge          = $true
@@ -41,30 +56,34 @@ $settings = @{
 } | ConvertTo-Json -Depth 5
 
 if ($PSCmdlet.ShouldProcess($Repo, 'Merge-Optionen und Sicherheit setzen')) {
-    $settings | gh api --method PATCH "repos/$Repo" --input - | Out-Null
-    gh api --method PUT "repos/$Repo/vulnerability-alerts" | Out-Null
-    gh api --method PUT "repos/$Repo/automated-security-fixes" | Out-Null
+    $file = Write-JsonFile $settings
+    try { Invoke-Gh @('api', '--method', 'PATCH', "repos/$Repo", '--input', $file) | Out-Null } finally { Remove-Item $file -ErrorAction SilentlyContinue }
+    Invoke-Gh @('api', '--method', 'PUT', "repos/$Repo/vulnerability-alerts") | Out-Null
+    Invoke-Gh @('api', '--method', 'PUT', "repos/$Repo/automated-security-fixes") | Out-Null
     Write-Host 'Repo-Einstellungen gesetzt.'
 }
 
 # 2. Rulesets
-$existing = gh api "repos/$Repo/rulesets" | ConvertFrom-Json
+$existing = (Invoke-Gh @('api', "repos/$Repo/rulesets")) -join "`n" | ConvertFrom-Json
 
-foreach ($file in Get-ChildItem (Join-Path $root '.github\rulesets') -Filter *.json) {
+foreach ($file in Get-ChildItem (Join-Path $root '.github/rulesets') -Filter *.json) {
     $body = Get-Content $file.FullName -Raw
     $name = ($body | ConvertFrom-Json).name
     $current = $existing | Where-Object { $_.name -eq $name } | Select-Object -First 1
+    $json = Write-JsonFile $body
 
-    if ($current) {
-        if ($PSCmdlet.ShouldProcess($name, "Ruleset aktualisieren (#$($current.id))")) {
-            $body | gh api --method PUT "repos/$Repo/rulesets/$($current.id)" --input - | Out-Null
-            Write-Host "Ruleset '$name' aktualisiert."
-        }
-    } else {
-        if ($PSCmdlet.ShouldProcess($name, 'Ruleset anlegen')) {
-            $body | gh api --method POST "repos/$Repo/rulesets" --input - | Out-Null
+    try {
+        if ($current) {
+            if ($PSCmdlet.ShouldProcess($name, "Ruleset aktualisieren (#$($current.id))")) {
+                Invoke-Gh @('api', '--method', 'PUT', "repos/$Repo/rulesets/$($current.id)", '--input', $json) | Out-Null
+                Write-Host "Ruleset '$name' aktualisiert."
+            }
+        } elseif ($PSCmdlet.ShouldProcess($name, 'Ruleset anlegen')) {
+            Invoke-Gh @('api', '--method', 'POST', "repos/$Repo/rulesets", '--input', $json) | Out-Null
             Write-Host "Ruleset '$name' angelegt."
         }
+    } finally {
+        Remove-Item $json -ErrorAction SilentlyContinue
     }
 }
 
