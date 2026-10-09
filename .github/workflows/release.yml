@@ -89,6 +89,8 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          # Die Windows-Version von PHP bringt nicht alle Erweiterungen mit, die die Anwendung braucht (composer prüft sie beim Installieren).
+          extensions: ctype, curl, dom, fileinfo, filter, iconv, libxml, mbstring, openssl, pdo_sqlite, session, sqlite3, tokenizer, zip
           coverage: none
 
       - uses: actions/setup-node@v4
@@ -101,6 +103,12 @@ jobs:
       - name: Tag lokal setzen (build-release.ps1 liest die Version aus git describe)
         shell: bash
         run: git tag "$VERSION" "$SHA"
+
+      - name: PHP-Erweiterungen prüfen
+        shell: pwsh
+        run: |
+          php -v
+          composer check-platform-reqs --no-dev --lock
 
       - name: Paket bauen
         shell: pwsh
