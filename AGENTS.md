@@ -1,47 +1,44 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# BiblioCollect – Hinweise für Entwickler:innen und KI-Assistenten
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+BiblioCollect ist die Schulbibliothekssoftware des VDBS e. V. (Laravel 13, PHP 8.4, Pest, Pint, PHPStan Stufe 6, Vite, Tailwind). Sie läuft im Echtbetrieb auf Strato-Webspace **ohne SSH** (Cron per URL, Updates über die Seite „Verwaltung → Update“). Dieses Repo ist **öffentlich**.
 
-## Prerequisites
+Ausführlich: `CONTRIBUTING.md` (Zusammenarbeit, Pull Requests, Veröffentlichen), `docs/CONVENTIONS.md` (Code), `docs/ARCHITECTURE.md`, `docs/PROJECT_STATUS.md` (was gebaut ist), `docs/LOKALE_EINRICHTUNG.md`.
 
-Verify that PHP and Composer are available:
+## Sprache
 
-```sh
-php -v
-composer -V
-```
+Deutsch für alles, was Nutzer:innen oder das Team lesen: Oberfläche, Hilfe (`resources/help/*.md`), Doku, Issues, Pull-Request-Titel, Commit-Nachrichten. Code, Klassen- und Methodennamen bleiben englisch. Nutzer:innen werden gegendert (Schüler:innen, Mitarbeiter:innen).
 
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
+## Arbeitsablauf
 
-macOS:
+- Nie direkt nach `main`. Branch von aktuellem `main` (`feature/<nr>-…`, `fix/<nr>-…`, `chore/…`), kleine Schritte, Pull Request mit Vorlage, **Squash-Merge**.
+- Vor jedem Push: `composer quality` (Pint, PHPStan, `foundation:check`, Pest). Nach `git pull` oder Branch-Wechsel: `composer sync`.
+- Pull Requests brauchen grüne Prüfungen `quality` und `mariadb`; ein Review der anderen Person ist erwünscht, aber kein Muss.
+- Veröffentlicht wird nur per **Actions → Release** (Tag, ZIP, GitHub Release). Tags nie verschieben oder löschen.
+- Zu jedem größeren Schritt gehören Tests, ein Abschnitt in `docs/PROJECT_STATUS.md` (nur den eigenen ändern) und, wenn Nutzer:innen es merken, ein Eintrag in `resources/help/`.
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
+## Architektur
 
-Windows PowerShell:
+- Module unter `app/Modules/*` (Catalog, Circulation, Patrons, Identity, School, Audit, Privacy, Reminders, Content, …), Oberflächen unter `app/Surfaces/*` (Public, Portal, Pos, Administration). Module greifen nicht auf Oberflächen zu; `Foundation` importiert keine Module; Audit importiert nicht Patrons. `tests/Architecture` und `php artisan foundation:check` prüfen das.
+- Geschäftslogik in Actions und Services, nicht in Controllern; Konstruktor-Injektion, explizite Rückgabetypen, Enums für feste Zustände, Transaktionen um mehrere Schreibvorgänge.
+- Rechte stehen in `config/authorization.php`, Navigation in `config/navigation.php`, Vorgänge in `config/processes.php`.
+- Migrationen nur anfügen und abwärtskompatibel halten; nach einem Release nie ändern. Eindeutige Zeitstempel.
+- `config()` statt `env()` außerhalb von `config/`. Neue Einstellungen in `.env.example` dokumentieren.
 
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
+## Hosting-Eigenheiten (kein SSH)
 
-Linux:
+- Alles, was der Betreiber tun muss, braucht eine Web-Oberfläche oder einen Cron-Aufruf (`/_cron`, `/_setup`, `/_status`, Update-Seite). Zeitplan-Aufgaben laufen im selben Prozess (`Schedule::call`), nicht als eigener `php artisan`-Prozess.
+- Lange Aufgaben in kleine Stücke teilen (Laufzeitgrenze des Anbieters), Fehler als Betriebsmeldung (`AlertService`) statt still.
+- Shared Hosting hat kleine Upload-Grenzen: Pakete lassen sich auch per FTP in `storage/app/updates` legen.
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
+## Sicherheit und Datenschutz
 
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
+- **Nichts Geheimes oder Personenbezogenes committen**: keine `.env`, Tokens, Passwörter, echte Namen oder Klassenlisten, keine Datenbank- oder Sicherungsdateien. Das Repo ist öffentlich; Secret-Scanning ist aktiv.
+- Personenbezogene Daten gehören in Auskunft (`PatronDataExport`) und Anonymisierung (`AnonymizationService`); neue Tabellen mit Personenbezug dort anschließen.
+- CSV-Ausgaben immer über `CsvExport` (Schutz vor Formeln).
 
-## Agent Setup
+## Tests und Werkzeuge
 
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+- Pest mit SQLite im Speicher; die MariaDB-Variante läuft in der CI. Testdaten ohne echte Personen. Externe HTTP-Aufrufe mit `Http::fake()`.
+- Blade: Kein Inline-`@if (…) Text @endif` mitten in einem Satz (führt zu Parserfehlern); Text vorher in `@php` oder als Ausdruck berechnen.
+- Oberflächen bei 320, 375 und 768 px prüfen (kein seitliches Scrollen, Tippflächen mindestens 24 px), hell und dunkel.
+- Windows-Entwicklung: Skripte (`scripts/*.ps1`) laufen mit `powershell -ExecutionPolicy Bypass -File …`.
