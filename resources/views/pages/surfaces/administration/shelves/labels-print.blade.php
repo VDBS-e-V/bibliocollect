@@ -37,7 +37,13 @@
         .label .brand span { font: bold 6.5pt/1 Arial, Helvetica, sans-serif; color: #58275a; }
         .label .scan { width: 100%; display: flex; align-items: center; justify-content: flex-end; min-height: 0; }
         .label .scan svg.bar128 { width: 100%; max-width: 40mm; height: 11mm; display: block; }
-        .label .scan.qr svg { width: 13mm; height: 13mm; display: block; padding: 0; }
+        .label .scan.qr svg { width: 14mm; height: 14mm; display: block; }
+        .label .scan.qr { flex: 0 0 auto; width: auto; align-self: end; margin-right: .5mm; padding: 1mm; background: #fff; }
+        .label.qr .main { grid-template-rows: auto 1fr auto auto; }
+        .label.qr .side { grid-template-rows: 1fr auto; row-gap: 1.4mm; }
+        .label.qr .brand-left { display: flex; align-items: center; gap: 1mm; margin-bottom: .8mm; }
+        .label.qr .brand-left img { height: 3.2mm; width: auto; }
+        .label.qr .brand-left span { font: bold 6pt/1 Arial, Helvetica, sans-serif; color: #58275a; }
         .label .nobarcode { font: 6pt/1.2 Arial, sans-serif; color: #444; text-align: right; }
         .label .loc { font: bold 11pt/1 Arial, Helvetica, sans-serif; color: #000; border: .35mm solid #000; border-radius: 1mm; padding: .7mm 1.8mm .6mm; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
         .label .loc.big { font-size: 17pt; padding: 1.4mm 2.6mm; align-self: center; }
@@ -59,8 +65,9 @@
             @if ($label === null)
                 <div class="label empty"></div>
             @else
-                <div class="label">
+                <div class="label{{ $codeType === 'qr' ? ' qr' : '' }}">
                     <div class="main">
+                        @if ($codeType === 'qr')<div class="brand-left"><img src="/brand/vdbs/mark.svg" alt=""><span>BiblioCollect</span></div>@endif
                         <div class="what {{ mb_strlen($label['headline']) > 38 ? 'long' : '' }}">{{ $label['headline'] }}</div>
                         <div class="where">{{ $label['where'] }}</div>
                         @if ($withTopics && $label['topics'] !== '' && $label['label'] !== '')
@@ -68,7 +75,7 @@
                         @endif
                     </div>
                     <div class="side">
-                        <div class="brand"><img src="/brand/vdbs/mark.svg" alt=""><span>BiblioCollect</span></div>
+                        @if ($codeType !== 'qr')<div class="brand"><img src="/brand/vdbs/mark.svg" alt=""><span>BiblioCollect</span></div>@endif
                         @if ($codeType === 'qr')
                             <div class="scan qr">{!! QrSvg::render($label['code']) !!}</div>
                         @elseif ($codeType === 'strich' && $label['barcode'])
