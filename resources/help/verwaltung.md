@@ -44,6 +44,10 @@ Unter **Verwaltung → Benutzerkonten** lädst du Mitarbeitende per E-Mail ein (
 
 Unter **Verwaltung → Update** spielst du eine neue Version ein: Das Paket (ZIP) hochladen oder per FTP in `storage/app/updates` legen, **Jetzt einspielen** wählen. Die Seite ist dabei kurz im Wartungsmodus, vorher wird die Datenbank gesichert, deine Einstellungen (.env), Cover und Ausweis-Motive bleiben unberührt. Mit **Nachts automatisch einspielen** übernimmt der Cron das um 03:15 Uhr. Das Ergebnis steht unter „Letztes Update“.
 
+## Etiketten für Regalbretter
+
+Unter **Regale und Regalbretter → Etiketten für Regalbretter drucken** wählst du, für welche Regalbretter du Etiketten brauchst (alle, ein Regal, ein Bereich oder einzelne Bretter). Das Etikett (105 × 26 mm) zeigt den Standort groß und einen Strichcode: Beim Einsortieren scannst du erst das Buch und dann das Etikett am Regalbrett. Drucke in **tatsächlicher Größe**; sitzt der Druck um einen Millimeter daneben, stellst du ihn oben im Feinabgleich nach.
+
 ## Regalbretter, Themenbereiche, Inventarnummern
 
 Die Bibliothek ist so aufgebaut: **Bereichsgruppe › Bereich › Regal › Regalbrett** (zum Beispiel „I. A 1 a“). Unter **Regale und Regalbretter** legst du sie an und gibst ihnen Namen; der Standort eines Exemplars setzt sich daraus zusammen. Themenbereiche und Regalbretter pflegst du unter **Verwaltung**: Jedes Medium bekommt beim Erfassen ein Thema, und unter „Regalbretter“ legst du fest, zu welchen Themenbereichen ein Brett gehört (ein Thema kann auf mehreren Brettern stehen, daraus entsteht der Vorschlag beim Einsortieren); das Einsortieren der Bücher macht die Schüler-AG am Arbeitsplatz („Medien einsortieren“). Alte Inventarnummern stellst du nur unter **Inventarnummern** bewusst auf siebenstellige um; nichts wird automatisch überschrieben.

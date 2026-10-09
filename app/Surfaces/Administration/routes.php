@@ -16,6 +16,7 @@ use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearTransitionController;
+use App\Surfaces\Administration\Http\Controllers\ShelfLabelController;
 use App\Surfaces\Administration\Http\Controllers\SystemHealthController;
 use App\Surfaces\Administration\Http\Controllers\UpdateController;
 use App\Surfaces\Administration\Http\Controllers\UserAccountController;
@@ -130,6 +131,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('/verwaltung/standorte/zuordnen', [CatalogShelfSectionController::class, 'assign'])->name('administration.sections.assign');
         Route::patch('/verwaltung/standorte/{sectionId}', [CatalogShelfSectionController::class, 'update'])->name('administration.sections.update');
         Route::delete('/verwaltung/standorte/{sectionId}', [CatalogShelfSectionController::class, 'destroy'])->name('administration.sections.destroy');
+
+        Route::get('/verwaltung/regalbretter/etiketten', [ShelfLabelController::class, 'index'])->name('administration.shelves.labels');
+        Route::post('/verwaltung/regalbretter/etiketten', [ShelfLabelController::class, 'print'])->middleware('throttle:30,1')->name('administration.shelves.labels.print');
 
         Route::patch('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'update'])->name('administration.shelves.update');
         Route::delete('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'destroy'])->name('administration.shelves.destroy');

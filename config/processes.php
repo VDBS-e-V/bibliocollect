@@ -45,6 +45,7 @@ return [
                         ['label' => 'Inventur', 'text' => 'Bestand und Regal abgleichen: Regalbrett wählen, Bücher scannen, Bericht über Fehlendes, falsch Einsortiertes und Unbekanntes.', 'route' => 'pos.inventory', 'permission' => 'inventory.count'],
                         ['label' => 'Bücher aussondern', 'text' => 'Alte, beschädigte oder doppelte Bücher mit Grund und Verbleib aus dem Bestand nehmen; Liste für den Jahresbericht.', 'route' => 'pos.withdrawal', 'permission' => 'catalog.withdraw'],
                         ['label' => 'Etiketten auf Vorrat drucken', 'text' => 'Inventarnummern im Voraus drucken (Vorlauf). Das System überspringt vergebene Nummern; einmalig lassen sich die Lücken der laufenden Reihe füllen.', 'route' => 'pos.labels.stock', 'permission' => 'catalog.manage'],
+                        ['label' => 'Regalbrett-Etiketten drucken', 'text' => 'Etiketten mit Standort und Strichcode für die Regalbretter (105 × 26 mm), zum Scannen beim Einsortieren.', 'route' => 'administration.shelves.labels', 'permission' => 'shelves.manage'],
                         ['label' => 'Etiketten drucken', 'text' => 'Inventarnummern als Etiketten mit Strichcode auf Bögen drucken, im Voraus und lückenlos.', 'route' => 'pos.labels.stock', 'permission' => 'catalog.manage'],
                         ['label' => 'Öffentlichen Katalog öffnen', 'text' => 'So sehen Leser:innen den Katalog.', 'route' => 'public.catalog.index', 'permission' => null],
                     ],
