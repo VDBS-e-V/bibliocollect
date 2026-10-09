@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Einrichtung Schritt für Schritt
+    url: https://github.com/VDBS-e-V/bibliocollect/blob/main/docs/GO_LIVE.md
+    about: Ablauf der Einrichtung auf dem Webspace und der Probelauf vor dem Start. Bitte zuerst hier nachlesen.
+  - name: Hochladen und Updates
+    url: https://github.com/VDBS-e-V/bibliocollect/blob/main/docs/WEBSPACE_UPLOAD.md
+    about: Alle Schritte vom Paket bis zur laufenden Seite, mit Fehlertabelle.
+  - name: Lokal einrichten
+    url: https://github.com/VDBS-e-V/bibliocollect/blob/main/docs/LOKALE_EINRICHTUNG.md
+    about: BiblioCollect auf dem eigenen Rechner einrichten, ab einem leeren Rechner.

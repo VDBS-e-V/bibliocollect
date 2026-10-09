@@ -1,0 +1,47 @@
+name: Frage oder Entscheidung nötig
+description: Eine Rückfrage zu Regeln, Rollen, Abläufen oder Texten, bevor etwas gebaut oder geändert wird.
+title: "Frage: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Für Fragen, die jemand entscheiden muss (zum Beispiel die Schule oder der Verein). **Dieses Repository ist öffentlich**: keine Passwörter, Tokens und keine echten Personendaten.
+  - type: dropdown
+    id: thema
+    attributes:
+      label: Worum geht es?
+      options:
+        - Regeln (Leihfristen, Vormerken, Erinnerungen)
+        - Rollen und Rechte
+        - Ablauf am Tresen oder beim Einsortieren
+        - Texte (Impressum, Datenschutz, Mails)
+        - Katalog und Regale
+        - Sonstiges
+    validations:
+      required: true
+  - type: textarea
+    id: frage
+    attributes:
+      label: Die Frage
+      description: So konkret wie möglich, am besten so, dass man mit „A“ oder „B“ antworten kann.
+    validations:
+      required: true
+  - type: textarea
+    id: optionen
+    attributes:
+      label: Mögliche Antworten
+      description: Die Optionen mit Vor- und Nachteilen. Eine Empfehlung ist willkommen.
+      placeholder: |
+        A) Nur Vormerken, wenn alle Exemplare ausgeliehen sind. Vorteil: …, Nachteil: …
+        B) Auch bei freiem Exemplar zurücklegen lassen. Vorteil: …, Nachteil: …
+  - type: textarea
+    id: folgen
+    attributes:
+      label: Was hängt davon ab?
+      description: Welche Arbeit wartet auf die Entscheidung?
+  - type: input
+    id: bis
+    attributes:
+      label: Entscheidung bis wann?
+      placeholder: zum Beispiel vor dem Start am 1. November

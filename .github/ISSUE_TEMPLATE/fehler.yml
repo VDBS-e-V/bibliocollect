@@ -1,0 +1,76 @@
+name: Fehler melden
+description: Etwas funktioniert nicht so, wie es sollte.
+title: "Fehler: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für die Meldung. **Dieses Repository ist öffentlich.** Bitte trage hier **keine Passwörter, Tokens, Inhalte der .env und keine Namen oder Daten echter Schüler:innen** ein. Screenshots bitte vorher schwärzen.
+  - type: textarea
+    id: was
+    attributes:
+      label: Was ist passiert?
+      description: Beschreibe kurz, was du siehst. Wenn es eine Fehlermeldung gibt, schreibe sie wörtlich auf.
+    validations:
+      required: true
+  - type: textarea
+    id: erwartet
+    attributes:
+      label: Was hätte passieren sollen?
+    validations:
+      required: true
+  - type: textarea
+    id: schritte
+    attributes:
+      label: Schritte zum Nachstellen
+      description: Wo hast du angefangen, was hast du angeklickt oder gescannt?
+      placeholder: |
+        1. Medien einsortieren öffnen
+        2. Inventarnummer scannen
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: seite
+    attributes:
+      label: Seite oder Adresse
+      description: Zum Beispiel /betrieb/einsortieren oder der Name der Seite.
+  - type: dropdown
+    id: rolle
+    attributes:
+      label: Mit welcher Rolle ist es passiert?
+      options:
+        - Verwaltung
+        - Mitarbeiter:in
+        - Schüler-AG Erweitert
+        - Schüler-AG Basis
+        - Lehrkraft
+        - Schüler:in
+        - Ohne Anmeldung (öffentlicher Katalog)
+        - Weiß ich nicht
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Installierte Version
+      description: Zu finden unter Verwaltung → Systemzustand → Installation oder Verwaltung → Update.
+      placeholder: v0.57.1
+  - type: input
+    id: geraet
+    attributes:
+      label: Browser und Gerät
+      placeholder: Edge auf Windows, Safari auf iPad, Chrome auf Android …
+  - type: textarea
+    id: weiteres
+    attributes:
+      label: Weitere Angaben oder Screenshot
+      description: Du kannst ein Bild hineinziehen. Namen und Nummern echter Personen bitte schwärzen.
+  - type: checkboxes
+    id: datenschutz
+    attributes:
+      label: Datenschutz
+      options:
+        - label: Ich habe keine Passwörter, Tokens, .env-Inhalte oder echten Personendaten eingefügt.
+          required: true

@@ -1,0 +1,62 @@
+name: Problem im Betrieb
+description: Etwas klemmt bei Server, Upload, Update, Mail, Cron, Datenbank oder Cover.
+title: "Betrieb: "
+labels: ["betrieb"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bitte zuerst die Anleitungen ansehen: [Hochladen und Updates](https://github.com/VDBS-e-V/bibliocollect/blob/main/docs/WEBSPACE_UPLOAD.md) (mit Fehlertabelle) und [Einrichtung](https://github.com/VDBS-e-V/bibliocollect/blob/main/docs/GO_LIVE.md).
+
+        **Dieses Repository ist öffentlich.** Bitte **keine Passwörter, Tokens (SETUP_TOKEN, CRON_TOKEN, STATUS_TOKEN), keinen APP_KEY und keine Zugangsdaten** einfügen. Meldungen vorher schwärzen.
+  - type: dropdown
+    id: bereich
+    attributes:
+      label: Wo tritt es auf?
+      options:
+        - Einrichtung (/_setup, Migrationen, Verwaltungskonto)
+        - Hochladen per FTP
+        - Update über die Update-Seite
+        - Mailversand
+        - Cron und Warteschlange
+        - Datenbank und Sicherung
+        - Cover und Bilder
+        - Wartungsmodus
+        - Sonstiges
+    validations:
+      required: true
+  - type: textarea
+    id: was
+    attributes:
+      label: Was passiert?
+      description: Beschreibe, was du siehst, und die genaue Meldung (zum Beispiel aus storage/logs oder von der Seite).
+    validations:
+      required: true
+  - type: textarea
+    id: versucht
+    attributes:
+      label: Was hast du schon versucht?
+  - type: input
+    id: version
+    attributes:
+      label: Installierte Version
+      description: Verwaltung → Systemzustand → Installation oder Verwaltung → Update.
+      placeholder: v0.57.1
+  - type: input
+    id: umgebung
+    attributes:
+      label: Anbieter und PHP-Version
+      placeholder: Strato, PHP 8.4, MySQL 8
+  - type: textarea
+    id: systemzustand
+    attributes:
+      label: Auszug aus dem Systemzustand
+      description: Die Zeilen mit „Hinweis“ oder „Fehler“ aus Verwaltung → Systemzustand (Prüfungen und Installation). Ist die Seite nicht erreichbar, genügt die genaue Meldung.
+      render: text
+  - type: checkboxes
+    id: datenschutz
+    attributes:
+      label: Datenschutz
+      options:
+        - label: Ich habe keine Passwörter, Tokens, den APP_KEY oder Zugangsdaten eingefügt.
+          required: true

@@ -1,0 +1,65 @@
+name: Neues Feature oder Änderungswunsch
+description: Etwas Neues oder eine Änderung an einem vorhandenen Ablauf vorschlagen.
+title: "Feature: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Beschreibe, was sich im Alltag ändern soll. Je genauer der Ablauf, desto weniger Rückfragen gibt es. **Dieses Repository ist öffentlich**: keine Passwörter, Tokens und keine echten Personendaten.
+  - type: textarea
+    id: ziel
+    attributes:
+      label: Ziel
+      description: Was soll danach besser oder möglich sein? Ein bis zwei Sätze.
+    validations:
+      required: true
+  - type: textarea
+    id: heute
+    attributes:
+      label: Wie läuft es heute?
+      description: Der jetzige Ablauf und was daran stört. Leer lassen, wenn es das noch nicht gibt.
+  - type: textarea
+    id: gewuenscht
+    attributes:
+      label: Wie soll es laufen?
+      description: Der gewünschte Ablauf Schritt für Schritt, gern mit Beispielen.
+    validations:
+      required: true
+  - type: dropdown
+    id: wer
+    attributes:
+      label: Wer braucht das?
+      multiple: true
+      options:
+        - Verwaltung
+        - Mitarbeiter:in
+        - Schüler-AG
+        - Lehrkräfte
+        - Schüler:innen
+        - Alle, die den Katalog nutzen
+    validations:
+      required: true
+  - type: dropdown
+    id: wichtigkeit
+    attributes:
+      label: Wie wichtig ist es?
+      options:
+        - Vor dem Start nötig
+        - Bald, im ersten Betrieb
+        - Später, bei Bedarf
+    validations:
+      required: true
+  - type: textarea
+    id: offen
+    attributes:
+      label: Offene Fragen
+      description: Was ist noch zu klären (Maße, Texte, Rechte, Rollen)?
+  - type: textarea
+    id: abnahme
+    attributes:
+      label: Woran sehen wir, dass es fertig ist?
+      description: Zwei bis fünf Punkte, die man ausprobieren kann.
+      placeholder: |
+        - Ein gedrucktes Etikett lässt sich beim Einsortieren scannen.
+        - …

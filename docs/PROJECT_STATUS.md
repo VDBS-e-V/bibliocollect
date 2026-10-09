@@ -205,6 +205,10 @@ Auf `/verwaltung/systemzustand` (Recht `system.view`) listet der Abschnitt „Ze
 
 Die Hauptnavigation scrollt nicht mehr. Passen nicht alle Punkte in die Zeile, bleiben so viele wie möglich sichtbar (der aktuelle Punkt immer), die übrigen stehen in einem Menü mit drei Punkten („⋯", Beschriftung „Weitere Menüpunkte"). Das Menü schließt sich mit Escape oder Klick daneben. Ohne JavaScript bricht die Leiste stattdessen in mehrere Zeilen um. Geprüft in Edge bei 1600, 1000, 700 und 420 px Breite.
 
+### Vorlagen für GitHub-Issues (v0.57.2)
+
+Unter `.github/ISSUE_TEMPLATE` gibt es vier Formulare (Issue-Forms): **Fehler melden** (Label `bug`), **Neues Feature oder Änderungswunsch** (`enhancement`), **Frage oder Entscheidung nötig** (`question`) und **Problem im Betrieb** (`betrieb`: Einrichtung, Hochladen, Update, Mail, Cron, Datenbank, Cover, Wartungsmodus). Leere Issues sind ausgeschaltet; `config.yml` verweist auf die Anleitungen (`GO_LIVE`, `WEBSPACE_UPLOAD`, `LOKALE_EINRICHTUNG`). Da das Repository öffentlich ist, warnt jede Vorlage davor, Passwörter, Tokens, `.env`-Inhalte oder echte Personendaten einzutragen (Pflicht-Kästchen). Außerdem läuft der Test „seeds shelves from the free text locations“ nur noch auf SQLite, weil er die Tabelle löscht und neu anlegt (auf MariaDB blockiert der Fremdschlüssel der Regalbrett-Themen).
+
 ### Protokoll: Suche nach Personen, mehr Filter, CSV-Export (v0.57.0)
 
 Das Protokoll (`/verwaltung/protokoll`) filtert nach Bereich, **Ereignis** (genaue Aktion), **Person** (Name oder Bibliotheksnummer; gefunden werden Ereignisse zum Konto selbst und solche, die sich im Kontext auf die Person beziehen, etwa Ausleihen und Vormerkungen), **Konto, das das Ereignis ausgelöst hat**, **Zeitraum** (von, bis) und Text. Die Tabelle zeigt eine Spalte „Person“ (Name und Nummer, aus den Konten aufgelöst; gespeichert werden weiter nur Kennungen). „Diese Auswahl als CSV exportieren“ liefert bis zu 20.000 Einträge mit Formelschutz, der Export steht selbst im Protokoll (`audit.exported`). Zugriff nur mit dem Recht „Protokoll einsehen“ (Verwaltung).

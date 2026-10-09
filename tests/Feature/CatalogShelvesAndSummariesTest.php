@@ -98,7 +98,7 @@ it('seeds shelves from the free text locations that already exist', function ():
     $migration->up();
 
     expect(CatalogShelf::query()->orderBy('code')->pluck('code')->all())->toBe(['HÖR ENDE', 'J 5 ENDE']);
-});
+})->skip(fn (): bool => DB::connection()->getDriverName() !== 'sqlite', 'Löscht und legt die Tabelle neu an (DDL): nur mit SQLite im Speicher, wo das mit dem Test zurückgerollt wird.');
 
 it('offers the shelves as a dropdown while editing a copy and keeps an old location selectable', function (): void {
     $staff = shelfUser('staff');
