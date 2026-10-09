@@ -14,7 +14,7 @@ it('lets public catalog visitors choose results per page and jump directly to a 
             'preferred_title' => sprintf('Paging Öffentlich %02d', $number),
             'sort_title' => sprintf('Paging Öffentlich %02d', $number),
         ]);
-        Edition::query()->create(['title_id' => $title->getKey()]);
+        catalogTestWithCopy(Edition::query()->create(['title_id' => $title->getKey()]));
     }
 
     $this->get(route('public.catalog.index', [
@@ -48,11 +48,11 @@ it('keeps active catalog filters in the pagination links of both surfaces', func
             'preferred_title' => sprintf('Filtertreffer %02d', $number),
             'sort_title' => sprintf('Filtertreffer %02d', $number),
         ]);
-        Edition::query()->create([
+        catalogTestWithCopy(Edition::query()->create([
             'title_id' => $title->getKey(),
             'media_type' => 'book',
             'language_code' => 'de',
-        ]);
+        ]));
     }
 
     $response = $this->get(route('public.catalog.index', [

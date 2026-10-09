@@ -196,9 +196,8 @@ it('distinguishes titles without copies from titles without active copies', func
         copyStatus: CopyStatus::Damaged,
     );
 
-    $this->get(route('public.catalog.show', ['titleId' => $withoutCopies['title']->getKey()]))
-        ->assertOk()
-        ->assertSee('Noch kein Exemplarbestand');
+    // Titel ohne vorhandenes Exemplar gibt es öffentlich nicht: weder in der Liste noch als Seite.
+    $this->get(route('public.catalog.show', ['titleId' => $withoutCopies['title']->getKey()]))->assertNotFound();
 
     $this->get(route('public.catalog.show', ['titleId' => $damagedOnly['title']->getKey()]))
         ->assertOk()
@@ -225,7 +224,6 @@ it('paginates public catalog browsing while preserving the filter contract', fun
             titleName: sprintf('Katalogtitel %02d', $number),
             contributorName: sprintf('Person %02d', $number),
             isbn: sprintf('9780000001%03d', $number),
-            copyStatus: null,
         );
     }
 

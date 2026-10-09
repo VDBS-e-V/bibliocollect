@@ -6,6 +6,8 @@ namespace App\Surfaces\Public\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Catalog\DTOs\HoldingSummary;
+use App\Modules\Catalog\Enums\CopyStatus;
+use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
 use App\Modules\Catalog\Services\CatalogClassificationService;
@@ -30,6 +32,17 @@ final class CatalogTitleController
         $title = Title::query()
             ->with(['contributions.contributor', 'editions.copies.shelf.topics'])
             ->findOrFail($titleId);
+
+        // Öffentlich zählen nur vorhandene Exemplare (nicht ausgesondert, nicht verloren); Ausgaben ohne solche Exemplare entfallen.
+        $present = [CopyStatus::Active, CopyStatus::Damaged];
+
+        foreach ($title->editions as $edition) {
+            $edition->setRelation('copies', $edition->copies->filter(static fn (Copy $copy): bool => in_array($copy->status, $present, true))->values());
+        }
+
+        $title->setRelation('editions', $title->editions->filter(static fn (Edition $edition): bool => $edition->copies->isNotEmpty())->values());
+
+        abort_if($title->editions->isEmpty(), 404);
 
         /** @var array<string, HoldingSummary> $editionSummaries */
         $editionSummaries = [];

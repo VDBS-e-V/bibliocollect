@@ -90,19 +90,19 @@ it('renders locally cached covers and falls back to the bundled placeholder', fu
     config()->set('catalog.covers.disk', 'public');
 
     $withCover = Title::query()->create(['preferred_title' => 'Mit Cover']);
-    $withCoverEdition = Edition::query()->create([
+    $withCoverEdition = catalogTestWithCopy(Edition::query()->create([
         'title_id' => $withCover->getKey(),
         'isbn' => '9783000000155',
-    ]);
+    ]));
     $path = 'catalog/covers/local-test.png';
     Storage::disk('public')->put($path, 'local-cover');
     $withCoverEdition->forceFill(['cover_path' => $path, 'cover_status' => 'ready'])->save();
 
     $withoutCover = Title::query()->create(['preferred_title' => 'Ohne Cover']);
-    Edition::query()->create([
+    catalogTestWithCopy(Edition::query()->create([
         'title_id' => $withoutCover->getKey(),
         'isbn' => '9783000000162',
-    ]);
+    ]));
 
     $this->get(route('public.catalog.index'))
         ->assertOk()

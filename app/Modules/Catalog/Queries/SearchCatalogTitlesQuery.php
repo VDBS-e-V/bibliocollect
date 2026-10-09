@@ -75,6 +75,12 @@ final class SearchCatalogTitlesQuery
     /** @param Builder<Title> $query */
     private function applyCriteria(Builder $query, CatalogSearchCriteria $criteria): void
     {
+        if ($criteria->presentCopiesOnly) {
+            $query->whereHas('editions.copies', static function (Builder $copies): void {
+                $copies->whereIn('status', [CopyStatus::Active->value, CopyStatus::Damaged->value]);
+            });
+        }
+
         $rawTerm = trim($criteria->term ?? '');
         $normalized = $this->normalizeTerm($criteria->term, true);
 

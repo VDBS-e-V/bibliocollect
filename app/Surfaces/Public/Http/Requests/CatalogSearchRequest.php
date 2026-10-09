@@ -64,6 +64,7 @@ final class CatalogSearchRequest extends FormRequest
             sort: is_string($sort) ? $sort : 'title',
             perPage: isset($data['per_page']) ? (int) $data['per_page'] : 20,
             page: isset($data['page']) ? (int) $data['page'] : 1,
+            presentCopiesOnly: true,
         );
     }
 

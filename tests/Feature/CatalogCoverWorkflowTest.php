@@ -158,12 +158,12 @@ it('keeps the cover cache migration rollback capable', function (): void {
 
 it('never exposes the cover source reference on public catalog pages', function (): void {
     $title = Title::query()->create(['preferred_title' => 'Cover-Datenschutz', 'sort_title' => 'Cover-Datenschutz']);
-    Edition::query()->create([
+    catalogTestWithCopy(Edition::query()->create([
         'title_id' => $title->getKey(),
         'cover_status' => 'pending',
         'cover_source' => 'test-provider',
         'cover_source_reference' => 'https://covers.example.test/geheim-123.png',
-    ]);
+    ]));
 
     $this->get(route('public.catalog.index'))
         ->assertOk()
@@ -183,7 +183,7 @@ it('builds local cover URLs from the current request host instead of APP_URL', f
     config()->set('app.url', 'http://localhost');
 
     $title = Title::query()->create(['preferred_title' => 'Host-Test', 'sort_title' => 'Host-Test']);
-    $edition = Edition::query()->create(['title_id' => $title->getKey()]);
+    $edition = catalogTestWithCopy(Edition::query()->create(['title_id' => $title->getKey()]));
     $edition->forceFill(['cover_path' => 'catalog/covers/host-test.png', 'cover_status' => 'ready'])->save();
     Storage::disk('public')->put('catalog/covers/host-test.png', 'bild');
 

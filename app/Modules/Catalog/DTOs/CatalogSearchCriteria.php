@@ -30,6 +30,8 @@ final readonly class CatalogSearchCriteria
         public string $sort = 'title',
         public int $perPage = 20,
         public int $page = 1,
+        /** Öffentlicher Katalog: nur Titel mit mindestens einem vorhandenen Exemplar (nicht ausgesondert, nicht verloren). */
+        public bool $presentCopiesOnly = false,
     ) {}
 
     public function hasSearchInput(): bool

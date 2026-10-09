@@ -11,12 +11,14 @@ use App\Modules\Catalog\Enums\WithdrawalReason;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
+use App\Modules\Catalog\Services\InventoryLabelPlanner;
 use App\Modules\Circulation\Actions\CheckoutCopyAction;
 use App\Modules\Identity\Actions\AssignRoleAction;
 use App\Modules\Patrons\Enums\PatronKind;
 use App\Modules\Patrons\Enums\PatronStatus;
 use App\Modules\Patrons\Models\Patron;
 use App\Modules\School\Models\LibraryOpeningHour;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -177,4 +179,29 @@ it('weeds out a scanned book at once by the chosen kind and reports problems wit
     // Rückgängig aus der Liste heraus.
     $this->actingAs($helper)->from(route('pos.withdrawal'))->post(route('pos.withdrawal.restore', ['copyId' => $book->getKey()]))->assertRedirect(route('pos.withdrawal'));
     expect($book->refresh()->status)->toBe(CopyStatus::Active);
+});
+
+it('hides weeded books in the public catalog but keeps the inventory number and the medium in the system', function (): void {
+    $staff = weedUser('staff');
+    $gone = weedCopy('0040070', 'Nur Ausgesondertes');
+    $kept = weedCopy('0040071', 'Teils vorhanden');
+    $otherEdition = Edition::query()->create(['title_id' => $kept->edition->title_id, 'media_type' => 'book', 'isbn' => '9783111111111', 'publisher_name' => 'Zweiter Verlag']);
+    $weeded = Copy::query()->create(['edition_id' => $otherEdition->getKey(), 'barcode' => '0040072', 'status' => CopyStatus::Active]);
+
+    $this->actingAs($staff)->post(route('pos.withdrawal.scan'), ['art' => 'disposed', 'code' => '0040070'])->assertSessionHas('withdrawal_notice');
+    $this->actingAs($staff)->post(route('pos.withdrawal.scan'), ['art' => 'sold', 'code' => '0040072'])->assertSessionHas('withdrawal_notice');
+
+    // Öffentlich: Titel ohne vorhandenes Exemplar fehlt, bei Titeln mit Rest entfallen nur die Ausgaben ohne Exemplar.
+    $this->get(route('public.catalog.index'))->assertOk()->assertSee('Teils vorhanden')->assertDontSee('Nur Ausgesondertes');
+    $this->get(route('public.catalog.show', ['titleId' => $gone->edition->title_id]))->assertNotFound();
+    $this->get(route('public.catalog.show', ['titleId' => $kept->edition->title_id]))->assertOk()->assertSee('9783000000003')->assertDontSee('9783111111111')->assertDontSee('Zweiter Verlag');
+
+    // Intern bleibt alles sichtbar und gespeichert.
+    $this->actingAs($staff)->get(route('pos.catalog.index', ['q' => 'Ausgesondertes']))->assertOk()->assertSee('Nur Ausgesondertes');
+    expect(Copy::query()->where('barcode', '0040070')->value('status'))->toBe(CopyStatus::Withdrawn);
+
+    // Die Inventarnummer bleibt vergeben: Datenbank, Anlegen und Etikettenvorrat.
+    expect(fn () => Copy::query()->create(['edition_id' => $kept->edition_id, 'barcode' => '0040070', 'status' => CopyStatus::Active]))->toThrow(QueryException::class);
+    $plan = app(InventoryLabelPlanner::class)->gaps(40069, 40073, true);
+    expect($plan['numbers'])->toBe(['0040069', '0040073'])->and($weeded->refresh()->status)->toBe(CopyStatus::Withdrawn);
 });

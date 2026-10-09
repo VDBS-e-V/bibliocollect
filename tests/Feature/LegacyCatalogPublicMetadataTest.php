@@ -95,13 +95,13 @@ it('finds titles through extended dnb gnd series keyword and identifier metadata
         'role_key' => 'author',
         'position' => 1,
     ]);
-    Edition::query()->create([
+    catalogTestWithCopy(Edition::query()->create([
         'title_id' => $title->getKey(),
         'series_statement' => 'Reihe Fernweh',
         'subject_keywords' => 'Wolkenkunde, Fernreise',
         'source_record_id' => 'DNB-RCN-SEARCH-42',
         'doi_handle' => '10.1234/example',
-    ]);
+    ]));
 
     $this->get(route('public.catalog.index', ['q' => 'GND-SEARCH-777']))
         ->assertOk()->assertSee('Versteckter Haupttitel');
