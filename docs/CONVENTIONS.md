@@ -29,11 +29,5 @@ Reads:
 - production runs with debug disabled
 
 ## Git
-Recommended:
-```text
-main
-feature/*
-fix/*
-refactor/*
-```
-Short-lived branches and squash merges are a good default.
+Seit der Zusammenarbeit zu zweit ist `main` geschützt: nur Pull Requests mit grünen Tests, Squash-Merge, kein Direkt-Push. Ablauf, Branch-Namen
+(`feature/<nr>-…`, `fix/<nr>-…`, `chore/…`), Regeln für Migrationen und das Veröffentlichen per Tag stehen in `CONTRIBUTING.md`.
