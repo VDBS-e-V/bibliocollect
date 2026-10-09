@@ -26,6 +26,14 @@ return [
     // Vor dem Schuljahreswechsel automatisch eine Datenbanksicherung erstellen (der Wechsel ist nicht umkehrbar).
     'backup_before_transition' => env('BACKUP_BEFORE_TRANSITION', true),
 
+    // Updates ohne Konsole (Verwaltung → Update). Ordner der Pakete und Ziel sind nur für Tests anders als hier. „protected“ wird nie überschrieben.
+    'update' => [
+        'directory' => null,
+        'target' => null,
+        'backup' => true,
+        'protected' => ['.env', 'storage', 'public/covers', 'public/card-designs', 'public/storage', 'bootstrap/cache'],
+    ],
+
     'production' => [
         'require_debug_disabled' => true,
         'require_app_key' => true,

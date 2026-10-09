@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Foundation\Console;
 
 use App\Foundation\Support\AlertService;
+use App\Foundation\Update\UpdateException;
+use App\Foundation\Update\UpdateManager;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
@@ -30,8 +32,29 @@ final class CronCommand extends Command
     {
         $this->reportGap();
 
+        // Ein eingespieltes Update wartet auf seinen Abschluss (neuer Code, neue Anfrage): zuerst das.
+        $updates = app(UpdateManager::class);
+
+        if ($updates->pending() !== null) {
+            try {
+                $this->info($updates->finish(null)['message']);
+            } catch (UpdateException $exception) {
+                $this->error($exception->getMessage());
+            }
+
+            return self::SUCCESS;
+        }
+
         Artisan::call('schedule:run');
         $schedule = trim(Artisan::output());
+
+        // Das nächtliche Update hat Dateien ausgetauscht: Dieser Prozess lädt keinen weiteren Code mehr, der Abschluss folgt beim nächsten Aufruf.
+        if (UpdateManager::$applied) {
+            $this->line($schedule);
+            $this->info('Update eingespielt; der Abschluss folgt beim nächsten Cron-Aufruf.');
+
+            return self::SUCCESS;
+        }
 
         $before = $this->waiting();
 

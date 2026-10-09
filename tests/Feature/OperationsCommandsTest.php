@@ -92,7 +92,7 @@ it('runs the schedule tasks inside the same process so that the web cron can sta
     $events = collect(app(Schedule::class)->events());
 
     expect($events->map(static fn (Event $event): string => $event->description ?? '')->sort()->values()->all())
-        ->toBe(['backup:database', 'catalog:covers:queue', 'catalog:quality:propose', 'circulation:reservations:expire', 'privacy:anonymize', 'reminders:send', 'system:prune-errors'])
+        ->toBe(['backup:database', 'catalog:covers:queue', 'catalog:quality:propose', 'circulation:reservations:expire', 'privacy:anonymize', 'reminders:send', 'system:prune-errors', 'system:update-nightly'])
         ->and($events->every(static fn (Event $event): bool => $event instanceof CallbackEvent))->toBeTrue();
 
     // Um 04:00 läuft das Ablaufen der Abholfristen über schedule:run, ohne zweiten PHP-Prozess.

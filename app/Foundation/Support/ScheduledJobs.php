@@ -20,6 +20,7 @@ final class ScheduledJobs
     private const DESCRIPTIONS = [
         'catalog:covers:queue' => 'Cover für Bestandstitel nachladen (stellt Jobs in die Warteschlange).',
         'catalog:quality:propose' => 'Vorschläge der DNB für offene Qualitätsfälle vorab holen (nur Prüftabelle, ändert den Katalog nicht).',
+        'system:update-nightly' => 'Ein bereitliegendes, neueres Update-Paket einspielen (nur wenn „Automatisch einspielen“ eingeschaltet ist).',
         'reminders:send' => 'Erinnerungen an bald fällige und überfällige Ausleihen und abholbereite Vormerkungen verschicken.',
         'circulation:reservations:expire' => 'Abgelaufene Abholfristen beenden und Exemplare für die nächste Vormerkung zurücklegen.',
         'backup:database' => 'Datenbank sichern (storage/app/backups).',

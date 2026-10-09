@@ -54,6 +54,11 @@ foreach ($dir in @('storage\logs', 'storage\app\public', 'storage\app\private', 
 }
 '*' + "`n" + '!.gitignore' | Set-Content -Path (Join-Path $stage 'storage\logs\.gitignore') -Encoding ASCII
 
+# Versionsnummer ins Paket (zeigt die Seite „Update“): letzter Git-Tag, sonst Datum.
+$version = (& git -C $root describe --tags --always 2>$null)
+if (-not $version) { $version = "v$stamp" }
+Set-Content -Path (Join-Path $stage 'VERSION') -Value $version -Encoding ASCII
+
 Write-Host '3/4 Abhängigkeiten ohne Entwicklungswerkzeuge installieren (composer) ...'
 Push-Location $stage
 composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --quiet

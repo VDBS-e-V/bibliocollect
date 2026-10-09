@@ -84,6 +84,10 @@ return [
             'label' => 'Inventarnummern umstellen',
             'description' => 'Erlaubt, alte Inventarnummern ausdrücklich auf siebenstellige Nummern umzustellen.',
         ],
+        'system.update' => [
+            'label' => 'Updates einspielen',
+            'description' => 'Erlaubt, ein neues Programmpaket hochzuladen und einzuspielen (mit Wartungsmodus und vorheriger Sicherung) sowie das nächtliche automatische Einspielen einzuschalten.',
+        ],
         'settings.manage' => [
             'label' => 'Regeln der Bibliothek einstellen',
             'description' => 'Erlaubt, Leihfristen, Höchstzahlen, Vormerk- und Erinnerungsregeln im Web zu ändern.',
@@ -181,6 +185,7 @@ return [
                 'shelves.manage',
                 'inventory.renumber',
                 'system.view',
+                'system.update',
                 'users.manage',
                 'settings.manage',
                 'privacy.erase',
@@ -190,7 +195,7 @@ return [
         ],
         'technical_admin' => [
             'label' => 'Technische Administration',
-            'permissions' => ['surface.administration.access', 'system.view'],
+            'permissions' => ['surface.administration.access', 'system.view', 'system.update'],
         ],
     ],
 ];

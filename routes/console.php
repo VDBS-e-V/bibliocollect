@@ -33,6 +33,13 @@ Schedule::call($command('catalog:quality:propose', ['--limit' => max(1, min(500,
     ->withoutOverlapping()
     ->onOneServer();
 
+// Spielt ein bereitliegendes, neueres Update-Paket nachts ein, wenn das auf der Seite „Update“ eingeschaltet ist.
+Schedule::call($command('system:update-nightly'))
+    ->name('system:update-nightly')
+    ->dailyAt('03:15')
+    ->withoutOverlapping()
+    ->onOneServer();
+
 // Erinnerungen an bald fällige und überfällige Ausleihen sowie abholbereite Vormerkungen.
 Schedule::call($command('reminders:send'))
     ->name('reminders:send')

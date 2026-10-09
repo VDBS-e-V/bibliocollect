@@ -40,6 +40,10 @@ Unter **Verwaltung → Benutzerkonten** lädst du Mitarbeitende per E-Mail ein (
 
 **Verwaltung → Systemzustand** zeigt, ob Cronjob, Warteschlange und Sicherung laufen, und die letzten Fehler. Dort kannst du Zeitplan-Aufgaben **einmal von Hand ausführen**, eine **Sicherung erstellen** und Sicherungen **herunterladen**. Lade sie regelmäßig herunter und lege sie außerhalb des Servers ab. Wiederherstellen: phpMyAdmin → Datenbank wählen → Importieren → die `.sql.gz`-Datei (vorher ist keine Migration nötig). Übe das einmal mit einer leeren Test-Datenbank.
 
+## Update einspielen
+
+Unter **Verwaltung → Update** spielst du eine neue Version ein: Das Paket (ZIP) hochladen oder per FTP in `storage/app/updates` legen, **Jetzt einspielen** wählen. Die Seite ist dabei kurz im Wartungsmodus, vorher wird die Datenbank gesichert, deine Einstellungen (.env), Cover und Ausweis-Motive bleiben unberührt. Mit **Nachts automatisch einspielen** übernimmt der Cron das um 03:15 Uhr. Das Ergebnis steht unter „Letztes Update“.
+
 ## Regalbretter, Themenbereiche, Inventarnummern
 
 Die Bibliothek ist so aufgebaut: **Bereichsgruppe › Bereich › Regal › Regalbrett** (zum Beispiel „I. A 1 a“). Unter **Regale und Regalbretter** legst du sie an und gibst ihnen Namen; der Standort eines Exemplars setzt sich daraus zusammen. Themenbereiche und Regalbretter pflegst du unter **Verwaltung**: Jedes Medium bekommt beim Erfassen ein Thema, und unter „Regalbretter“ legst du fest, zu welchen Themenbereichen ein Brett gehört (ein Thema kann auf mehreren Brettern stehen, daraus entsteht der Vorschlag beim Einsortieren); das Einsortieren der Bücher macht die Schüler-AG am Arbeitsplatz („Medien einsortieren“). Alte Inventarnummern stellst du nur unter **Inventarnummern** bewusst auf siebenstellige um; nichts wird automatisch überschrieben.

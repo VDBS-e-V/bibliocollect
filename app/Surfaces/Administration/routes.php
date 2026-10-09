@@ -17,6 +17,7 @@ use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearTransitionController;
 use App\Surfaces\Administration\Http\Controllers\SystemHealthController;
+use App\Surfaces\Administration\Http\Controllers\UpdateController;
 use App\Surfaces\Administration\Http\Controllers\UserAccountController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,14 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/regeln', [RulesController::class, 'index'])->name('administration.rules.index');
         Route::put('/verwaltung/regeln', [RulesController::class, 'update'])->middleware('throttle:20,1')->name('administration.rules.update');
         Route::post('/verwaltung/regeln/zuruecksetzen', [RulesController::class, 'reset'])->middleware('throttle:5,1')->name('administration.rules.reset');
+    });
+
+    Route::middleware('permission:system.update')->group(function (): void {
+        Route::get('/verwaltung/update', [UpdateController::class, 'index'])->name('administration.update.index');
+        Route::post('/verwaltung/update/hochladen', [UpdateController::class, 'upload'])->middleware('throttle:10,1')->name('administration.update.upload');
+        Route::post('/verwaltung/update/einspielen', [UpdateController::class, 'apply'])->middleware('throttle:5,1')->name('administration.update.apply');
+        Route::post('/verwaltung/update/automatisch', [UpdateController::class, 'auto'])->middleware('throttle:10,1')->name('administration.update.auto');
+        Route::delete('/verwaltung/update/paket/{name}', [UpdateController::class, 'destroy'])->middleware('throttle:10,1')->name('administration.update.destroy');
     });
 
     Route::middleware('permission:system.view')->group(function (): void {

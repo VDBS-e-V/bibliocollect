@@ -34,7 +34,7 @@ it('defines stable surface permissions and combinable role bundles', function ()
         ->toContain('catalog.manage', 'catalog.import');
 
     expect($roles->permissionsFor(['technical_admin']))
-        ->toBe(['surface.administration.access', 'system.view']);
+        ->toBe(['surface.administration.access', 'system.update', 'system.view']);
 });
 
 it('keeps identity independent from patrons at module level', function (): void {
@@ -50,7 +50,7 @@ it('builds navigation for all four surfaces', function (): void {
     expect($navigation->allForSurface('public'))->toHaveCount(3);
     expect($navigation->allForSurface('portal'))->toHaveCount(1);
     expect($navigation->allForSurface('pos'))->toHaveCount(10);
-    expect($navigation->allForSurface('administration'))->toHaveCount(11);
+    expect($navigation->allForSurface('administration'))->toHaveCount(12);
 });
 
 it('uses Europe Berlin as the business timezone by default', function (): void {

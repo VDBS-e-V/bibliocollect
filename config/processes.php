@@ -87,6 +87,7 @@ return [
                     'title' => 'Auswertungen',
                     'items' => [
                         ['label' => 'Statistik', 'text' => 'Ausleihen, beliebte Titel, Klassen, Medientypen und Bestand für einen Zeitraum; Export und Druck.', 'route' => 'pos.statistics', 'permission' => 'statistics.view'],
+                        ['label' => 'Update einspielen', 'text' => 'Ein neues Programmpaket (ZIP) hochladen und einspielen, mit Wartungsmodus und Sicherung, auf Wunsch nachts automatisch.', 'route' => 'administration.update.index', 'permission' => 'system.update'],
                         ['label' => 'E-Mail-Vorschau', 'text' => 'Alle E-Mails der Anwendung mit Beispielangaben ansehen, ohne etwas zu verschicken.', 'route' => 'administration.mail-preview', 'permission' => 'system.view'],
                         ['label' => 'Systemzustand', 'text' => 'Läuft der Cron, wartet etwas in der Warteschlange, ist die Sicherung aktuell, gab es Fehler?', 'route' => 'administration.system.index', 'permission' => 'system.view'],
                         ['label' => 'Protokoll', 'text' => 'Wer hat wann was geändert.', 'route' => 'administration.audit.index', 'permission' => 'audit.view'],

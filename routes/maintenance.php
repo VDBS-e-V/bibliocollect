@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Foundation\Http\Controllers\SystemStatusController;
+use App\Foundation\Http\Controllers\UpdateFinishController;
 use App\Foundation\Http\Controllers\WebCronController;
 use App\Modules\Identity\Http\Controllers\SetupController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,9 @@ if ($usable(config('hosting.cron_token'))) {
     // Der Key kommt im Header (X-Api-Key oder Authorization: Bearer) oder, wenn der Dienst keine Header kann, im Pfad.
     Route::match(['GET', 'POST'], '/_cron/{token?}', WebCronController::class)->middleware('throttle:30,1');
 }
+
+// Abschluss eines Updates: gehört zum Einspielen und muss auch im Wartungsmodus erreichbar sein (nur mit dem einmaligen Schlüssel).
+Route::get('/_update/abschluss/{token}', UpdateFinishController::class)->where('token', '[a-z0-9]{40}')->middleware('throttle:20,1')->name('update.finish');
 
 // Statusadresse für ein Monitoring (zum Beispiel UptimeRobot): JSON, bei Fehlern HTTP 503. Eigener STATUS_TOKEN oder der CRON_TOKEN.
 $statusToken = $usable(config('hosting.status_token')) ? config('hosting.status_token') : config('hosting.cron_token');

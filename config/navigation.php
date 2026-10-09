@@ -163,6 +163,13 @@ return [
                     'order' => 38,
                 ],
                 [
+                    'label' => 'Update',
+                    'route' => 'administration.update.index',
+                    'active' => 'administration.update.*',
+                    'permission' => 'system.update',
+                    'order' => 39,
+                ],
+                [
                     'label' => 'Protokoll',
                     'route' => 'administration.audit.index',
                     'active' => 'administration.audit.*',

@@ -187,3 +187,12 @@
 .bc-sub__arrow { color: var(--text-secondary); }
 .bc-sub__name { font-size: var(--text-base); }
 .bc-sub__shelves { margin-left: auto; font-size: var(--text-sm); }
+
+/* Update */
+.bc-update-package { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem); gap: .75rem 1.5rem; border-bottom: 1px solid var(--border-default); padding: .9rem 0; }
+.bc-update-package__main { display: grid; gap: .25rem; align-content: start; }
+.bc-update-package__actions { display: grid; gap: .5rem; align-content: start; }
+@media (max-width: 52rem) { .bc-update-package { grid-template-columns: 1fr; } }
+ol.bc-section-copy { list-style: decimal; padding-left: 1.5rem; }
+ol.bc-section-copy li { margin: .3rem 0; }
+.bc-update-package .bc-checkbox-line { display: flex; align-items: flex-start; gap: .5rem; }

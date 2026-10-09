@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->append(SecurityHeaders::class);
 
+        // Im Wartungsmodus bleiben der Abschluss eines Updates und der Cron erreichbar (der Cron schließt wartende Updates ab).
+        $middleware->preventRequestsDuringMaintenance(except: ['_update/*', '_cron', '_cron/*', '_status', '_status/*']);
+
         $middleware->alias([
             'permission' => RequirePermission::class,
         ]);
