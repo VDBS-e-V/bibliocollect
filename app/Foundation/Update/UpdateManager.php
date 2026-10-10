@@ -155,6 +155,35 @@ class UpdateManager
         }
     }
 
+    /** Ob nachts nach einem neuen Release auf GitHub gesucht und es selbst geholt wird (nur zusammen mit dem automatischen Einspielen). */
+    public function autoDownloadEnabled(): bool
+    {
+        return is_file($this->directory().'/auto-download');
+    }
+
+    public function setAutoDownload(bool $on): void
+    {
+        $marker = $this->directory().'/auto-download';
+
+        if ($on) {
+            File::put($marker, now()->toIso8601String());
+        } else {
+            File::delete($marker);
+        }
+    }
+
+    /** Ob schon ein Paket dieser Version bereitliegt. */
+    public function hasPackageVersion(string $version): bool
+    {
+        foreach ($this->packages() as $package) {
+            if ($package['error'] === null && $package['version'] !== null && $this->normalize($package['version']) === $this->normalize($version)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** @return array<string, mixed>|null */
     public function pending(): ?array
     {

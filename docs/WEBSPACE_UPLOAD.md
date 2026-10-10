@@ -170,6 +170,8 @@ Mit einem Testkonto und einem Probebuch durchklicken (siehe `docs/GO_LIVE.md`, A
 
 **Ab dieser Version geht es im Browser** unter **Verwaltung → Update**: Das neue Paket (die ZIP aus `build-release.ps1`) hochladen oder per FTP in den Ordner `storage/app/updates` legen, auf „Jetzt einspielen“ klicken. Das System sichert die Datenbank, setzt die Seite in den Wartungsmodus, kopiert die neuen Dateien und schließt mit den Migrationen und dem Leeren der Zwischenspeicher ab. `.env`, Cover, Ausweis-Motive und alles unter `storage` bleiben unberührt. Mit **„Nachts automatisch einspielen“** übernimmt der Cron das um 03:15 Uhr, sobald ein neueres Paket bereitliegt. Das erste Mal (wenn die Update-Seite auf dem Server noch fehlt) lädst du das Paket noch wie unten per FTP hoch.
 
+**Ohne Upload (empfohlen, wenn der Webspace große Dateien ablehnt):** Auf der Update-Seite **Auf neue Version prüfen** und **Paket holen** wählen. Der Server lädt das Release-Paket selbst von GitHub (`github.com/VDBS-e-V/bibliocollect`), vergleicht die Prüfsumme und legt es unter „Bereitliegende Pakete“ bereit. Das setzt voraus, dass der Server ausgehende HTTPS-Verbindungen zu GitHub aufbauen darf. Mit „Neue Versionen nachts selbst von GitHub holen“ (zusammen mit „Nachts automatisch einspielen“) geschieht das ohne Zutun.
+
 **Der alte Weg per FTP** (zum ersten Mal und als Rückfall):
 
 1. Neues Paket bauen (B) und entpacken.

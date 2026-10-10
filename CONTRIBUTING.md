@@ -58,7 +58,8 @@ Veröffentlicht wird ein Stand von `main`. Jede Person kann das jederzeit tun:
    (Standard `main`; ein älterer Commit auf `main`, wenn neuere Änderungen noch nicht mitkommen sollen).
    Mit `dry_run` wird nur gebaut und geprüft, ohne Tag und Release.
 3. Der Workflow prüft Version, Stand und grüne Tests, baut das Paket (`scripts/build-release.ps1`), legt den Tag an und erstellt ein GitHub Release mit
-   dem ZIP (`bibliocollect-<version>.zip`) und automatisch erzeugten Notizen aus den Pull-Request-Titeln.
+   dem ZIP (`bibliocollect-<version>.zip`), seiner Prüfsumme (`bibliocollect-<version>.zip.sha256`) und automatisch erzeugten Notizen aus den Pull-Request-Titeln.
+   Die Update-Seite beim Betreiber holt das Paket von dort selbst („Neue Version von GitHub holen“), ohne Upload im Browser.
 4. Das ZIP wird beim Betreiber unter **Verwaltung → Update** eingespielt (`docs/WEBSPACE_UPLOAD.md`).
 
 Tags werden nie verschoben oder gelöscht. Ein fehlerhaftes Release wird durch ein neues mit höherer Version ersetzt.

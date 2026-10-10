@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Administration\Http\Controllers;
 
+use App\Foundation\Update\ReleaseSource;
 use App\Foundation\Update\UpdateException;
 use App\Foundation\Update\UpdateManager;
 use App\Modules\Audit\Services\AuditRecorder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 
 /** Seite „Update“: Programmpaket hochladen oder per FTP ablegen, einspielen (mit Wartungsmodus) und das nächtliche Einspielen einschalten. */
 final class UpdateController
 {
+    private const RELEASE_CACHE = 'update.release.latest';
+
     public function index(UpdateManager $updates): Response
     {
+        $release = Cache::get(self::RELEASE_CACHE);
+
         return response()
             ->view('pages.surfaces.administration.update.index', [
                 'current' => $updates->currentVersion(),
@@ -23,12 +29,63 @@ final class UpdateController
                 'pending' => $updates->pending(),
                 'last' => $updates->lastResult(),
                 'auto' => $updates->autoEnabled(),
+                'autoDownload' => $updates->autoDownloadEnabled(),
+                'release' => is_array($release) ? $release + ['newer' => $updates->compare($release['version'] ?? null, $updates->currentVersion()), 'ready' => $updates->hasPackageVersion((string) ($release['version'] ?? ''))] : null,
+                'repository' => app(ReleaseSource::class)->repository(),
                 'maintenance' => app()->isDownForMaintenance(),
                 'directory' => 'storage/app/updates',
                 'limit' => ini_get('upload_max_filesize'),
                 'php' => PHP_VERSION,
             ])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Fragt GitHub nach dem neuesten stabilen Release und merkt es sich kurz für die Anzeige. */
+    public function checkRelease(ReleaseSource $source, AuditRecorder $audit, Request $request): RedirectResponse
+    {
+        try {
+            $release = $source->latest();
+        } catch (UpdateException $exception) {
+            Cache::forget(self::RELEASE_CACHE);
+
+            return redirect()->route('administration.update.index')->withErrors(['release' => $exception->getMessage()]);
+        }
+
+        Cache::put(self::RELEASE_CACHE, $release, now()->addMinutes(30));
+        $audit->record('system.update.release_checked', 'Neuestes Release auf GitHub abgefragt: '.$release['tag'].'.', null, ['tag' => $release['tag']], (int) $request->user()?->getAuthIdentifier());
+
+        return redirect()->route('administration.update.index');
+    }
+
+    /** Holt das Paket des abgefragten Releases (Server zu Server), prüft die Prüfsumme und legt es bereit. */
+    public function fetchRelease(Request $request, ReleaseSource $source, UpdateManager $updates, AuditRecorder $audit): RedirectResponse
+    {
+        $data = $request->validate(['tag' => ['required', 'string', 'regex:/^v\d+\.\d+\.\d+$/']]);
+        $release = Cache::get(self::RELEASE_CACHE);
+
+        if (! is_array($release) || ($release['tag'] ?? null) !== $data['tag']) {
+            return redirect()->route('administration.update.index')->withErrors(['release' => 'Bitte zuerst auf neue Version prüfen.']);
+        }
+
+        @set_time_limit(300);
+
+        try {
+            $path = $source->download($release);
+        } catch (UpdateException $exception) {
+            return redirect()->route('administration.update.index')->withErrors(['release' => $exception->getMessage()]);
+        }
+
+        try {
+            $name = $updates->store($path, 'bibliocollect-'.$release['tag'].'.zip');
+        } catch (UpdateException $exception) {
+            @unlink($path);
+
+            return redirect()->route('administration.update.index')->withErrors(['release' => $exception->getMessage()]);
+        }
+
+        $audit->record('system.update.downloaded', 'Update-Paket von GitHub geholt: '.$name.'.', null, ['package' => $name, 'tag' => $release['tag']], (int) $request->user()?->getAuthIdentifier());
+
+        return redirect()->route('administration.update.index')->with('update_success', 'Das Paket „'.$name.'“ ist von GitHub geholt, die Prüfsumme stimmt. Du kannst es jetzt einspielen.');
     }
 
     public function upload(Request $request, UpdateManager $updates, AuditRecorder $audit): RedirectResponse
@@ -76,8 +133,9 @@ final class UpdateController
     {
         $on = $request->boolean('auto');
         $updates->setAuto($on);
+        $updates->setAutoDownload($on && $request->boolean('auto_download'));
         $audit->record('system.update.auto', 'Automatisches Einspielen '.($on ? 'eingeschaltet' : 'ausgeschaltet').'.', null, [], (int) $request->user()?->getAuthIdentifier());
 
-        return redirect()->route('administration.update.index')->with('update_success', $on ? 'Ein neueres Paket wird ab jetzt nachts um 03:15 Uhr automatisch eingespielt.' : 'Das automatische Einspielen ist ausgeschaltet.');
+        return redirect()->route('administration.update.index')->with('update_success', $on ? 'Ein neueres Paket wird ab jetzt nachts um 03:15 Uhr automatisch eingespielt.'.($updates->autoDownloadEnabled() ? ' Neue Releases holt der Server dafür selbst von GitHub.' : '') : 'Das automatische Einspielen ist ausgeschaltet.');
     }
 }

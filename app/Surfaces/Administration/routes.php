@@ -53,6 +53,8 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/update', [UpdateController::class, 'index'])->name('administration.update.index');
         Route::post('/verwaltung/update/hochladen', [UpdateController::class, 'upload'])->middleware('throttle:10,1')->name('administration.update.upload');
         Route::post('/verwaltung/update/einspielen', [UpdateController::class, 'apply'])->middleware('throttle:5,1')->name('administration.update.apply');
+        Route::post('/verwaltung/update/release/pruefen', [UpdateController::class, 'checkRelease'])->middleware('throttle:6,10')->name('administration.update.release.check');
+        Route::post('/verwaltung/update/release/holen', [UpdateController::class, 'fetchRelease'])->middleware('throttle:4,10')->name('administration.update.release.fetch');
         Route::post('/verwaltung/update/automatisch', [UpdateController::class, 'auto'])->middleware('throttle:10,1')->name('administration.update.auto');
         Route::delete('/verwaltung/update/paket/{name}', [UpdateController::class, 'destroy'])->middleware('throttle:10,1')->name('administration.update.destroy');
     });

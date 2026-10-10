@@ -220,3 +220,4 @@ ol.bc-section-copy li { margin: .3rem 0; }
 .bc-covers__recent { display: flex; flex-wrap: wrap; gap: .8rem; margin: 0; padding: 0; list-style: none; }
 .bc-covers__recent li { display: grid; gap: .25rem; width: 5.5rem; font-size: var(--text-xs); }
 .bc-covers__recent img { width: 64px; height: 90px; object-fit: cover; border: 1px solid var(--border-default); border-radius: .15rem; background: var(--bg-surface-muted); }
+.bc-update-notes { max-height: 20rem; overflow: auto; margin: .5rem 0 0; padding: .75rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .875rem; }

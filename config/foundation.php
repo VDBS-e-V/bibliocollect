@@ -32,6 +32,11 @@ return [
         'target' => null,
         'backup' => true,
         'protected' => ['.env', 'storage', 'public/covers', 'public/card-designs', 'public/storage', 'bootstrap/cache'],
+        // Update direkt von GitHub holen (ohne Upload): nur dieses Repository, nur stabile Releases mit Prüfsumme.
+        'release' => [
+            'repository' => 'VDBS-e-V/bibliocollect',
+            'max_bytes' => 100 * 1024 * 1024,
+        ],
     ],
 
     'production' => [
