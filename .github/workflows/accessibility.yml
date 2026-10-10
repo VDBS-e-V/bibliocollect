@@ -1,7 +1,9 @@
 name: Barrierefreiheit
 
-# Automatische Prüfung (axe-core, WCAG 2.2 AA) über die wichtigsten Seiten in hellem und dunklem Design.
-# Läuft getrennt von "Quality", damit ein Browserproblem nie die Codeprüfung blockiert. Bei Verstößen ab "serious" schlägt der Lauf fehl.
+# Browserprüfungen über die wichtigsten Seiten mit Demodaten:
+#  1. axe-core (WCAG 2.2 AA) in hellem und dunklem Design; Verstöße ab "serious" lassen den Lauf scheitern.
+#  2. Layout bei 320, 375, 768 und 1024 px; seitliches Scrollen oder über den Rand ragende Elemente lassen den Lauf scheitern.
+# Läuft getrennt von "Quality", damit ein Browserproblem nie die Codeprüfung blockiert.
 on:
   pull_request:
     paths:
@@ -63,9 +65,22 @@ jobs:
           BROWSER: /usr/bin/google-chrome
         run: npm run a11y
 
+      - name: Layout bei Handy- und Tabletbreiten
+        if: always()
+        env:
+          BROWSER: /usr/bin/google-chrome
+        run: npm run check:layout
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: a11y-report
           path: a11y-report/
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: layout-report
+          path: layout-report/
           retention-days: 14

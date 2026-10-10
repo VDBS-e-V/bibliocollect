@@ -1,4 +1,5 @@
 .bc-table-wrap {
+    position: relative;
     overflow-x: auto;
     border: 1px solid var(--border-default);
     background: var(--bg-surface);
