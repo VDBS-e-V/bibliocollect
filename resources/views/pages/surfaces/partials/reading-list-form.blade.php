@@ -6,18 +6,29 @@
 </div>
 
 @php($chosen = array_map('strval', old('school_class_ids', $list?->classes->pluck('id')->all() ?? [])))
-<fieldset class="bc-reading-classes">
-    <legend>Klassen</legend>
-    <p class="bc-field__hint">Schüler:innen dieser Klassen sehen die Liste in ihrem Konto. Das ist freiwillig: Mit dem Link unten kann jede Person die Liste ohne Konto öffnen.</p>
-    @forelse ($classes as $class)
-        <label class="bc-public-catalog-filter__check">
-            <input type="checkbox" name="school_class_ids[]" value="{{ $class['id'] }}" @checked(in_array($class['id'], $chosen, true))>
-            <span>{{ $class['name'] }}</span>
-        </label>
-    @empty
-        <p class="bc-section-copy">Es sind noch keine Klassen angelegt.</p>
-    @endforelse
-</fieldset>
+@php($classNames = collect($classes)->pluck('name', 'id'))
+<div class="bc-class-picker" data-class-picker>
+    <label class="bc-field__label" for="{{ $prefix }}-class-select">Klassen</label>
+    <p class="bc-field__hint">Schüler:innen der gewählten Klassen sehen die Liste in ihrem Konto. Das ist freiwillig: Mit dem Link kann jede Person die Liste ohne Konto öffnen.</p>
+    <select id="{{ $prefix }}-class-select" class="bc-field__control" data-class-picker-select>
+        <option value="">Klasse hinzufügen …</option>
+        @foreach ($classes as $class)
+            <option value="{{ $class['id'] }}" @disabled(in_array($class['id'], $chosen, true))>{{ $class['name'] }}</option>
+        @endforeach
+    </select>
+    <ul class="bc-class-picker__list" data-class-picker-list aria-label="Gewählte Klassen">
+        @foreach ($chosen as $classId)
+            @if ($classNames->has($classId))
+                <li class="bc-class-picker__item" data-class-id="{{ $classId }}">
+                    <span>{{ $classNames[$classId] }}</span>
+                    <input type="hidden" name="school_class_ids[]" value="{{ $classId }}">
+                    <button type="button" class="bc-class-picker__remove" data-class-remove aria-label="Klasse {{ $classNames[$classId] }} entfernen">×</button>
+                </li>
+            @endif
+        @endforeach
+    </ul>
+    <p class="bc-section-copy" data-class-picker-empty @if ($chosen !== []) hidden @endif>Noch keine Klasse gewählt. Die Liste ist dann nur über den Link erreichbar.</p>
+</div>
 
 <label class="bc-public-catalog-filter__check">
     <input type="checkbox" name="is_published" value="1" @checked(old('is_published', $list?->is_published ?? true))>

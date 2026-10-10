@@ -80,6 +80,10 @@ it('lets a teacher create a list, add titles from search and bookmarks and remov
     $this->actingAs($teacher)->post(route('portal.reading-lists.remove', ['listId' => $list->getKey(), 'titleId' => $found->getKey()]));
     expect($list->items()->count())->toBe(1);
 
+    // Die gewählten Klassen stehen als Liste unter dem Auswahlfeld.
+    $this->actingAs($teacher)->get(route('portal.reading-lists.show', ['listId' => $list->getKey()]))
+        ->assertSee('data-class-picker-select', false)->assertSee('Klasse 7a entfernen')->assertSee('Klasse 7b entfernen');
+
     $this->actingAs($teacher)->post(route('portal.reading-lists.update', ['listId' => $list->getKey()]), ['name' => 'Umbenannt'])->assertSessionHasNoErrors();
     expect($list->refresh()->name)->toBe('Umbenannt')->and($list->is_published)->toBeFalse();
 
