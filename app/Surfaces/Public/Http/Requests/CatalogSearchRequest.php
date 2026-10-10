@@ -32,9 +32,10 @@ final class CatalogSearchRequest extends FormRequest
             'year_to' => ['nullable', 'integer', 'min:1000', 'max:2100', Rule::when($this->filled('year_from'), ['gte:year_from'])],
             'media_type' => ['nullable', 'string', 'max:80'],
             'language_code' => ['nullable', 'string', 'max:16'],
+            'alter' => ['nullable', Rule::in(['0-6', '7-10', '11-13', '14-99'])],
             'active_only' => ['nullable', 'boolean'],
             'available_only' => ['nullable', 'boolean'],
-            'sort' => ['nullable', Rule::in(['title', 'title_desc', 'year_desc', 'year_asc', 'recent'])],
+            'sort' => ['nullable', Rule::in(['relevance', 'title', 'title_desc', 'year_desc', 'year_asc', 'recent'])],
             'per_page' => ['nullable', 'integer', Rule::in([10, 20, 50, 100])],
             'page' => ['nullable', 'integer', 'min:1', 'max:10000'],
         ];
@@ -43,7 +44,8 @@ final class CatalogSearchRequest extends FormRequest
     public function toCriteria(): CatalogSearchCriteria
     {
         $data = $this->validated();
-        $sort = $data['sort'] ?? 'title';
+        // Mit Suchwort sortiert der Katalog nach Relevanz, solange niemand etwas anderes gewählt hat.
+        $sort = $data['sort'] ?? (($data['q'] ?? null) !== null ? 'relevance' : 'title');
 
         return new CatalogSearchCriteria(
             term: $this->nullableString($data['q'] ?? null),
@@ -59,6 +61,7 @@ final class CatalogSearchRequest extends FormRequest
             yearTo: isset($data['year_to']) ? (int) $data['year_to'] : null,
             mediaType: $this->nullableString($data['media_type'] ?? null),
             languageCode: $this->nullableString($data['language_code'] ?? null),
+            ageStage: $this->nullableString($data['alter'] ?? null),
             activeCopiesOnly: $this->boolean('active_only'),
             availableNowOnly: $this->boolean('available_only'),
             sort: is_string($sort) ? $sort : 'title',
@@ -70,7 +73,7 @@ final class CatalogSearchRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        foreach (['q', 'title', 'contributor', 'subject', 'identifier', 'publisher', 'topic', 'regalbrett', 'thema', 'sort'] as $field) {
+        foreach (['q', 'title', 'contributor', 'subject', 'identifier', 'publisher', 'topic', 'regalbrett', 'thema', 'sort', 'alter'] as $field) {
             $this->merge([$field => $this->normalizeNullable($this->input($field))]);
         }
 

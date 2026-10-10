@@ -25,6 +25,8 @@ final readonly class CatalogSearchCriteria
         public ?int $yearTo = null,
         public ?string $mediaType = null,
         public ?string $languageCode = null,
+        /** Altersstufe als „von-bis“ des empfohlenen Mindestalters, zum Beispiel „7-10“. */
+        public ?string $ageStage = null,
         public bool $activeCopiesOnly = false,
         public bool $availableNowOnly = false,
         public string $sort = 'title',
@@ -54,6 +56,7 @@ final readonly class CatalogSearchCriteria
             || $this->yearTo !== null
             || $this->mediaType !== null
             || $this->languageCode !== null
+            || $this->ageStage !== null
             || $this->activeCopiesOnly
             || $this->availableNowOnly;
     }
