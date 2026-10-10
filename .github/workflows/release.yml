@@ -93,7 +93,7 @@ jobs:
           extensions: ctype, curl, dom, fileinfo, filter, iconv, libxml, mbstring, openssl, pdo_sqlite, session, sqlite3, tokenizer, zip
           coverage: none
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
