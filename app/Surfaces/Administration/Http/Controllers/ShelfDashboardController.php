@@ -108,9 +108,9 @@ final class ShelfDashboardController
             }
             $rows[] = [
                 'shelf' => $shelf,
-                'group' => $groupSection?->code ?? '',
-                'area' => $areaSection?->code ?? '',
-                'rack' => $section?->code ?? '',
+                'group' => $groupSection->code ?? '',
+                'area' => $areaSection->code ?? '',
+                'rack' => $section->code ?? '',
                 'copies' => $used,
                 'topics' => $shelf->topics->pluck('name')->implode(', '),
                 'warning' => implode('; ', $warnings),
