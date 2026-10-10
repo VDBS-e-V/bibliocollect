@@ -11,7 +11,6 @@ use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /** Schreibfreie Übersicht über Belegung und Themenabdeckung der physischen Regalbretter. */
