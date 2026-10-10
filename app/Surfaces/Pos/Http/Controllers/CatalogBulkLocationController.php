@@ -10,6 +10,7 @@ use App\Modules\Catalog\Models\Copy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -76,7 +77,14 @@ final class CatalogBulkLocationController
         $ids = array_column($snapshots, 'id');
         $destination = (string) $draft['shelf'];
 
-        DB::transaction(static function () use ($ids, $snapshots, $destination, $audit): void {
+        // Derselbe Vorschauschlüssel darf nicht parallel angewendet werden.
+        $lock = Cache::lock('catalog.bulk.location.'.hash('sha256', $data['token']), 30);
+        if (! $lock->get()) {
+            throw ValidationException::withMessages(['bulk' => 'Diese Stapelbearbeitung wird bereits verarbeitet.']);
+        }
+
+        try {
+            DB::transaction(static function () use ($ids, $snapshots, $destination, $audit): void {
             $shelf = CatalogShelf::query()->where('code', $destination)->where('is_active', true)->first();
 
             if ($shelf === null) {
@@ -107,7 +115,10 @@ final class CatalogBulkLocationController
                     'from' => $snapshot['from'], 'to' => $destination,
                 ]);
             }
-        });
+            });
+        } finally {
+            $lock->release();
+        }
 
         return redirect()->route('pos.catalog.index')->with('catalog_success', count($snapshots).' Exemplar(e) wurden auf den Standort '.$destination.' gesetzt.');
     }
