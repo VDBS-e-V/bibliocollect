@@ -293,3 +293,29 @@
 .bc-card-designs--compact {
     grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 }
+
+/* Leselisten: Zeilen mit Titel, Zusatzangaben und Knopf */
+.bc-reading-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+}
+
+.bc-reading-item > span {
+    color: var(--text-secondary);
+}
+
+.bc-reading-item form {
+    margin-left: auto;
+}
+
+.bc-reading-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+}

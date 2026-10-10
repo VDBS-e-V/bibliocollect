@@ -38,6 +38,7 @@
             <a href="#vormerkungen">Vormerkungen</a>
             @if (! $preview)
                 <a href="{{ route('portal.bookmarks') }}">Merkliste</a>
+                <a href="{{ route('portal.reading-lists') }}">Leselisten</a>
                 <a href="{{ route('portal.wishes.index') }}">Buchwünsche</a>
             @endif
         </aside>
