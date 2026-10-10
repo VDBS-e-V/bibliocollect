@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Foundation\Update;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -65,7 +66,7 @@ class ReleaseSource
             if (is_string($retry) && ctype_digit($retry)) {
                 $waitUntil = now()->addSeconds((int) $retry);
             } elseif (is_string($reset) && ctype_digit($reset)) {
-                $waitUntil = \Carbon\CarbonImmutable::createFromTimestamp((int) $reset, 'UTC');
+                $waitUntil = CarbonImmutable::createFromTimestamp((int) $reset, 'UTC');
             }
 
             // Bei fehlender Zeitangabe konservativ fünf Minuten nicht erneut anfragen.
