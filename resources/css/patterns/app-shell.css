@@ -236,7 +236,7 @@
 
 .bc-pos-tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
     gap: .75rem;
     margin: 0;
     padding: 0;
@@ -311,7 +311,7 @@
 
 .bc-stat-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
     gap: 0 2.5rem;
 }
 

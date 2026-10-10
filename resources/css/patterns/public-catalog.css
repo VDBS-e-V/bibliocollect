@@ -385,7 +385,7 @@
 
 /* Startseite: Schaufenster mit empfohlenen und neuen Medien sowie Themen. */
 .bc-showcase { margin-block: 2rem; }
-.bc-showcase__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.bc-showcase__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(9.5rem, 100%), 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
 .bc-showcase__tile { display: grid; align-content: start; gap: .5rem; }
 .bc-showcase__link { display: grid; gap: .25rem; color: inherit; text-decoration: none; }
 .bc-showcase__link:hover .bc-showcase__title { text-decoration: underline; }
@@ -393,7 +393,7 @@
 .bc-showcase__cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .bc-showcase__title { overflow-wrap: anywhere; line-height: 1.25; }
 .bc-showcase__authors { color: var(--text-secondary); font-size: .875rem; overflow-wrap: anywhere; }
-.bc-showcase__topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.bc-showcase__topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
 .bc-showcase__topic { display: grid; gap: .25rem; height: 100%; padding: .9rem 1rem; border: 1px solid var(--border-default); border-top: 3px solid var(--border-strong); border-radius: var(--radius-md); background: var(--bg-surface); color: inherit; text-decoration: none; }
 .bc-showcase__topic:hover strong { text-decoration: underline; }
 .bc-showcase__topic span { color: var(--text-secondary); font-size: .875rem; }

@@ -1,6 +1,6 @@
 .bc-card-designs {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
     gap: 1rem;
     margin: 0;
     padding: 0;
@@ -112,7 +112,7 @@
 }
 
 .bc-process-list {
-    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
 }
 
 .bc-process {
@@ -291,7 +291,7 @@
 }
 
 .bc-card-designs--compact {
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
 }
 
 /* Leselisten: Zeilen mit Titel, Zusatzangaben und Knopf */

@@ -79,3 +79,16 @@
 @media (max-width: 70rem) {
     .bc-calendar-table:not(.bc-stack-table) { display: block; max-width: 100%; overflow-x: auto; }
 }
+
+/* Mindestgröße der Tippfläche (WCAG 2.5.8, 24 × 24 px) für alleinstehende Links, auch mit der Maus. */
+.bc-context-actions a,
+.bc-account__claim,
+.bc-help-card__title,
+.bc-public-result__details-link,
+.bc-public-result__cover-link,
+.bc-content-section > p > a,
+.bc-page-header + p > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+}
