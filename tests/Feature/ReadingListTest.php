@@ -54,6 +54,7 @@ function listTitle(string $name, string $status = 'active'): Title
 
 it('lets a teacher create a list, add titles from search and bookmarks and remove them again', function (): void {
     $class = listClass('7a');
+    $second = listClass('7b');
     $teacher = listUser('teacher');
     $found = listTitle('Der kleine Wal');
     $marked = listTitle('Sternenreise');
@@ -63,10 +64,10 @@ it('lets a teacher create a list, add titles from search and bookmarks and remov
 
     $this->actingAs($teacher)->get(route('portal.reading-lists'))->assertOk()->assertSee('Neue Leseliste');
 
-    $this->actingAs($teacher)->post(route('portal.reading-lists.store'), ['name' => 'Klassenlektüre', 'school_class_id' => $class->getKey(), 'is_published' => '1'])
+    $this->actingAs($teacher)->post(route('portal.reading-lists.store'), ['name' => 'Klassenlektüre', 'school_class_ids' => [$class->getKey(), $second->getKey()], 'is_published' => '1'])
         ->assertRedirect();
     $list = ReadingList::query()->firstOrFail();
-    expect($list->name)->toBe('Klassenlektüre')->and($list->is_published)->toBeTrue();
+    expect($list->name)->toBe('Klassenlektüre')->and($list->is_published)->toBeTrue()->and($list->classes()->count())->toBe(2)->and(strlen($list->public_token))->toBe(32);
 
     $this->actingAs($teacher)->get(route('portal.reading-lists.show', ['listId' => $list->getKey(), 'q' => 'Wal']))
         ->assertOk()->assertSee('Der kleine Wal')->assertSee('Von meiner Merkliste')->assertSee('Sternenreise');
@@ -95,7 +96,8 @@ it('shows a published list only to students of the class and only while it runs'
     $classless = listUser('student', null, '810004');
     $title = listTitle('Lesestoff');
 
-    $list = ReadingList::query()->create(['user_id' => $teacher->getKey(), 'school_class_id' => $class->getKey(), 'name' => 'Sommerlektüre', 'is_published' => true]);
+    $list = ReadingList::query()->create(['user_id' => $teacher->getKey(), 'name' => 'Sommerlektüre', 'is_published' => true]);
+    $list->classes()->sync([$class->getKey()]);
     $list->items()->create(['title_id' => $title->getKey()]);
 
     $this->actingAs($student)->get(route('portal.reading-lists'))->assertOk()->assertSee('Sommerlektüre')->assertDontSee('Neue Leseliste');
@@ -112,7 +114,7 @@ it('shows a published list only to students of the class and only while it runs'
     // Ausgeschaltet oder abgelaufen: unsichtbar für die Klasse, die Lehrkraft sieht sie weiter.
     $list->update(['is_published' => false]);
     $this->actingAs($student)->get(route('portal.reading-lists.show', ['listId' => $list->getKey()]))->assertNotFound();
-    $this->actingAs($teacher)->get(route('portal.reading-lists.show', ['listId' => $list->getKey()]))->assertOk()->assertSee('Noch nicht für die Klasse sichtbar');
+    $this->actingAs($teacher)->get(route('portal.reading-lists.show', ['listId' => $list->getKey()]))->assertOk()->assertSee('Liste ist nicht erreichbar');
 
     $list->update(['is_published' => true, 'ends_on' => now()->subDay()->toDateString()]);
     $this->actingAs($student)->get(route('portal.reading-lists'))->assertDontSee('Sommerlektüre');
@@ -126,7 +128,8 @@ it('keeps lists private between teachers and hides withdrawn books', function ()
     $kept = listTitle('Bleibt');
     $gone = listTitle('Weg');
 
-    $list = ReadingList::query()->create(['user_id' => $first->getKey(), 'school_class_id' => $class->getKey(), 'name' => 'Erste Liste', 'is_published' => true]);
+    $list = ReadingList::query()->create(['user_id' => $first->getKey(), 'name' => 'Erste Liste', 'is_published' => true]);
+    $list->classes()->sync([$class->getKey()]);
     $list->items()->create(['title_id' => $kept->getKey()]);
     $list->items()->create(['title_id' => $gone->getKey()]);
 
@@ -147,4 +150,46 @@ it('deletes the lists of a teacher when the account is anonymized', function ():
     app(AnonymizationService::class)->anonymizePatron($patron->refresh());
 
     expect(ReadingList::query()->count())->toBe(0);
+});
+
+it('opens a list through the public link without an account and can renew the link', function (): void {
+    $class = listClass('7a');
+    $otherClass = listClass('7b');
+    $teacher = listUser('teacher', null, '810008');
+    $title = listTitle('Link-Buch');
+    $gone = listTitle('Link-Weg');
+
+    $list = ReadingList::query()->create(['user_id' => $teacher->getKey(), 'name' => 'Linkliste', 'description' => 'Für beide Klassen', 'is_published' => true]);
+    $list->classes()->sync([$class->getKey(), $otherClass->getKey()]);
+    $list->items()->create(['title_id' => $title->getKey()]);
+    $list->items()->create(['title_id' => $gone->getKey()]);
+    Copy::query()->where('barcode', md5('Link-Weg'))->update(['status' => 'withdrawn']);
+
+    $url = route('public.reading-list', ['token' => $list->public_token]);
+    $this->get($url)->assertOk()->assertSee('Linkliste')->assertSee('Link-Buch')->assertDontSee('Link-Weg')->assertSee('7a')->assertSee('7b')
+        ->assertSee('Zum Merken anmelden')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+
+    // Ein Link, den es nicht gibt, ist 404; die Liste selbst nennt keine Zahlen-ID als Zugang.
+    $this->get(route('public.reading-list', ['token' => str_repeat('a', 32)]))->assertNotFound();
+    $this->get(route('public.reading-list', ['token' => $list->getKey()]))->assertNotFound();
+
+    // Beide Klassen sehen die Liste im Konto.
+    foreach ([['810009', $class], ['810010', $otherClass]] as [$number, $studentClass]) {
+        $student = listUser('student', $studentClass, $number);
+        $this->actingAs($student)->get(route('portal.reading-lists'))->assertOk()->assertSee('Linkliste');
+    }
+
+    // Link erneuern: der alte geht nicht mehr. Nur die Besitzerin darf das.
+    $old = $list->public_token;
+    $this->actingAs(listUser('teacher', null, '810011'))->post(route('portal.reading-lists.renew-link', ['listId' => $list->getKey()]))->assertNotFound();
+    $this->actingAs($teacher)->post(route('portal.reading-lists.renew-link', ['listId' => $list->getKey()]))->assertRedirect();
+    expect($list->refresh()->public_token)->not->toBe($old);
+    $this->get(route('public.reading-list', ['token' => $old]))->assertNotFound();
+    $this->get(route('public.reading-list', ['token' => $list->public_token]))->assertOk();
+
+    // Ausgeschaltet oder abgelaufen: auch der Link zeigt nichts mehr.
+    $list->update(['is_published' => false]);
+    $this->get(route('public.reading-list', ['token' => $list->public_token]))->assertNotFound();
+    $list->update(['is_published' => true, 'ends_on' => now()->subDay()->toDateString()]);
+    $this->get(route('public.reading-list', ['token' => $list->public_token]))->assertNotFound();
 });

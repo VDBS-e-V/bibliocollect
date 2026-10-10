@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified', 'permission:surface.portal.access'])->gro
     Route::post('/konto/leselisten', [PortalReadingListController::class, 'store'])->name('portal.reading-lists.store');
     Route::get('/konto/leselisten/{listId}', [PortalReadingListController::class, 'show'])->name('portal.reading-lists.show');
     Route::post('/konto/leselisten/{listId}', [PortalReadingListController::class, 'update'])->name('portal.reading-lists.update');
+    Route::post('/konto/leselisten/{listId}/link-erneuern', [PortalReadingListController::class, 'renewLink'])->name('portal.reading-lists.renew-link');
     Route::post('/konto/leselisten/{listId}/loeschen', [PortalReadingListController::class, 'destroy'])->name('portal.reading-lists.destroy');
     Route::post('/konto/leselisten/{listId}/titel/{titleId}', [PortalReadingListController::class, 'addItem'])->name('portal.reading-lists.add');
     Route::post('/konto/leselisten/{listId}/titel/{titleId}/entfernen', [PortalReadingListController::class, 'removeItem'])->name('portal.reading-lists.remove');

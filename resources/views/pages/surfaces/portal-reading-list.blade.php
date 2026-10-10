@@ -1,6 +1,6 @@
 <x-app-shell surface="portal" :title="$list->name">
     <x-ui.page-header
-        :kicker="'Leseliste'.($list->schoolClass ? ' · '.$list->schoolClass->name : '')"
+        :kicker="'Leseliste'.($list->classes->isNotEmpty() ? ' · '.$list->classes->pluck('name')->join(', ') : '')"
         :title="$list->name"
         :lead="$list->description ?? ($owner ? 'Stelle hier Bücher für deine Klasse zusammen.' : 'Bücher, die deine Lehrkraft für dich ausgesucht hat.')"
     />
@@ -22,9 +22,22 @@
         <x-ui.alert variant="error" title="Bitte prüfen">{{ $errors->first() }}</x-ui.alert>
     @endif
 
-    @if ($owner && ! $list->isVisibleToClass())
-        @php($why = ! $list->is_published ? 'Die Liste ist ausgeschaltet.' : ($list->school_class_id === null ? 'Wähle unten eine Klasse aus.' : 'Die Laufzeit ist vorbei.'))
-        <x-ui.alert title="Noch nicht für die Klasse sichtbar">{{ $why }} Die Schüler:innen sehen die Liste erst, wenn du das änderst.</x-ui.alert>
+    @if ($owner && ! $list->isActive())
+        @php($why = ! $list->is_published ? 'Die Liste ist ausgeschaltet.' : 'Die Laufzeit ist vorbei.')
+        <x-ui.alert title="Liste ist nicht erreichbar">{{ $why }} Weder der öffentliche Link noch das Konto der Klassen zeigen sie, bis du das unten änderst.</x-ui.alert>
+    @endif
+
+    @if ($owner)
+        <section class="bc-content-section" aria-labelledby="link-heading">
+            <h2 id="link-heading">Öffentlicher Link</h2>
+            <p class="bc-section-copy">Wer diesen Link hat, sieht die Liste ohne Konto. Gib ihn an die Klasse weiter, zum Beispiel über die Lernplattform oder als Aushang.</p>
+            <p><input type="text" readonly value="{{ route('public.reading-list', ['token' => $list->public_token]) }}" class="bc-field__control" aria-label="Öffentlicher Link der Leseliste" onclick="this.select()"></p>
+            <p><a href="{{ route('public.reading-list', ['token' => $list->public_token]) }}">Liste so ansehen, wie die Klasse sie sieht</a></p>
+            <form method="post" action="{{ route('portal.reading-lists.renew-link', ['listId' => $list->getKey()]) }}">
+                @csrf
+                <button type="submit" class="bc-intake-linkbutton">Neuen Link erzeugen (der alte funktioniert dann nicht mehr)</button>
+            </form>
+        </section>
     @endif
 
     <section class="bc-content-section" aria-labelledby="items-heading">
