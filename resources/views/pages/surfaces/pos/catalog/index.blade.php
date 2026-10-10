@@ -117,9 +117,23 @@
                 id-prefix="staff-catalog-top"
             />
 
+            <form method="post" action="{{ route('pos.catalog.bulk-location.preview') }}">
+                @csrf
+                <div class="bc-action-row">
+                    <label for="bulk-target">Ziel-Regalbrett</label>
+                    <select id="bulk-target" name="shelf" required>
+                        <option value="">Bitte wählen</option>
+                        @foreach (\App\Modules\Catalog\Models\CatalogShelf::query()->where('is_active', true)->orderBy('code')->get() as $shelfOption)
+                            <option value="{{ $shelfOption->code }}">{{ $shelfOption->display() }}</option>
+                        @endforeach
+                    </select>
+                    <x-ui.button type="submit" variant="secondary">Ausgewählte Exemplare: Vorschau</x-ui.button>
+                </div>
+                <p class="bc-section-copy">Maximal 50 Exemplare pro Stapel. Die Vorschau schreibt noch keine Daten.</p>
             <x-ui.table>
                 <thead>
                     <tr>
+                        <th scope="col">Auswahl</th>
                         <th scope="col">Titel</th>
                         <th scope="col">Verantwortliche</th>
                         <th scope="col">Ausgaben / Metadaten</th>
@@ -132,6 +146,16 @@
                             $latestEdition = $title->editions->sortByDesc(fn ($edition) => $edition->publication_year ?? 0)->first();
                         @endphp
                         <tr>
+                            <td>
+                                @foreach ($title->editions as $edition)
+                                    @foreach ($edition->copies as $copy)
+                                        <label style="display:block">
+                                            <input type="checkbox" name="copies[]" value="{{ $copy->getKey() }}">
+                                            {{ $copy->barcode }}
+                                        </label>
+                                    @endforeach
+                                @endforeach
+                            </td>
                             <td>
                                 <strong>{{ $title->preferred_title }}</strong>
                                 @if ($title->subtitle)
@@ -164,6 +188,7 @@
                     @endforeach
                 </tbody>
             </x-ui.table>
+            </form>
 
             <x-catalog.pagination-controls
                 :paginator="$titles"

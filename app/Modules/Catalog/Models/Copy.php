@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
+ * @property Carbon|null $updated_at
  * @property string $edition_id
  * @property string $barcode
  * @property CopyStatus $status

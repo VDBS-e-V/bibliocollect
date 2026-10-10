@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Surfaces\Pos\Http\Controllers\CatalogBulkLocationController;
 use App\Surfaces\Pos\Http\Controllers\CatalogContributionController;
 use App\Surfaces\Pos\Http\Controllers\CatalogCopyController;
 use App\Surfaces\Pos\Http\Controllers\CatalogEditionController;
@@ -80,6 +81,9 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
     });
 
     Route::middleware('permission:catalog.manage')->group(function (): void {
+        Route::post('/betrieb/katalog/stapel/standort/vorschau', [CatalogBulkLocationController::class, 'preview'])->middleware('throttle:10,1')->name('pos.catalog.bulk-location.preview');
+        Route::post('/betrieb/katalog/stapel/standort/uebernehmen', [CatalogBulkLocationController::class, 'commit'])->middleware('throttle:10,1')->name('pos.catalog.bulk-location.commit');
+
         Route::get('/betrieb/katalog', CatalogIndexController::class)
             ->name('pos.catalog.index');
 
