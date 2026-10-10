@@ -208,7 +208,7 @@ it('does not mistake permission-related GitHub 403 for a rate limit', function (
     $admin = releaseUser('management');
 
     $this->actingAs($admin)->post(route('administration.update.release.check'))->assertSessionHasErrors('release');
-    $this->actingAs($admin)->get(route('administration.update.index'))->assertSee('verweigert die Release-Abfrage');
+    expect(session('errors')->first('release'))->toContain('verweigert die Release-Abfrage');
 });
 
 it('shows the GitHub rate-limit reset time rather than claiming one hour', function (): void {
@@ -221,9 +221,21 @@ it('shows the GitHub rate-limit reset time rather than claiming one hour', funct
     $admin = releaseUser('management');
 
     $this->actingAs($admin)->post(route('administration.update.release.check'))->assertSessionHasErrors('release');
-    $this->actingAs($admin)->get(route('administration.update.index'))
-        ->assertSee('Nächster Versuch frühestens am')
-        ->assertDontSee('in einer Stunde');
+    expect(session('errors')->first('release'))->toContain('Nächster Versuch frühestens am')
+        ->not->toContain('in einer Stunde');
+});
+
+it('applies a cooldown after a confirmed API limit', function (): void {
+    releaseHttp();
+    Http::fake(['api.github.com/*' => Http::response(['message' => 'API rate limit exceeded'], 403, [
+        'X-RateLimit-Remaining' => '0',
+        'Retry-After' => '120',
+    ])]);
+
+    $source = app(ReleaseSource::class);
+    expect(fn () => $source->latest())->toThrow(Exception::class, 'Nächster Versuch');
+    expect(fn () => $source->latest())->toThrow(Exception::class, 'vorübergehend begrenzt');
+    Http::assertSentCount(1);
 });
 
 it('reuses a successful release check rather than requesting GitHub again', function (): void {
