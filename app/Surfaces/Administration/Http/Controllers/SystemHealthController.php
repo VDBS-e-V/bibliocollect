@@ -7,6 +7,7 @@ namespace App\Surfaces\Administration\Http\Controllers;
 use App\Foundation\Models\SystemErrorEvent;
 use App\Foundation\Support\AlertService;
 use App\Foundation\Support\InstallationInfo;
+use App\Foundation\Support\ManualTasks;
 use App\Foundation\Support\ScheduledJobs;
 use App\Foundation\Support\SystemHealth;
 use App\Modules\Audit\Services\AuditRecorder;
@@ -47,6 +48,36 @@ final class SystemHealthController
                 'statusUrl' => config('hosting.cron_token') || config('hosting.status_token') ? url('/_status') : null,
             ])
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Unterseite „Cron und Aufgaben“: Zeitplan, Cron-Lauf und Aufgaben, die sonst die Konsole bräuchten. */
+    public function cron(ScheduledJobs $jobs, ManualTasks $tasks): Response
+    {
+        $statusUrl = config('hosting.cron_token') || config('hosting.status_token') ? url('/_status') : null;
+
+        return response()
+            ->view('pages.surfaces.administration.system.cron', [
+                'jobs' => $jobs->all(),
+                'tasks' => $tasks->all(),
+                'statusUrl' => $statusUrl,
+            ])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Führt eine Aufgabe aus der Liste „Weitere Aufgaben“ aus und zeigt ihre Ausgabe. */
+    public function runTask(string $task, ManualTasks $tasks, AuditRecorder $audit): RedirectResponse
+    {
+        abort_unless($tasks->has($task), 404);
+
+        $definition = $tasks->all()[$task];
+        $result = $tasks->run($task);
+
+        $audit->record('system.task.run', 'Aufgabe von Hand ausgeführt: '.$task.($result['ok'] ? '.' : ' (mit Fehler).'), null, ['task' => $task, 'ok' => $result['ok'], 'seconds' => $result['seconds']]);
+
+        return redirect()->route('administration.system.cron')
+            ->with($result['ok'] ? 'system_success' : 'system_error', '„'.$definition['label'].'“ ist '.($result['ok'] ? 'durchgelaufen' : 'fehlgeschlagen').' ('.$result['seconds'].' s).')
+            ->with('task_label', $definition['label'])
+            ->with('task_output', $result['output']);
     }
 
     /**
@@ -261,7 +292,7 @@ final class SystemHealthController
 
         $audit->record('system.job.run', 'Zeitplan-Aufgabe von Hand ausgeführt: '.$job.($result['ok'] ? '.' : ' (mit Fehler).'), null, ['job' => $job, 'ok' => $result['ok'], 'seconds' => $result['seconds']]);
 
-        return redirect()->route('administration.system.index')->with($result['ok'] ? 'system_success' : 'system_error', '„'.$job.'“: '.$result['message'].' ('.$result['seconds'].' s)');
+        return redirect()->route('administration.system.cron')->with($result['ok'] ? 'system_success' : 'system_error', '„'.$job.'“: '.$result['message'].' ('.$result['seconds'].' s)');
     }
 
     /** Ein Cron-Lauf wie vom Cronjob: fällige Aufgaben und danach ein Stück der Warteschlange (kurz, damit die Seite nicht hängt). */
@@ -273,12 +304,12 @@ final class SystemHealthController
         } catch (Throwable $exception) {
             report($exception);
 
-            return redirect()->route('administration.system.index')->with('system_error', 'Der Cron-Lauf ist mit einem Fehler beendet worden: '.$exception->getMessage());
+            return redirect()->route('administration.system.cron')->with('system_error', 'Der Cron-Lauf ist mit einem Fehler beendet worden: '.$exception->getMessage());
         }
 
         $audit->record('system.cron.run', 'Cron-Lauf von Hand ausgelöst.');
 
-        return redirect()->route('administration.system.index')->with('system_success', 'Cron-Lauf ausgeführt. '.$output);
+        return redirect()->route('administration.system.cron')->with('system_success', 'Cron-Lauf ausgeführt. '.$output);
     }
 
     /** Schickt eine Testmeldung, damit man sieht, ob ALERT_EMAIL und der Mailversand funktionieren. */

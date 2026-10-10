@@ -225,15 +225,19 @@ it('lists the scheduled tasks on the system page and runs one of them once on de
         'occurrences' => 1, 'first_seen_at' => now()->subDays(40), 'last_seen_at' => now()->subDays(40),
     ]);
 
-    $this->actingAs($admin)->get(route('administration.system.index'))
+    $this->actingAs($admin)->get(route('administration.system.index'))->assertOk()->assertSee('Cron und Aufgaben öffnen');
+
+    $this->get(route('administration.system.cron'))
         ->assertOk()
         ->assertSee('Zeitplan-Aufgaben')
         ->assertSee('reminders:send')
         ->assertSee('backup:database')
-        ->assertSee('Cron-Lauf jetzt auslösen');
+        ->assertSee('Cron-Lauf jetzt auslösen')
+        ->assertSee('Weitere Aufgaben')
+        ->assertSee('Katalogsuche messen');
 
     $this->post(route('administration.system.run-job', ['job' => 'system:prune-errors']))
-        ->assertRedirect(route('administration.system.index'))
+        ->assertRedirect(route('administration.system.cron'))
         ->assertSessionHas('system_success', static fn (string $text): bool => str_contains($text, 'system:prune-errors') && str_contains($text, 'durchgelaufen'));
 
     // Die Aufgabe hat wirklich gearbeitet und der Lauf steht im Protokoll.
@@ -245,7 +249,7 @@ it('runs a cron pass from the system page and leaves the heartbeat', function ()
     $admin = healthUser('technical_admin');
 
     $this->actingAs($admin)->post(route('administration.system.run-cron'))
-        ->assertRedirect(route('administration.system.index'))
+        ->assertRedirect(route('administration.system.cron'))
         ->assertSessionHas('system_success');
 
     expect(Cache::get(CronCommand::HEARTBEAT_KEY))->not->toBeNull();
@@ -261,5 +265,29 @@ it('rejects unknown tasks and keeps the task buttons away from other roles', fun
     foreach (['staff', 'student_ag_basic', 'teacher'] as $role) {
         $this->actingAs(healthUser($role))->post(route('administration.system.run-job', ['job' => 'reminders:send']))->assertForbidden();
         $this->actingAs(healthUser($role))->post(route('administration.system.run-cron'))->assertForbidden();
+    }
+});
+
+it('runs a manual task from the cron page and shows its output', function (): void {
+    $admin = healthUser('technical_admin');
+
+    $this->actingAs($admin)->post(route('administration.system.run-task', ['task' => 'search-benchmark']))
+        ->assertRedirect(route('administration.system.cron'))
+        ->assertSessionHas('system_success')
+        ->assertSessionHas('task_output', static fn (string $text): bool => str_contains($text, 'Titelwort'));
+
+    $this->get(route('administration.system.cron'))->assertOk()->assertSee('Ergebnis: Katalogsuche messen')->assertSee('Mittel');
+    expect(AuditEvent::query()->where('action', 'system.task.run')->count())->toBe(1);
+
+    $this->post(route('administration.system.run-task', ['task' => 'series-sync']))->assertSessionHas('system_success');
+    $this->post(route('administration.system.run-task', ['task' => 'privacy-preview']))->assertSessionHas('system_success');
+});
+
+it('rejects unknown manual tasks and keeps them away from other roles', function (): void {
+    $this->actingAs(healthUser('technical_admin'))->post(route('administration.system.run-task', ['task' => 'rm-rf']))->assertNotFound();
+
+    foreach (['staff', 'student_ag_basic', 'teacher'] as $role) {
+        $this->actingAs(healthUser($role))->post(route('administration.system.run-task', ['task' => 'search-benchmark']))->assertForbidden();
+        $this->actingAs(healthUser($role))->get(route('administration.system.cron'))->assertForbidden();
     }
 });

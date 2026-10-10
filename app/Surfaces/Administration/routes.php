@@ -63,6 +63,8 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/systemzustand', [SystemHealthController::class, 'index'])->name('administration.system.index');
         Route::post('/verwaltung/systemzustand/sicherung', [SystemHealthController::class, 'createBackup'])->middleware('throttle:4,1')->name('administration.system.backup');
         Route::get('/verwaltung/systemzustand/sicherung/{file}', [SystemHealthController::class, 'downloadBackup'])->middleware('throttle:20,1')->name('administration.system.backup.download');
+        Route::get('/verwaltung/systemzustand/cron', [SystemHealthController::class, 'cron'])->name('administration.system.cron');
+        Route::post('/verwaltung/systemzustand/aufgabe/{task}', [SystemHealthController::class, 'runTask'])->where('task', '[a-z0-9\-]+')->middleware('throttle:10,1')->name('administration.system.run-task');
         Route::post('/verwaltung/systemzustand/cron', [SystemHealthController::class, 'runCron'])->middleware('throttle:6,1')->name('administration.system.run-cron');
         Route::post('/verwaltung/systemzustand/aufgaben/{job}', [SystemHealthController::class, 'runJob'])->where('job', '[a-z0-9:_\-]+')->middleware('throttle:10,1')->name('administration.system.run-job');
         Route::post('/verwaltung/systemzustand/datenqualitaet', [SystemHealthController::class, 'saveQuality'])->middleware('throttle:10,1')->name('administration.system.quality');
