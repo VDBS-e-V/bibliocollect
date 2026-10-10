@@ -63,9 +63,9 @@ class ReleaseSource
 
             $waitUntil = null;
 
-            if (is_string($retry) && ctype_digit($retry)) {
+            if (ctype_digit($retry)) {
                 $waitUntil = now()->addSeconds((int) $retry);
-            } elseif (is_string($reset) && ctype_digit($reset)) {
+            } elseif (ctype_digit($reset)) {
                 $waitUntil = CarbonImmutable::createFromTimestamp((int) $reset, 'UTC');
             }
 
