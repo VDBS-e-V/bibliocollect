@@ -40,7 +40,32 @@ class ReleaseSource
         }
 
         if (in_array($response->status(), [403, 429], true)) {
-            throw new UpdateException('GitHub begrenzt gerade die Abfragen von diesem Server. Bitte in einer Stunde erneut versuchen.');
+            $remaining = $response->header('X-RateLimit-Remaining');
+            $retry = $response->header('Retry-After');
+            $reset = $response->header('X-RateLimit-Reset');
+            $message = strtolower((string) $response->json('message', ''));
+            $limited = $response->status() === 429
+                || $remaining === '0'
+                || str_contains($message, 'rate limit')
+                || str_contains($message, 'abuse detection');
+
+            if (! $limited) {
+                throw new UpdateException('GitHub verweigert die Release-Abfrage (HTTP 403). Bitte Repository-Zugriff und Serververbindung prüfen. Alternativ das Release-Paket manuell hochladen.');
+            }
+
+            $waitUntil = null;
+
+            if (is_string($retry) && ctype_digit($retry)) {
+                $waitUntil = now()->addSeconds((int) $retry);
+            } elseif (is_string($reset) && ctype_digit($reset)) {
+                $waitUntil = \Carbon\CarbonImmutable::createFromTimestamp((int) $reset, 'UTC');
+            }
+
+            $when = $waitUntil !== null && $waitUntil->isFuture()
+                ? ' Nächster Versuch frühestens am '.$waitUntil->timezone('Europe/Berlin')->format('d.m.Y H:i').' Uhr.'
+                : ' Bitte später erneut versuchen.';
+
+            throw new UpdateException('GitHub begrenzt gerade die Abfragen von diesem Server.'.$when.' Alternativ das Release-Paket manuell hochladen.');
         }
 
         if (! $response->successful()) {
