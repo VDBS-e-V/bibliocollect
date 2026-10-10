@@ -227,11 +227,14 @@ final readonly class ApplyMetadataProposalAction
             return;
         }
 
+        $dnb = in_array($proposal->source, [MetadataProposal::SOURCE_DNB_ID, MetadataProposal::SOURCE_DNB_ISBN], true);
+
         if (blank($edition->metadata_source)) {
-            $edition->metadata_source = 'dnb';
+            $edition->metadata_source = $dnb ? 'dnb' : explode('-', $proposal->source)[0];
         }
 
-        if (blank($edition->source_record_id)) {
+        // Die Kennung gehört nur dann in `source_record_id`, wenn sie von der DNB ist: Mit ihr fragt die Qualitätsprüfung später die DNB.
+        if ($dnb && blank($edition->source_record_id)) {
             $edition->source_record_id = $proposal->recordId;
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Catalog\Contracts\BibliographicLookupProvider;
 use App\Modules\Catalog\Exceptions\BibliographicLookupUnavailable;
+use App\Modules\Catalog\Lookup\ChainedLookupProvider;
 use App\Modules\Catalog\Lookup\Dnb\DnbLookupProvider;
 use App\Modules\Catalog\Lookup\Dnb\DnbMarcMapper;
 use App\Modules\Catalog\Services\BibliographicLookupService;
@@ -139,9 +140,13 @@ it('returns no records for an empty SRU result and rejects SRU diagnostics', fun
         ->toThrow(BibliographicLookupUnavailable::class);
 });
 
-it('exposes the DNB provider behind the lookup contract', function (): void {
-    expect(app(BibliographicLookupProvider::class))
-        ->toBeInstanceOf(DnbLookupProvider::class);
+it('exposes the DNB provider behind the lookup contract (the other sources are switched off in the tests)', function (): void {
+    $provider = app(BibliographicLookupProvider::class);
+    Http::fake(['services.dnb.de/*' => Http::response(DnbRecordXml::record(['id' => '1244853364', 'title' => 'Shi Yu']))]);
+
+    expect($provider)->toBeInstanceOf(ChainedLookupProvider::class)
+        ->and($provider->findByRecordId('1244853364')[0]->title)->toBe('Shi Yu')
+        ->and(app(DnbLookupProvider::class))->toBeInstanceOf(DnbLookupProvider::class);
 });
 
 it('finds a record by its DNB id and rejects values that are not an id', function (): void {

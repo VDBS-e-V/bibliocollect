@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Surfaces\Public\Support;
 
 use App\Modules\Catalog\DTOs\HoldingSummary;
+use App\Modules\Catalog\Lookup\Support\LanguageCodes;
 use App\Modules\Circulation\DTOs\CopyAvailability;
 use App\Modules\Circulation\DTOs\CopyLoanState;
 use Illuminate\Support\Str;
@@ -34,14 +35,7 @@ final class PublicCatalogPresenter
             return 'Sprache nicht angegeben';
         }
 
-        return match (mb_strtolower(trim($languageCode))) {
-            'de', 'deu', 'ger' => 'Deutsch',
-            'en', 'eng' => 'Englisch',
-            'fr', 'fra', 'fre' => 'Französisch',
-            'es', 'spa' => 'Spanisch',
-            'it', 'ita' => 'Italienisch',
-            default => mb_strtoupper(trim($languageCode)),
-        };
+        return LanguageCodes::label($languageCode) ?? mb_strtoupper(trim($languageCode));
     }
 
     public function roleLabel(string $roleKey): string

@@ -14,6 +14,10 @@ final readonly class MetadataProposal
 
     public const SOURCE_DNB_ISBN = 'dnb-isbn';
 
+    public const SOURCE_OPENLIBRARY_ISBN = 'openlibrary-isbn';
+
+    public const SOURCE_GOOGLEBOOKS_ISBN = 'googlebooks-isbn';
+
     public const SOURCE_LOCAL = 'local';
 
     /**

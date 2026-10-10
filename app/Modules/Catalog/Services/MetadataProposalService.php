@@ -92,6 +92,15 @@ final readonly class MetadataProposalService
         );
     }
 
+    /** Kennung der Quelle am Vorschlag; bei gemischten Quellen („openlibrary+googlebooks“) zählt die erste. */
+    private function sourceFor(string $recordSource): string
+    {
+        return match (explode('+', $recordSource)[0]) {
+            'googlebooks' => MetadataProposal::SOURCE_GOOGLEBOOKS_ISBN,
+            default => MetadataProposal::SOURCE_OPENLIBRARY_ISBN,
+        };
+    }
+
     /** @return array{0: BibliographicRecord|null, 1: string, 2: bool, 3: list<string>} Treffer, Quelle, Quelle erreichbar, Hinweise */
     private function findRecord(Edition $edition): array
     {
@@ -141,7 +150,16 @@ final readonly class MetadataProposalService
         }
 
         if (count($result->records) === 1) {
-            return [$result->records[0], MetadataProposal::SOURCE_DNB_ISBN, true, $warnings];
+            $record = $result->records[0];
+
+            if ($record->isAuthoritative()) {
+                return [$record, MetadataProposal::SOURCE_DNB_ISBN, true, $warnings];
+            }
+
+            // Treffer aus Open Library oder Google Books: brauchbar, aber weniger verlässlich. Die Warnung schließt den Fall von der gesammelten Übernahme aus.
+            $warnings[] = 'Die Angaben stammen aus '.$record->sourceLabel().' und sind weniger verlässlich als die der DNB. Bitte jede Änderung einzeln prüfen; der Fall wird nicht gesammelt übernommen.';
+
+            return [$record, $this->sourceFor($record->source), true, $warnings];
         }
 
         if (count($result->records) > 1) {
