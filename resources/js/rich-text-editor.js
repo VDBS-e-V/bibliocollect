@@ -17,6 +17,9 @@ await Promise.all([
   import('tinymce/skins/ui/oxide/skin.js'),
   import('tinymce/skins/ui/oxide/content.js'),
   import('tinymce/skins/content/default/content.js'),
+  import('tinymce/skins/ui/oxide-dark/skin.js'),
+  import('tinymce/skins/ui/oxide-dark/content.js'),
+  import('tinymce/skins/content/dark/content.js'),
   import('tinymce-i18n/langs8/de.js'),
 ]);
 
@@ -32,6 +35,16 @@ const CONTENT_STYLE = `
   a { color: #04704f; }
 `;
 
+/** Farben im dunklen Design (entsprechen den Tokens in resources/css/tokens.css). */
+const DARK_STYLE = `
+  body { background: #261926; color: #f1f4f2; }
+  th, td { border-color: #a49ca3; }
+  blockquote { border-left-color: #40cd9a; color: #d8d2d7; }
+  a { color: #40cd9a; }
+`;
+
+const isDark = () => document.documentElement.hasAttribute('data-vdbs-theme');
+
 /** Erlaubte Elemente: spiegelt die Liste des Servers (App\Modules\Content\Services\RichTextSanitizer). */
 const VALID_ELEMENTS = [
   'h2', 'h3', 'h4', 'p', 'br', 'strong/b', 'em/i', 'u', 's', 'ul', 'ol', 'li', 'blockquote', 'hr',
@@ -41,6 +54,8 @@ const VALID_ELEMENTS = [
 
 export function enhance(textarea) {
   textarea.removeAttribute('required'); // sonst blockiert der Browser das Absenden, weil das versteckte Feld nicht fokussierbar ist
+
+  const dark = isDark();
 
   return tinymce.init({
     target: textarea,
@@ -63,9 +78,9 @@ export function enhance(textarea) {
     entity_encoding: 'raw',
     browser_spellcheck: true,
     paste_data_images: false,
-    content_style: CONTENT_STYLE,
-    skin: 'oxide',
-    content_css: 'default',
+    content_style: CONTENT_STYLE + (dark ? DARK_STYLE : ''),
+    skin: dark ? 'oxide-dark' : 'oxide',
+    content_css: dark ? 'dark' : 'default',
     iframe_aria_text: FRAME_TITLE,
     setup(editor) {
       editor.on('change input undo redo', () => editor.save());
@@ -76,5 +91,28 @@ export function enhance(textarea) {
 }
 
 export default function init(textareas) {
-  return Promise.all(Array.from(textareas).map((textarea) => enhance(textarea)));
+  const fields = Array.from(textareas);
+  let darkNow = isDark();
+
+  // Wechselt jemand das Farbschema, wird der Editor mit dem passenden Aussehen neu aufgebaut (der Text bleibt erhalten).
+  new MutationObserver(() => {
+    if (isDark() === darkNow) {
+      return;
+    }
+
+    darkNow = isDark();
+
+    for (const textarea of fields) {
+      const editor = tinymce.get(textarea.id);
+
+      if (editor) {
+        editor.save();
+        editor.remove();
+      }
+
+      enhance(textarea);
+    }
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-vdbs-theme'] });
+
+  return Promise.all(fields.map((textarea) => enhance(textarea)));
 }
