@@ -40,7 +40,7 @@ function bulkLocationFixtures(): array
 
 it('requires catalog.manage for preview and commit', function (): void {
     $copies = bulkLocationFixtures();
-    $ag = bulkLocationUser('student_ag_extended');
+    $ag = bulkLocationUser('student_ag_basic');
 
     $this->actingAs($ag)->post(route('pos.catalog.bulk-location.preview'), [
         'copies' => [$copies[0]->getKey()], 'shelf' => 'I. A 1 b',
