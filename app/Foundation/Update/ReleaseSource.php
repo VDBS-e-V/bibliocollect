@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Foundation\Update;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 
@@ -16,6 +18,8 @@ use Throwable;
  */
 class ReleaseSource
 {
+    private const COOLDOWN_KEY = 'update.release.github.cooldown';
+
     /**
      * Das neueste stabile Release.
      *
@@ -26,6 +30,10 @@ class ReleaseSource
     public function latest(): array
     {
         $repository = $this->repository();
+
+        if (Cache::has(self::COOLDOWN_KEY)) {
+            throw new UpdateException('GitHub hat weitere Release-Abfragen vorübergehend begrenzt. Bitte später erneut versuchen oder das Paket manuell hochladen.');
+        }
 
         try {
             $response = Http::timeout(10)->acceptJson()
@@ -40,7 +48,38 @@ class ReleaseSource
         }
 
         if (in_array($response->status(), [403, 429], true)) {
-            throw new UpdateException('GitHub begrenzt gerade die Abfragen von diesem Server. Bitte in einer Stunde erneut versuchen.');
+            $remaining = $response->header('X-RateLimit-Remaining');
+            $retry = $response->header('Retry-After');
+            $reset = $response->header('X-RateLimit-Reset');
+            $message = strtolower((string) $response->json('message', ''));
+            $limited = $response->status() === 429
+                || $remaining === '0'
+                || str_contains($message, 'rate limit')
+                || str_contains($message, 'abuse detection');
+
+            if (! $limited) {
+                throw new UpdateException('GitHub verweigert die Release-Abfrage (HTTP 403). Bitte Repository-Zugriff und Serververbindung prüfen. Alternativ das Release-Paket manuell hochladen.');
+            }
+
+            $waitUntil = null;
+
+            if (ctype_digit($retry)) {
+                $waitUntil = now()->addSeconds((int) $retry);
+            } elseif (ctype_digit($reset)) {
+                $waitUntil = CarbonImmutable::createFromTimestamp((int) $reset, 'UTC');
+            }
+
+            // Bei fehlender Zeitangabe konservativ fünf Minuten nicht erneut anfragen.
+            $seconds = $waitUntil !== null && $waitUntil->isFuture()
+                ? min(3600, max(60, now()->diffInSeconds($waitUntil)))
+                : 300;
+            Cache::put(self::COOLDOWN_KEY, true, (int) $seconds);
+
+            $when = $waitUntil !== null && $waitUntil->isFuture()
+                ? ' Nächster Versuch frühestens am '.$waitUntil->timezone('Europe/Berlin')->format('d.m.Y H:i').' Uhr.'
+                : ' Bitte später erneut versuchen.';
+
+            throw new UpdateException('GitHub begrenzt gerade die Abfragen von diesem Server.'.$when.' Alternativ das Release-Paket manuell hochladen.');
         }
 
         if (! $response->successful()) {
