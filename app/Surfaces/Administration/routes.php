@@ -7,6 +7,7 @@ use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
 use App\Surfaces\Administration\Http\Controllers\CatalogShelfController;
 use App\Surfaces\Administration\Http\Controllers\CatalogShelfSectionController;
 use App\Surfaces\Administration\Http\Controllers\CatalogTopicController;
+use App\Surfaces\Administration\Http\Controllers\ClassificationImportController;
 use App\Surfaces\Administration\Http\Controllers\ContentBlockAdminController;
 use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
 use App\Surfaces\Administration\Http\Controllers\InventoryRenumberController;
@@ -131,6 +132,12 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
 // gesamten Verwaltungsbereich, nur das jeweilige Recht.
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::middleware('permission:shelves.manage')->group(function (): void {
+        Route::get('/verwaltung/klassifikation-import', [ClassificationImportController::class, 'index'])->name('administration.classification-import.index');
+        Route::post('/verwaltung/klassifikation-import', [ClassificationImportController::class, 'preview'])->middleware('throttle:10,1')->name('administration.classification-import.preview');
+        Route::get('/verwaltung/klassifikation-import/{draftId}', [ClassificationImportController::class, 'show'])->where('draftId', '[0-9A-Za-z]{26}')->name('administration.classification-import.show');
+        Route::post('/verwaltung/klassifikation-import/{draftId}', [ClassificationImportController::class, 'apply'])->where('draftId', '[0-9A-Za-z]{26}')->middleware('throttle:5,1')->name('administration.classification-import.apply');
+        Route::delete('/verwaltung/klassifikation-import/{draftId}', [ClassificationImportController::class, 'discard'])->where('draftId', '[0-9A-Za-z]{26}')->name('administration.classification-import.discard');
+
         Route::get('/verwaltung/regalbretter', [CatalogShelfController::class, 'index'])->name('administration.shelves.index');
         Route::post('/verwaltung/regalbretter', [CatalogShelfController::class, 'store'])->name('administration.shelves.store');
         Route::get('/verwaltung/themenbereiche', [CatalogTopicController::class, 'index'])->name('administration.topics.index');

@@ -192,3 +192,7 @@ Der optionale JSON-Bericht enthält alle auffälligen Barcodes mit DNB-ID, betro
 ## Testbetrieb
 
 Der Development-Seed enthält eine ausführlich angereicherte bestehende Demo-Ausgabe sowie Topic-/Signaturdaten, ohne die bisherigen Titel-/Exemplarzählwerte zu verändern. Zusätzlich liegen die realistischen phpMyAdmin-JSON-Fixtures unter `database/seeders/fixtures/`, mit denen Analyse, Import, Mehrfachexemplare, Klassifikation, Legacy-Verfügbarkeit, Warnungen sowie der Metadaten-Qualitätsaudit automatisiert getestet werden.
+
+## Themen und Regalbretter über die Weboberfläche
+
+Die Themenliste (`mediaTopicList`) und die Regalsignaturen (`mediaSignatures`) lassen sich ohne Konsole über die Verwaltung importieren (Vorschau, Bestätigung, Transaktion): siehe `docs/CLASSIFICATION_IMPORT.md`.

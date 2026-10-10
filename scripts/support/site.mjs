@@ -56,6 +56,7 @@ export const memberPages = [
   ['Statistik', '/betrieb/statistik'],
   ['Katalogimport', '/betrieb/katalog/import'],
   ['Regalbretter', '/verwaltung/regalbretter'],
+  ['Themen und Regalbretter importieren', '/verwaltung/klassifikation-import'],
   ['Themenbereiche', '/verwaltung/themenbereiche'],
   ['Schule', '/verwaltung/schule'],
   ['Regeln', '/verwaltung/regeln'],

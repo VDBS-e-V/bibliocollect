@@ -79,6 +79,7 @@ return [
                     'title' => 'Bestand',
                     'items' => [
                         ['label' => 'Regalbretter pflegen', 'text' => 'Die Liste der Regalbretter anlegen, die beim Erfassen als Standort gewählt werden.', 'route' => 'administration.shelves.index', 'permission' => 'shelves.manage'],
+                        ['label' => 'Themen und Regalbretter importieren', 'text' => 'Themenliste und Regalsignaturen aus dem Altsystem (JSON) prüfen und übernehmen, mit Vorschau und Bestätigung.', 'route' => 'administration.classification-import.index', 'permission' => 'shelves.manage'],
                         ['label' => 'Themenbereiche pflegen', 'text' => 'Die Themenbereiche anlegen und ändern, die ein Medium beim Erfassen bekommt. Welche Regalbretter dazu gehören, stellst du bei den Regalbrettern ein.', 'route' => 'administration.topics.index', 'permission' => 'shelves.manage'],
                         ['label' => 'Alte Inventarnummern umstellen', 'text' => 'Exemplare mit alter Nummer ausdrücklich auf neue siebenstellige Nummern umstellen und Etiketten drucken.', 'route' => 'administration.inventory.index', 'permission' => 'inventory.renumber'],
                         ['label' => 'Katalog importieren', 'text' => 'Bestandsdaten aus einer Datei einlesen.', 'route' => 'pos.catalog.import.create', 'permission' => 'catalog.import'],

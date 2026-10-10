@@ -18,6 +18,7 @@
     <div class="bc-context-actions">
         <a href="{{ route('administration.home') }}">← Zurück zur Verwaltung</a>
         <a href="{{ route('administration.topics.index') }}">Themenbereiche</a>
+        <a href="{{ route('administration.classification-import.index') }}">Themen und Regalbretter importieren</a>
         <a href="{{ route('administration.shelves.labels') }}"><strong>Etiketten für Regalbretter drucken</strong></a>
     </div>
 
