@@ -100,6 +100,10 @@ return [
             'label' => 'Regalbretter pflegen',
             'description' => 'Erlaubt, die Liste der Regalbretter (Standorte der Exemplare) anzulegen und zu ändern.',
         ],
+        'reading_lists.manage' => [
+            'label' => 'Leselisten anlegen',
+            'description' => 'Erlaubt, Leselisten für Klassen zusammenzustellen. Die Schüler:innen der Klasse sehen sie in ihrem Konto.',
+        ],
         'wishes.manage' => [
             'label' => 'Buchwünsche bearbeiten',
             'description' => 'Erlaubt, Buchwünsche anzusehen, selbst zu erfassen und den Stand zu setzen.',
@@ -126,7 +130,7 @@ return [
         ],
         'teacher' => [
             'label' => 'Lehrkraft',
-            'permissions' => ['surface.portal.access'],
+            'permissions' => ['surface.portal.access', 'reading_lists.manage'],
         ],
         'student_ag_basic' => [
             'label' => 'Schüler-AG Basis',
@@ -154,6 +158,7 @@ return [
                 'circulation.reports',
                 'statistics.view',
                 'wishes.manage',
+                'reading_lists.manage',
                 'shelves.manage',
                 'catalog.withdraw',
                 'inventory.count',
@@ -182,6 +187,7 @@ return [
                 'circulation.reports',
                 'statistics.view',
                 'wishes.manage',
+                'reading_lists.manage',
                 'shelves.manage',
                 'inventory.renumber',
                 'system.view',

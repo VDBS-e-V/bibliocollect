@@ -51,8 +51,8 @@ it('fills the profile menu with the personal account pages only', function (stri
 
     expect(switcherMenu($html))->toBe($expected);
 })->with([
-    'student' => ['student', ['Mein Konto', 'Meine Ausleihen', 'Meine Vormerkungen', 'Meine Merkliste', 'Meine Buchwünsche', 'Einstellungen', 'Meine Daten']],
-    'staff' => ['staff', ['Mein Konto', 'Meine Ausleihen', 'Meine Vormerkungen', 'Meine Merkliste', 'Meine Buchwünsche', 'Einstellungen', 'Meine Daten']],
+    'student' => ['student', ['Mein Konto', 'Meine Ausleihen', 'Meine Vormerkungen', 'Meine Merkliste', 'Meine Leselisten', 'Meine Buchwünsche', 'Einstellungen', 'Meine Daten']],
+    'staff' => ['staff', ['Mein Konto', 'Meine Ausleihen', 'Meine Vormerkungen', 'Meine Merkliste', 'Meine Leselisten', 'Meine Buchwünsche', 'Einstellungen', 'Meine Daten']],
     'technical admin' => ['technical_admin', []],
 ]);
 

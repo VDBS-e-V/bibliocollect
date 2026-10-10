@@ -33,6 +33,7 @@
         ['label' => 'Meine Ausleihen', 'url' => route('portal.home').'#ausleihen', 'current' => false],
         ['label' => 'Meine Vormerkungen', 'url' => route('portal.home').'#vormerkungen', 'current' => false],
         ['label' => 'Meine Merkliste', 'url' => route('portal.bookmarks'), 'current' => request()->routeIs('portal.bookmarks*')],
+        ['label' => 'Meine Leselisten', 'url' => route('portal.reading-lists'), 'current' => request()->routeIs('portal.reading-lists*')],
         ['label' => 'Meine Buchwünsche', 'url' => route('portal.wishes.index'), 'current' => request()->routeIs('portal.wishes.*')],
         ['label' => 'Einstellungen', 'url' => route('portal.home').'#einstellungen', 'current' => false],
         ['label' => 'Meine Daten', 'url' => route('portal.my-data'), 'current' => false],

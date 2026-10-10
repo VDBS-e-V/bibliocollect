@@ -14,6 +14,7 @@ use App\Modules\Circulation\Models\Bookmark;
 use App\Modules\Circulation\Models\BookWish;
 use App\Modules\Circulation\Models\Loan;
 use App\Modules\Circulation\Models\LoanTransaction;
+use App\Modules\Circulation\Models\ReadingList;
 use App\Modules\Circulation\Models\Reservation;
 use App\Modules\Patrons\Enums\CardBlockReason;
 use App\Modules\Patrons\Enums\CardStatus;
@@ -307,6 +308,7 @@ final readonly class AnonymizationService
         if ($user instanceof User) {
             // Die Merkliste gehört zur Person und wird mit dem Konto gelöscht.
             Bookmark::query()->where('user_id', $user->getKey())->delete();
+            ReadingList::query()->where('user_id', $user->getKey())->delete();
 
             $user->forceFill([
                 'name' => 'Anonymisiert',
