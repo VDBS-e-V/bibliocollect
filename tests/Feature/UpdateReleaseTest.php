@@ -195,11 +195,45 @@ it('explains clearly when there is no release yet', function (): void {
 
 it('explains clearly when GitHub limits the requests', function (): void {
     releaseHttp();
-    Http::fake(['api.github.com/*' => Http::response([], 403)]);
+    Http::fake(['api.github.com/*' => Http::response(['message' => 'API rate limit exceeded'], 403, ['X-RateLimit-Remaining' => '0'])]);
     $admin = releaseUser('management');
 
     $this->actingAs($admin)->post(route('administration.update.release.check'))->assertRedirect(route('administration.update.index'));
     $this->actingAs($admin)->get(route('administration.update.index'))->assertSee('begrenzt gerade die Abfragen');
+});
+
+it('does not mistake permission-related GitHub 403 for a rate limit', function (): void {
+    releaseHttp();
+    Http::fake(['api.github.com/*' => Http::response(['message' => 'Resource not accessible by integration'], 403)]);
+    $admin = releaseUser('management');
+
+    $this->actingAs($admin)->post(route('administration.update.release.check'))->assertSessionHasErrors('release');
+    $this->actingAs($admin)->get(route('administration.update.index'))->assertSee('verweigert die Release-Abfrage');
+});
+
+it('shows the GitHub rate-limit reset time rather than claiming one hour', function (): void {
+    releaseHttp();
+    $reset = now()->addMinutes(17)->timestamp;
+    Http::fake(['api.github.com/*' => Http::response(['message' => 'API rate limit exceeded'], 403, [
+        'X-RateLimit-Remaining' => '0',
+        'X-RateLimit-Reset' => (string) $reset,
+    ])]);
+    $admin = releaseUser('management');
+
+    $this->actingAs($admin)->post(route('administration.update.release.check'))->assertSessionHasErrors('release');
+    $this->actingAs($admin)->get(route('administration.update.index'))
+        ->assertSee('Nächster Versuch frühestens am')
+        ->assertDontSee('in einer Stunde');
+});
+
+it('reuses a successful release check rather than requesting GitHub again', function (): void {
+    releaseFake('v9.9.9');
+    $admin = releaseUser('management');
+
+    $this->actingAs($admin)->post(route('administration.update.release.check'))->assertSessionHasNoErrors();
+    $this->actingAs($admin)->post(route('administration.update.release.check'))->assertSessionHasNoErrors();
+
+    Http::assertSentCount(1);
 });
 
 it('explains clearly when GitHub cannot be reached', function (): void {
