@@ -108,7 +108,7 @@
                 @if ($provenance)
                     <dt>Datenquelle</dt>
                     <dd>
-                        {{ strtoupper($provenance->source) }}
+                        {{ \App\Modules\Catalog\DTOs\BibliographicRecord::label($provenance->source) }}
                         @if ($provenance->permalink)
                             · <a href="{{ $provenance->permalink }}" rel="noopener noreferrer" target="_blank">{{ $provenance->recordId }}</a>
                         @endif

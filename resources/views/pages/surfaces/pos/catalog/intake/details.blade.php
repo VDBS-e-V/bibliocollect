@@ -35,12 +35,15 @@
 
     @if ($provenance)
         <p class="bc-intake-note">
-            Datenquelle: <strong>{{ strtoupper($provenance->source) }}</strong>
+            Datenquelle: <strong>{{ \App\Modules\Catalog\DTOs\BibliographicRecord::label($provenance->source) }}</strong>
             @if ($provenance->permalink)
                 · <a href="{{ $provenance->permalink }}" rel="noopener noreferrer" target="_blank">Datensatz {{ $provenance->recordId }}</a>
             @endif
             – bitte prüfen und bei Bedarf ändern.
         </p>
+        @if ($provenance->source !== 'dnb')
+            <x-ui.alert title="Angaben nicht aus der DNB">Diese Angaben stammen aus {{ \App\Modules\Catalog\DTOs\BibliographicRecord::label($provenance->source) }} und sind weniger verlässlich als die der Deutschen Nationalbibliothek. Bitte Titel, Verlag, Jahr und Namen besonders genau prüfen.</x-ui.alert>
+        @endif
     @endif
 
     <form method="post" action="{{ route('pos.catalog.intake.details.store') }}" class="bc-intake-form">

@@ -43,5 +43,16 @@ return [
             'timeout' => (int) env('CATALOG_DNB_TIMEOUT', 10),
             'max_records' => (int) env('CATALOG_DNB_MAX_RECORDS', 10),
         ],
+
+        // Weitere Quellen für Bücher, die die DNB nicht kennt (andere Sprachen). Sie werden nur gefragt, wenn die DNB nichts findet
+        // (bei ISBN-Gruppe 3, dem deutschen Sprachraum) oder sogar vor ihr (alle anderen ISBN-Gruppen).
+        'open_library' => [
+            'enabled' => (bool) env('CATALOG_LOOKUP_OPEN_LIBRARY', true),
+            'timeout' => (int) env('CATALOG_LOOKUP_TIMEOUT', 10),
+        ],
+        'google_books' => [
+            'enabled' => (bool) env('CATALOG_LOOKUP_GOOGLE_BOOKS', true),
+            'timeout' => (int) env('CATALOG_LOOKUP_TIMEOUT', 10),
+        ],
     ],
 ];

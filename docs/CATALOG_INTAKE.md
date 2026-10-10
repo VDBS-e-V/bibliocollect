@@ -85,3 +85,13 @@ Bei Google Books ist die Speicherung der Bilder durch deren Nutzungsbedingungen 
 - `CatalogIntakeWorkflowTest`: Rechte, alle Schritte, Schutz vor Überspringen, vorhandene Ausgabe, GND-Wiederverwendung, Rollback bei Barcode-Konflikt, Abbruch.
 
 Die Tests laufen offline (`Http::fake`); in `phpunit.xml` ist der externe Cover-Abruf abgeschaltet.
+
+## Bücher in anderen Sprachen (Issue 40)
+
+Die DNB kennt vor allem deutschsprachige Titel. `App\Modules\Catalog\Lookup\ChainedLookupProvider` fragt deshalb mehrere Quellen der Reihe nach, bis eine etwas findet: Für ISBN-Gruppe 3 (deutscher Sprachraum) zuerst die DNB, danach Open Library und Google Books; für alle anderen ISBN-Gruppen zuerst Open Library und Google Books, zuletzt die DNB. Die Titelsuche fragt die DNB zuerst. Fehlt dem Treffer Verlag, Jahr, Sprache oder Verantwortliche, werden nur diese Lücken aus der nächsten Quelle zur selben ISBN gefüllt; die Quelle heißt dann zum Beispiel „Open Library + Google Books“. Ist keine Quelle erreichbar und gibt es keinen Treffer, gilt die Abfrage als „nicht verfügbar“.
+
+- Anbieter: `OpenLibraryLookupProvider` (Books-API, `jscmd=details`, Suche über `search.json`) und `GoogleBooksLookupProvider` (Volumes-API, Schlüssel optional aus `CATALOG_COVER_GOOGLE_BOOKS_KEY`). Beide lassen sich über `CATALOG_LOOKUP_OPEN_LIBRARY` und `CATALOG_LOOKUP_GOOGLE_BOOKS` abschalten; die DNB bleibt immer an.
+- Sprachcodes werden auf den dreistelligen MARC-Code vereinheitlicht (`LanguageCodes`, „en“ → „eng“), damit der Sprachfilter dieselbe Sprache nicht doppelt führt; der Katalog zeigt deutsche Sprachnamen für die gängigen Sprachen.
+- **Vertrauen:** Treffer aus Open Library und Google Books sind weniger verlässlich. In der Erfassung steht ein Hinweis, in der Katalogqualität trägt der Vorschlag die Quelle (`openlibrary-isbn`, `googlebooks-isbn`) und eine Warnung; damit ist er von der gesammelten Übernahme ausgeschlossen. Die Kennung der Quelle landet nur bei DNB-Treffern in `source_record_id` (mit ihr fragt die Qualitätsprüfung später die DNB).
+- **Qualitätslauf:** Fälle, bei denen die DNB nichts fand, lassen sich unter Systemzustand → Datenqualität mit „Fälle ohne Treffer erneut versuchen“ zurücksetzen; der nächtliche Lauf fragt sie dann bei allen Quellen. Dieselbe Seite zeigt die Sprachen im Bestand mit der Zahl der Ausgaben ohne Treffer.
+- Nicht lateinische Schrift (Kyrillisch, Arabisch, Türkisch, Ostasiatisch) wird als Text gespeichert, gesucht und angezeigt; die Qualitätsprüfung hält sie nicht für beschädigt (getestet). Eine lateinische Umschrift für die Suche gibt es noch nicht.

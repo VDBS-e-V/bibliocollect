@@ -34,6 +34,25 @@ final readonly class BibliographicRecord
         public ?string $targetAudience,
     ) {}
 
+    /** Namen der Quelle(n) für die Anzeige, zum Beispiel „Open Library + Google Books“. */
+    public function sourceLabel(): string
+    {
+        return self::label($this->source);
+    }
+
+    /** Ob die Angaben aus der DNB stammen (die verlässlichste Quelle). Aus anderen Quellen wird nie gesammelt übernommen. */
+    public function isAuthoritative(): bool
+    {
+        return $this->source === 'dnb';
+    }
+
+    public static function label(string $source): string
+    {
+        $names = ['dnb' => 'DNB', 'openlibrary' => 'Open Library', 'googlebooks' => 'Google Books'];
+
+        return implode(' + ', array_map(static fn (string $part): string => $names[$part] ?? strtoupper($part), explode('+', $source)));
+    }
+
     /** @return array<string, mixed> */
     public function toArray(): array
     {

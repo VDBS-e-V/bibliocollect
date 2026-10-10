@@ -12,6 +12,7 @@ use App\Foundation\Support\SystemHealth;
 use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Catalog\Enums\MetadataIssue;
 use App\Modules\Catalog\Enums\MetadataReviewStatus;
+use App\Modules\Catalog\Lookup\Support\LanguageCodes;
 use App\Modules\Catalog\Models\CatalogMetadataReview;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Services\MetadataProposalService;
@@ -115,7 +116,25 @@ final class SystemHealthController
 
         $settings = $queue->get();
 
+        // Welche Sprachen gibt es im Bestand, und bei wie vielen Ausgaben fand die Qualitätsprüfung keinen Treffer? Zeigt, wo weitere Quellen helfen.
+        $noMatch = CatalogMetadataReview::query()->where('proposal_state', MetadataProposalService::STATE_NONE)->pluck('edition_id');
+        $languages = Edition::query()
+            ->selectRaw('language_code, count(*) as editions')
+            ->groupBy('language_code')
+            ->orderByDesc('editions')
+            ->limit(12)
+            ->get()
+            ->map(static fn (Edition $edition): array => [
+                'code' => $edition->language_code,
+                'label' => $edition->language_code === null ? 'Sprache nicht angegeben' : (LanguageCodes::label($edition->language_code) ?? strtoupper($edition->language_code)),
+                'editions' => (int) $edition->getAttribute('editions'),
+                'no_match' => $noMatch->isEmpty() ? 0 : Edition::query()->whereIn('id', $noMatch)->when($edition->language_code === null, static fn ($query) => $query->whereNull('language_code'), static fn ($query) => $query->where('language_code', $edition->language_code))->count(),
+            ])
+            ->all();
+
         return [
+            'languages' => $languages,
+            'no_match_total' => $noMatch->count(),
             'rows' => $rows,
             'settings' => $settings,
             'open_defects' => $open()->where('severity', '>', 0)->count(),
@@ -123,6 +142,25 @@ final class SystemHealthController
             'waiting_enrichment' => $open()->where('severity', 0)->whereNull('proposal_state')->count(),
             'nights' => $settings['per_night'] > 0 ? (int) ceil(($open()->where('severity', '>', 0)->whereNull('proposal_state')->count() + ($settings['enrichment'] ? $open()->where('severity', 0)->whereNull('proposal_state')->count() : 0)) / $settings['per_night']) : 0,
         ];
+    }
+
+    /**
+     * Setzt Fälle zurück, bei denen die Qualitätsprüfung keinen Treffer fand: Der nächtliche Lauf versucht sie erneut, jetzt auch mit den
+     * weiteren Quellen (Open Library, Google Books). Nur für Fälle, deren Ausgabe eine ISBN hat (ohne ISBN wird nichts nachgeschlagen).
+     */
+    public function retryNoMatch(AuditRecorder $audit, Request $request): RedirectResponse
+    {
+        $count = CatalogMetadataReview::query()
+            ->where('status', MetadataReviewStatus::Open->value)
+            ->where('proposal_state', MetadataProposalService::STATE_NONE)
+            ->whereIn('edition_id', Edition::query()->whereNotNull('isbn')->select('id'))
+            ->update(['proposal_state' => null, 'proposal' => null, 'proposal_source' => null, 'proposal_fetched_at' => null]);
+
+        $audit->record('system.quality.retry_none', $count.' Fälle ohne Treffer zum erneuten Nachschlagen vorgemerkt.', null, ['cases' => $count], (int) $request->user()?->getAuthIdentifier());
+
+        return redirect()->route('administration.system.index')->with('system_success', $count === 0
+            ? 'Es gibt keine offenen Fälle ohne Treffer mit ISBN.'
+            : $count.' Fälle werden vom nächtlichen Lauf (oder mit „Jetzt ein Stück abarbeiten“) erneut nachgeschlagen, jetzt auch bei Open Library und Google Books.');
     }
 
     /** Speichert, was der nächtliche Lauf zuerst abarbeiten soll. */

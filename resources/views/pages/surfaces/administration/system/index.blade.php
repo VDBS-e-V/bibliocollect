@@ -182,6 +182,25 @@
             </div>
         </form>
 
+        <h3 class="bc-covers__recent-heading">Sprachen im Bestand</h3>
+        <p class="bc-section-copy">Die DNB kennt vor allem deutschsprachige Bücher. Bei anderen Sprachen fragt das System zusätzlich Open Library und Google Books. Die Spalte „ohne Treffer“ zeigt, wie viele Ausgaben bei der Prüfung nirgends gefunden wurden.</p>
+        @if ($quality['languages'] !== [])
+            <table class="bc-calendar-table">
+                <thead><tr><th scope="col">Sprache</th><th scope="col">Ausgaben</th><th scope="col">Ohne Treffer</th></tr></thead>
+                <tbody>
+                    @foreach ($quality['languages'] as $language)
+                        <tr><th scope="row">{{ $language['label'] }}</th><td class="bc-tabular">{{ $language['editions'] }}</td><td class="bc-tabular">{{ $language['no_match'] }}</td></tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+        @if ($quality['no_match_total'] > 0)
+            <form method="post" action="{{ route('administration.system.quality.retry') }}">
+                @csrf
+                <x-ui.button type="submit" variant="secondary" data-confirm="Alle offenen Fälle ohne Treffer ({{ $quality['no_match_total'] }}) noch einmal nachschlagen, jetzt auch bei Open Library und Google Books?">Fälle ohne Treffer erneut versuchen ({{ $quality['no_match_total'] }})</x-ui.button>
+            </form>
+        @endif
+
         <form method="post" action="{{ route('administration.system.run-job', ['job' => 'catalog:quality:propose']) }}">
             @csrf
             <x-ui.button type="submit" variant="secondary" data-confirm="Jetzt einen Lauf mit der gespeicherten Auswahl starten? Er fragt externe Quellen ab und kann einige Minuten dauern.">Jetzt ein Stück abarbeiten</x-ui.button>

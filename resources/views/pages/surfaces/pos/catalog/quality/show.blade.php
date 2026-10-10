@@ -11,6 +11,8 @@
     $sourceLabel = match ($proposal?->source) {
         'dnb-id' => 'DNB (über die gespeicherte DNB-ID)',
         'dnb-isbn' => 'DNB (über die ISBN)',
+        'openlibrary-isbn' => 'Open Library (über die ISBN, weniger verlässlich als die DNB)',
+        'googlebooks-isbn' => 'Google Books (über die ISBN, weniger verlässlich als die DNB)',
         default => 'Lokale Bereinigung (ohne externe Quelle)',
     };
 @endphp
