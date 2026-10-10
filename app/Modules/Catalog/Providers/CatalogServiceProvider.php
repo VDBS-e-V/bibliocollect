@@ -35,7 +35,8 @@ final class CatalogServiceProvider extends ServiceProvider
                 $providers['openlibrary'] = $app->make(OpenLibraryLookupProvider::class);
             }
 
-            if ((bool) config('catalog.lookup.google_books.enabled', true)) {
+            // Ohne eigenen Schlüssel ist die gemeinsame Tagesgrenze von Google bei Anfragen von Webspace-Adressen fast immer erschöpft.
+            if ((bool) config('catalog.lookup.google_books.enabled', true) && trim((string) config('catalog.covers.google_books.key')) !== '') {
                 $providers['googlebooks'] = $app->make(GoogleBooksLookupProvider::class);
             }
 

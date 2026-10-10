@@ -34,7 +34,7 @@ final readonly class OpenLibraryLookupProvider implements BibliographicLookupPro
             return [];
         }
 
-        $response = $this->get('https://openlibrary.org/api/books', ['bibkeys' => 'ISBN:'.$compact, 'format' => 'json', 'jscmd' => 'details']);
+        $response = $this->get('https://openlibrary.org/api/books', ['bibkeys' => 'ISBN:'.$compact, 'format' => 'json', 'jscmd' => 'data']);
 
         if ($response->status() === 404) {
             return [];
@@ -42,13 +42,13 @@ final readonly class OpenLibraryLookupProvider implements BibliographicLookupPro
 
         $entry = $response->json('ISBN:'.$compact);
 
-        if (! is_array($entry) || ! is_array($entry['details'] ?? null)) {
+        if (! is_array($entry) || $this->text($entry['title'] ?? null) === null) {
             return [];
         }
 
-        $record = $this->fromDetails($entry['details'], $this->isbns->toIsbn13($compact) ?? $compact, is_string($entry['info_url'] ?? null) ? $entry['info_url'] : null);
+        $record = $this->fromData($entry, $this->isbns->toIsbn13($compact) ?? $compact, $this->editionLanguage($compact));
 
-        return $record === null ? [] : [$record];
+        return [$record];
     }
 
     /** Open Library kennt keine Datensatz-Nummern der DNB. */
@@ -112,58 +112,61 @@ final readonly class OpenLibraryLookupProvider implements BibliographicLookupPro
     }
 
     /**
-     * @param  array<string, mixed>  $details
+     * @param  array<string, mixed>  $data  Antwort von `api/books?jscmd=data`
      */
-    private function fromDetails(array $details, string $isbn, ?string $permalink): ?BibliographicRecord
+    private function fromData(array $data, string $isbn, ?string $language): BibliographicRecord
     {
-        $title = $this->text($details['title'] ?? null);
-
-        if ($title === null) {
-            return null;
-        }
-
-        $key = $this->text($details['key'] ?? null);
-        $authors = [];
-
-        foreach ((array) ($details['authors'] ?? []) as $author) {
-            $authors[] = is_array($author) ? ($author['name'] ?? null) : $author;
-        }
-
-        $languages = (array) ($details['languages'] ?? []);
-        $language = null;
-
-        foreach ($languages as $entry) {
-            $language = LanguageCodes::marc(is_array($entry) ? ($entry['key'] ?? null) : (is_string($entry) ? $entry : null));
-
-            if ($language !== null) {
-                break;
-            }
-        }
-
-        $pages = $details['number_of_pages'] ?? null;
+        $names = static fn (array $entries): array => array_map(static fn (mixed $entry): mixed => is_array($entry) ? ($entry['name'] ?? null) : $entry, $entries);
+        $identifiers = is_array($data['identifiers'] ?? null) ? $data['identifiers'] : [];
+        $id = $this->text(((array) ($identifiers['openlibrary'] ?? []))[0] ?? null);
+        $pages = $data['number_of_pages'] ?? null;
 
         return new BibliographicRecord(
             source: self::SOURCE,
-            sourceRecordId: $key !== null ? basename($key) : null,
-            sourcePermalink: $permalink ?? ($key !== null ? 'https://openlibrary.org'.$key : null),
-            title: $title,
-            subtitle: $this->text($details['subtitle'] ?? null),
-            responsibilityStatement: $this->text($details['by_statement'] ?? null),
-            contributors: $this->contributors($authors),
+            sourceRecordId: $id,
+            sourcePermalink: $this->https($this->text($data['url'] ?? null)),
+            title: (string) $this->text($data['title'] ?? null),
+            subtitle: $this->text($data['subtitle'] ?? null),
+            responsibilityStatement: $this->text($data['by_statement'] ?? null),
+            contributors: $this->contributors($names((array) ($data['authors'] ?? []))),
             isbn: $isbn,
-            publisherName: $this->text(((array) ($details['publishers'] ?? []))[0] ?? null),
-            publicationPlace: $this->text(((array) ($details['publish_places'] ?? []))[0] ?? null),
-            publicationYear: $this->year($details['publish_date'] ?? null),
-            editionStatement: $this->text($details['edition_name'] ?? null),
+            publisherName: $this->text($names((array) ($data['publishers'] ?? []))[0] ?? null),
+            publicationPlace: $this->text($names((array) ($data['publish_places'] ?? []))[0] ?? null),
+            publicationYear: $this->year($data['publish_date'] ?? null),
+            editionStatement: $this->text($data['edition_name'] ?? null),
             physicalExtent: is_numeric($pages) && (int) $pages > 0 ? (int) $pages.' Seiten' : null,
             languageCode: $language,
             originalLanguageCode: null,
             mediaType: 'book',
-            seriesStatement: $this->text(((array) ($details['series'] ?? []))[0] ?? null),
+            seriesStatement: null,
             summary: null,
-            subjectKeywords: $this->keywords((array) ($details['subjects'] ?? [])),
+            subjectKeywords: $this->keywords((array) ($data['subjects'] ?? [])),
             targetAudience: null,
         );
+    }
+
+    /** Die Sprache steht nur im Ausgabe-Datensatz (`/isbn/<ISBN>.json`, folgt einer Weiterleitung). Fehlt er, bleibt die Sprache leer. */
+    private function editionLanguage(string $isbn): ?string
+    {
+        try {
+            $response = $this->get('https://openlibrary.org/isbn/'.$isbn.'.json', []);
+        } catch (BibliographicLookupUnavailable) {
+            return null;
+        }
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        foreach ((array) $response->json('languages', []) as $entry) {
+            $code = LanguageCodes::marc(is_array($entry) ? ($entry['key'] ?? null) : (is_string($entry) ? $entry : null));
+
+            if ($code !== null) {
+                return $code;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -187,6 +190,11 @@ final readonly class OpenLibraryLookupProvider implements BibliographicLookupPro
         }
 
         return $response;
+    }
+
+    private function https(?string $url): ?string
+    {
+        return $url === null ? null : (string) preg_replace('#^http://#', 'https://', $url);
     }
 
     private function text(mixed $value): ?string

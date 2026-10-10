@@ -42,18 +42,24 @@ function foreignUser(string $role): User
     return $user;
 }
 
-/** @return array<string, mixed> */
-function openLibraryBody(string $isbn = FOREIGN_ISBN, array $details = []): array
+/**
+ * Open Library antwortet zweimal: Daten zur ISBN (`api/books`) und der Ausgabe-Datensatz (`isbn/<ISBN>.json`) mit der Sprache.
+ *
+ * @param  array<string, mixed>  $data
+ * @return array<string, mixed> nachgestellte Antworten
+ */
+function openLibraryStubs(string $isbn = FOREIGN_ISBN, array $data = [], string $language = 'eng'): array
 {
-    return ['ISBN:'.$isbn => [
-        'bib_key' => 'ISBN:'.$isbn,
-        'info_url' => 'https://openlibrary.org/books/OL1M/Pride_and_Prejudice',
-        'details' => array_merge([
-            'key' => '/books/OL1M', 'title' => 'Pride and Prejudice', 'authors' => [['name' => 'Jane Austen', 'key' => '/authors/OL1A']],
-            'publishers' => ['Penguin Classics'], 'publish_date' => 'March 3, 2003', 'languages' => [['key' => '/languages/eng']],
-            'number_of_pages' => 480, 'subjects' => ['Fiction', 'Sisters', 'fiction'],
-        ], $details),
-    ]];
+    return [
+        'openlibrary.org/api/books*' => Http::response(['ISBN:'.$isbn => array_merge([
+            'url' => 'https://openlibrary.org/books/OL1M/Pride_and_Prejudice', 'title' => 'Pride and Prejudice',
+            'authors' => [['name' => 'Jane Austen', 'url' => 'https://openlibrary.org/authors/OL1A/Jane_Austen']],
+            'publishers' => [['name' => 'Penguin Classics']], 'publish_date' => 'March 3, 2003', 'number_of_pages' => 480,
+            'identifiers' => ['openlibrary' => ['OL1M']],
+            'subjects' => [['name' => 'Fiction'], ['name' => 'Sisters'], ['name' => 'fiction']],
+        ], $data)]),
+        'openlibrary.org/isbn/*' => Http::response(['languages' => [['key' => '/languages/'.$language]]]),
+    ];
 }
 
 /** @return array<string, mixed> */
@@ -75,7 +81,7 @@ function foreignFake(array $stubs): void
 
 function foreignSourcesOn(): void
 {
-    config(['catalog.lookup.open_library.enabled' => true, 'catalog.lookup.google_books.enabled' => true]);
+    config(['catalog.lookup.open_library.enabled' => true, 'catalog.lookup.google_books.enabled' => true, 'catalog.covers.google_books.key' => 'testschluessel']);
     app()->forgetInstance(BibliographicLookupProvider::class);
     app()->forgetInstance(BibliographicLookupService::class);
     app()->forgetInstance(MetadataProposalService::class);
@@ -95,7 +101,7 @@ it('unifies language codes of the sources', function (): void {
 });
 
 it('maps an Open Library record to neutral catalog fields', function (): void {
-    foreignFake(['openlibrary.org/*' => Http::response(openLibraryBody())]);
+    foreignFake(openLibraryStubs());
 
     $records = app(OpenLibraryLookupProvider::class)->findByIsbn('978-0-14-143951-8');
 
@@ -140,7 +146,7 @@ it('asks the DNB first for German ISBNs and the other sources first for all othe
     foreignSourcesOn();
     foreignFake([
         'services.dnb.de/*' => Http::response(DnbRecordXml::record(['id' => '1244853364', 'isbns' => [GERMAN_ISBN], 'title' => 'Shi Yu', 'contributors' => [['name' => 'Autor, Anna', 'code' => 'aut']]])),
-        'openlibrary.org/*' => Http::response(openLibraryBody()),
+        ...openLibraryStubs(),
         'www.googleapis.com/*' => Http::response(googleBody()),
     ]);
 
@@ -150,7 +156,7 @@ it('asks the DNB first for German ISBNs and the other sources first for all othe
 
     foreignFake([
         'services.dnb.de/*' => Http::response(DnbRecordXml::record(['isbns' => [FOREIGN_ISBN], 'title' => 'Aus der DNB'])),
-        'openlibrary.org/*' => Http::response(openLibraryBody()),
+        ...openLibraryStubs(),
         'www.googleapis.com/*' => Http::response(googleBody()),
     ]);
     $foreign = app(BibliographicLookupService::class)->byIsbn(FOREIGN_ISBN);
@@ -183,7 +189,7 @@ it('reports a lookup as unavailable only when no source answered and none found 
 it('fills gaps of a record from the next source and names both', function (): void {
     foreignSourcesOn();
     foreignFake([
-        'openlibrary.org/*' => Http::response(openLibraryBody(FOREIGN_ISBN, ['publishers' => [], 'publish_date' => null, 'title' => 'Von Open Library'])),
+        ...openLibraryStubs(FOREIGN_ISBN, ['publishers' => [], 'publish_date' => null, 'title' => 'Von Open Library']),
         'www.googleapis.com/*' => Http::response(googleBody(FOREIGN_ISBN, ['publisher' => 'Penguin', 'publishedDate' => '1999'])),
     ]);
 
@@ -213,7 +219,7 @@ it('proposes data from another source in the quality check, marks it as less rel
     foreignSourcesOn();
     foreignFake([
         'services.dnb.de/*' => Http::response(DnbRecordXml::response([])),
-        'openlibrary.org/*' => Http::response(openLibraryBody()),
+        ...openLibraryStubs(),
         'www.googleapis.com/*' => Http::response(googleBody()),
     ]);
 
@@ -276,4 +282,19 @@ it('keeps the DNB provider usable on its own and builds the chain from the switc
     expect(app(BibliographicLookupService::class)->byIsbn(FOREIGN_ISBN)->records[0])->toBeInstanceOf(BibliographicRecord::class);
     Http::assertNotSent(static fn (Request $request): bool => str_contains($request->url(), 'openlibrary.org'));
     expect(app(DnbLookupProvider::class))->toBeInstanceOf(DnbLookupProvider::class);
+});
+
+it('asks Google Books only when a key is configured', function (): void {
+    foreignSourcesOn();
+    config(['catalog.covers.google_books.key' => '']);
+    app()->forgetInstance(BibliographicLookupProvider::class);
+    app()->forgetInstance(BibliographicLookupService::class);
+    foreignFake([
+        'openlibrary.org/api/books*' => Http::response([]),
+        'services.dnb.de/*' => Http::response(DnbRecordXml::response([])),
+        'www.googleapis.com/*' => Http::response(googleBody()),
+    ]);
+
+    expect(app(BibliographicLookupService::class)->byIsbn(FOREIGN_ISBN)->records)->toBe([]);
+    Http::assertNotSent(static fn (Request $request): bool => str_contains($request->url(), 'googleapis.com'));
 });
