@@ -61,6 +61,7 @@ export const memberPages = [
   ['Regeln', '/verwaltung/regeln'],
   ['Öffnungszeiten', '/verwaltung/oeffnungszeiten'],
   ['Seiten', '/verwaltung/seiten'],
+  ['Seite bearbeiten (Editor)', '/verwaltung/seiten/impressum'],
   ['Protokoll', '/verwaltung/protokoll'],
 ];
 
