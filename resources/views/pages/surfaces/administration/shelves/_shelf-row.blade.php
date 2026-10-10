@@ -25,11 +25,14 @@
     <details class="bc-loc__edit">
         <summary>Regalbrett bearbeiten</summary>
         @include('pages.surfaces.administration.shelves._shelf-form', ['shelf' => $shelf, 'rackId' => $shelf->section_id])
-        @if ($copies === 0)
-            <form method="post" action="{{ route('administration.shelves.destroy', ['shelfId' => $shelf->getKey()]) }}">
-                @csrf @method('DELETE')
+        <form method="post" action="{{ route('administration.shelves.destroy', ['shelfId' => $shelf->getKey()]) }}">
+            @csrf @method('DELETE')
+            @if ($copies === 0)
                 <button type="submit" class="bc-intake-linkbutton" data-confirm="Regalbrett „{{ $shelf->code }}“ wirklich löschen?" data-confirm-label="Löschen">Regalbrett löschen</button>
-            </form>
-        @endif
+            @else
+                <input type="hidden" name="release_copies" value="1">
+                <button type="submit" class="bc-intake-linkbutton" data-confirm="Regalbrett „{{ $shelf->code }}“ löschen? {{ $copies }} {{ $copies === 1 ? 'Exemplar verliert' : 'Exemplare verlieren' }} dabei ihren Standort und stehen wieder zum Einsortieren an. Die Medien und ihre Inventarnummern bleiben." data-confirm-label="Löschen">Regalbrett löschen (Standort von {{ $copies }} {{ $copies === 1 ? 'Exemplar' : 'Exemplaren' }} entfernen)</button>
+            @endif
+        </form>
     </details>
 </li>

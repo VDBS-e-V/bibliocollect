@@ -60,17 +60,22 @@ final class CatalogTopicController
         return redirect()->route('administration.topics.index')->with('taxonomy_success', 'Der Themenbereich „'.trim($data['name']).'“ ist gespeichert.');
     }
 
-    public function destroy(string $topicId, DeleteCatalogTopicAction $delete): RedirectResponse
+    public function destroy(Request $request, string $topicId, DeleteCatalogTopicAction $delete): RedirectResponse
     {
         $topic = CatalogTopic::query()->findOrFail($topicId);
 
         try {
-            $delete->execute($topic);
+            $children = (string) $request->input('children', DeleteCatalogTopicAction::CHILDREN_BLOCK);
+            abort_unless(in_array($children, [DeleteCatalogTopicAction::CHILDREN_BLOCK, DeleteCatalogTopicAction::CHILDREN_MOVE, DeleteCatalogTopicAction::CHILDREN_DELETE], true), 422);
+
+            $result = $delete->execute($topic, $children, $request->boolean('detach_shelves'));
         } catch (CatalogTaxonomyInUse $exception) {
             return redirect()->route('administration.topics.index')->withErrors(['topic' => $exception->getMessage()]);
         }
 
-        return redirect()->route('administration.topics.index')->with('taxonomy_success', 'Der Themenbereich „'.$topic->name.'“ ist gelöscht.');
+        return redirect()->route('administration.topics.index')->with('taxonomy_success', 'Der Themenbereich „'.$topic->name.'“ ist gelöscht.'
+            .($result['deleted'] > 1 ? ' Mit ihm '.($result['deleted'] - 1).' Unterbereich(e).' : '')
+            .($result['moved'] > 0 ? ' '.$result['moved'].' Unterbereich(e) sind eine Ebene nach oben gerückt.' : ''));
     }
 
     /** @return array<string, mixed> */
