@@ -123,7 +123,7 @@ final class ShelfDashboardController
         })->count();
 
         $unknownLocations = Copy::query()
-            ->whereNotNull('shelf_location')->where('shelf_location', '!= '')
+            ->whereNotNull('shelf_location')->where('shelf_location', '!=', '')
             ->when($validCodes !== [], static fn ($query) => $query->whereNotIn('shelf_location', $validCodes))
             ->count();
 
