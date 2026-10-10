@@ -362,3 +362,17 @@
 .bc-class-picker__remove:hover {
     background: var(--bg-brand-soft);
 }
+
+/* Ausgabe einer von Hand ausgeführten Aufgabe (Tabellen in Textform): in sich scrollbar, nie die Seite verbreitern */
+.bc-task-output {
+    max-height: 28rem;
+    margin: 0;
+    padding: 1rem;
+    overflow: auto;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    white-space: pre;
+}

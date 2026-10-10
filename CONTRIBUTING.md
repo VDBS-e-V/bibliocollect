@@ -75,6 +75,8 @@ Die Regeln stehen als Dateien in `.github/rulesets/` und werden von einer Admin-
 
 ## Abhängigkeiten (Dependabot)
 
+**Befehle und Webspace:** Der Webspace hat keine Konsole. Jeder neue Artisan-Befehl, den jemand aus der Bibliothek braucht, bekommt deshalb einen Weg über die Webseite: entweder einen Eintrag im Zeitplan (`routes/console.php`, mit Beschreibung in `ScheduledJobs`) oder einen Eintrag in `App\Foundation\Support\ManualTasks` (erscheint unter Systemzustand → Cron und Aufgaben). Reine Entwickler- und Einrichtungsbefehle bleiben Konsole.
+
 Dependabot öffnet montags Pull Requests für Composer, npm und GitHub Actions; kleine Updates sind gebündelt. Ein solcher Pull Request wird wie jeder andere behandelt: Prüfungen grün, kurz in `docs/PROJECT_STATUS.md` oder der Release-Notiz erwähnen, wenn Nutzer:innen etwas merken. Große Sprünge (Laravel, PHP, Vite) einzeln, mit lokalem `composer quality` und einem Blick auf die Oberfläche (`npm run build`).
 
 ## Wenn der Branch zu `main` nicht mehr aktuell ist

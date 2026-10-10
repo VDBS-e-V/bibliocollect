@@ -40,6 +40,7 @@ export const memberPages = [
   ['Verwaltung', '/verwaltung'],
   ['Regalbrett-Etiketten', '/verwaltung/regalbretter/etiketten'],
   ['Systemzustand', '/verwaltung/systemzustand'],
+  ['Cron und Aufgaben', '/verwaltung/systemzustand/cron'],
   ['Benutzer', '/verwaltung/benutzer'],
   ['Update', '/verwaltung/update'],
   ['Ausleihkonten', '/betrieb/ausleihkonten'],

@@ -218,7 +218,7 @@ it('lets the administration queue covers from the system state page, also for ti
     });
 
     $this->actingAs($admin)->get(route('administration.system.index'))->assertOk()
-        ->assertSee('Cover der Bücher')->assertSee('Einmal ausführen');
+        ->assertSee('Cover der Bücher')->assertSee('Cron und Aufgaben öffnen');
 
     $this->actingAs($admin)->post(route('administration.system.queue-covers'))->assertRedirect(route('administration.system.index'));
     Queue::assertPushed(RefreshEditionCoverJob::class, 1);
