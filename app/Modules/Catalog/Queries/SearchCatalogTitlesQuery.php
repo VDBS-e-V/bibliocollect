@@ -10,6 +10,7 @@ use App\Modules\Catalog\Models\CatalogShelf;
 use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
+use App\Modules\Catalog\Support\Transliteration;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -304,11 +305,25 @@ final class SearchCatalogTitlesQuery
         foreach ($tokens as $token) {
             $like = '%'.$token.'%';
 
-            $query->where(function (Builder $titleQuery) use ($like): void {
+            // Zusätzlich die lateinische Umschrift: „voyna“ findet „Война и мир“, „cocuk“ findet „Çocuk“.
+            $aliasLikes = array_map(static fn (string $form): string => '%'.$form.'%', Transliteration::searchForms($token));
+
+            $query->where(function (Builder $titleQuery) use ($like, $aliasLikes): void {
                 $titleQuery
                     ->whereAny(['preferred_title', 'subtitle', 'sort_title'], 'like', $like)
-                    ->orWhereHas('contributions.contributor', function (Builder $contributorQuery) use ($like): void {
-                        $contributorQuery->whereAny(['display_name', 'sort_name', 'gnd_id'], 'like', $like);
+                    ->orWhere(function (Builder $aliasQuery) use ($aliasLikes): void {
+                        foreach ($aliasLikes as $aliasLike) {
+                            $aliasQuery->orWhere('search_aliases', 'like', $aliasLike);
+                        }
+                    })
+                    ->orWhereHas('contributions.contributor', function (Builder $contributorQuery) use ($like, $aliasLikes): void {
+                        $contributorQuery->where(function (Builder $names) use ($like, $aliasLikes): void {
+                            $names->whereAny(['display_name', 'sort_name', 'gnd_id'], 'like', $like);
+
+                            foreach ($aliasLikes as $aliasLike) {
+                                $names->orWhere('search_aliases', 'like', $aliasLike);
+                            }
+                        });
                     })
                     ->orWhereHas('editions', function (Builder $editionQuery) use ($like): void {
                         $editionQuery
