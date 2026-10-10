@@ -7,3 +7,7 @@ BiblioCollect ist die modulare Schulbibliothekssoftware des VDBS e. V. auf Larav
 Zusammenarbeit, Pull Requests und Veröffentlichen: `CONTRIBUTING.md`. Regeln für Entwickler:innen und KI-Assistenten: `AGENTS.md`.
 
 Siehe `docs/GO_LIVE.md` für die Einrichtung, `docs/PROJECT_STATUS.md` für den fachlichen Stand je Funktion, `docs/ROADMAP.md` für die Richtung, `docs/OFFENE_PUNKTE.md` für Aufgaben des Betreibers und `docs/LEGACY_CATALOG_IMPORT.md` für den Altbestandsimport.
+
+## Lizenz und Drittsoftware
+
+BiblioCollect ist die Software des VDBS e. V.; die Lizenz des Projekts legt der Verein fest. Das Release-Paket enthält den Texteditor TinyMCE, der unter der GNU General Public License Version 2 oder später (GPL-2.0-or-later) steht. Quelle und Hinweise zu Drittpaketen mit besonderen Bedingungen: `THIRD_PARTY_NOTICES.md`. Alle weiteren Pakete stehen in `composer.lock` und `package-lock.json`.

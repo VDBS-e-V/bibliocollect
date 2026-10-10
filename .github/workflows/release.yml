@@ -145,4 +145,5 @@ jobs:
           gh release create "$VERSION" "${{ steps.package.outputs.path }}" "${{ steps.package.outputs.checksum }}" \
             --target "$SHA" \
             --title "$VERSION" \
+            --notes "Enthält den Texteditor TinyMCE unter GPL-2.0-or-later (Hinweise: THIRD_PARTY_NOTICES.md im Paket und im Repository)." \
             --generate-notes
