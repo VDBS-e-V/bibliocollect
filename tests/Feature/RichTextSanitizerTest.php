@@ -75,7 +75,7 @@ it('saves sanitized html, shows legacy text as html in the editor and rejects em
     ContentPage::query()->where('slug', 'impressum')->update(['body' => "## Alt\n\nText im alten Format"]);
 
     $this->actingAs($manager)->get(route('administration.pages.edit', ['slug' => 'impressum']))
-        ->assertOk()->assertSee('&lt;h2&gt;Alt&lt;/h2&gt;', false);
+        ->assertOk()->assertSee('&lt;h2&gt;Alt&lt;/h2&gt;', false)->assertSee('data-rich-text', false);
 
     $this->actingAs($manager)->patch(route('administration.pages.update', ['slug' => 'impressum']), [
         'title' => 'Impressum',

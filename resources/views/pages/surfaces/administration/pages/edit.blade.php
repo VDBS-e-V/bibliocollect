@@ -22,8 +22,8 @@
             <x-ui.input label="Überschrift" name="title" :value="old('title', $page->title)" required />
             <div class="bc-field">
                 <label class="bc-field__label" for="body">Text</label>
-                <p class="bc-field__hint" id="body-hint">Der Text wird als HTML gespeichert. Erlaubt sind Überschriften (h2 bis h4), Absätze, fett und kursiv, Listen, Zitate, Tabellen und Links; alles andere wird beim Speichern entfernt.</p>
-                <textarea id="body" name="body" rows="22" class="bc-field__control" aria-describedby="body-hint" required>{{ old('body', $editorHtml) }}</textarea>
+                <p class="bc-field__hint" id="body-hint">Formatiere den Text mit der Leiste über dem Feld. Erlaubt sind Überschriften, Absätze, fett, kursiv, Listen, Zitate, Tabellen und Links; alles andere wird beim Speichern entfernt. Ohne JavaScript erscheint hier das HTML im Klartext.</p>
+                <textarea id="body" name="body" rows="22" class="bc-field__control" aria-describedby="body-hint" data-rich-text data-license-key="{{ config('content.editor_license_key') }}" required>{{ old('body', $editorHtml) }}</textarea>
             </div>
             <x-ui.button type="submit">Speichern</x-ui.button>
         </form>
