@@ -11,6 +11,7 @@
 
     <div class="bc-context-actions">
         <a href="{{ route('administration.home') }}">← Zurück zur Verwaltung</a>
+        <a href="{{ route('administration.blocks.index') }}">Textbausteine (Hinweise auf Startseite und Katalog)</a>
     </div>
 
     @if (session('school_success'))

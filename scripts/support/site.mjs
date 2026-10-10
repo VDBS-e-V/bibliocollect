@@ -62,6 +62,8 @@ export const memberPages = [
   ['Öffnungszeiten', '/verwaltung/oeffnungszeiten'],
   ['Seiten', '/verwaltung/seiten'],
   ['Seite bearbeiten (Editor)', '/verwaltung/seiten/impressum'],
+  ['Textbausteine', '/verwaltung/textbausteine'],
+  ['Textbaustein bearbeiten', '/verwaltung/textbausteine/home.notice'],
   ['Protokoll', '/verwaltung/protokoll'],
 ];
 
