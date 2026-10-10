@@ -6,7 +6,7 @@ Ausführlich: `CONTRIBUTING.md` (Zusammenarbeit, Pull Requests, Veröffentlichen
 
 ## Sprache
 
-Deutsch für alles, was Nutzer:innen oder das Team lesen: Oberfläche, Hilfe (`resources/help/*.md`), Doku, Issues, Pull-Request-Titel, Commit-Nachrichten. Code, Klassen- und Methodennamen bleiben englisch. Nutzer:innen werden gegendert (Schüler:innen, Mitarbeiter:innen).
+Deutsch für alles, was Nutzer:innen oder das Team lesen: Oberfläche, Hilfe (`resources/help/artikel/*.md`, Aufbau in der dortigen `README.md`), Doku, Issues, Pull-Request-Titel, Commit-Nachrichten. Code, Klassen- und Methodennamen bleiben englisch. Nutzer:innen werden gegendert (Schüler:innen, Mitarbeiter:innen).
 
 ## Arbeitsablauf
 
@@ -14,7 +14,7 @@ Deutsch für alles, was Nutzer:innen oder das Team lesen: Oberfläche, Hilfe (`r
 - Vor jedem Push: `composer quality` (Pint, PHPStan, `foundation:check`, Pest). Nach `git pull` oder Branch-Wechsel: `composer sync`.
 - Pull Requests brauchen grüne Prüfungen `quality` und `mariadb`; ein Review der anderen Person ist erwünscht, aber kein Muss.
 - Veröffentlicht wird nur per **Actions → Release** (Tag, ZIP, GitHub Release). Tags nie verschieben oder löschen.
-- Zu jedem größeren Schritt gehören Tests, ein Abschnitt in `docs/PROJECT_STATUS.md` (nur den eigenen ändern) und, wenn Nutzer:innen es merken, ein Eintrag in `resources/help/`.
+- Zu jedem größeren Schritt gehören Tests, ein Abschnitt in `docs/PROJECT_STATUS.md` (nur den eigenen ändern) und, wenn Nutzer:innen es merken, ein Hilfeartikel in `resources/help/artikel/`.
 
 ## Architektur
 

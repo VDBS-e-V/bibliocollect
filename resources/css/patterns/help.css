@@ -1,0 +1,24 @@
+/* Hilfe im Bibliotheksbetrieb: Suche, Filter und Artikelkarten. */
+.bc-help-search { display: grid; gap: .75rem; margin-bottom: 1.5rem; }
+.bc-help-search__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; align-items: end; }
+.bc-help-search__filters { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: end; }
+.bc-help-search__filters .bc-field { min-width: 12rem; }
+.bc-help-search__reset { padding-block: .5rem; }
+
+.bc-help-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.bc-help-card { display: grid; align-content: start; gap: .35rem; padding: .9rem 1rem; border: 1px solid var(--border-default); border-top: 3px solid var(--border-strong); border-radius: var(--radius-md); background: var(--bg-surface); }
+.bc-help-card p { margin: 0; color: var(--text-secondary); font-size: .9375rem; }
+.bc-help-card__title { font-weight: 800; font-size: 1.0625rem; line-height: 1.3; overflow-wrap: anywhere; }
+.bc-help-card__meta { display: flex; flex-wrap: wrap; gap: .35rem; }
+.bc-help-card__snippet { font-size: .875rem; font-style: italic; }
+.bc-help-audience { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 0 0 1rem; color: var(--text-secondary); }
+
+.bc-help { max-width: 48rem; }
+.bc-help table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; margin-block: 1rem; }
+.bc-help th, .bc-help td { padding: .45rem .6rem; border: 1px solid var(--border-default); text-align: left; vertical-align: top; }
+.bc-help thead th { background: var(--bg-surface); }
+
+@media (max-width: 34rem) {
+    .bc-help-search__row { grid-template-columns: 1fr; }
+    .bc-help-list { grid-template-columns: 1fr; }
+}

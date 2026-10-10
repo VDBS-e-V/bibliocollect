@@ -4,41 +4,78 @@ declare(strict_types=1);
 
 namespace App\Surfaces\Pos\Http\Controllers;
 
+use App\Surfaces\Pos\Support\HelpLibrary;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
-/** Anleitungen für den Bibliotheksbetrieb, geschrieben als Markdown unter `resources/help`. */
+/** Hilfe für den Bibliotheksbetrieb: viele kurze Artikel mit Suche und Filtern (Markdown unter `resources/help/artikel`). */
 final class HelpController
 {
-    /** @var array<string, string> */
-    private const TOPICS = [
-        'ausleihe' => 'Ausleihe am Tresen',
-        'katalog' => 'Katalog und Ausleihkonten pflegen',
-        'verwaltung' => 'Verwaltung',
-    ];
-
-    public function index(): Response
+    public function index(Request $request, HelpLibrary $library): Response
     {
-        return response()->view('pages.surfaces.pos.help', ['topics' => self::TOPICS, 'current' => null, 'html' => null]);
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:80'],
+            'bereich' => ['nullable', Rule::in(array_keys(HelpLibrary::AREAS))],
+            'rolle' => ['nullable', Rule::in(array_keys(HelpLibrary::ROLES))],
+        ]);
+
+        $query = trim((string) ($filters['q'] ?? ''));
+        $area = (string) ($filters['bereich'] ?? '');
+        $role = (string) ($filters['rolle'] ?? '');
+        $hits = $library->search($query, $area, $role);
+        $filtered = $query !== '' || $area !== '' || $role !== '';
+
+        return response()
+            ->view('pages.surfaces.pos.help', [
+                'areas' => HelpLibrary::AREAS,
+                'roles' => HelpLibrary::ROLES,
+                'query' => $query,
+                'area' => $area,
+                'role' => $role,
+                'filtered' => $filtered,
+                'hits' => $hits,
+                'grouped' => $filtered ? [] : $this->group($hits),
+                'total' => count($library->all()),
+            ])
+            ->header('Cache-Control', 'private, no-store');
     }
 
-    public function show(string $topic): Response
+    public function show(string $topic, Request $request, HelpLibrary $library): Response|RedirectResponse
     {
-        abort_unless(array_key_exists($topic, self::TOPICS), 404);
+        // Die drei früheren Sammelseiten gibt es nicht mehr: Sie führen zur Liste des Bereichs.
+        if (array_key_exists($topic, HelpLibrary::LEGACY)) {
+            return redirect()->route('pos.help', ['bereich' => HelpLibrary::LEGACY[$topic]]);
+        }
 
-        $markdown = (string) file_get_contents(resource_path('help/'.$topic.'.md'));
+        $article = $library->find($topic);
+        abort_if($article === null, 404);
 
-        return response()->view('pages.surfaces.pos.help', [
-            'topics' => self::TOPICS,
-            'current' => $topic,
+        return response()->view('pages.surfaces.pos.help-article', [
+            'article' => $article,
+            'areas' => HelpLibrary::AREAS,
+            'roles' => HelpLibrary::ROLES,
             // Eigene, versionierte Texte; trotzdem wird eingebettetes HTML nicht ausgeführt.
-            'html' => $this->demoteHeadings(Str::markdown($markdown, ['html_input' => 'escape', 'allow_unsafe_links' => false])),
+            'html' => Str::markdown($article['body'], ['html_input' => 'escape', 'allow_unsafe_links' => false]),
+            'related' => $library->related($article['slug']),
+            'query' => trim((string) $request->query('q', '')),
         ]);
     }
 
-    /** Die Seitenüberschrift ist schon die Hauptüberschrift; im Text rücken alle Überschriften eine Ebene tiefer. */
-    private function demoteHeadings(string $html): string
+    /**
+     * @param  list<array{article: array{slug: string, title: string, summary: string, area: string, roles: list<string>, keywords: list<string>, body: string}, snippet: string|null}>  $hits
+     * @return array<string, list<array{slug: string, title: string, summary: string, area: string, roles: list<string>, keywords: list<string>, body: string}>>
+     */
+    private function group(array $hits): array
     {
-        return strtr($html, ['<h3>' => '<h4>', '</h3>' => '</h4>', '<h2>' => '<h3>', '</h2>' => '</h3>', '<h1>' => '<h2>', '</h1>' => '</h2>']);
+        $grouped = [];
+
+        foreach ($hits as $hit) {
+            $grouped[$hit['article']['area']][] = $hit['article'];
+        }
+
+        return $grouped;
     }
 }
