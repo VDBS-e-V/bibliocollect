@@ -14,6 +14,7 @@ use App\Surfaces\Administration\Http\Controllers\InventoryRenumberController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
 use App\Surfaces\Administration\Http\Controllers\MailPreviewController;
 use App\Surfaces\Administration\Http\Controllers\RulesController;
+use App\Surfaces\Administration\Http\Controllers\ShelfDashboardController;
 use App\Surfaces\Administration\Http\Controllers\SchoolClassController;
 use App\Surfaces\Administration\Http\Controllers\SchoolIndexController;
 use App\Surfaces\Administration\Http\Controllers\SchoolYearController;
@@ -138,6 +139,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('/verwaltung/klassifikation-import/{draftId}', [ClassificationImportController::class, 'apply'])->where('draftId', '[0-9A-Za-z]{26}')->middleware('throttle:5,1')->name('administration.classification-import.apply');
         Route::delete('/verwaltung/klassifikation-import/{draftId}', [ClassificationImportController::class, 'discard'])->where('draftId', '[0-9A-Za-z]{26}')->name('administration.classification-import.discard');
 
+        Route::get('/verwaltung/regalbretter/dashboard', [ShelfDashboardController::class, 'index'])->name('administration.shelves.dashboard');
+        Route::get('/verwaltung/regalbretter/dashboard/export', [ShelfDashboardController::class, 'export'])->middleware('throttle:20,1')->name('administration.shelves.dashboard.export');
         Route::get('/verwaltung/regalbretter', [CatalogShelfController::class, 'index'])->name('administration.shelves.index');
         Route::post('/verwaltung/regalbretter', [CatalogShelfController::class, 'store'])->name('administration.shelves.store');
         Route::get('/verwaltung/themenbereiche', [CatalogTopicController::class, 'index'])->name('administration.topics.index');
