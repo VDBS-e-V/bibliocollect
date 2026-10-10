@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Queries;
 
+use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Edition;
 
 final class CatalogSearchFilterOptionsQuery
 {
     /**
-     * @return array{mediaTypes: list<string>, languageCodes: list<string>}
+     * @return array{mediaTypes: list<string>, languageCodes: list<string>, themes: list<string>}
      */
     public function execute(): array
     {
         return [
             'mediaTypes' => $this->distinctValues('media_type'),
             'languageCodes' => $this->distinctValues('language_code'),
+            // Themen, die auf mindestens einem Regalbrett eingetragen sind (nur dann findet man darüber etwas).
+            'themes' => CatalogTopic::query()->whereHas('shelves')->orderBy('name')->pluck('name')->map(static fn ($name): string => (string) $name)->unique()->values()->all(),
         ];
     }
 

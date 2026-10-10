@@ -16,7 +16,10 @@
                     value="{{ $criteria->term }}"
                     placeholder="Titel, Autor:in, Thema oder ISBN"
                     autocomplete="off"
+                    list="public-catalog-suggestions"
+                    data-suggest-url="{{ route('public.catalog.suggest') }}"
                 >
+                <datalist id="public-catalog-suggestions"></datalist>
                 <x-ui.button type="submit">Suchen</x-ui.button>
             </div>
             <div class="bc-public-hero-search__links">
@@ -83,7 +86,7 @@
             @if ($criteria->shelf)
                 <input type="hidden" name="regalbrett" value="{{ $criteria->shelf }}">
             @endif
-            @if ($criteria->theme)
+            @if ($criteria->theme && empty($filterOptions['themes']))
                 <input type="hidden" name="thema" value="{{ $criteria->theme }}">
             @endif
             @foreach (['title', 'contributor', 'subject', 'identifier', 'publisher', 'topic'] as $advancedField)
@@ -120,7 +123,26 @@
                     @endforeach
                 </x-ui.select>
 
+                <x-ui.select label="Empfohlen ab" name="alter" data-auto-submit>
+                    <option value="">Alle Altersstufen</option>
+                    @foreach (['0-6' => 'Bis 6 Jahre', '7-10' => '7 bis 10 Jahre', '11-13' => '11 bis 13 Jahre', '14-99' => 'Ab 14 Jahren'] as $stage => $stageLabel)
+                        <option value="{{ $stage }}" @selected($criteria->ageStage === $stage)>{{ $stageLabel }}</option>
+                    @endforeach
+                </x-ui.select>
+
+                @if (! empty($filterOptions['themes']))
+                    <x-ui.select label="Thema" name="thema" data-auto-submit>
+                        <option value="">Alle Themen</option>
+                        @foreach ($filterOptions['themes'] as $themeName)
+                            <option value="{{ $themeName }}" @selected(mb_strtolower((string) $criteria->theme) === mb_strtolower($themeName))>{{ $themeName }}</option>
+                        @endforeach
+                    </x-ui.select>
+                @endif
+
                 <x-ui.select label="Sortierung" name="sort" data-auto-submit>
+                    @if ($criteria->term)
+                        <option value="relevance" @selected($criteria->sort === 'relevance')>Beste Treffer zuerst</option>
+                    @endif
                     <option value="title" @selected($criteria->sort === 'title')>Titel A–Z</option>
                     <option value="title_desc" @selected($criteria->sort === 'title_desc')>Titel Z–A</option>
                     <option value="year_desc" @selected($criteria->sort === 'year_desc')>Neuere Erscheinungsjahre zuerst</option>
@@ -181,6 +203,9 @@
         @if ($titles->count() === 0)
             <div class="bc-public-catalog-empty">
                 <strong>Keine passenden Titel gefunden.</strong>
+                @if ($didYouMean)
+                    <p>Meintest du <a href="{{ route('public.catalog.index', ['q' => $didYouMean]) }}"><strong>{{ $didYouMean }}</strong></a>?</p>
+                @endif
                 <p>Versuche einen allgemeineren Suchbegriff oder entferne einzelne Filter.</p>
                 <div class="bc-action-row">
                     <x-ui.button href="{{ route('public.catalog.index') }}" variant="secondary">Gesamten Katalog anzeigen</x-ui.button>

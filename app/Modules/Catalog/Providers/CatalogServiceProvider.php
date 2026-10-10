@@ -6,6 +6,7 @@ namespace App\Modules\Catalog\Providers;
 
 use App\Modules\Catalog\Console\AnalyzeLegacyCatalogCommand;
 use App\Modules\Catalog\Console\AuditLegacyCatalogQualityCommand;
+use App\Modules\Catalog\Console\BenchmarkSearchCommand;
 use App\Modules\Catalog\Console\FetchMetadataProposalsCommand;
 use App\Modules\Catalog\Console\ImportLegacyCatalogCommand;
 use App\Modules\Catalog\Console\QueueCatalogCoverRefreshCommand;
@@ -59,6 +60,7 @@ final class CatalogServiceProvider extends ServiceProvider
         $this->commands([
             AnalyzeLegacyCatalogCommand::class,
             SyncSeriesCommand::class,
+            BenchmarkSearchCommand::class,
             AuditLegacyCatalogQualityCommand::class,
             ImportLegacyCatalogCommand::class,
             QueueCatalogCoverRefreshCommand::class,

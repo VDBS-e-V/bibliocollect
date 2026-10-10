@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Surfaces\Public\Http\Controllers\CatalogAdvancedSearchController;
 use App\Surfaces\Public\Http\Controllers\CatalogIndexController;
+use App\Surfaces\Public\Http\Controllers\CatalogSuggestController;
 use App\Surfaces\Public\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Public\Http\Controllers\ContentPageController;
 use App\Surfaces\Public\Http\Controllers\PublicHomeController;
@@ -28,6 +29,8 @@ Route::get('/reihe/{slug}', SeriesController::class)->where('slug', '[a-z0-9\-]+
 Route::get('/regal/{code}', ShelfLinkController::class)->where('code', '.+')->name('public.shelf');
 
 Route::get('/thema/{key}', TopicLinkController::class)->where('key', '.+')->name('public.topic');
+
+Route::get('/katalog/vorschlaege', CatalogSuggestController::class)->middleware('throttle:90,1')->name('public.catalog.suggest');
 
 Route::get('/katalog/erweiterte-suche', CatalogAdvancedSearchController::class)
     ->name('public.catalog.advanced');

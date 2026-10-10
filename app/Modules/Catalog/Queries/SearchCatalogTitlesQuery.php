@@ -40,7 +40,7 @@ final class SearchCatalogTitlesQuery
     {
         $query = $this->baseQuery();
         $this->applyCriteria($query, $criteria);
-        $this->applySort($query, $criteria->sort);
+        $this->applySort($query, $criteria->sort, $criteria->term);
 
         return $query
             ->limit(max(1, min($limit, 100)))
@@ -52,7 +52,7 @@ final class SearchCatalogTitlesQuery
     {
         $query = $this->baseQuery();
         $this->applyCriteria($query, $criteria);
-        $this->applySort($query, $criteria->sort);
+        $this->applySort($query, $criteria->sort, $criteria->term);
 
         return $query->paginate(
             max(1, min($criteria->perPage, 100)),
@@ -130,6 +130,7 @@ final class SearchCatalogTitlesQuery
             $this->applyEditionTextFilter($editionQuery, $criteria->series, ['series_statement']);
             $this->applyEditionTextFilter($editionQuery, $criteria->classification, ['local_classification']);
             $this->applyEditionTextFilter($editionQuery, $criteria->targetAudience, ['target_audience']);
+            $this->applyAgeStage($editionQuery, $criteria->ageStage);
             $this->applyEditionTextFilter($editionQuery, $criteria->sourceRecordId, ['source_record_id']);
 
             if ($criteria->topic !== null) {
@@ -251,6 +252,7 @@ final class SearchCatalogTitlesQuery
             || $criteria->yearTo !== null
             || $criteria->mediaType !== null
             || $criteria->languageCode !== null
+            || $criteria->ageStage !== null
             || $criteria->activeCopiesOnly
             || $criteria->availableNowOnly;
     }
@@ -361,8 +363,15 @@ final class SearchCatalogTitlesQuery
     }
 
     /** @param Builder<Title> $query */
-    private function applySort(Builder $query, string $sort): void
+    private function applySort(Builder $query, string $sort, ?string $term = null): void
     {
+        if ($sort === 'relevance' && $term !== null) {
+            $this->orderByRelevance($query, $term);
+            $query->orderBy('preferred_title');
+
+            return;
+        }
+
         match ($sort) {
             'title_desc' => $query->orderByDesc('preferred_title'),
             'year_desc' => $query
@@ -376,6 +385,48 @@ final class SearchCatalogTitlesQuery
             'recent' => $query->orderByDesc('created_at')->orderBy('preferred_title'),
             default => $query->orderBy('preferred_title'),
         };
+    }
+
+    /**
+     * Treffer nach Relevanz: ganzer Titel gleich Suchbegriff vor Titelanfang vor Wort im Titel vor Autor:in vor Reihe und Schlagwörtern.
+     * Je Suchwort werden die Punkte addiert; Gleichstand entscheidet der Titel (A–Z).
+     *
+     * @param  Builder<Title>  $query
+     */
+    private function orderByRelevance(Builder $query, string $term): void
+    {
+        $tokens = array_slice(preg_split('/\s+/', mb_strtolower($term), -1, PREG_SPLIT_NO_EMPTY) ?: [], 0, 6);
+
+        if ($tokens === []) {
+            return;
+        }
+
+        $parts = ['(CASE WHEN LOWER(catalog_titles.preferred_title) = ? THEN 100 ELSE 0 END)'];
+        $bindings = [mb_strtolower($term)];
+
+        foreach ($tokens as $token) {
+            $parts[] = '(CASE WHEN LOWER(catalog_titles.preferred_title) LIKE ? THEN 40 ELSE 0 END)';
+            $parts[] = '(CASE WHEN LOWER(catalog_titles.preferred_title) LIKE ? THEN 30 ELSE 0 END)';
+            $parts[] = '(CASE WHEN EXISTS (SELECT 1 FROM catalog_title_contributions tc JOIN catalog_contributors c ON c.id = tc.contributor_id WHERE tc.title_id = catalog_titles.id AND LOWER(c.display_name) LIKE ?) THEN 25 ELSE 0 END)';
+            $parts[] = '(CASE WHEN EXISTS (SELECT 1 FROM catalog_editions e WHERE e.title_id = catalog_titles.id AND (LOWER(e.series_statement) LIKE ? OR LOWER(e.subject_keywords) LIKE ?)) THEN 10 ELSE 0 END)';
+            array_push($bindings, $token.'%', '%'.$token.'%', '%'.$token.'%', '%'.$token.'%', '%'.$token.'%');
+        }
+
+        $query->orderByRaw('('.implode(' + ', $parts).') DESC', $bindings);
+    }
+
+    /**
+     * Altersstufe: empfohlenes Mindestalter der Ausgabe liegt in „von-bis“ (zum Beispiel 7-10).
+     *
+     * @param  Builder<Edition>  $editionQuery
+     */
+    private function applyAgeStage(Builder $editionQuery, ?string $stage): void
+    {
+        if ($stage === null || preg_match('/^(\d{1,2})-(\d{1,2})$/', $stage, $m) !== 1) {
+            return;
+        }
+
+        $editionQuery->whereNotNull('minimum_age')->whereBetween('minimum_age', [(int) $m[1], (int) $m[2]]);
     }
 
     private function normalizeTerm(?string $term, bool $allowEmpty): ?string
