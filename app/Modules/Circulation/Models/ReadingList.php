@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace App\Modules\Circulation\Models;
 
 use App\Modules\School\Models\SchoolClass;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * Leseliste einer Lehrkraft für eine Klasse.
  *
  * @property string $id
  * @property int $user_id
- * @property string|null $school_class_id
+ * @property string $public_token
  * @property string $name
  * @property string|null $description
  * @property Carbon|null $ends_on
  * @property bool $is_published
- * @property-read SchoolClass|null $schoolClass
+ * @property-read Collection<int, SchoolClass> $classes
  */
 final class ReadingList extends Model
 {
@@ -34,12 +36,22 @@ final class ReadingList extends Model
     protected $table = 'circulation_reading_lists';
 
     /** @var list<string> */
-    protected $fillable = ['user_id', 'school_class_id', 'name', 'description', 'ends_on', 'is_published'];
+    protected $fillable = ['user_id', 'name', 'description', 'ends_on', 'is_published'];
 
-    /** @return BelongsTo<SchoolClass, $this> */
-    public function schoolClass(): BelongsTo
+    protected static function booted(): void
     {
-        return $this->belongsTo(SchoolClass::class);
+        // Öffentlicher Link: nicht erratbares Kennzeichen, gesetzt beim Anlegen.
+        self::creating(static function (self $list): void {
+            if (blank($list->getAttribute('public_token'))) {
+                $list->public_token = Str::random(32);
+            }
+        });
+    }
+
+    /** @return BelongsToMany<SchoolClass, $this> */
+    public function classes(): BelongsToMany
+    {
+        return $this->belongsToMany(SchoolClass::class, 'circulation_reading_list_classes', 'reading_list_id', 'school_class_id');
     }
 
     /** @return HasMany<ReadingListItem, $this> */
@@ -54,10 +66,16 @@ final class ReadingList extends Model
         return $this->ends_on === null || ! $this->ends_on->endOfDay()->isPast();
     }
 
-    /** Ob die Schüler:innen der Klasse die Liste sehen. */
-    public function isVisibleToClass(): bool
+    /** Ob die Liste über den öffentlichen Link und im Konto der Klassen erreichbar ist. */
+    public function isActive(): bool
     {
-        return $this->is_published && $this->school_class_id !== null && $this->isCurrent();
+        return $this->is_published && $this->isCurrent();
+    }
+
+    /** Neuen Link erzeugen; der alte funktioniert dann nicht mehr. */
+    public function regenerateToken(): void
+    {
+        $this->forceFill(['public_token' => Str::random(32)])->save();
     }
 
     /** @return list<string> Titel in der Reihenfolge des Hinzufügens */

@@ -2,7 +2,7 @@
     <x-ui.page-header
         kicker="Mein Konto"
         title="Leselisten"
-        lead="Bücher, die Lehrkräfte für eine Klasse zusammengestellt haben, zum Beispiel eine Klassenlektüre oder Tipps zu einem Thema."
+        lead="Bücher, die Lehrkräfte für Klassen zusammengestellt haben, zum Beispiel eine Klassenlektüre oder Tipps zu einem Thema. Jede Liste hat auch einen Link, der ohne Konto funktioniert."
     />
 
     <div class="bc-context-actions">
@@ -37,10 +37,10 @@
                             <a href="{{ route('portal.reading-lists.show', ['listId' => $list->getKey()]) }}"><strong>{{ $list->name }}</strong></a>
                             <span>
                                 {{ $list->items_count }} Titel
-                                · {{ $list->schoolClass?->name ?? 'keine Klasse' }}
+                                · {{ $list->classes->isEmpty() ? 'keine Klasse' : $list->classes->pluck('name')->join(', ') }}
                                 @if ($list->ends_on) · bis {{ $list->ends_on->format('d.m.Y') }} @endif
                             </span>
-                            @if (! $list->is_published)<x-ui.badge variant="neutral">Nicht sichtbar</x-ui.badge>@endif
+                            @if (! $list->is_published)<x-ui.badge variant="neutral">Ausgeschaltet</x-ui.badge>@endif
                             @if (! $list->isCurrent())<x-ui.badge variant="neutral">Abgelaufen</x-ui.badge>@endif
                         </li>
                     @endforeach
