@@ -143,7 +143,7 @@ it('sends the invitation again and not to disabled accounts', function (): void 
 it('lists, searches and filters the accounts', function (): void {
     $admin = accountUser('management', ['name' => 'Anna Verwaltung']);
     accountUser('staff', ['name' => 'Bernd Bibliothek', 'email' => 'bernd@example.invalid']);
-    accountUser('student', ['name' => 'Clara Schülerin']);
+    accountUser('student', ['name' => 'Clara Schülerin', 'email' => 'clara@example.invalid']);
     $off = accountUser('staff', ['name' => 'Dora Deaktiviert']);
     $off->forceFill(['disabled_at' => now()])->save();
     accountUser('staff', ['name' => 'Emil Eingeladen', 'email_verified_at' => null]);

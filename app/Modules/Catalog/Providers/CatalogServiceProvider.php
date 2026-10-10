@@ -10,6 +10,7 @@ use App\Modules\Catalog\Console\FetchMetadataProposalsCommand;
 use App\Modules\Catalog\Console\ImportLegacyCatalogCommand;
 use App\Modules\Catalog\Console\QueueCatalogCoverRefreshCommand;
 use App\Modules\Catalog\Console\ScanCatalogMetadataQualityCommand;
+use App\Modules\Catalog\Console\SyncSeriesCommand;
 use App\Modules\Catalog\Contracts\BibliographicLookupProvider;
 use App\Modules\Catalog\Contracts\CatalogCoverProvider;
 use App\Modules\Catalog\Covers\ChainedCatalogCoverProvider;
@@ -57,6 +58,7 @@ final class CatalogServiceProvider extends ServiceProvider
         // Auch außerhalb der Konsole registrieren: Der Web-Cron ruft app:cron und die Zeitplan-Befehle über die URL auf.
         $this->commands([
             AnalyzeLegacyCatalogCommand::class,
+            SyncSeriesCommand::class,
             AuditLegacyCatalogQualityCommand::class,
             ImportLegacyCatalogCommand::class,
             QueueCatalogCoverRefreshCommand::class,

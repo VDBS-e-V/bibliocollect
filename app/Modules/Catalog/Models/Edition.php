@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Models;
 
+use App\Modules\Catalog\Services\SeriesService;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $age_rating_label
  * @property string|null $responsibility_statement
  * @property string|null $series_statement
+ * @property string|null $series_id
+ * @property string|null $series_volume
+ * @property-read Series|null $series
  * @property string|null $publication_place
  * @property string|null $edition_number
  * @property array<int, string>|null $alternate_identifiers
@@ -63,6 +67,8 @@ final class Edition extends Model
         'age_rating_label',
         'responsibility_statement',
         'series_statement',
+        'series_id',
+        'series_volume',
         'publication_place',
         'edition_number',
         'alternate_identifiers',
@@ -85,6 +91,22 @@ final class Edition extends Model
         'legacy_source',
         'legacy_record_key',
     ];
+
+    protected static function booted(): void
+    {
+        // Reihe und Bandnummer aus der Reihenangabe ableiten, sobald sie sich ändert (oder noch nicht zugeordnet ist).
+        self::saving(static function (self $edition): void {
+            if ($edition->isDirty('series_statement') || ($edition->series_id === null && trim((string) $edition->series_statement) !== '')) {
+                app(SeriesService::class)->assign($edition);
+            }
+        });
+    }
+
+    /** @return BelongsTo<Series, $this> */
+    public function series(): BelongsTo
+    {
+        return $this->belongsTo(Series::class, 'series_id');
+    }
 
     /** @return BelongsTo<Title, $this> */
     public function title(): BelongsTo

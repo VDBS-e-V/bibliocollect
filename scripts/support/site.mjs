@@ -18,6 +18,7 @@ export const guestPages = [
   ['Datenschutz', '/datenschutz'],
   ['Barrierefreiheit', '/barrierefreiheit'],
   ['Anmelden', '/anmelden'],
+  ['Reihen', '/reihen'],
 ];
 
 export const memberPages = [
@@ -33,6 +34,7 @@ export const memberPages = [
   ['Katalog verwalten', '/betrieb/katalog'],
   ['Medium erfassen', '/betrieb/katalog/erfassen'],
   ['Katalogqualität', '/betrieb/katalog/qualitaet'],
+  ['Reihen prüfen', '/betrieb/katalog/reihen'],
   ['Etiketten Vorrat', '/betrieb/etiketten/vorrat'],
   ['Ausweise', '/betrieb/ausweise'],
   ['Verwaltung', '/verwaltung'],

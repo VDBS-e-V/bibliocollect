@@ -40,6 +40,7 @@ return [
                     'items' => [
                         ['label' => 'Medium erfassen', 'text' => 'Neuzugang per ISBN oder Titel aufnehmen, Exemplar anlegen, Etikett drucken.', 'route' => 'pos.catalog.intake.identify', 'permission' => 'catalog.manage'],
                         ['label' => 'Katalog suchen und pflegen', 'text' => 'Titel, Ausgaben und Exemplare ausführlich recherchieren und bearbeiten.', 'route' => 'pos.catalog.index', 'permission' => 'catalog.manage'],
+                        ['label' => 'Reihen prüfen', 'text' => 'Erkannte Buchreihen und Bandnummern ansehen, Verlagsreihen ausblenden, Namen korrigieren.', 'route' => 'pos.catalog.series', 'permission' => 'catalog.manage'],
                         ['label' => 'Metadaten prüfen', 'text' => 'Fehlerhafte und lückenhafte Katalogdaten mit Vorschlägen durchgehen.', 'route' => 'pos.catalog.quality.index', 'permission' => 'catalog.manage'],
                         ['label' => 'Medien einsortieren', 'text' => 'Neu erfasste Bücher vom Stapel ins Regal stellen: Regalbrett wählen, Bücher scannen, Standort wird vermerkt.', 'route' => 'pos.shelving', 'permission' => 'circulation.manage'],
                         ['label' => 'Inventur', 'text' => 'Bestand und Regal abgleichen: Regalbrett wählen, Bücher scannen, Bericht über Fehlendes, falsch Einsortiertes und Unbekanntes.', 'route' => 'pos.inventory', 'permission' => 'inventory.count'],
