@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Foundation\Update;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 
@@ -16,6 +17,8 @@ use Throwable;
  */
 class ReleaseSource
 {
+    private const COOLDOWN_KEY = 'update.release.github.cooldown';
+
     /**
      * Das neueste stabile Release.
      *
@@ -26,6 +29,10 @@ class ReleaseSource
     public function latest(): array
     {
         $repository = $this->repository();
+
+        if (Cache::has(self::COOLDOWN_KEY)) {
+            throw new UpdateException('GitHub hat weitere Release-Abfragen vorübergehend begrenzt. Bitte später erneut versuchen oder das Paket manuell hochladen.');
+        }
 
         try {
             $response = Http::timeout(10)->acceptJson()
@@ -60,6 +67,12 @@ class ReleaseSource
             } elseif (is_string($reset) && ctype_digit($reset)) {
                 $waitUntil = \Carbon\CarbonImmutable::createFromTimestamp((int) $reset, 'UTC');
             }
+
+            // Bei fehlender Zeitangabe konservativ fünf Minuten nicht erneut anfragen.
+            $seconds = $waitUntil !== null && $waitUntil->isFuture()
+                ? min(3600, max(60, now()->diffInSeconds($waitUntil)))
+                : 300;
+            Cache::put(self::COOLDOWN_KEY, true, (int) $seconds);
 
             $when = $waitUntil !== null && $waitUntil->isFuture()
                 ? ' Nächster Versuch frühestens am '.$waitUntil->timezone('Europe/Berlin')->format('d.m.Y H:i').' Uhr.'
