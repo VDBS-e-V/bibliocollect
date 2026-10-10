@@ -35,8 +35,9 @@
     --action-secondary-text: var(--vdbs-white);
     --action-danger: var(--vdbs-error);
     --action-warning: var(--vdbs-group-orange);
+    --text-warning: #8a4a00;
     --action-success: var(--vdbs-green-dark);
-    --link-default: var(--vdbs-green-dark);
+    --link-default: #04704f;
     --link-visited: var(--vdbs-purple);
     --focus-ring: var(--vdbs-purple);
 
@@ -109,6 +110,8 @@
     --link-visited: #e0a7e1;
     --focus-ring: #e0a7e1;
     --action-danger: #ff8a80;
+    --text-warning: var(--vdbs-group-orange);
+    --action-success: #40cd9a;
 }
 
 @media (prefers-reduced-motion: reduce) {

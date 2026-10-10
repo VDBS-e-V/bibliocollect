@@ -82,7 +82,7 @@
 
         <div class="bc-masthead">
             <div class="bc-masthead__inner">
-                <a href="{{ route('public.home') }}" class="bc-brand-lockup" aria-label="BiblioCollect Startseite">
+                <a href="{{ route('public.home') }}" class="bc-brand-lockup" aria-label="BiblioCollect Schulbibliothek, zur Startseite">
                     <span class="bc-brand-lockup__logo-wrap">
                         <img class="bc-brand-lockup__vdbs bc-brand-logo--light" src="/brand/vdbs/logo-light.svg" alt="VDBS">
                         <img class="bc-brand-lockup__vdbs bc-brand-logo--dark" src="/brand/vdbs/logo-dark.svg" alt="VDBS">
@@ -96,7 +96,7 @@
                 <div class="bc-account">
                     @auth
                         <details class="bc-account-menu" data-account-menu>
-                            <summary class="bc-account-menu__button" aria-label="Profilmenü von {{ $profile->name }}">
+                            <summary class="bc-account-menu__button" aria-label="{{ $initials }}, Profilmenü von {{ $profile->name }}">
                                 <span class="bc-avatar" aria-hidden="true">{{ $initials }}</span>
                             </summary>
                             <div class="bc-account-menu__panel">
