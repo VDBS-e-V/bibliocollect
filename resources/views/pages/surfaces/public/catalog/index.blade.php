@@ -22,6 +22,7 @@
             <div class="bc-public-hero-search__links">
                 <span>Mindestens zwei Buchstaben oder Ziffern.</span>
                 <a href="{{ route('public.catalog.advanced', $queryParameters) }}">Erweiterte Suche</a>
+                <a href="{{ route('public.series.index') }}">Reihen</a>
             </div>
         </form>
     </header>

@@ -31,7 +31,7 @@ final class CatalogTitleController
         PublicCatalogPresenter $presenter,
     ): Response {
         $title = Title::query()
-            ->with(['contributions.contributor', 'editions.copies.shelf.topics'])
+            ->with(['contributions.contributor', 'editions.copies.shelf.topics', 'editions.series'])
             ->findOrFail($titleId);
 
         // Öffentlich zählen nur vorhandene Exemplare (nicht ausgesondert, nicht verloren); Ausgaben ohne solche Exemplare entfallen.

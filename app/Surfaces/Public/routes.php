@@ -8,6 +8,8 @@ use App\Surfaces\Public\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Public\Http\Controllers\ContentPageController;
 use App\Surfaces\Public\Http\Controllers\PublicHomeController;
 use App\Surfaces\Public\Http\Controllers\ReadingListLinkController;
+use App\Surfaces\Public\Http\Controllers\SeriesController;
+use App\Surfaces\Public\Http\Controllers\SeriesIndexController;
 use App\Surfaces\Public\Http\Controllers\ShelfLinkController;
 use App\Surfaces\Public\Http\Controllers\TopicLinkController;
 use App\Surfaces\Public\Http\Controllers\WishController;
@@ -19,6 +21,9 @@ Route::get('/katalog', CatalogIndexController::class)
     ->name('public.catalog.index');
 
 Route::get('/leseliste/{token}', ReadingListLinkController::class)->where('token', '[A-Za-z0-9]{20,40}')->name('public.reading-list');
+
+Route::get('/reihen', SeriesIndexController::class)->name('public.series.index');
+Route::get('/reihe/{slug}', SeriesController::class)->where('slug', '[a-z0-9\-]+')->name('public.series');
 
 Route::get('/regal/{code}', ShelfLinkController::class)->where('code', '.+')->name('public.shelf');
 

@@ -9,6 +9,7 @@ use App\Surfaces\Pos\Http\Controllers\CatalogImportController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIndexController;
 use App\Surfaces\Pos\Http\Controllers\CatalogIntakeController;
 use App\Surfaces\Pos\Http\Controllers\CatalogQualityController;
+use App\Surfaces\Pos\Http\Controllers\CatalogSeriesController;
 use App\Surfaces\Pos\Http\Controllers\CatalogTitleController;
 use App\Surfaces\Pos\Http\Controllers\CirculationController;
 use App\Surfaces\Pos\Http\Controllers\ClassLoanReportController;
@@ -102,6 +103,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.pos.access'])->group(
             Route::get('/pruefen', [CatalogIntakeController::class, 'review'])->name('pos.catalog.intake.review');
             Route::post('/speichern', [CatalogIntakeController::class, 'commit'])->name('pos.catalog.intake.commit');
         });
+
+        Route::get('/betrieb/katalog/reihen', [CatalogSeriesController::class, 'index'])->name('pos.catalog.series');
+        Route::post('/betrieb/katalog/reihen/neu-zuordnen', [CatalogSeriesController::class, 'sync'])->middleware('throttle:6,1')->name('pos.catalog.series.sync');
+        Route::post('/betrieb/katalog/reihen/{seriesId}', [CatalogSeriesController::class, 'update'])->name('pos.catalog.series.update');
 
         Route::prefix('/betrieb/katalog/qualitaet')->group(function (): void {
             Route::get('/', [CatalogQualityController::class, 'index'])->name('pos.catalog.quality.index');

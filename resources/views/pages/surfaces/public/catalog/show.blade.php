@@ -264,7 +264,16 @@
                                     <div><dt>Erschienen</dt><dd>{{ $edition->publication_year }}</dd></div>
                                 @endif
                                 @if ($edition->series_statement)
-                                    <div><dt>Reihe</dt><dd>{{ $edition->series_statement }}</dd></div>
+                                    <div>
+                                        <dt>Reihe</dt>
+                                        <dd>
+                                            @if ($edition->series && ! $edition->series->is_hidden)
+                                                Teil der Reihe <a href="{{ route('public.series', ['slug' => $edition->series->slug]) }}">{{ $edition->series->name }}</a>@if ($edition->series_volume), Band {{ $edition->series_volume }}@endif
+                                            @else
+                                                {{ $edition->series_statement }}
+                                            @endif
+                                        </dd>
+                                    </div>
                                 @endif
                                 @if ($edition->physical_extent || $edition->page_count)
                                     <div><dt>Umfang</dt><dd>{{ $edition->physical_extent ?: $edition->page_count.' Seiten' }}</dd></div>
