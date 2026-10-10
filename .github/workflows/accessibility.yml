@@ -1,0 +1,71 @@
+name: Barrierefreiheit
+
+# Automatische Prüfung (axe-core, WCAG 2.2 AA) über die wichtigsten Seiten in hellem und dunklem Design.
+# Läuft getrennt von "Quality", damit ein Browserproblem nie die Codeprüfung blockiert. Bei Verstößen ab "serious" schlägt der Lauf fehl.
+on:
+  pull_request:
+    paths:
+      - 'resources/**'
+      - 'app/**'
+      - 'scripts/a11y/**'
+      - '.github/workflows/accessibility.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'resources/**'
+      - 'app/**'
+      - 'scripts/a11y/**'
+  workflow_dispatch:
+
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  axe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - run: npm run build
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - run: sed -i 's#^APP_URL=.*#APP_URL=http://127.0.0.1:8000#' .env
+      - run: touch database/database.sqlite
+      - run: php artisan migrate --seed --force
+
+      - name: Anwendung starten
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > serve.log 2>&1 &
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8000/katalog > /dev/null && exit 0; sleep 1; done
+          cat serve.log
+          exit 1
+
+      - name: axe-core über die Seiten
+        env:
+          BROWSER: /usr/bin/google-chrome
+        run: npm run a11y
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: a11y-report
+          path: a11y-report/
+          retention-days: 14

@@ -4,4 +4,7 @@ h1,h2,h3,h4,h5,h6 { margin-block-start:0; color:var(--text-primary); font-family
 .vdbs-editorial { font-family:var(--font-family-editorial); }
 a { color:var(--link-default); text-underline-offset:.18em; }
 a:visited { color:var(--link-visited); }
+/* Links im Fließtext und in Tabellen nicht nur durch die Farbe kenntlich machen (WCAG 1.4.1); Links mit eigener Klasse regeln das selbst. */
+a:not([class]) { text-decoration:underline; }
+td > a:not([class]) { display:inline-block; padding-block:.2rem; }
 small { color:var(--text-secondary); }

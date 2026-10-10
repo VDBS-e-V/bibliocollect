@@ -14,7 +14,7 @@
 @endphp
 
 @if ($paginator->total() > 0)
-    <nav class="bc-catalog-pagination" aria-label="Seitennavigation der Katalogtreffer">
+    <nav class="bc-catalog-pagination" aria-label="Seitennavigation der Katalogtreffer ({{ str_ends_with($idPrefix, 'bottom') ? 'unten' : 'oben' }})">
         <p class="bc-catalog-pagination__summary">
             <strong>Ergebnisse:</strong>
             {{ $paginator->firstItem() }}–{{ $paginator->lastItem() }} von {{ $paginator->total() }}

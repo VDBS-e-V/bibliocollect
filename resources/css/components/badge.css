@@ -12,4 +12,4 @@
 }
 .bc-badge--success { border-color: var(--action-success); color: var(--action-success); }
 .bc-badge--danger { border-color: var(--action-danger); color: var(--action-danger); }
-.bc-badge--warning { border-color: var(--action-warning); color: var(--action-warning); }
+.bc-badge--warning { border-color: var(--action-warning); color: var(--text-warning); }
