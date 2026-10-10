@@ -43,11 +43,17 @@ final class UpdateController
     /** Fragt GitHub nach dem neuesten stabilen Release und merkt es sich kurz für die Anzeige. */
     public function checkRelease(ReleaseSource $source, AuditRecorder $audit, Request $request): RedirectResponse
     {
+        // Wiederholtes Klicken darf das knappe anonyme GitHub-API-Limit nicht aufbrauchen.
+        $cached = Cache::get(self::RELEASE_CACHE);
+
+        if (is_array($cached) && isset($cached['tag'], $cached['version'])) {
+            return redirect()->route('administration.update.index');
+        }
+
         try {
             $release = $source->latest();
         } catch (UpdateException $exception) {
-            Cache::forget(self::RELEASE_CACHE);
-
+            // Eine erfolgreiche frühere Abfrage bleibt für die Anzeige verfügbar.
             return redirect()->route('administration.update.index')->withErrors(['release' => $exception->getMessage()]);
         }
 
