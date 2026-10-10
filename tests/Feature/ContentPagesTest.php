@@ -53,7 +53,8 @@ it('lets management edit a page and drops the placeholder notice', function (): 
         ->assertOk()
         ->assertDontSee('Noch nicht ausgefüllt')
         ->assertSee('<h2>Anbieter</h2>', false)
-        ->assertSee('<a href="mailto:info@example.org">info@example.org</a>', false)
+        ->assertSee('href="mailto:info&#64;example.org"', false)
+        ->assertSee('>info&#64;example.org</a>', false)
         ->assertSee('<li>Punkt zwei</li>', false);
 });
 

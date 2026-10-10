@@ -6,7 +6,8 @@ namespace App\Surfaces\Administration\Http\Controllers;
 
 use App\Modules\Audit\Services\AuditRecorder;
 use App\Modules\Content\Models\ContentPage;
-use App\Modules\Content\Services\PageTextRenderer;
+use App\Modules\Content\Services\PageContentRenderer;
+use App\Modules\Content\Services\RichTextSanitizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -20,27 +21,35 @@ final class ContentPageAdminController
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function edit(string $slug, PageTextRenderer $renderer): Response
+    public function edit(string $slug, PageContentRenderer $renderer): Response
     {
         $page = ContentPage::query()->where('slug', $slug)->firstOrFail();
+        $html = $renderer->toHtml($page->body);
 
         return response()
-            ->view('pages.surfaces.administration.pages.edit', ['page' => $page, 'preview' => $renderer->render($page->body)])
+            ->view('pages.surfaces.administration.pages.edit', ['page' => $page, 'preview' => $html, 'editorHtml' => $html])
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function update(Request $request, string $slug, AuditRecorder $audit): RedirectResponse
+    public function update(Request $request, string $slug, AuditRecorder $audit, PageContentRenderer $renderer, RichTextSanitizer $sanitizer): RedirectResponse
     {
         $page = ContentPage::query()->where('slug', $slug)->firstOrFail();
 
         $data = $request->validate([
             'title' => ['required', 'string', 'max:160'],
-            'body' => ['required', 'string', 'max:60000'],
+            'body' => ['required', 'string', 'max:120000'],
         ]);
+
+        // Gespeichert wird bereinigtes HTML; Text im alten Format wird dabei umgewandelt.
+        $html = $renderer->toHtml($data['body']);
+
+        if (! $sanitizer->hasText($html)) {
+            return back()->withInput()->withErrors(['body' => 'Der Text ist nach dem Bereinigen leer. Bitte gib einen Text ein.']);
+        }
 
         $page->forceFill([
             'title' => trim($data['title']),
-            'body' => trim($data['body']),
+            'body' => $html,
             'is_placeholder' => false,
             'updated_by_user_id' => $request->user()?->getKey(),
         ])->save();
