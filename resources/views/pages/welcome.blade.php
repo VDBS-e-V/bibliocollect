@@ -1,4 +1,6 @@
 <x-app-shell surface="public" title="Katalog">
+    <x-content.block key="home.notice" />
+
     <section class="bc-home-intro" aria-labelledby="home-heading">
         <div class="bc-home-intro__copy">
             <p class="bc-eyebrow">BiblioCollect · VDBS</p>

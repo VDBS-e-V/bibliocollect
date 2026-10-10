@@ -7,6 +7,7 @@ use App\Surfaces\Administration\Http\Controllers\AuditIndexController;
 use App\Surfaces\Administration\Http\Controllers\CatalogShelfController;
 use App\Surfaces\Administration\Http\Controllers\CatalogShelfSectionController;
 use App\Surfaces\Administration\Http\Controllers\CatalogTopicController;
+use App\Surfaces\Administration\Http\Controllers\ContentBlockAdminController;
 use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
 use App\Surfaces\Administration\Http\Controllers\InventoryRenumberController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
@@ -30,6 +31,10 @@ Route::middleware(['auth', 'verified', 'permission:surface.administration.access
         Route::get('/verwaltung/seiten', [ContentPageAdminController::class, 'index'])->name('administration.pages.index');
         Route::get('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'edit'])->name('administration.pages.edit');
         Route::patch('/verwaltung/seiten/{slug}', [ContentPageAdminController::class, 'update'])->name('administration.pages.update');
+
+        Route::get('/verwaltung/textbausteine', [ContentBlockAdminController::class, 'index'])->name('administration.blocks.index');
+        Route::get('/verwaltung/textbausteine/{key}', [ContentBlockAdminController::class, 'edit'])->where('key', '[a-z0-9.]+')->name('administration.blocks.edit');
+        Route::patch('/verwaltung/textbausteine/{key}', [ContentBlockAdminController::class, 'update'])->where('key', '[a-z0-9.]+')->name('administration.blocks.update');
     });
 
     Route::middleware('permission:users.manage')->group(function (): void {

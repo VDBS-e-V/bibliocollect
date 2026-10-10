@@ -1,4 +1,6 @@
 <x-app-shell surface="public" title="Katalog">
+    <x-content.block key="catalog.notice" />
+
     <header class="bc-public-catalog-hero">
         <div>
             <p class="bc-eyebrow">Öffentlicher Katalog</p>

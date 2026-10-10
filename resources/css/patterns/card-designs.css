@@ -376,3 +376,18 @@
     line-height: 1.5;
     white-space: pre;
 }
+
+/* Textbaustein (Hinweis der Bibliothek) oben auf Startseite und Katalog */
+.bc-content-notice {
+    margin: 0 0 1.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-default);
+    border-left: 4px solid var(--vdbs-green);
+    border-radius: var(--radius-md);
+    background: var(--bg-brand-soft);
+}
+
+.bc-content-notice > :last-child,
+.bc-content-notice .bc-content-page__body > :last-child {
+    margin-bottom: 0;
+}
