@@ -75,12 +75,16 @@
                 <details class="bc-loc__edit">
                     <summary>Bereichsgruppe bearbeiten</summary>
                     @include('pages.surfaces.administration.shelves._section-form', ['section' => $group, 'kind' => ShelfSectionKind::Group, 'parentId' => null])
-                    @if ($group->children->isEmpty())
-                        <form method="post" action="{{ route('administration.sections.destroy', ['sectionId' => $group->getKey()]) }}">
-                            @csrf @method('DELETE')
+                    <form method="post" action="{{ route('administration.sections.destroy', ['sectionId' => $group->getKey()]) }}">
+                        @csrf @method('DELETE')
+                        @if ($group->children->isEmpty())
                             <button type="submit" class="bc-intake-linkbutton" data-confirm="Bereichsgruppe „{{ $group->code }}“ wirklich löschen?" data-confirm-label="Löschen">Bereichsgruppe löschen</button>
-                        </form>
-                    @endif
+                        @else
+                            <input type="hidden" name="cascade" value="1">
+                            <input type="hidden" name="release_copies" value="1">
+                            <button type="submit" class="bc-intake-linkbutton" data-confirm="Bereichsgruppe „{{ $group->code }}“ mit ALLEM darunter löschen (Bereiche, Regale und Regalbretter)? Exemplare auf diesen Regalbrettern verlieren ihren Standort und stehen wieder zum Einsortieren an. Die Medien bleiben." data-confirm-label="Alles löschen">Bereichsgruppe mit allem darunter löschen</button>
+                        @endif
+                    </form>
                 </details>
 
                 @foreach ($group->children as $area)
@@ -100,12 +104,16 @@
                             <details class="bc-loc__edit">
                                 <summary>Bereich bearbeiten</summary>
                                 @include('pages.surfaces.administration.shelves._section-form', ['section' => $area, 'kind' => ShelfSectionKind::Area, 'parentId' => $group->getKey()])
-                                @if ($area->children->isEmpty())
-                                    <form method="post" action="{{ route('administration.sections.destroy', ['sectionId' => $area->getKey()]) }}">
-                                        @csrf @method('DELETE')
+                                <form method="post" action="{{ route('administration.sections.destroy', ['sectionId' => $area->getKey()]) }}">
+                                    @csrf @method('DELETE')
+                                    @if ($area->children->isEmpty())
                                         <button type="submit" class="bc-intake-linkbutton" data-confirm="Bereich „{{ $area->code }}“ wirklich löschen?" data-confirm-label="Löschen">Bereich löschen</button>
-                                    </form>
-                                @endif
+                                    @else
+                                        <input type="hidden" name="cascade" value="1">
+                                        <input type="hidden" name="release_copies" value="1">
+                                        <button type="submit" class="bc-intake-linkbutton" data-confirm="Bereich „{{ $area->code }}“ mit ALLEM darunter löschen (Regale und Regalbretter)? Exemplare auf diesen Regalbrettern verlieren ihren Standort und stehen wieder zum Einsortieren an. Die Medien bleiben." data-confirm-label="Alles löschen">Bereich mit allem darunter löschen</button>
+                                    @endif
+                                </form>
                             </details>
 
                             @foreach ($area->children as $rack)
@@ -128,12 +136,16 @@
                                         <details class="bc-loc__edit">
                                             <summary>Regal bearbeiten</summary>
                                             @include('pages.surfaces.administration.shelves._section-form', ['section' => $rack, 'kind' => ShelfSectionKind::Rack, 'parentId' => $area->getKey()])
-                                            @if ($rack->shelves->isEmpty())
-                                                <form method="post" action="{{ route('administration.sections.destroy', ['sectionId' => $rack->getKey()]) }}">
-                                                    @csrf @method('DELETE')
+                                            <form method="post" action="{{ route('administration.sections.destroy', ['sectionId' => $rack->getKey()]) }}">
+                                                @csrf @method('DELETE')
+                                                @if ($rack->shelves->isEmpty())
                                                     <button type="submit" class="bc-intake-linkbutton" data-confirm="Regal „{{ $rack->code }}“ wirklich löschen?" data-confirm-label="Löschen">Regal löschen</button>
-                                                </form>
-                                            @endif
+                                                @else
+                                                    <input type="hidden" name="cascade" value="1">
+                                                    <input type="hidden" name="release_copies" value="1">
+                                                    <button type="submit" class="bc-intake-linkbutton" data-confirm="Regal „{{ $rack->code }}“ mit allen {{ $rack->shelves->count() }} Regalbrettern löschen? Exemplare auf diesen Regalbrettern verlieren ihren Standort und stehen wieder zum Einsortieren an. Die Medien bleiben." data-confirm-label="Alles löschen">Regal mit allen {{ $rack->shelves->count() }} Regalbrettern löschen</button>
+                                                @endif
+                                            </form>
                                         </details>
 
                                         @if ($rackShelves->isNotEmpty())

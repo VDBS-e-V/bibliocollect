@@ -45,17 +45,19 @@ final class CatalogShelfSectionController
         return redirect()->route('administration.shelves.index')->with('shelf_success', $section->display().' ist gespeichert.');
     }
 
-    public function destroy(string $sectionId, DeleteCatalogShelfSectionAction $delete): RedirectResponse
+    public function destroy(Request $request, string $sectionId, DeleteCatalogShelfSectionAction $delete): RedirectResponse
     {
         $section = CatalogShelfSection::query()->findOrFail($sectionId);
 
         try {
-            $delete->execute($section);
+            $result = $delete->execute($section, $request->boolean('cascade'), $request->boolean('release_copies'));
         } catch (CatalogShelfStructureConflict $exception) {
             return redirect()->route('administration.shelves.index')->withErrors(['shelf' => $exception->getMessage()]);
         }
 
-        return redirect()->route('administration.shelves.index')->with('shelf_success', $section->display().' ist gelöscht.');
+        return redirect()->route('administration.shelves.index')->with('shelf_success', $section->display().' ist gelöscht.'
+            .($result['shelves'] > 0 ? ' Mit '.$result['shelves'].' Regalbrett(ern).' : '')
+            .($result['copies'] > 0 ? ' '.$result['copies'].' Exemplar(e) haben ihren Standort verloren und stehen wieder zum Einsortieren an.' : ''));
     }
 
     /** Regalbretter ohne Regal anhand ihres Codes („I. A 1 a“) zuordnen. */

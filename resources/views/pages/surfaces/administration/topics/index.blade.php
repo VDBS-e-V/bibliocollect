@@ -53,12 +53,7 @@
                             <details class="bc-loc__edit">
                                 <summary>Unterbereich bearbeiten</summary>
                                 @include('pages.surfaces.administration.topics._form', ['topic' => $topic, 'roots' => $roots])
-                                @if ($topic->shelves_count === 0 && $topic->children_count === 0)
-                                    <form method="post" action="{{ route('administration.topics.destroy', ['topicId' => $topic->getKey()]) }}">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="bc-intake-linkbutton" data-confirm="Themenbereich „{{ $topic->name }}“ wirklich löschen?" data-confirm-label="Löschen">Löschen</button>
-                                    </form>
-                                @endif
+                                @include('pages.surfaces.administration.topics._delete', ['topic' => $topic])
                             </details>
                         </li>
                     @endforeach
@@ -71,12 +66,7 @@
                 <details class="bc-loc__edit">
                     <summary>Hauptbereich „{{ $root->name }}“ bearbeiten</summary>
                     @include('pages.surfaces.administration.topics._form', ['topic' => $root, 'roots' => $roots])
-                    @if ($root->shelves_count === 0 && $root->children_count === 0)
-                        <form method="post" action="{{ route('administration.topics.destroy', ['topicId' => $root->getKey()]) }}">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="bc-intake-linkbutton" data-confirm="Themenbereich „{{ $root->name }}“ wirklich löschen?" data-confirm-label="Löschen">Löschen</button>
-                        </form>
-                    @endif
+                    @include('pages.surfaces.administration.topics._delete', ['topic' => $root])
                 </details>
             </div>
         </details>

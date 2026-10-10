@@ -89,17 +89,18 @@ final class CatalogShelfController
         return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.$shelf->code.'“ ist gespeichert.');
     }
 
-    public function destroy(string $shelfId, DeleteCatalogShelfAction $delete): RedirectResponse
+    public function destroy(Request $request, string $shelfId, DeleteCatalogShelfAction $delete): RedirectResponse
     {
         $shelf = CatalogShelf::query()->findOrFail($shelfId);
 
         try {
-            $delete->execute($shelf);
+            $released = $delete->execute($shelf, $request->boolean('release_copies'));
         } catch (CatalogShelfInUse $exception) {
             return redirect()->route('administration.shelves.index')->withErrors(['shelf' => $exception->getMessage()]);
         }
 
-        return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.$shelf->code.'“ ist gelöscht.');
+        return redirect()->route('administration.shelves.index')->with('shelf_success', 'Das Regalbrett „'.$shelf->code.'“ ist gelöscht.'
+            .($released > 0 ? ' '.$released.' Exemplar(e) haben ihren Standort verloren und stehen wieder zum Einsortieren an.' : ''));
     }
 
     /**
