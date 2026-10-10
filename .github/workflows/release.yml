@@ -122,13 +122,19 @@ jobs:
           zip=$(ls dist/bibliocollect-*.zip | head -n 1)
           target="dist/bibliocollect-$VERSION.zip"
           mv "$zip" "$target"
+          # Prüfsumme neben dem Paket: Die Update-Seite holt das Paket von GitHub und vergleicht sie vor dem Einspielen.
+          hash=$(sha256sum "$target" | cut -d' ' -f1)
+          echo "$hash  bibliocollect-$VERSION.zip" > "$target.sha256"
           echo "path=$target" >> "$GITHUB_OUTPUT"
+          echo "checksum=$target.sha256" >> "$GITHUB_OUTPUT"
 
       - name: Paket als Artefakt ablegen
         uses: actions/upload-artifact@v4
         with:
           name: bibliocollect-${{ inputs.version }}
-          path: ${{ steps.package.outputs.path }}
+          path: |
+            ${{ steps.package.outputs.path }}
+            ${{ steps.package.outputs.checksum }}
           if-no-files-found: error
 
       - name: Tag veröffentlichen und Release anlegen
@@ -136,7 +142,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release create "$VERSION" "${{ steps.package.outputs.path }}" \
+          gh release create "$VERSION" "${{ steps.package.outputs.path }}" "${{ steps.package.outputs.checksum }}" \
             --target "$SHA" \
             --title "$VERSION" \
             --generate-notes

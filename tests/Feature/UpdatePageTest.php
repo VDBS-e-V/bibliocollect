@@ -31,7 +31,7 @@ afterEach(function (): void {
 
 it('shows the update page only to those who may update', function (): void {
     foreach (['management', 'technical_admin'] as $role) {
-        $this->actingAs(updateUser($role))->get(route('administration.update.index'))->assertOk()->assertSee('Neues Paket bereitstellen')->assertSee('Nachts automatisch einspielen');
+        $this->actingAs(updateUser($role))->get(route('administration.update.index'))->assertOk()->assertSee('Neue Version von GitHub holen')->assertSee('Paket selbst bereitstellen')->assertSee('Nachts automatisch einspielen');
     }
 
     $this->actingAs(updateUser('staff'))->get(route('administration.update.index'))->assertForbidden();

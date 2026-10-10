@@ -31,8 +31,59 @@
         </dl>
     </section>
 
+    <section class="bc-content-section" aria-labelledby="update-github-heading">
+        <div class="bc-section-heading"><h2 id="update-github-heading">1. Neue Version von GitHub holen</h2></div>
+        <p class="bc-section-copy">Der Server holt das neueste veröffentlichte Paket selbst von <code>github.com/{{ $repository }}</code> (kein Upload im Browser, keine Größengrenze des Webspace). Vor dem Einspielen wird die <strong>Prüfsumme</strong> verglichen; ein verändertes oder unvollständiges Paket wird verworfen. Es werden nur stabile Releases angeboten.</p>
+
+        @if ($errors->has('release'))
+            <x-ui.alert variant="error" title="Nicht möglich">{{ $errors->first('release') }}</x-ui.alert>
+        @endif
+
+        <form method="post" action="{{ route('administration.update.release.check') }}" class="bc-calendar-form">
+            @csrf
+            <x-ui.button type="submit" variant="secondary">Auf neue Version prüfen</x-ui.button>
+        </form>
+
+        @if ($release)
+            <article class="bc-update-package">
+                <div class="bc-update-package__main">
+                    <strong>{{ $release['name'] }}</strong>
+                    <span>
+                        Version <strong>{{ $release['version'] }}</strong> · {{ number_format($release['zip_size'] / 1048576, 1, ',', '.') }} MB{{ $release['published'] ? ' · veröffentlicht '.\Illuminate\Support\Carbon::parse($release['published'])->timezone(config('foundation.business_timezone', 'Europe/Berlin'))->format('d.m.Y') : '' }}
+                    </span>
+                    @if ($release['ready'])
+                        <x-ui.badge variant="success">liegt schon bereit</x-ui.badge>
+                    @elseif ($release['newer'] === true)
+                        <x-ui.badge variant="success">neuer als installiert</x-ui.badge>
+                    @elseif ($release['newer'] === false)
+                        <x-ui.badge variant="neutral">bereits installiert oder älter</x-ui.badge>
+                    @else
+                        <x-ui.badge>Version nicht vergleichbar</x-ui.badge>
+                    @endif
+                    @if ($release['notes'] !== '')
+                        <details class="bc-loc__edit">
+                            <summary>Änderungen in dieser Version</summary>
+                            <pre class="bc-update-notes">{{ $release['notes'] }}</pre>
+                        </details>
+                    @endif
+                </div>
+                <div class="bc-update-package__actions">
+                    @if (! $release['ready'])
+                        <form method="post" action="{{ route('administration.update.release.fetch') }}">
+                            @csrf
+                            <input type="hidden" name="tag" value="{{ $release['tag'] }}">
+                            <x-ui.button type="submit" data-confirm="Das Paket {{ $release['tag'] }} jetzt von GitHub herunterladen? Es wird danach noch nicht eingespielt.">Paket holen</x-ui.button>
+                        </form>
+                    @else
+                        <span>Weiter unter „Bereitliegende Pakete“.</span>
+                    @endif
+                </div>
+            </article>
+        @endif
+    </section>
+
     <section class="bc-content-section" aria-labelledby="update-new-heading">
-        <div class="bc-section-heading"><h2 id="update-new-heading">1. Neues Paket bereitstellen</h2></div>
+        <div class="bc-section-heading"><h2 id="update-new-heading">Oder: Paket selbst bereitstellen (Upload oder FTP)</h2></div>
         <p class="bc-section-copy">Das Paket ist die ZIP-Datei aus <code>build-release.ps1</code>. Du kannst sie hier hochladen (Grenze des Servers: <strong>{{ $limit }}</strong>) oder per FTP in den Ordner <code>{{ $directory }}</code> legen, dann erscheint sie unten.</p>
         <form method="post" action="{{ route('administration.update.upload') }}" enctype="multipart/form-data" class="bc-calendar-form">
             @csrf
@@ -91,6 +142,7 @@
         <form method="post" action="{{ route('administration.update.auto') }}">
             @csrf
             <label class="bc-checkbox-line"><input type="hidden" name="auto" value="0"><input type="checkbox" name="auto" value="1" @checked($auto)> Nachts automatisch einspielen</label>
+            <label class="bc-checkbox-line"><input type="hidden" name="auto_download" value="0"><input type="checkbox" name="auto_download" value="1" @checked($autoDownload)> Neue Versionen nachts selbst von GitHub holen (nur zusammen mit dem automatischen Einspielen)</label>
             <x-ui.button type="submit" variant="secondary">Speichern</x-ui.button>
         </form>
     </section>
