@@ -84,38 +84,44 @@ final class CatalogBulkLocationController
         }
 
         try {
+            $usedKey = 'catalog.bulk.location.used.'.hash('sha256', $data['token']);
+            if (Cache::has($usedKey)) {
+                throw ValidationException::withMessages(['bulk' => 'Diese Vorschau wurde bereits übernommen.']);
+            }
+
             DB::transaction(static function () use ($ids, $snapshots, $destination, $audit): void {
-            $shelf = CatalogShelf::query()->where('code', $destination)->where('is_active', true)->first();
+                $shelf = CatalogShelf::query()->where('code', $destination)->where('is_active', true)->first();
 
-            if ($shelf === null) {
-                throw ValidationException::withMessages(['bulk' => 'Das Zielregalbrett existiert nicht mehr oder ist inaktiv.']);
-            }
-
-            $locked = Copy::query()->whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
-
-            if ($locked->count() !== count($snapshots)) {
-                throw ValidationException::withMessages(['bulk' => 'Die Auswahl hat sich verändert. Bitte Vorschau neu erstellen.']);
-            }
-
-            foreach ($snapshots as $snapshot) {
-                $copy = $locked->get($snapshot['id']);
-
-                if ($copy === null || $copy->shelf_location !== $snapshot['from']
-                    || $copy->updated_at?->toISOString() !== $snapshot['updated_at']) {
-                    throw ValidationException::withMessages(['bulk' => 'Ein Exemplar wurde zwischenzeitlich verändert. Keine Änderung übernommen.']);
+                if ($shelf === null) {
+                    throw ValidationException::withMessages(['bulk' => 'Das Zielregalbrett existiert nicht mehr oder ist inaktiv.']);
                 }
-            }
 
-            foreach ($snapshots as $snapshot) {
-                $copy = $locked->get($snapshot['id']);
-                $copy->shelf_location = $destination;
-                $copy->save();
+                $locked = Copy::query()->whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
 
-                $audit->record('catalog.copy.bulk_location', 'Exemplarstandort in Stapelbearbeitung geändert.', $copy, [
-                    'from' => $snapshot['from'], 'to' => $destination,
-                ]);
-            }
+                if ($locked->count() !== count($snapshots)) {
+                    throw ValidationException::withMessages(['bulk' => 'Die Auswahl hat sich verändert. Bitte Vorschau neu erstellen.']);
+                }
+
+                foreach ($snapshots as $snapshot) {
+                    $copy = $locked->get($snapshot['id']);
+
+                    if ($copy === null || $copy->shelf_location !== $snapshot['from']
+                        || $copy->updated_at?->toISOString() !== $snapshot['updated_at']) {
+                        throw ValidationException::withMessages(['bulk' => 'Ein Exemplar wurde zwischenzeitlich verändert. Keine Änderung übernommen.']);
+                    }
+                }
+
+                foreach ($snapshots as $snapshot) {
+                    $copy = $locked->get($snapshot['id']);
+                    $copy->shelf_location = $destination;
+                    $copy->save();
+
+                    $audit->record('catalog.copy.bulk_location', 'Exemplarstandort in Stapelbearbeitung geändert.', $copy, [
+                        'from' => $snapshot['from'], 'to' => $destination,
+                    ]);
+                }
             });
+            Cache::put($usedKey, true, now()->addMinutes(20));
         } finally {
             $lock->release();
         }
