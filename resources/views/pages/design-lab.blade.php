@@ -5,13 +5,13 @@
         $isLegacy = in_array($screen, $legacyScreens, true);
         $nav = [
             ['key' => 'index', 'label' => 'Übersicht', 'route' => 'public.design-lab'],
+            ['key' => 'komponenten', 'label' => 'Komponenten', 'route' => 'public.design-lab.components'],
             ['key' => 'designsystem', 'label' => 'Designsystem', 'route' => 'public.design-lab.designsystem'],
             ['key' => 'startseite', 'label' => 'Startseite · Alt', 'route' => 'public.design-lab.home'],
             ['key' => 'medien', 'label' => 'Mediendetail · Alt', 'route' => 'public.design-lab.media'],
             ['key' => 'assistent', 'label' => 'Assistent · Alt', 'route' => 'public.design-lab.wizard'],
             ['key' => 'dashboard', 'label' => 'Dashboard · Alt', 'route' => 'public.design-lab.dashboard'],
             ['key' => 'portal', 'label' => 'Portal · Alt', 'route' => 'public.design-lab.portal'],
-            ['key' => 'komponenten', 'label' => 'Komponenten', 'route' => 'public.design-lab.components'],
         ];
         $wizardSteps = [
             ['label' => 'Datei wählen', 'description' => 'Importquelle', 'status' => 'done'],
@@ -55,6 +55,15 @@
                 <h1>Ein System.<br><em>Mehr Raum für Ideen.</em></h1>
                 <p><strong>Aktueller Arbeitsbereich: die Komponentenbibliothek.</strong> Die fünf eigenständigen Musterseiten sind frühere Designstudien und ausdrücklich noch keine finalen Seiten. Wir gestalten zuerst alle wiederverwendbaren Elemente.</p>
             </header>
+
+            <a class="bc-design-lab__active-library" href="{{ route('public.design-lab.components') }}">
+                <span class="bc-design-lab__active-library-copy">
+                    <small>Aktueller Arbeitsbereich · Komponenten zuerst</small>
+                    <strong>Bausteine entwickeln, vergleichen und freigeben.</strong>
+                    <span>Buttons, Navigation, Formulare, Status, Tabellen und weitere Patterns – inklusive Comfortable-/Compact-Vergleich.</span>
+                </span>
+                <span class="bc-design-lab__active-library-link">Zur Komponentenbibliothek <span aria-hidden="true">↗</span></span>
+            </a>
 
             <a class="bc-design-lab__system-banner" href="{{ route('public.design-lab.designsystem') }}">
                 <span class="bc-design-lab__system-banner-copy">
