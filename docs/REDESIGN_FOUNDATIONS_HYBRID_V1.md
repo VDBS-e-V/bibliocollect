@@ -1,5 +1,7 @@
 # BiblioCollect Foundations – Hybrid v1.0 (Entwurf)
 
+**Portalpriorität P-01:** [Portal-Template L08 – Ausleihen und Rückgabefristen zuerst](REDESIGN_PORTAL_TEMPLATE_PRIORITY.md). Die Richtung ist beschlossen; konkrete Fristwarnschwellen und Pixelwerte bleiben offen.
+
 **Nächster Planungsabschnitt:** [Foundations-Workshop mit Designlab-Playground, Vergleichsszenen und Freigaben](REDESIGN_FOUNDATIONS_WORKSHOP_ROADMAP.md). Die Portal-Richtung „großzügiger Einstieg, kompakte Ausleih-/Medienlisten“ wurde im Workshopplan als Beschluss H-01 festgehalten; die Zahlenwerte bleiben Vorschläge.
 
 > **Status: ZUR GESTALTERISCHEN FREIGABE.** Die hier festgelegten Größen, Abstände und Regeln sind konkrete Vorschläge. Der Entwurf ist **keine Änderung** an `resources/css/tokens.css` oder den produktiven Blade-Komponenten.
