@@ -125,7 +125,11 @@ it('färbt beim Scanner nur den vorhandenen Fokusrahmen lila statt einen zweiten
     $css = file_get_contents(resource_path('css/patterns/library-data-components.css'));
 
     expect($css)->toBeString()
-        ->toContain('.bc-scan-input__control:focus-within')
+        ->toContain('.bc-scan-input__control:is(:hover,:focus-within)')
+        ->toContain('margin:1px')
+        ->toContain('margin:0')
+        ->toContain('min-height:calc(3.25rem - 2px)')
+        ->toContain('min-height:3.25rem')
         ->toContain('border-color:var(--focus-ring)')
         ->toContain('border-width:2px')
         ->toContain('.bc-core-gallery .bc-scan-input .bc-scan-input__field:focus-visible')
