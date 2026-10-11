@@ -57,7 +57,7 @@ final class CatalogIndexController
         foreach ($titles->items() as $title) {
             $titleId = (string) $title->getKey();
             $holdingSummaries[$titleId] = $holdings->summarizeTitle($title);
-            $coverUrls[$titleId] = $covers->localUrlForTitle($title);
+            $coverUrls[$titleId] = $covers->displayUrlForTitle($title);
 
             $names = [];
 
