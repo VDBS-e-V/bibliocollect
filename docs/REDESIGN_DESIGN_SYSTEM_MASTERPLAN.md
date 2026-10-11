@@ -386,81 +386,110 @@
 20. Browser-Autofill
 21. Fehlertoleranz bei Scannerbedienung
 
-## 3. Seitentemplates (Soll-Designfamilien, nicht 1:1 Komponenten)
+## 3. Die 22 tatsächlich wiederverwendbaren Seitentemplates (Layout-Baupläne)
 
-Ein Template definiert den **Seitenaufbau**, nicht die komplette Fachlogik. Die realen Routen/Views können sich in mehreren Fachseiten ein Template teilen.
+Diese Ebene ist besonders wichtig: **Wir entwickeln nicht 67 voneinander unabhängige Layouts.** Wir entwickeln die folgenden **22 Grundtemplates**, die von den fachlichen Seiten wiederverwendet werden. Je nach Ergebnis der Designreviews lassen sich später Templates zusammenlegen.
 
-| Bereich | ID | Template | Bausteine und Zweck | Repository-Bezug |
-|---|---|---|---|---|
-| Öffentlich / Identität | T01 | Öffentliche Startseite | Hero, Suche, Kurzangebote, aktuelle Medien, Editorial, Öffnungszeiten | bestehende Startseite im Redesign |
-| Öffentlich / Identität | T02 | Katalog-Ergebnisliste | Suchleiste, Facetten, Liste/Grid, Sortierung, Paginierung | öffentlich vorhanden |
-| Öffentlich / Identität | T03 | Erweiterte Suche | Suchfelder, Filtergruppen, Kriterien-Zusammenfassung | öffentlich vorhanden |
-| Öffentlich / Identität | T04 | Mediendetail | Cover, Metadaten, Verfügbarkeit, Exemplare, Vormerken | öffentlich vorhanden |
-| Öffentlich / Identität | T05 | Buchreihenübersicht | Reihenkarten, A–Z, Katalogzugang | öffentlich vorhanden |
-| Öffentlich / Identität | T06 | Buchreihendetail | Serienkopf, zugehörige Titel und Reihenfolge | öffentlich vorhanden |
-| Öffentlich / Identität | T07 | Themen-/Regalansicht | Themenintro, Filter, zugeordnete Medien | öffentlich verlinkt |
-| Öffentlich / Identität | T08 | Öffentliche geteilte Leseliste | Listenkopf, Medienübersicht, Freigabehinweis | öffentlich vorhanden |
-| Öffentlich / Identität | T09 | Öffentliches Buchwunschformular | Medienwunsch, Validierung, Bestätigung | öffentlich vorhanden |
-| Öffentlich / Identität | T10 | Informations-/Contentseite | Artikel, Bilder, Info, FAQ, Kontakt | öffentlich vorhanden |
-| Öffentlich / Identität | T11 | Login / Kontoaktivierung | klarer Login-Formularrahmen, Hinweis und Fehler | Identity-Views vorhanden |
-| Öffentlich / Identität | T12 | Passwort & Verifizierung | E-Mail-Bestätigung, Reset, Erfolg/Fehler | Identity-Views vorhanden |
-| Öffentlich / Identität | T13 | Standard-Fehlerseite | 403, 404, 419, 429, 500, 503, Rückwege | Error-Views vorhanden |
-| Portal | T14 | Persönliches Dashboard | Fristen, Ausleihen, Vormerkungen, Schnellaktionen | Portal vorhanden |
-| Portal | T15 | Meine Ausleihen | Medien-/Fristenliste, Verlängerung, Zustände | Portal vorhanden |
-| Portal | T16 | Meine Vormerkungen | Vormerkungen, Rang/Status soweit vorhanden, Storno | Portal vorhanden |
-| Portal | T17 | Merkliste | Coverraster, entfernen, zu Leseliste | Portal vorhanden |
-| Portal | T18 | Leselistenübersicht | private Listen, Erstellen, Teilen | Portal vorhanden |
-| Portal | T19 | Leselistendetail/Editor | Titel hinzunehmen, sortieren, Freigabelink | Portal vorhanden |
-| Portal | T20 | Meine Buchwünsche | Wunschstatus, Rücknahme, Verlauf | Portal vorhanden |
-| Portal | T21 | Meine Daten / Einstellungen | Profil-/Datenschutz-/Benachrichtigungsoptionen | Portal vorhanden |
-| Betrieb | T22 | Betriebsdashboard | Aktuelle Aufgaben, Systemstatus, Schnellzugriffe, KPIs | POS vorhanden |
-| Betrieb | T23 | Ausleihe – Person wählen | Scanner, Identifikation, Sperrgründe | POS vorhanden |
-| Betrieb | T24 | Ausleihe – Scan / Warenkorb | Scanfeld, Medium, Konto, Aktionen | POS vorhanden |
-| Betrieb | T25 | Ausleihe – Bestätigung / Beleg | Zusammenfassung, Bestätigung, Ausgabe | POS vorhanden |
-| Betrieb | T26 | Rückgabe / Verlängerung | Scanner, Fristen, Rückmeldungen | POS vorhanden |
-| Betrieb | T27 | Vormerkungen / Überfällige | Datentabellen, Status, Aktionen | POS vorhanden |
-| Betrieb | T28 | Interner Katalog | dichte Trefferliste, Arbeitsaktionen, Filter | POS vorhanden |
-| Betrieb | T29 | Titel / Edition / Exemplar bearbeiten | Stammdaten, Beziehungen, Standort, Status | POS vorhanden |
-| Betrieb | T30 | Medienerfassung – Identifizieren | Barcode/ISBN, externe Abfrage und Fehler | POS vorhanden |
-| Betrieb | T31 | Medienerfassung – Treffer wählen | Kandidatenvergleich und Dublettenprüfung | POS vorhanden |
-| Betrieb | T32 | Medienerfassung – Angaben/Exemplar | mehrstufige Formulare und Standorte | POS vorhanden |
-| Betrieb | T33 | Medienerfassung – Prüfen & Speichern | Diff, Zusammenfassung, Bestätigung | POS vorhanden |
-| Betrieb | T34 | Katalogimport – Datei/Mapping | Upload, Feldzuordnung, Validierungsreport | POS vorhanden |
-| Betrieb | T35 | Katalogimport – Vorschau/Übernahme | Korrekturen, Prüffehler, Bestätigung | POS vorhanden |
-| Betrieb | T36 | Datenqualität – Liste/Detail | Metadatenprüfung, Korrekturvorschläge, Diff | POS vorhanden |
-| Betrieb | T37 | Personenübersicht / Personendetail | Ausleihkonto, Kontakt, Sperren, Aktionen | POS vorhanden |
-| Betrieb | T38 | Personenformular / Personenimport | Stammdaten, Klassen, Upload, Zuordnung | POS vorhanden |
-| Betrieb | T39 | Inventur – Start & Scannen | Fortschritt, Scan-Rückmeldung, Differenzen | POS vorhanden |
-| Betrieb | T40 | Inventur – Bericht & Korrektur | Statistik, Abweichungen, Export, Freigabe | POS vorhanden |
-| Betrieb | T41 | Regalordnung & Standortwechsel | Scanner und Standort-Zuordnung | POS vorhanden |
-| Betrieb | T42 | Aussonderung – Scan/Prüfung/Ergebnis | Stapel, Gründe, Rücknahme | POS vorhanden |
-| Betrieb | T43 | Bestandsetiketten / Ausweisdruck | Vorlagenwahl, Charge, Vorschau, Druck | POS vorhanden |
-| Betrieb | T44 | Buchwunsch- und Reihenverwaltung | Listen, Status, Aktionen | POS vorhanden |
-| Betrieb | T45 | Statistiken & Klassenberichte | KPI, Diagramme, Berichtstabelle, Export | POS vorhanden |
-| Betrieb | T46 | Betriebshilfe / Prozesse | Anleitungsartikel, FAQ, Handlungsübersicht | POS vorhanden |
-| Administration | T47 | Verwaltungsdashboard | Bento, wichtige Aufgaben, aktuelle Systeme | Admin vorhanden |
-| Administration | T48 | Benutzer & Rollen | Liste, Edit, Einladen, Sperren und Berechtigungen | Admin vorhanden |
-| Administration | T49 | Schule, Schuljahre & Klassen | Stammdaten, Auswahl und Klassenlisten | Admin vorhanden |
-| Administration | T50 | Schuljahreswechsel-Assistent | Folgen, Prüfung, Vorschau, Commit | Admin vorhanden |
-| Administration | T51 | Ausleihregeln | Einstellungen, Validierung, Reset | Admin vorhanden |
-| Administration | T52 | Öffnungszeiten & Schließtage | Wochenplan, Ausnahmen, Bearbeitung | Admin vorhanden |
-| Administration | T53 | Regale / Standorte / Themen | Hierarchie, Zuordnung, Bearbeitung | Admin vorhanden |
-| Administration | T54 | Klassifikationsimport | Upload, Vorschau, Freigabe | Admin vorhanden |
-| Administration | T55 | Mediennummerierung / Regal-Labels | Prüfung, Anpassung, Druck | Admin vorhanden |
-| Administration | T56 | CMS: Seiten / Textbausteine | Contenteditierung, Veröffentlichungsstatus | Admin vorhanden |
-| Administration | T57 | Systemzustand / Hintergrundaufgaben | Job-Status, Diagnose, Neustart, Logs | Admin vorhanden |
-| Administration | T58 | Update / Backup | Release, Pakete, Sicherung, Sicherheitshinweise | Admin vorhanden |
-| Administration | T59 | Audit-Protokoll | Zeitlinie, Filter, Export, Änderungsdetails | Admin vorhanden |
-| Administration | T60 | Mailvorschau und Testversand | Templates, Vorschau, Testaktion | Admin vorhanden |
-| Druck, E-Mail & System | T61 | Ausleihbeleg / Rückgabeauszug | Kompakter Beleg, Barcodes, Termine | Druckansichten vorhanden |
-| Druck, E-Mail & System | T62 | Bibliotheksausweis | Vorder-/Rückseite, Motive, Druck | Druckansichten vorhanden |
-| Druck, E-Mail & System | T63 | Barcode- und Regal-Etiketten | Papierformate, Positionierung, Druckkalibrierung | Druckansichten vorhanden |
-| Druck, E-Mail & System | T64 | Listen- und Berichtsdruck | Klassen, Inventur, Wünsche | Druckansichten vorhanden |
-| Druck, E-Mail & System | T65 | E-Mail-Transaktionsbeleg | Header, Inhaltsblock, handlungsrelevante Daten | Mail-Views vorhanden |
-| Druck, E-Mail & System | T66 | Erinnerung / Statusmail | Status, Hilfe, Optik ohne Bilder | Mail-Views vorhanden |
-| Druck, E-Mail & System | T67 | Designreview & Pattern-Galerie | alle Varianten und Zustände, responsive Gegenprobe | Review-Seiten vorhanden |
+| Code | Template | Grundstruktur | Beispiele |
+|---|---|---|---|
+| L01 | PublicLanding | Hero + Suchfunktion + kuratierte Module + Service | Public Startseite |
+| L02 | EditorialStory | FeatureOverlap + Bilder/Quelle + Artikel + CTA | Themen und Bibliotheksinformationen |
+| L03 | SearchResults | Suchtoolbar + Facetten + Treffer + Pagination | öffentlicher/interner Katalog |
+| L04 | AdvancedSearch | mehrere Eingaben + Validierung + Suchkriterien | erweiterte Suche |
+| L05 | RecordDetail | Titelbild + Primärinfo + Metadaten + Kontextaktionen | Mediendetail, Personendetail |
+| L06 | CollectionBrowser | Sammlungsheader + Coverraster/Liste + Filter | Leselisten, Buchreihen, Merklisten |
+| L07 | RecordEditor | Formularabschnitte + Hilfen + Aktionen | Medium, Exemplar, Nutzer, CMS |
+| L08 | PersonalOverview | Fristen + Ausleihlisten + nächste Aktionen | persönliches Portal |
+| L09 | OperationsDashboard | Bento-KPIs + Tasks + wichtige Zustände | Betrieb, Verwaltung, Statistik |
+| L10 | ScanWorkbench | Scannerfokus + Person/Objekt + Arbeitskorb + Ergebnis | Ausleihe, Rückgabe, Einsortieren |
+| L11 | DataList | Such-/Filtertoolbar + Tabelle + Zeilen- und Bulk-Aktionen | Personen, Vormerkungen, Audit |
+| L12 | WorkflowWizard | ProcessStepper + Schrittinhalt + Review + Commit | Erfassung, Import, Schuljahreswechsel |
+| L13 | DataReview | Diff + Fehlerliste + Auswahl + Bestätigung | Qualitätsprüfung, Inventurbericht |
+| L14 | SettingsPanel | Einstellungsgruppen + Erläuterungen + Speichern | Regeln, Konto, Schule |
+| L15 | HierarchyManager | Baum/strukturierte Liste + Zuordnung + Editor | Regale, Klassifikation, Standorte |
+| L16 | CalendarEditor | Wochenschema + Ausnahmen + Kalender | Öffnungszeiten, Schließtage |
+| L17 | ArticleHelp | Lesespalte + Überschriften + FAQ + Kontextlinks | Hilfeseiten, Datenschutz, Artikel |
+| L18 | IdentityForm | sicheres Auth-Formular + Hilfe + Rückmeldung | Login, Aktivierung, Passwort |
+| L19 | SystemStatus | Diagnosen + Jobs + Warnungen + sichere Aktionen | Systemzustand, Updates, Backup |
+| L20 | PrintDocument | druckgerechte Header, Layouts, Umbrüche | Belege, Etiketten, Berichte, Ausweise |
+| L21 | MailMessage | text- und bildrobuste Mail-Struktur | Beleg-/Erinnerungsmails |
+| L22 | ErrorPage | Fehlercode + Erklärung + sichere Rückwege | 403,404,419,429,500,503 |
 
-## 4. Designvarianten, Zustände und Responsivität
+## 4. Fachliches Seiteninventar: 67 Anwendungen der Templates
+
+Die folgenden **67 Einträge sind Seiten-/Workflow-Szenarien**, keine 67 neu zu implementierenden Komponenten. Die „Bauplan“-Spalte ordnet die reale Seite einem oder mehreren Grundtemplates zu.
+
+| Bereich | ID | Seitenszenario | Bausteine und Zweck | Repository-Bezug | Bauplan |
+|---|---|---|---|---|---|
+| Öffentlich / Identität | T01 | Öffentliche Startseite | Hero, Suche, Kurzangebote, aktuelle Medien, Editorial, Öffnungszeiten | bestehende Startseite im Redesign | L01 |
+| Öffentlich / Identität | T02 | Katalog-Ergebnisliste | Suchleiste, Facetten, Liste/Grid, Sortierung, Paginierung | öffentlich vorhanden | L03 |
+| Öffentlich / Identität | T03 | Erweiterte Suche | Suchfelder, Filtergruppen, Kriterien-Zusammenfassung | öffentlich vorhanden | L04 |
+| Öffentlich / Identität | T04 | Mediendetail | Cover, Metadaten, Verfügbarkeit, Exemplare, Vormerken | öffentlich vorhanden | L05 |
+| Öffentlich / Identität | T05 | Buchreihenübersicht | Reihenkarten, A–Z, Katalogzugang | öffentlich vorhanden | L06 |
+| Öffentlich / Identität | T06 | Buchreihendetail | Serienkopf, zugehörige Titel und Reihenfolge | öffentlich vorhanden | L06 |
+| Öffentlich / Identität | T07 | Themen-/Regalansicht | Themenintro, Filter, zugeordnete Medien | öffentlich verlinkt | L03 |
+| Öffentlich / Identität | T08 | Öffentliche geteilte Leseliste | Listenkopf, Medienübersicht, Freigabehinweis | öffentlich vorhanden | L06 |
+| Öffentlich / Identität | T09 | Öffentliches Buchwunschformular | Medienwunsch, Validierung, Bestätigung | öffentlich vorhanden | L07 |
+| Öffentlich / Identität | T10 | Informations-/Contentseite | Artikel, Bilder, Info, FAQ, Kontakt | öffentlich vorhanden | L17 |
+| Öffentlich / Identität | T11 | Login / Kontoaktivierung | klarer Login-Formularrahmen, Hinweis und Fehler | Identity-Views vorhanden | L18 |
+| Öffentlich / Identität | T12 | Passwort & Verifizierung | E-Mail-Bestätigung, Reset, Erfolg/Fehler | Identity-Views vorhanden | L18 |
+| Öffentlich / Identität | T13 | Standard-Fehlerseite | 403, 404, 419, 429, 500, 503, Rückwege | Error-Views vorhanden | L22 |
+| Portal | T14 | Persönliches Dashboard | Fristen, Ausleihen, Vormerkungen, Schnellaktionen | Portal vorhanden | L08 |
+| Portal | T15 | Meine Ausleihen | Medien-/Fristenliste, Verlängerung, Zustände | Portal vorhanden | L11 |
+| Portal | T16 | Meine Vormerkungen | Vormerkungen, Rang/Status soweit vorhanden, Storno | Portal vorhanden | L11 |
+| Portal | T17 | Merkliste | Coverraster, entfernen, zu Leseliste | Portal vorhanden | L06 |
+| Portal | T18 | Leselistenübersicht | private Listen, Erstellen, Teilen | Portal vorhanden | L06 |
+| Portal | T19 | Leselistendetail/Editor | Titel hinzunehmen, sortieren, Freigabelink | Portal vorhanden | L06 |
+| Portal | T20 | Meine Buchwünsche | Wunschstatus, Rücknahme, Verlauf | Portal vorhanden | L11 |
+| Portal | T21 | Meine Daten / Einstellungen | Profil-/Datenschutz-/Benachrichtigungsoptionen | Portal vorhanden | L14 |
+| Betrieb | T22 | Betriebsdashboard | Aktuelle Aufgaben, Systemstatus, Schnellzugriffe, KPIs | POS vorhanden | L09 |
+| Betrieb | T23 | Ausleihe – Person wählen | Scanner, Identifikation, Sperrgründe | POS vorhanden | L10 |
+| Betrieb | T24 | Ausleihe – Scan / Warenkorb | Scanfeld, Medium, Konto, Aktionen | POS vorhanden | L10 |
+| Betrieb | T25 | Ausleihe – Bestätigung / Beleg | Zusammenfassung, Bestätigung, Ausgabe | POS vorhanden | L20 |
+| Betrieb | T26 | Rückgabe / Verlängerung | Scanner, Fristen, Rückmeldungen | POS vorhanden | L10 |
+| Betrieb | T27 | Vormerkungen / Überfällige | Datentabellen, Status, Aktionen | POS vorhanden | L11 |
+| Betrieb | T28 | Interner Katalog | dichte Trefferliste, Arbeitsaktionen, Filter | POS vorhanden | L03 |
+| Betrieb | T29 | Titel / Edition / Exemplar bearbeiten | Stammdaten, Beziehungen, Standort, Status | POS vorhanden | L05+L07 |
+| Betrieb | T30 | Medienerfassung – Identifizieren | Barcode/ISBN, externe Abfrage und Fehler | POS vorhanden | L12 |
+| Betrieb | T31 | Medienerfassung – Treffer wählen | Kandidatenvergleich und Dublettenprüfung | POS vorhanden | L12 |
+| Betrieb | T32 | Medienerfassung – Angaben/Exemplar | mehrstufige Formulare und Standorte | POS vorhanden | L12 |
+| Betrieb | T33 | Medienerfassung – Prüfen & Speichern | Diff, Zusammenfassung, Bestätigung | POS vorhanden | L12 |
+| Betrieb | T34 | Katalogimport – Datei/Mapping | Upload, Feldzuordnung, Validierungsreport | POS vorhanden | L12 |
+| Betrieb | T35 | Katalogimport – Vorschau/Übernahme | Korrekturen, Prüffehler, Bestätigung | POS vorhanden | L13 |
+| Betrieb | T36 | Datenqualität – Liste/Detail | Metadatenprüfung, Korrekturvorschläge, Diff | POS vorhanden | L13 |
+| Betrieb | T37 | Personenübersicht / Personendetail | Ausleihkonto, Kontakt, Sperren, Aktionen | POS vorhanden | L05+L11 |
+| Betrieb | T38 | Personenformular / Personenimport | Stammdaten, Klassen, Upload, Zuordnung | POS vorhanden | L07 |
+| Betrieb | T39 | Inventur – Start & Scannen | Fortschritt, Scan-Rückmeldung, Differenzen | POS vorhanden | L10 |
+| Betrieb | T40 | Inventur – Bericht & Korrektur | Statistik, Abweichungen, Export, Freigabe | POS vorhanden | L13 |
+| Betrieb | T41 | Regalordnung & Standortwechsel | Scanner und Standort-Zuordnung | POS vorhanden | L10 |
+| Betrieb | T42 | Aussonderung – Scan/Prüfung/Ergebnis | Stapel, Gründe, Rücknahme | POS vorhanden | L12+L13 |
+| Betrieb | T43 | Bestandsetiketten / Ausweisdruck | Vorlagenwahl, Charge, Vorschau, Druck | POS vorhanden | L20 |
+| Betrieb | T44 | Buchwunsch- und Reihenverwaltung | Listen, Status, Aktionen | POS vorhanden | L11 |
+| Betrieb | T45 | Statistiken & Klassenberichte | KPI, Diagramme, Berichtstabelle, Export | POS vorhanden | L09 |
+| Betrieb | T46 | Betriebshilfe / Prozesse | Anleitungsartikel, FAQ, Handlungsübersicht | POS vorhanden | L17 |
+| Administration | T47 | Verwaltungsdashboard | Bento, wichtige Aufgaben, aktuelle Systeme | Admin vorhanden | L09 |
+| Administration | T48 | Benutzer & Rollen | Liste, Edit, Einladen, Sperren und Berechtigungen | Admin vorhanden | L11 |
+| Administration | T49 | Schule, Schuljahre & Klassen | Stammdaten, Auswahl und Klassenlisten | Admin vorhanden | L11+L14 |
+| Administration | T50 | Schuljahreswechsel-Assistent | Folgen, Prüfung, Vorschau, Commit | Admin vorhanden | L12 |
+| Administration | T51 | Ausleihregeln | Einstellungen, Validierung, Reset | Admin vorhanden | L14 |
+| Administration | T52 | Öffnungszeiten & Schließtage | Wochenplan, Ausnahmen, Bearbeitung | Admin vorhanden | L16 |
+| Administration | T53 | Regale / Standorte / Themen | Hierarchie, Zuordnung, Bearbeitung | Admin vorhanden | L15 |
+| Administration | T54 | Klassifikationsimport | Upload, Vorschau, Freigabe | Admin vorhanden | L12 |
+| Administration | T55 | Mediennummerierung / Regal-Labels | Prüfung, Anpassung, Druck | Admin vorhanden | L12+L20 |
+| Administration | T56 | CMS: Seiten / Textbausteine | Contenteditierung, Veröffentlichungsstatus | Admin vorhanden | L07+L17 |
+| Administration | T57 | Systemzustand / Hintergrundaufgaben | Job-Status, Diagnose, Neustart, Logs | Admin vorhanden | L19 |
+| Administration | T58 | Update / Backup | Release, Pakete, Sicherung, Sicherheitshinweise | Admin vorhanden | L12+L19 |
+| Administration | T59 | Audit-Protokoll | Zeitlinie, Filter, Export, Änderungsdetails | Admin vorhanden | L11 |
+| Administration | T60 | Mailvorschau und Testversand | Templates, Vorschau, Testaktion | Admin vorhanden | L21 |
+| Druck, E-Mail & System | T61 | Ausleihbeleg / Rückgabeauszug | Kompakter Beleg, Barcodes, Termine | Druckansichten vorhanden | L20 |
+| Druck, E-Mail & System | T62 | Bibliotheksausweis | Vorder-/Rückseite, Motive, Druck | Druckansichten vorhanden | L20 |
+| Druck, E-Mail & System | T63 | Barcode- und Regal-Etiketten | Papierformate, Positionierung, Druckkalibrierung | Druckansichten vorhanden | L20 |
+| Druck, E-Mail & System | T64 | Listen- und Berichtsdruck | Klassen, Inventur, Wünsche | Druckansichten vorhanden | L20 |
+| Druck, E-Mail & System | T65 | E-Mail-Transaktionsbeleg | Header, Inhaltsblock, handlungsrelevante Daten | Mail-Views vorhanden | L21 |
+| Druck, E-Mail & System | T66 | Erinnerung / Statusmail | Status, Hilfe, Optik ohne Bilder | Mail-Views vorhanden | L21 |
+| Druck, E-Mail & System | T67 | Designreview & Pattern-Galerie | alle Varianten und Zustände, responsive Gegenprobe | Review-Seiten vorhanden | L17 |
+
+## 5. Designvarianten, Zustände und Responsivität
 
 Jedes wiederverwendbare Element wird nicht nur als Idealzustand gezeigt. Der Designatlas soll je nach Relevanz dokumentieren:
 
@@ -474,7 +503,7 @@ Jedes wiederverwendbare Element wird nicht nur als Idealzustand gezeigt. Der Des
 - Tabellen/Listen: leere, wenige, sehr viele Ergebnisse, lange Einträge, Filter ohne Treffer, Ladezustand.
 - MediaCover: Originalbild, fehlendes Bild, SVG-Cache vorhanden/neu, sehr langer Titel, keine Autor:innen, Ersatzgrafik ohne Storage-Schreibrecht.
 
-## 5. Abhängigkeiten – was zuerst gestaltet sein muss
+## 6. Abhängigkeiten – was zuerst gestaltet sein muss
 
 | Erst freigeben | Darauf aufbauende Templates |
 |---|---|
@@ -487,7 +516,7 @@ Jedes wiederverwendbare Element wird nicht nur als Idealzustand gezeigt. Der Des
 | StatTile, BentoGrid, Charts, StatusPanel | Portal, Betrieb, Verwaltung, Statistik |
 | PrintTokens, ReceiptLayout, LabelLayout | Belege, Ausweise, Etiketten, Berichte |
 
-## 6. Etappenplan für Design, Pilot und Rollout
+## 7. Etappenplan für Design, Pilot und Rollout
 
 | Phase | Inhalt | Ergebnis |
 |---|---|---|
@@ -500,7 +529,7 @@ Jedes wiederverwendbare Element wird nicht nur als Idealzustand gezeigt. Der Des
 | 6 · Breiter Rollout | Verwandte Seiten in kleinen PRs migrieren, doppelte CSS-Regeln entfernen, Print/Mail/Fehlerseiten angleichen. | Migrationsmatrix je Route, vollständige Abnahme |
 | 7 · Pflege & Governance | Visuelle Regression, Accessibility-Checks, Komponentenversionierung, dokumentierte Ausnahmen und Änderungsprozess einführen. | lebendes Designsystem als Single Source of Truth |
 
-## 7. Qualitäts-/Freigabekriterien
+## 8. Qualitäts-/Freigabekriterien
 
 - Jede Komponente besitzt Zweck, API/Props, Varianten, Größe, Inhaltsgrenzen, mobile Darstellung, Dark Mode, Fehler- und Disabled-Verhalten.
 - Zu jeder relevanten interaktiven Komponente gibt es Fokus-, Hover-, Keyboard-, Screenreader- und Zoom-Prüfung.
@@ -514,7 +543,7 @@ Jedes wiederverwendbare Element wird nicht nur als Idealzustand gezeigt. Der Des
 - Barrierefreie Alternativen und Print-/E-Mail-Kompatibilität sind Voraussetzung für die jeweilige Freigabe.
 - Die Einführung erfolgt pro Bereich in Review-PRs mit CI, Fachtests und ggf. Browser-/Visual-Regression; kein Big-Bang-Austausch.
 
-## 8. Verbindliche Designentscheidung für die aktuelle Runde
+## 9. Verbindliche Designentscheidung für die aktuelle Runde
 
 Wir gestalten **zunächst** einen ausführlichen Komponentenatlas und **pro Template-Familie eine ideale Musterseite**. Das ist kein sofortiger Ersatz aller produktiven Views. Bereits sichtbare Lösungen aus Designstudio 04 (`feature-overlap`, `process-stepper`, `stat-tile`, `notice-panel`) sind Kandidaten für Standardisierung und müssen vor dem flächendeckenden Einsatz auf Accessibility, Konsistenz und reale Fachzustände geprüft werden.
 
