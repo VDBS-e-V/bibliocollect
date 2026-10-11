@@ -82,7 +82,7 @@
                     <span>Großzügiger Einstieg und kompakte Medienlisten <span aria-hidden="true">↗</span></span>
                 </a>
                 <a href="{{ route('public.design-lab.components') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--library">
-                    <span class="bc-design-lab__kicker">06 / Komponenten</span>
+                    <span class="bc-design-lab__kicker">06 / Komponentenbibliothek</span>
                     <strong>Die Bausteine<br>dahinter.</strong>
                     <span>Vier wiederverwendbare Patterns und weitere UI-Elemente <span aria-hidden="true">↗</span></span>
                 </a>
