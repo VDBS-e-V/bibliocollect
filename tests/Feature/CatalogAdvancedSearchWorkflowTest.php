@@ -122,6 +122,7 @@ it('provides a more detailed internal catalog search for catalog managers', func
         ]))
         ->assertOk()
         ->assertSee('Erweiterte Suche')
+        ->assertSee('bc-page-header__actions', false)
         ->assertSee('The Giver')
         ->assertDontSee('Momo');
 });
