@@ -102,3 +102,40 @@ it('filter toolbar nutzt Slots und zeigt Trefferzahl ohne eigene Fachlogik', fun
         ->toContain('bc-filter-chip--active')
         ->toContain('Bücher');
 });
+
+it('nutzt kräftige VDBS-Statusflächen mit klarem Kontrast bei Verfügbarkeit und Fälligkeit', function (): void {
+    $css = file_get_contents(resource_path('css/patterns/library-data-components.css'));
+
+    expect($css)->toBeString()
+        ->toContain('.bc-availability--available')
+        ->toContain('--bc-status-fill:var(--vdbs-green)')
+        ->toContain('--bc-status-foreground:var(--vdbs-ink)')
+        ->toContain('.bc-availability--reserved')
+        ->toContain('--bc-status-fill:var(--vdbs-purple)')
+        ->toContain('.bc-due-status--soon')
+        ->toContain('--bc-status-fill:var(--action-warning)')
+        ->toContain('.bc-due-status--overdue')
+        ->toContain('--bc-status-fill:var(--vdbs-error)')
+        ->toContain('--bc-status-foreground:var(--vdbs-white)')
+        ->toContain('.bc-due-status--overdue::before')
+        ->toContain('--bc-status-fill:var(--bg-surface-muted)');
+});
+
+it('färbt beim Scanner nur den vorhandenen Fokusrahmen lila statt einen zweiten Rahmen zu zeichnen', function (): void {
+    $css = file_get_contents(resource_path('css/patterns/library-data-components.css'));
+
+    expect($css)->toBeString()
+        ->toContain('.bc-scan-input__control:focus-within')
+        ->toContain('border-color:var(--focus-ring)')
+        ->toContain('border-width:2px')
+        ->toContain('.bc-core-gallery .bc-scan-input .bc-scan-input__field:focus-visible')
+        ->not->toContain('.bc-scan-input__control:focus-within { outline:3px')
+        ->not->toContain('outline-offset:3px; }');
+
+    $html = Blade::render('<x-library.scan-input name="test-barcode" label="Exemplarbarcode" />');
+
+    expect($html)
+        ->toContain('class="bc-scan-input__control"')
+        ->toContain('class="bc-scan-input__field"')
+        ->toContain('type="text"');
+});
