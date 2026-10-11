@@ -30,7 +30,7 @@ it('zeigt alle zwölf Designvorlagen und gemeinsame Komponenten in einer lokalen
 
     expect($xpath->query('//main//h1')->length)->toBe(1)
         ->and($xpath->query('//main//section[contains(@class, "bc-review-section")]')->length)->toBe(13)
-        ->and($xpath->query('//main//button[not(@disabled)]')->length)->toBe(1); // globaler Theme-Toggle
+        ->and($xpath->query('//main//div[contains(@class, "bc-review")]//button[not(@disabled)]')->length)->toBe(0); // Keine schreibenden Demo-Aktionen
 });
 
 it('zeigt alle vier Beispiel-Covervarianten ohne produktive Datenbankeinträge', function (): void {
