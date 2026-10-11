@@ -8,6 +8,9 @@
         $newTiles = $showcase['new'] ?? [];
         $discoverTiles = collect(array_merge($recommendedTiles, $newTiles))->unique('id')->take(4)->values()->all();
         $heroTiles = array_slice($discoverTiles, 0, 2);
+        $recommendedIds = collect($recommendedTiles)->pluck('id')->all();
+        $showsRecommended = collect($discoverTiles)->contains(fn (array $tile): bool => in_array($tile['id'], $recommendedIds, true));
+        $showsNew = collect($discoverTiles)->contains(fn (array $tile): bool => ! in_array($tile['id'], $recommendedIds, true));
     @endphp
 
     <div class="bc-library-home">
@@ -84,8 +87,8 @@
 
                 @if ($discoverTiles !== [])
                     <div class="bc-home-discovery__labels">
-                        @if ($recommendedTiles !== []) <span>Empfohlene Medien</span> @endif
-                        @if ($newTiles !== []) <span>Neue Medien</span> @endif
+                        @if ($showsRecommended) <span>Empfohlene Medien</span> @endif
+                        @if ($showsNew) <span>Neue Medien</span> @endif
                     </div>
                     <ul class="bc-home-discovery__grid">
                         @foreach ($discoverTiles as $tile)
