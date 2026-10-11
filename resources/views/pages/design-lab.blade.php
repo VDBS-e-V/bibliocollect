@@ -41,7 +41,7 @@
             <header class="bc-design-lab__intro">
                 <span class="bc-design-lab__kicker">VDBS / BiblioCollect · Designstudie 04</span>
                 <h1>Ein System.<br><em>Mehr Raum für Ideen.</em></h1>
-                <p>Vier eigenständige Beispielseiten und eine Komponentenbibliothek. Die Studie verbindet lebendige Überlagerungen nach deiner Oodi-Referenz mit einer modernen Prozessachse, Bento-Statistiken und klaren Statusmeldungen.</p>
+                <p>Fünf eigenständige Beispielseiten und eine Komponentenbibliothek. Die Studie verbindet lebendige Überlagerungen nach deiner Oodi-Referenz mit einer modernen Prozessachse, Bento-Statistiken und klaren Statusmeldungen.</p>
             </header>
 
             <a class="bc-design-lab__system-banner" href="{{ route('public.design-lab.designsystem') }}">
@@ -76,8 +76,13 @@
                     <strong>Alles im<br>Überblick.</strong>
                     <span>Bento-Grid und Statusmeldungen <span aria-hidden="true">↗</span></span>
                 </a>
+                <a href="{{ route('public.design-lab.portal') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--portal">
+                    <span class="bc-design-lab__kicker">05 / Persönliches Portal</span>
+                    <strong>Fristen zuerst.<br>Deine Bibliothek.</strong>
+                    <span>Großzügiger Einstieg und kompakte Medienlisten <span aria-hidden="true">↗</span></span>
+                </a>
                 <a href="{{ route('public.design-lab.components') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--library">
-                    <span class="bc-design-lab__kicker">05 / Komponenten</span>
+                    <span class="bc-design-lab__kicker">06 / Komponenten</span>
                     <strong>Die Bausteine<br>dahinter.</strong>
                     <span>Vier wiederverwendbare Patterns und weitere UI-Elemente <span aria-hidden="true">↗</span></span>
                 </a>
@@ -219,6 +224,8 @@
             <x-library.notice-panel variant="error" title="Ein Feld konnte nicht zugeordnet werden">
                 <p>Ein Fehler wird in Text und Symbol kommuniziert, nicht allein über die Farbe. Diese Meldung ist Teil der Vorschau.</p>
             </x-library.notice-panel>
+        @elseif ($screen === 'portal')
+            @include('pages.partials.design-lab-portal')
         @elseif ($screen === 'dashboard')
             <header class="bc-design-lab__page-head">
                 <span class="bc-design-lab__kicker">Musterseite 04 · Dashboard</span>
