@@ -136,3 +136,17 @@
     .bc-core-gallery-v5__media-grid,.bc-core-gallery-v5__state-grid,.bc-core-gallery-v5__scan-grid { grid-template-columns:1fr; }
     .bc-core-gallery-v5__media-grid > :last-child { grid-column:auto; }
 }
+
+
+/* K6b: compact component review scenes, independent of production templates. */
+.bc-core-gallery-v6__stack { display:grid; gap:.85rem; min-width:0; }
+.bc-core-gallery-v6__person-grid,
+.bc-core-gallery-v6__feedback-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; align-items:start; }
+.bc-core-gallery-v6__person-grid > *,
+.bc-core-gallery-v6__feedback-grid > * { min-width:0; }
+.bc-core-gallery-v6__choices { display:grid; gap:.7rem; margin:0; padding:0; border:0; }
+.bc-core-gallery-v6__choices legend { font-size:var(--text-sm); font-weight:700; margin:0 0 .8rem; }
+@media(max-width:52rem) {
+    .bc-core-gallery-v6__person-grid,
+    .bc-core-gallery-v6__feedback-grid { grid-template-columns:1fr; }
+}
