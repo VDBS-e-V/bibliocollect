@@ -115,7 +115,7 @@
             </div>
         </div>
     </div>
-    <p class="bc-core-gallery-v5__note">Die 7-Tage-Regel betrifft ausschließlich die visuelle Portalwarnung. E-Mail-Erinnerungen, reale Ausleihregeln und die Berechnung der Fälligkeit bleiben davon getrennt.</p>
+    <p class="bc-core-gallery-v5__note">Die kräftigen VDBS-Statusfarben sind eine bewusste Designentscheidung: 8 Tage neutral, ab 7 Tagen orange, überfällig rot. Die 7-Tage-Regel betrifft nur die visuelle Warnung; E-Mail-Erinnerungen und Ausleihlogik bleiben getrennt.</p>
 </section>
 
 <section class="bc-core-gallery__section" id="bc-core-scan-input" aria-labelledby="bc-core-scan-input-heading">
