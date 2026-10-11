@@ -17,6 +17,10 @@
         <a href="#bc-core-surfaces">Flächen</a>
         <a href="#bc-core-feedback">Feedback</a>
         <a href="#bc-core-details">Metadaten</a>
+        <a href="#bc-core-navigation">Navigation</a>
+        <a href="#bc-core-controls">Auswahl</a>
+        <a href="#bc-core-status">Fortschritt</a>
+        <a href="#bc-core-disclosures">Akkordeon</a>
         <a href="#bc-core-patterns">Größere Patterns</a>
     </nav>
 
@@ -178,6 +182,8 @@
         </div>
         <div class="bc-core-gallery__component-note"><code>&lt;x-ui.description-list&gt; / &lt;x-ui.table&gt;</code><span>Metadaten, Tabellenkopf und statusbezogene Zellen; ohne Bindung an Fachlogik</span></div>
     </section>
+
+    @include('pages.partials.design-lab-components-v2')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
