@@ -3,13 +3,15 @@
     'title' => '',
     'author' => '',
     'size' => 'normal',
+    'variant' => null,
 ])
 
 @php
     // Vier konsistente Cover-Illustrationen; derselbe Titel erhält immer dieselbe Variante.
     // Keine externen Requests und keine zusätzlichen Bilddateien notwendig.
     $safeTitle = trim((string) $title) !== '' ? trim((string) $title) : 'Ohne Titel';
-    $palette = ['plum', 'mint', 'ink', 'sand'][hexdec(substr(hash('sha256', mb_strtolower($safeTitle)), 0, 2)) % 4];
+    $variants = ['plum', 'mint', 'ink', 'sand'];
+    $palette = in_array($variant, $variants, true) ? $variant : $variants[hexdec(substr(hash('sha256', mb_strtolower($safeTitle)), 0, 2)) % count($variants)];
     $hasCover = filled($src) && ! str_contains((string) $src, 'catalog-cover-placeholder.svg');
 @endphp
 
