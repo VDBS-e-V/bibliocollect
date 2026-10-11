@@ -34,6 +34,9 @@
         <a href="#bc-core-media-cards">Medienkarten</a>
         <a href="#bc-core-library-states">Bibliotheksstatus</a>
         <a href="#bc-core-scan-input">Barcodefeld</a>
+        <a href="#bc-core-copy-rows">Exemplarzeilen</a>
+        <a href="#bc-core-patron-choice">Personenauswahl</a>
+        <a href="#bc-core-scan-feedback">Scan-Feedback</a>
         <a href="#bc-core-patterns">Größere Patterns</a>
     </nav>
 
@@ -203,6 +206,8 @@
     @include('pages.partials.design-lab-components-v4')
 
     @include('pages.partials.design-lab-components-v5')
+
+    @include('pages.partials.design-lab-components-v6')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
