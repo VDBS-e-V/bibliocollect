@@ -67,7 +67,15 @@ Bevor wir eine Komponente für produktive Seiten freigeben, benötigt sie:
 - **Tests:** Blade-/Featuretests und für interaktive Komponenten später Browser-/Accessibility-Prüfung.
 - **Status:** \`draft → review → approved → implemented → verified\`. Neue Komponenten sind zunächst \`draft\`, bis ihre visuellen Werte freigegeben sind.
 
-## 4. Nächste reine Komponentenrunden
+## 4. Erweiterung K2 / K3 / K4 – neue Universalbausteine (Entwurf)
+
+Die Designlab-Galerie enthält nun zusätzlich zehn eigenständige Blade-Komponenten: `breadcrumbs`, `tabs`, `pagination`, `disclosure`, `checkbox`, `radio`, `switch`, `search-field`, `progress` und `skeleton`. Sie nutzen zentrale Styles und bestehende semantische VDBS-Tokens. Tabs sind ausdrücklich **Seitennavigation per Link**, kein unvollständig implementiertes ARIA-Tabpanel; Disclosure verwendet native `details/summary`.
+
+Die älteren Musterseiten werden in Navigation, Übersicht und jeweiliger Musterseite deutlich als **„Älterer Entwurf“** gekennzeichnet. Als aktueller Arbeitsbereich ist auf `/design-lab` nun die Komponentenbibliothek prominent verlinkt.
+
+Für die vollständige Umsetzungs- und Freigabematrix siehe [Komponententracker](REDESIGN_COMPONENT_TRACKER.md). **Die Komponenten sind noch nicht vollständig implementiert und nicht visuell freigegeben – finale Seiten sind ausdrücklich noch nicht an der Reihe.**
+
+## 5. Nächste reine Komponentenrunden
 
 | Runde | Priorität | Universelle Komponenten |
 |---|---|---|
