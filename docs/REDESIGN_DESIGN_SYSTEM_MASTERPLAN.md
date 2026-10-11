@@ -10,6 +10,10 @@
 
 Das Grundtemplate **L08 Personal Overview** priorisiert **Ausleihen und Rückgabefristen**, danach Vormerkungen, anschließend weitere Kontofunktionen und Medienentdeckung. Der Portal-Rahmen bleibt großzügig, die Listen kompakt. Vollständige Daten- und Zustandsregeln: [Portal-Template L08](REDESIGN_PORTAL_TEMPLATE_PRIORITY.md); lokale Designlab-Vorschau unter `/design-lab/portal`.
 
+## Komponenten zuerst – aktueller Umsetzungsmodus
+
+Vor der Migration produktiver Seiten entwerfen und testen wir ausschließlich wiederverwendbare Basis-UI und Patterns. Die lokal verfügbare Galerie `/design-lab/komponenten` ist jetzt in Aktionen, Formulare, Oberflächen, Feedback, Daten und Patterns gegliedert, mit schaltbarem Comfortable-/Compact-Vergleich. Die vollständige neue Komponentenstrategie mit Blade-APIs, Variationsstatus und nächsten Runden steht in [`REDESIGN_COMPONENT_LIBRARY_V1.md`](REDESIGN_COMPONENT_LIBRARY_V1.md). Keine produktive Fachseite ist für diesen Schritt umgestaltet worden.
+
 ## Foundations v1 – konkrete Werte zur Freigabe
 
 Die hybride Designrichtung wurde konkretisiert in [`docs/REDESIGN_FOUNDATIONS_HYBRID_V1.md`](REDESIGN_FOUNDATIONS_HYBRID_V1.md): Schriftgrößen, Abstände, Dichteprofile, Radien, Container, Responsive-Rules, Stepper-Geometrie, Fokus, Schatten und Bewegungs-Tokens. Die Markenfarben und Schriftfamilien bleiben unverändert. **Die Spezifikation ist ein Planungsentwurf, noch kein produktiver CSS-Rollout.**
