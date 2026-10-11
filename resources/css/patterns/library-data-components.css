@@ -1,43 +1,91 @@
 /* K6 – library presentation primitives. State is supplied by Blade props, never a database query. */
+/* VDBS Farbpaket 6.0: clearly legible, VIVID semantic states rather than almost-white pills.
+   Use existing brand/semantic tokens; no new palette. Normal loans remain quiet so alerts stand out. */
 .bc-availability,
 .bc-due-status {
-    --bc-status-accent:var(--action-secondary);
-    --bc-status-soft:6%;
+    --bc-status-fill:var(--bg-surface-muted);
+    --bc-status-foreground:var(--text-primary);
+    --bc-status-stroke:var(--border-default);
     display:inline-flex;
     align-items:center;
     flex-wrap:wrap;
     gap:.25rem .55rem;
-    padding:.42rem .65rem;
-    border:1px solid var(--border-default);
-    border-radius:var(--radius-sm);
-    background:color-mix(in srgb,var(--bc-status-accent) var(--bc-status-soft),var(--bg-surface));
-    color:var(--text-primary);
-    font-size:var(--text-sm);
-    line-height:1.35;
+    max-width:100%;
     min-width:0;
+    padding:.48rem .75rem;
+    border:1px solid var(--bc-status-stroke);
+    border-radius:var(--radius-sm);
+    background:var(--bc-status-fill);
+    color:var(--bc-status-foreground);
+    font-size:var(--text-sm);
+    line-height:1.4;
 }
 .bc-availability strong,
 .bc-due-status strong { font-weight:900; }
 .bc-availability__detail,
 .bc-due-status__detail,
-.bc-due-status__date { color:var(--text-secondary); font-size:.8rem; line-height:1.4; overflow-wrap:anywhere; }
-.bc-availability--available { --bc-status-accent:var(--action-success); --bc-status-soft:7%; }
+.bc-due-status__date {
+    color:inherit;
+    font-size:.8rem;
+    line-height:1.4;
+    overflow-wrap:anywhere;
+}
+.bc-availability--available {
+    --bc-status-fill:var(--vdbs-green);
+    --bc-status-foreground:var(--vdbs-ink);
+    --bc-status-stroke:var(--vdbs-green);
+}
+.bc-availability--reserved {
+    --bc-status-fill:var(--vdbs-purple);
+    --bc-status-foreground:var(--vdbs-white);
+    --bc-status-stroke:var(--vdbs-purple);
+}
 .bc-availability--on-loan,
-.bc-due-status--normal { --bc-status-accent:var(--border-strong); --bc-status-soft:3%; }
-.bc-availability--reserved { --bc-status-accent:var(--action-secondary); --bc-status-soft:5%; }
+.bc-due-status--normal {
+    --bc-status-fill:var(--bg-surface-muted);
+    --bc-status-foreground:var(--text-primary);
+    --bc-status-stroke:var(--border-default);
+}
+.bc-availability--unavailable {
+    --bc-status-fill:color-mix(in srgb,var(--action-danger) 18%,var(--bg-surface));
+    --bc-status-foreground:var(--text-primary);
+    --bc-status-stroke:var(--action-danger);
+}
 .bc-due-status--soon,
-.bc-due-status--today { --bc-status-accent:var(--action-warning); --bc-status-soft:8%; }
-.bc-availability--unavailable,
-.bc-due-status--overdue { --bc-status-accent:var(--action-danger); --bc-status-soft:7%; }
+.bc-due-status--today {
+    --bc-status-fill:var(--action-warning);
+    --bc-status-foreground:var(--vdbs-ink);
+    --bc-status-stroke:var(--action-warning);
+}
+.bc-due-status--overdue {
+    --bc-status-fill:var(--vdbs-error);
+    --bc-status-foreground:var(--vdbs-white);
+    --bc-status-stroke:var(--vdbs-error);
+}
+.bc-due-status--overdue::before {
+    content:"!";
+    display:inline-grid;
+    place-items:center;
+    width:1.15rem;
+    height:1.15rem;
+    flex:0 0 auto;
+    border:1.5px solid currentColor;
+    border-radius:50%;
+    font-size:.8rem;
+    font-weight:900;
+    line-height:1;
+}
 .bc-availability--unknown,
-.bc-due-status--unknown { --bc-status-accent:var(--action-secondary); --bc-status-soft:4%; }
-.bc-due-status--overdue strong,
-.bc-availability--unavailable strong { color:var(--text-primary); }
+.bc-due-status--unknown {
+    --bc-status-fill:var(--bg-surface-muted);
+    --bc-status-foreground:var(--text-secondary);
+    --bc-status-stroke:var(--border-default);
+}
 .bc-availability--compact,
-.bc-due-status--compact { padding:.3rem .5rem; font-size:.78rem; }
+.bc-due-status--compact { padding:.34rem .6rem; font-size:.78rem; }
 .bc-availability--compact .bc-availability__detail,
 .bc-due-status--compact .bc-due-status__detail,
-.bc-due-status--compact .bc-due-status__date { font-size:.74rem; }
+.bc-due-status--compact .bc-due-status__date { font-size:.76rem; }
 
 .bc-media-card {
     display:grid;
@@ -69,13 +117,30 @@
 .bc-scan-input { display:grid; gap:.4rem; min-width:0; }
 .bc-scan-input__label { font-size:var(--text-sm); font-weight:800; color:var(--text-primary); }
 .bc-scan-input__control { display:flex; align-items:center; gap:.6rem; min-height:3.25rem; min-width:0; padding:0 .85rem; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--bg-surface); }
-.bc-scan-input__control:focus-within { outline:3px solid var(--focus-ring); outline-offset:3px; }
+/* Focus is indicated by recolouring the existing border, not adding an outer ring.
+   The Designlab's generic input focus selector is deliberately overridden below. */
+.bc-scan-input__control:focus-within {
+    border-color:var(--focus-ring);
+    outline:none;
+    box-shadow:none;
+}
 .bc-scan-input__icon { flex:0 0 auto; color:var(--text-secondary); font-size:1.5rem; line-height:1; }
 .bc-scan-input__field { display:block; min-width:0; flex:1 1 auto; width:100%; min-height:3.1rem; padding:.55rem 0; background:transparent; border:0; border-radius:0; outline:0; color:var(--text-primary); font:inherit; font-size:1rem; }
-.bc-scan-input__field:focus-visible { outline:0; }
+.bc-scan-input .bc-scan-input__field:is(:focus,:focus-visible) {
+    border:0;
+    outline:none;
+    box-shadow:none;
+}
+/* More specific than .bc-core-gallery :is(a,input,select,button,summary):focus-visible */
+.bc-core-gallery .bc-scan-input .bc-scan-input__field:focus-visible {
+    border:0;
+    outline:none;
+    box-shadow:none;
+}
 .bc-scan-input__field::placeholder { color:var(--text-secondary); }
 .bc-scan-input__field:disabled { color:var(--text-secondary); cursor:not-allowed; }
 .bc-scan-input__control:has([aria-invalid="true"]) { border-color:var(--action-danger); }
+.bc-scan-input__control:has([aria-invalid="true"]:focus-visible) { border-color:var(--focus-ring); }
 .bc-scan-input__error { margin:0; font-size:var(--text-sm); color:var(--action-danger); line-height:1.55; }
 .bc-scan-input__hint { margin:0; font-size:var(--text-sm); color:var(--text-secondary); line-height:1.55; }
 
