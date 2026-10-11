@@ -74,7 +74,8 @@
     letter-spacing: -.05em;
     text-wrap: balance;
 }
-.bc-home-hero h1 span { color: var(--vdbs-green); }
+.bc-home-hero h1 span { display: block; }
+.bc-home-hero h1 .bc-home-hero__accent { color: var(--vdbs-green); }
 .bc-home-hero__copy > p {
     max-width: 32rem;
     margin: 0 0 1.95rem;
@@ -453,6 +454,6 @@
     .bc-home-hero h1,
     .bc-home-hero__copy > p { color: var(--text-primary); }
     .bc-home-hero__art { display: none; }
-    .bc-home-hero h1 span { color: var(--text-primary); }
+    .bc-home-hero h1 .bc-home-hero__accent { color: var(--text-primary); }
     .bc-home-editorial__visual { display: none; }
 }
