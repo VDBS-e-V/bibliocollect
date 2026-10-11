@@ -10,6 +10,10 @@
     $density = in_array($density, ['comfortable', 'compact'], true) ? $density : null;
 @endphp
 
-<{{ $as }} {{ $attributes->class('bc-card') }}>
+<{{ $as }} {{ $attributes->class([
+    'bc-card',
+    'bc-card--'.$tone => $tone !== 'default',
+    'bc-card--'.$density => $density !== null,
+]) }}>
     {{ $slot }}
 </{{ $as }}>
