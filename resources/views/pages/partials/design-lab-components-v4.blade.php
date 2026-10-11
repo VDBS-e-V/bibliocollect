@@ -62,7 +62,7 @@
             <button class="bc-button bc-button--primary" type="button" data-ui-dialog-open="bc-ui-demo-information">Informationsdialog öffnen</button>
             <button class="bc-button bc-button--secondary" type="button" data-ui-dialog-open="bc-ui-demo-warning">Bestätigungsvorschau öffnen</button>
         </div>
-        <p class="bc-core-gallery-v4__explain">Schließe die Dialoge über das X, „Schließen“ oder Escape. Nach dem Schließen kehrt der Tastaturfokus zum auslösenden Button zurück.</p>
+        <p class="bc-core-gallery-v4__explain">Neues Grunddesign: 10 px Eckenradius, feiner Rahmen und bei Warnungen nur eine kurze Akzentleiste im Header – keine durchgehende obere Linie. Schließe den Dialog über X, „Schließen“ oder Escape; der Fokus kehrt zum auslösenden Button zurück.</p>
     </div>
 
     <x-ui.dialog id="bc-ui-demo-information" title="Informationen zum Medium" description="Eine reine Demonstration des gemeinsamen Dialog-Grundbausteins.">
@@ -95,8 +95,8 @@
             <x-ui.toast title="Beispiel eines Fehlers" message="Die Anwendung würde hier erklären, was fehlgeschlagen ist." variant="error" />
         </div>
     </div>
-    <p class="bc-core-gallery-v4__explain">Die Meldungen werden in der Vorschau statisch angezeigt. Das Schließen funktioniert; eine echte Anwendung zeigt sie nur nach einem tatsächlichen Ereignis. Fehler bleiben über Text und nicht allein über Farbe erkennbar.</p>
-    <div class="bc-core-gallery__component-note"><code>&lt;x-ui.toast&gt;</code><span>info, success, warning, error; role=status oder role=alert; option zum Ausblenden ohne automatische Zeitbegrenzung.</span></div>
+    <p class="bc-core-gallery-v4__explain">Neues Grunddesign: 8 px Eckenradius, dezente Statustönung und ein kurzer Akzent oberhalb des Titels statt langer farbiger Seitenlinien. Die Meldungen sind Demo-Zustände, lassen sich schließen und vermitteln ihre Bedeutung zusätzlich durch den Text.</p>
+    <div class="bc-core-gallery__component-note"><code>&lt;x-ui.toast&gt;</code><span>info, success, warning, error; 8-px-Radius, kurze Akzentleiste, dezente Flächentönung, role=status oder role=alert; ohne automatisches Ausblenden.</span></div>
 </section>
 
 <section class="bc-core-gallery__section" id="bc-core-loading">
