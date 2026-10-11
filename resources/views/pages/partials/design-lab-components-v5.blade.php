@@ -119,7 +119,7 @@
 </section>
 
 <section class="bc-core-gallery__section" id="bc-core-scan-input" aria-labelledby="bc-core-scan-input-heading">
-    <x-ui.section-heading eyebrow="22 · Eingaben im Betrieb" title="Scannerfeld mit einheitlicher Formularlogik" description="Ein gemeinsamer Baustein für die manuelle Barcodeeingabe oder angeschlossene Scanner. Fokus und Fehlermeldung sind klar erkennbar." />
+    <x-ui.section-heading eyebrow="22 · Eingaben im Betrieb" title="Scannerfeld mit einheitlicher Formularlogik" description="Beim Fokussieren färbt sich nur der vorhandene Rahmen lila, ohne zusätzliche äußere Umrandung oder lila Innenstriche. Hinweise und Fehler stehen unter dem Feld." />
     <div class="bc-core-gallery-v5__scan-grid">
         <div class="bc-core-gallery__example">
             <div class="bc-core-gallery__example-head"><strong id="bc-core-scan-input-heading">Standard</strong><span>x-library.scan-input</span></div>
