@@ -30,7 +30,11 @@
                 @endforeach
             </div>
         </nav>
-        <p class="bc-design-lab__notice">Interaktive Seitennavigation, aber ausschließlich <strong>fiktive Beispieldaten</strong>. Es werden keine Ausleihen, Importe oder Verwaltungsaktionen ausgeführt.</p>
+        @if ($screen === 'designsystem')
+            <p class="bc-design-lab__notice">Die folgenden Zahlen stammen aus dem <strong>Designsystem-Masterplan</strong> und beschreiben die geplante Struktur – keine Live-Statistiken oder bereits vollständig umgestellten Seiten.</p>
+        @else
+            <p class="bc-design-lab__notice">Interaktive Seitennavigation, aber ausschließlich <strong>fiktive Beispieldaten</strong>. Es werden keine Ausleihen, Importe oder Verwaltungsaktionen ausgeführt.</p>
+        @endif
 
         @if ($screen === 'index')
             <header class="bc-design-lab__intro">
@@ -39,6 +43,16 @@
                 <p>Vier eigenständige Beispielseiten und eine Komponentenbibliothek. Die Studie verbindet lebendige Überlagerungen nach deiner Oodi-Referenz mit einer modernen Prozessachse, Bento-Statistiken und klaren Statusmeldungen.</p>
             </header>
 
+            <a class="bc-design-lab__system-banner" href="{{ route('public.design-lab.designsystem') }}">
+                <span class="bc-design-lab__system-banner-copy">
+                    <small>Neu · Grafischer Masterplan</small>
+                    <strong>Das gesamte BiblioCollect Designsystem auf einer Seite.</strong>
+                    <span>15 Familien · 323 Planungspositionen · 22 Templates · 4 Anwendungsbereiche <span aria-hidden="true">↗</span></span>
+                </span>
+                <span class="bc-design-lab__system-banner-visual" aria-hidden="true">
+                    <span>Tokens</span><span>Komponenten</span><span>Patterns</span><span>Templates</span><span>Fachseiten</span>
+                </span>
+            </a>
             <div class="bc-design-lab__overview">
                 <a href="{{ route('public.design-lab.home') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--feature">
                     <span class="bc-design-lab__kicker">01 / Startseite</span>
@@ -67,6 +81,8 @@
                     <span>Vier wiederverwendbare Patterns und weitere UI-Elemente <span aria-hidden="true">↗</span></span>
                 </a>
             </div>
+        @elseif ($screen === 'designsystem')
+            @include('pages.partials.design-system-map')
         @elseif ($screen === 'startseite')
             <header class="bc-design-lab__page-head">
                 <span class="bc-design-lab__kicker">Musterseite 01 · Öffentlich</span>
