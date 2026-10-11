@@ -277,11 +277,11 @@
                         <h3 class="bc-review-block-title">Typografie</h3>
                         <div class="bc-review-type"><strong>Wissen beginnt mit Neugier.</strong><p>Gut lesbare Absätze, verständliche Links und eine erkennbare Struktur – vom ersten Blick bis zum Detail.</p><small>Lato · Text und UI | Neuland · markante Akzente | Source Serif 4 · redaktionelle Zitate</small></div>
                         <h3 class="bc-review-block-title">Schaltflächen</h3>
-                        <div class="bc-review-demo-actions"><x-ui.button disabled>Primär (Demo)</x-ui.button><x-ui.button variant="secondary" disabled>Sekundär (Demo)</x-ui.button><x-ui.button variant="outline" disabled>Outline (Demo)</x-ui.button></div>
+                        <div class="bc-review-demo-actions"><x-ui.button disabled>Primär (Demo)</x-ui.button><x-ui.button variant="secondary" disabled>Sekundär (Demo)</x-ui.button><x-ui.button variant="primary" disabled>Deaktiviert (Demo)</x-ui.button></div>
                         <h3 class="bc-review-block-title">Statusanzeigen</h3>
-                        <div class="bc-review-statuses"><x-ui.badge variant="success">Verfügbar</x-ui.badge><x-ui.badge variant="neutral">In Bearbeitung</x-ui.badge><x-ui.badge variant="warning">Frist beachten</x-ui.badge><x-ui.badge variant="error">Aktion fehlgeschlagen</x-ui.badge></div>
+                        <div class="bc-review-statuses"><x-ui.badge variant="success">Verfügbar</x-ui.badge><x-ui.badge variant="neutral">In Bearbeitung</x-ui.badge><x-ui.badge variant="warning">Frist beachten</x-ui.badge><x-ui.badge variant="danger">Aktion fehlgeschlagen</x-ui.badge></div>
                         <h3 class="bc-review-block-title">Hinweise</h3>
-                        <div class="bc-review-alert-grid"><x-ui.alert variant="info" title="Information">Ergänzende Hinweise unterstützen den Ablauf.</x-ui.alert><x-ui.alert variant="warning" title="Bitte prüfen">Eine wichtige Angabe ist noch offen.</x-ui.alert></div>
+                        <div class="bc-review-alert-grid"><x-ui.alert variant="info" title="Information">Ergänzende Hinweise unterstützen den Ablauf.</x-ui.alert><x-ui.alert variant="error" title="Fehlerbeispiel">Eine wichtige Angabe ist noch offen.</x-ui.alert></div>
                         <h3 class="bc-review-block-title">Covervarianten</h3>
                         <div class="bc-review-covers">
                             @foreach ($demoTitles as $item)
