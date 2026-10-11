@@ -20,10 +20,9 @@
                     <p>Finde Bücher, die dich begeistern. Entdecke neue Themen und nutze die Bibliothek ganz nach deinen Ideen.</p>
                     <x-library.catalog-search id="catalog-search" placeholder="Buchtitel, Autor:in oder Thema …" />
                     <div class="bc-home-hero__links">
-                        <span>Direkt entdecken:</span>
-                        <a href="{{ route('public.catalog.index') }}">Alle Medien</a>
-                        <a href="{{ route('public.series.index') }}">Buchreihen</a>
+                        <span>Direkt zu:</span>
                         <a href="{{ route('public.catalog.advanced') }}">Erweiterte Suche</a>
+                        <a href="#oeffnungszeiten">Öffnungszeiten</a>
                     </div>
                 </div>
 
@@ -31,8 +30,8 @@
                     <span class="bc-home-hero__circle bc-home-hero__circle--main"></span>
                     <span class="bc-home-hero__circle bc-home-hero__circle--ring"></span>
                     <span class="bc-home-hero__caption">
-                        <small>Aus dem Katalog</small>
-                        <strong>Lesen öffnet Welten.</strong>
+                        <small>Entdecken</small>
+                        <strong>Was liest du als Nächstes?</strong>
                     </span>
                     <div class="bc-home-hero__book bc-home-hero__book--back">
                         @if (isset($heroTiles[0]))
@@ -48,7 +47,7 @@
                             <x-library.media-cover title="Lesen öffnet Welten" author="Deine Bibliothek" variant="plum" size="hero" />
                         @endif
                     </div>
-                    <span class="bc-home-hero__footnote">Ein Ort für alle Ideen.</span>
+                    
                 </div>
             </div>
         </section>
@@ -57,8 +56,7 @@
         <section class="bc-home-actions" aria-labelledby="home-actions-heading">
             <div class="bc-home-heading">
                 <span class="bc-home-eyebrow">Schnell zum Ziel</span>
-                <h2 id="home-actions-heading">Was möchtest du tun?</h2>
-                <p>Die wichtigsten Möglichkeiten auf einen Blick.</p>
+                <h2 id="home-actions-heading">Direkt zu deinem Anliegen</h2>
             </div>
             <div class="bc-home-actions__grid">
                 <x-library.quick-action :href="route('public.catalog.index')" title="Medien finden" description="Den gesamten Bestand durchsuchen." icon="search" />
@@ -78,8 +76,8 @@
                 <div class="bc-home-heading bc-home-heading--split">
                     <div>
                         <span class="bc-home-eyebrow">Aus dem Katalog</span>
-                        <h2 id="home-discovery-heading">Entdecke etwas Neues</h2>
-                        <p>Stöbere durch Bücher, die neu im Regal stehen oder besonders empfohlen werden.</p>
+                        <h2 id="home-discovery-heading">Zum Lesen entdeckt</h2>
+                        <p>Empfehlungen aus deiner Bibliothek und Medien, die neu dazugekommen sind.</p>
                     </div>
                     <a class="bc-home-text-link" href="{{ route('public.catalog.index') }}">Alle Medien ansehen <span aria-hidden="true">→</span></a>
                 </div>
@@ -126,17 +124,15 @@
         {{-- 04 · Redaktionelles Gegenstück zu Suche und Katalog, bewusst keine weitere Kachelwand. --}}
         <section class="bc-home-editorial" aria-labelledby="home-editorial-heading">
             <div class="bc-home-editorial__visual" aria-hidden="true">
-                <span class="bc-home-eyebrow bc-home-eyebrow--light">Unser Ort</span>
-                <div class="bc-home-editorial__books">
-                    <span></span><span></span><span></span>
-                </div>
-                <strong>Mehr als Regale voller Bücher.</strong>
+                <span class="bc-home-eyebrow bc-home-eyebrow--light">Zusammen lesen, lernen, gestalten</span>
+                <img src="/brand/vdbs/figures-chain.svg" alt="" width="1587" height="482" loading="lazy">
+                <strong>Deine Bibliothek. Eure Ideen.</strong>
             </div>
             <div class="bc-home-editorial__copy">
                 <span class="bc-home-eyebrow">Deine Bibliothek</span>
-                <h2 id="home-editorial-heading">Ein Ort zum Lernen. Ein Ort zum Bleiben.</h2>
-                <p>Deine Schulbibliothek bietet Raum für Geschichten, neue Perspektiven und gemeinsames Entdecken. Im Katalog findest du die Medien, die dazu gehören.</p>
-                <a class="bc-home-outline-link" href="{{ route('public.catalog.index') }}">Bibliothek entdecken <span aria-hidden="true">→</span></a>
+                <h2 id="home-editorial-heading">Hier ist Platz für mehr als Bücher.</h2>
+                <p>In der Schulbibliothek kannst du stöbern, in Ruhe lesen oder gemeinsam Ideen entwickeln. Was dich interessiert, findest du im Katalog – und vielleicht schon bald im Regal.</p>
+                <a class="bc-home-outline-link" href="{{ route('public.wishes.create') }}">Ein Buch vorschlagen <span aria-hidden="true">→</span></a>
             </div>
         </section>
 
@@ -144,7 +140,7 @@
         <section class="bc-home-info" aria-labelledby="home-info-heading">
             <div class="bc-home-heading">
                 <span class="bc-home-eyebrow">Gut zu wissen</span>
-                <h2 id="home-info-heading">Alles Wichtige auf einen Blick</h2>
+                <h2 id="home-info-heading">Dein Bibliotheksbesuch</h2>
             </div>
             <div class="bc-home-info__grid">
                 <article class="bc-home-info__panel" id="oeffnungszeiten">
