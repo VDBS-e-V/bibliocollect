@@ -91,7 +91,7 @@
 </section>
 
 <section class="bc-core-gallery__section" id="bc-core-library-states" aria-labelledby="bc-core-library-states-heading">
-    <x-ui.section-heading eyebrow="21 · Bibliothek" title="Verfügbarkeit und Rückgabefristen" description="Dieselben Zustände im Katalog, Portal und Bibliotheksbetrieb – mit Statuswort, optionalem Zusatztext und vorhandenen VDBS-Farben." />
+    <x-ui.section-heading eyebrow="21 · Bibliothek" title="Verfügbarkeit und Rückgabefristen" description="Farben dürfen auffallen: Grün für verfügbar, Lila für vorgemerkt, kräftiges Orange vor der Frist und klares Rot bei Überfälligkeit. Normale Ausleihen bleiben neutral – Bedeutung immer mit Text." />
     <div class="bc-core-gallery-v5__state-grid">
         <div class="bc-core-gallery__example">
             <div class="bc-core-gallery__example-head"><strong id="bc-core-library-states-heading">Verfügbarkeit</strong><span>x-library.availability-status</span></div>
