@@ -103,17 +103,16 @@
                     <option value="recent" @selected($criteria->sort === 'recent')>Zuletzt erfasst</option>
                 </x-ui.select>
 
-                <label class="bc-search-check" for="staff-active-only" title="Filtert auf Exemplare mit dem Status „aktiv“.">
-                    <input id="staff-active-only" name="active_only" type="checkbox" value="1" @checked($criteria->activeCopiesOnly)>
-                    <span>Nur Titel mit aktiven Exemplaren</span>
+                <label class="bc-search-check" for="staff-active-only" title="Nur Titel mit aktiven Exemplaren">
+                    <input id="staff-active-only" name="active_only" type="checkbox" value="1" data-auto-submit @checked($criteria->activeCopiesOnly)>
+                    <span>Mit aktiven Exemplaren</span>
                 </label>
-                <label class="bc-search-check" for="staff-available-only" title="Mindestens ein aktives Exemplar, das weder ausgeliehen noch zurückgelegt ist.">
-                    <input id="staff-available-only" name="available_only" type="checkbox" value="1" @checked($criteria->availableNowOnly)>
-                    <span>Nur jetzt verfügbare Titel</span>
+                <label class="bc-search-check" for="staff-available-only" title="Nur jetzt verfügbare Titel: mindestens ein aktives Exemplar, das weder ausgeliehen noch zurückgelegt ist.">
+                    <input id="staff-available-only" name="available_only" type="checkbox" value="1" data-auto-submit @checked($criteria->availableNowOnly)>
+                    <span>Jetzt verfügbar</span>
                 </label>
 
                 <div class="bc-search-filters__actions">
-                    <x-ui.button type="submit" variant="secondary">Anwenden</x-ui.button>
                     @if ($criteria->hasSearchInput())
                         <x-ui.button href="{{ route('pos.catalog.index') }}" variant="secondary">Zurücksetzen</x-ui.button>
                     @endif

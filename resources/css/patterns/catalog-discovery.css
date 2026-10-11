@@ -758,18 +758,19 @@ details.bc-search-card[open] > summary.bc-search-card__title::after {
 /* Filters: one compact row that wraps only when the screen is too narrow. */
 .bc-search-filters {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: end;
     gap: .75rem 1rem;
 }
 
-.bc-search-filters > .bc-field,
-.bc-search-filters > div {
-    flex: 0 1 12rem;
-    min-width: 9rem;
+.bc-search-filters > .bc-field {
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .bc-search-check {
+    flex: 0 0 auto;
+    white-space: nowrap;
     display: inline-flex;
     align-items: center;
     gap: .45rem;
@@ -797,8 +798,11 @@ details.bc-search-card[open] > summary.bc-search-card__title::after {
         grid-template-columns: 1fr;
     }
 
-    .bc-search-filters > .bc-field,
-    .bc-search-filters > div {
+    .bc-search-filters {
+        flex-wrap: wrap;
+    }
+
+    .bc-search-filters > .bc-field {
         flex: 1 1 100%;
     }
 
