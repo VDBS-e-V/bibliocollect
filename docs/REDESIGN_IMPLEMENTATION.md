@@ -19,6 +19,21 @@ Neuer CSS-Baustein:
 
 Die Blade-Startseite `resources/views/pages/welcome.blade.php` nutzt diese Komponenten. **Unverändert** bleiben Katalog- und Kontorouten, Empfehlungen, Neuerscheinungen, Themen, Öffnungszeiten, Schließtage, Leihregeln und Portalzugriffsprüfung. Die echten VDBS-Grafiken unter `public/brand/vdbs/` werden weiterverwendet; es werden keine Demo-Cover oder Demo-Ausleihen produktiv eingebaut.
 
+## Cover-Cache (SVG) – implementiert
+
+BiblioCollect verwendet weiterhin zunächst das originale, lokal gespeicherte Cover über
+\`CatalogCoverService::localUrlForTitle()\`. Gibt es kein echtes Cover, wählt
+\`CatalogCoverService::displayUrlForTitle()\` eine persistierte SVG-Illustration.
+
+- Der Service \`CatalogGeneratedCoverService\` erzeugt eine SVG-Datei mit Titel, optional Autor:innen und einer von vier fest definierten Farbvarianten. Die Variante wird aus einem erweiterten Hash des Titels bestimmt; gleiche Farben für zwei Bücher sind weiterhin möglich.
+- Die Datei liegt auf dem mit \`catalog.covers.disk\` konfigurierten Datenträger unter \`catalog/covers/generated/v1/{hash}.svg\` (bzw. unter dem konfigurierten Cover-Verzeichnis). Existiert sie schon, wird sie **nicht neu geschrieben**.
+- Der Dateiname basiert auf Titel-ID, Titel, Autor:innen und Designversion. Änderungen erzeugen einen neuen Cachepfad. Alte generierte SVGs können bei einer späteren Wartungsroutine bereinigt werden.
+- Ein inzwischen heruntergeladenes echtes Cover gewinnt ab der nächsten dynamischen Cover-Auflösung; die Startseitenempfehlungen sind noch maximal zehn Minuten separat zwischengespeichert.
+- Ohne Schreibzugriff greift die bisherige HTML/CSS-Ersatzdarstellung; keine neuen externen Bildquellen oder Datenbankmigrationen.
+- Vor der Nutzung auf einem Server muss wie für lokale Originalcover das öffentlich lesbare Storage-Verzeichnis eingerichtet sein (z. B. \`php artisan storage:link\`).
+
+Betroffene reale Ansichten: Startseiten-Schaufenster, öffentliche Katalogtreffer, öffentliche Titeldetails. Header und Footer sind gemeinsam, die Inhalte von Portal, Bibliotheksbetrieb und Verwaltung noch nicht umfassend neu gestaltet.
+
 ## Vorgeschlagene weitere Schritte
 
 | Stufe | Vorlagen | Reale Oberflächen | Hinweise |
