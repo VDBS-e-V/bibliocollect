@@ -1,5 +1,7 @@
 # BiblioCollect Foundations – Hybrid v1.0 (Entwurf)
 
+**Nächster Planungsabschnitt:** [Foundations-Workshop mit Designlab-Playground, Vergleichsszenen und Freigaben](REDESIGN_FOUNDATIONS_WORKSHOP_ROADMAP.md).
+
 > **Status: ZUR GESTALTERISCHEN FREIGABE.** Die hier festgelegten Größen, Abstände und Regeln sind konkrete Vorschläge. Der Entwurf ist **keine Änderung** an \`resources/css/tokens.css\` oder den produktiven Blade-Komponenten.
 >
 > **Designrichtung:** öffentlich großzügig und organischer; Bibliotheksbetrieb und Administration klar und kompakt. Identische Marke, identische Fachlogik, gemeinsame semantische Tokenbasis.
