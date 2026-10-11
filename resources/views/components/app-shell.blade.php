@@ -133,7 +133,7 @@
             <nav class="bc-nav" aria-label="Hauptnavigation" data-nav>
                 <div class="bc-nav__inner">
                     @foreach ($areas as $area)
-                        <a href="{{ $area['url'] }}" @class(['bc-nav__link', 'bc-nav__link--active' => $area['current']]) @if ($area['current']) aria-current="page" @endif data-nav-item>{{ $area['label'] }}</a>
+                        <a href="{{ $area['url'] }}" @class(['bc-nav__link', 'bc-nav__link--active' => $area['current']]) @if ($area['current']) aria-current="page" @endif data-area-link data-nav-item>{{ $area['label'] }}</a>
                     @endforeach
                     @foreach ($navigationItems as $item)
                         @php
