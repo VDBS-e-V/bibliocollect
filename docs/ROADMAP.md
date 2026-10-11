@@ -1,6 +1,6 @@
 # Entwicklungsplan — BiblioCollect
 
-Stand: v0.37.0. Dieses Dokument gibt nur die Richtung vor. Den genauen Stand je Funktion nennt `docs/PROJECT_STATUS.md`, die Einrichtung für den Testeinsatz `docs/GO_LIVE.md`, offene Aufgaben für den Betreiber `docs/OFFENE_PUNKTE.md` und das, was bewusst später kommt, `docs/VOR_ECHTEINSATZ.md`.
+Stand: v0.71.0. Dieses Dokument gibt nur die Richtung vor. Den genauen Stand je Funktion nennt `docs/PROJECT_STATUS.md`, die Einrichtung für den Testeinsatz `docs/GO_LIVE.md`, offene Aufgaben für den Betreiber `docs/OFFENE_PUNKTE.md` und das, was bewusst später kommt, `docs/VOR_ECHTEINSATZ.md`.
 
 ## Erledigt
 
@@ -13,12 +13,11 @@ Stand: v0.37.0. Dieses Dokument gibt nur die Richtung vor. Den genauen Stand je 
 ## Als Nächstes (nach dem Start des Testeinsatzes, je nach Erfahrung)
 
 1. Schuljahreswechsel: Teilwechsel und Rückgängig.
-2. Konten-Import mit Aktualisierung vorhandener Konten, mehrere Klassen je Datei.
-3. Anreicherung des Katalogs (Zusammenfassungen, Schlagwörter).
-4. Etiketten für Regalbretter (sobald das Etikettenformat feststeht), Kamera-Scan am Handy.
-5. Automatisierte Browsertests für Ausleihe, Ausweis-Registrierung und Rückgabe.
-6. Jahresbericht als Text.
+2. Anreicherung des Katalogs (Zusammenfassungen, Schlagwörter).
+3. Weitere Stapelaktionen im Katalog für Titel, Themen und Ausgaben (Issue 86).
+4. Automatisierte Browsertests für Ausleihe, Ausweis-Registrierung und Rückgabe.
+5. Jahresbericht als Text.
 
 ## Später, bei Bedarf
 
-Merkliste, Zeitraumsvormerkungen und Click & Collect, MARC21-Import, Veranstaltungen und Leselisten, Zählung gedruckter Ausweise je Motiv. Mahnungen und Gebühren sind bewusst nicht vorgesehen.
+Zeitraumsvormerkungen und Click & Collect, MARC21-Import, Veranstaltungen und Leselisten, Zählung gedruckter Ausweise je Motiv. Mahnungen und Gebühren sind bewusst nicht vorgesehen.

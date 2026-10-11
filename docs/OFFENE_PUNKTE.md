@@ -1,6 +1,6 @@
 # Offene Punkte vor dem Start
 
-Stand: v0.37.0. Ablauf der Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`. Funktionen, die bewusst später kommen: `docs/VOR_ECHTEINSATZ.md`. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
+Stand: v0.71.0. Ablauf der Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`. Funktionen, die bewusst später kommen: `docs/VOR_ECHTEINSATZ.md`. ✔ = erledigt, ◐ = teilweise, ☐ = offen. „Du“ heißt: Entscheidung, Text oder Zugang kommt vom Betreiber.
 
 ## A. Muss vor dem Start
 
@@ -24,8 +24,8 @@ Stand: v0.37.0. Ablauf der Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`. 
 | ✔ | Statistik | `/betrieb/statistik`: Kennzahlen, Ausleihen je Monat, beliebteste Titel, nach Klasse und Medientyp, Bestand; Zeitraum je Schuljahr, letzte 12 Monate oder gesamt; CSV-Download und Druck. Ein fertiger „Jahresbericht“ als Text fehlt |
 | ✔ | Pflege von Signaturen und Themen, Inventur | Signaturen und Themen (v0.19.0), Inventur (v0.22.0) |
 | ✔ | Filter „nur verfügbare Titel“ | v0.21.0 |
-| ◐ | Buchwünsche, Merkliste/Favoriten | Buchwünsche sind da (Portal, Arbeitsplatz, Mails, Datenschutz). Merkliste/Favoriten offen |
-| ☐ | Ausleihkonten-Import: vorhandene Konten aktualisieren | offen |
+| ✔ | Buchwünsche, Merkliste/Favoriten | Buchwünsche (Portal, Arbeitsplatz, Mails, Datenschutz) und Merkliste (v0.67.0) sind da |
+| ✔ | Ausleihkonten-Import: vorhandene Konten aktualisieren | mehrere Klassen je Datei und Aktualisieren (v0.55.0) |
 | ☐ | Schuljahreswechsel: Teilwechsel, Rückgängig | offen |
 | ☐ | Zeitraumsvormerkungen / Click & Collect | offen |
 
@@ -45,7 +45,7 @@ Stand: v0.37.0. Ablauf der Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`. 
 | ☐ | Mobilansicht auf dem Handy ansehen | **Du** |
 | ☐ | Ende-zu-Ende-Browsertests | offen |
 | ✔ | Fehlerüberwachung | Seite „Systemzustand“, Mails bei Fehlern und Cron-Ausfall, Statusadresse (v0.17.0) |
-| ☐ | Git: pushen, Branches aufräumen, CI prüfen | **Du**, nichts wurde gepusht |
+| ✔ | Git und CI | Repo VDBS-e-V/bibliocollect, Pull Requests mit `quality` und `mariadb`, Release per Actions-Workflow (`CONTRIBUTING.md`) |
 | ✔ | Anleitung für Schüler-AG und Mitarbeiter:innen | In der Anwendung unter „Hilfe“ (`/betrieb/hilfe`): Ausleihe, Katalog und Ausleihkonten, Verwaltung (`resources/help/*.md`). **Du:** lesen und an die Praxis anpassen; eine Schulung ersetzt das nicht |
 
 ## E. Betrieb

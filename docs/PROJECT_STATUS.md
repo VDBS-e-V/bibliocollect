@@ -1,6 +1,6 @@
 # Projektstatus — BiblioCollect
 
-Stand: v0.37.0 (Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`, offene Punkte: `docs/OFFENE_PUNKTE.md`). Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, neuere Bausteine stehen oben in den Unterabschnitten „v0.5.x/v0.6.x“.
+Stand: v0.71.0 und die danach gemergten Änderungen (Einrichtung für den Testeinsatz: `docs/GO_LIVE.md`, offene Punkte: `docs/OFFENE_PUNKTE.md`). Katalog mit Erfassung, Qualitätsprüfung und Covern; Ausleihe mit Verlängerung, Vormerkung und Abholung; Portal, Erinnerungen, Protokoll, Schuljahreswechsel, Import und Anonymisierung. Die Abschnitte unten sind nach Themen geordnet, innerhalb der Unterabschnitte stehen die neueren Bausteine ab „Etiketten für Regalbretter“ (v0.58.0) oben, die älteren (v0.5.x bis v0.46.0) weiter unten.
 
 ## Abgeschlossen
 
@@ -212,6 +212,18 @@ Unter Verwaltung → Regale und Regalbretter → **Etiketten für Regalbretter d
 ### Bücher in anderen Sprachen: weitere Quellen (Issue 40)
 
 Beim Erfassen per ISBN und im Qualitätslauf werden jetzt neben der DNB auch **Open Library** und **Google Books** gefragt (Kette je nach ISBN-Gruppe, Lückenfüllung, Sprachcodes vereinheitlicht, Quelle sichtbar, weniger verlässliche Quellen nie gesammelt übernommen). Systemzustand → Datenqualität zeigt die Sprachen im Bestand und setzt Fälle ohne Treffer zum erneuten Nachschlagen zurück. Die Anzeige der Sprache im Katalog kennt mehr Sprachen (Türkisch, Arabisch, Russisch, Ukrainisch, Polnisch und weitere). Einzelheiten und Grenzen in `docs/CATALOG_INTAKE.md`. Neue Einstellungen in `.env.example`: `CATALOG_LOOKUP_OPEN_LIBRARY`, `CATALOG_LOOKUP_GOOGLE_BOOKS`, `CATALOG_LOOKUP_TIMEOUT`. Die Suche findet Titel und Namen in anderer Schrift auch mit lateinischen Buchstaben („voyna“ → „Война и мир“, Spalte `search_aliases`). Die Qualitätsregeln sind sprachneutral (getestet für Kyrillisch, Arabisch, Türkisch, Ostasiatisch). Bewusst nicht gebaut: eine Nationalbibliothek des Herkunftslands als Quelle, erst nach der Auswertung der Sprachen im Bestand.
+
+### Regalübersicht mit Belegung und CSV-Export (Issue 59)
+
+Neue Seite `/verwaltung/regalbretter/dashboard` (verlinkt von der Regalbrett-Verwaltung, nur lesend): je Regalbrett Zahl der Exemplare, Kapazität, Themen und ein **Hinweis** („Ohne Thema“, „Ohne Regalzuordnung“, „Kapazität überschritten“), filterbar nach Gruppe, Bereich und Regal. Der CSV-Export (`bibliocollect-regal-dashboard.csv`, über `CsvExport`, 20 Aufrufe je Minute) enthält dieselben Zeilen. Logik in `ShelfDashboardController`, Tests in `ShelfDashboardTest`.
+
+### Standort mehrerer Exemplare gesichert ändern (Issue 60)
+
+Im Katalog lassen sich bis zu **50 ausgewählte Exemplare** auf einmal auf ein anderes Regalbrett legen: erst **Vorschau** (`/betrieb/katalog/stapel/standort/vorschau`, nichts wird geschrieben), dann ausdrückliche **Bestätigung** (`…/uebernehmen`); beide Schritte sind auf 10 Aufrufe je Minute begrenzt. Weitere Stapelaktionen für Titel, Themen und Ausgaben stehen in Issue 86. Logik in `CatalogBulkLocationController`, Tests in `CatalogBulkLocationTest`.
+
+### Update-Prüfung: Zugriffsgrenzen von GitHub (Issue 82)
+
+Die Prüfung auf neue Releases unterscheidet bei GitHub-Antworten echte **Rate-Limits** (403 mit Limit-Kopfzeilen, 429) von anderen Sperren, wertet `Retry-After` und `X-RateLimit-Reset` aus und nennt die Wartezeit in Berliner Zeit. Nach einem bestätigten Limit gilt ein serverseitiger **Cooldown** für manuelle und nächtliche Prüfungen; ein erfolgreicher Release-Cache bleibt bei Fehlversuchen erhalten. ZIP-Download und Prüfsumme sind unverändert.
 
 ### Regalbretter, Regale und Themenbereiche mit Inhalt löschen
 
