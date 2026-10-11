@@ -3,13 +3,13 @@
         kicker="Bibliotheksbetrieb"
         title="Katalogpflege"
         lead="Bibliografische Datensätze intern detailliert recherchieren, öffnen und pflegen."
-    />
-
-    @can('catalog.manage')
-        <div class="bc-action-row bc-catalog-toolbar">
-            <x-ui.button href="{{ route('pos.catalog.intake.identify', ['neu' => 1]) }}">Medium erfassen</x-ui.button>
-        </div>
-    @endcan
+    >
+        @can('catalog.manage')
+            <x-slot:actions>
+                <x-ui.button href="{{ route('pos.catalog.intake.identify', ['neu' => 1]) }}">Medium erfassen</x-ui.button>
+            </x-slot:actions>
+        @endcan
+    </x-ui.page-header>
 
     <div class="bc-context-actions">
         <a href="{{ route('pos.home') }}">← Zurück zum Arbeitsplatz</a>

@@ -693,11 +693,6 @@
 }
 
 /* Staff catalog: simple search and filters always visible, detail search collapsible in between. */
-.bc-catalog-toolbar {
-    margin-top: 0;
-    margin-bottom: 1rem;
-}
-
 .bc-catalog-search__staff-form {
     display: grid;
     gap: 1rem;

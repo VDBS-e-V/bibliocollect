@@ -24,3 +24,35 @@
     font-size: 1.05rem;
     line-height: 1.55;
 }
+
+/* Call-to-action buttons sit top right, next to the title, right-aligned. */
+.bc-page-header--with-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    max-width: none;
+}
+.bc-page-header__main {
+    flex: 1 1 24rem;
+    min-width: 0;
+    max-width: 66rem;
+}
+.bc-page-header__actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .55rem;
+    margin-left: auto;
+    padding-top: 1.2rem;
+}
+@media (max-width: 40rem) {
+    .bc-page-header__actions {
+        flex: 1 1 100%;
+        justify-content: flex-start;
+        margin-left: 0;
+        padding-top: 0;
+    }
+}

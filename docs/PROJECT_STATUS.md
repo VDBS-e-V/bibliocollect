@@ -213,6 +213,18 @@ Unter Verwaltung → Regale und Regalbretter → **Etiketten für Regalbretter d
 
 Beim Erfassen per ISBN und im Qualitätslauf werden jetzt neben der DNB auch **Open Library** und **Google Books** gefragt (Kette je nach ISBN-Gruppe, Lückenfüllung, Sprachcodes vereinheitlicht, Quelle sichtbar, weniger verlässliche Quellen nie gesammelt übernommen). Systemzustand → Datenqualität zeigt die Sprachen im Bestand und setzt Fälle ohne Treffer zum erneuten Nachschlagen zurück. Die Anzeige der Sprache im Katalog kennt mehr Sprachen (Türkisch, Arabisch, Russisch, Ukrainisch, Polnisch und weitere). Einzelheiten und Grenzen in `docs/CATALOG_INTAKE.md`. Neue Einstellungen in `.env.example`: `CATALOG_LOOKUP_OPEN_LIBRARY`, `CATALOG_LOOKUP_GOOGLE_BOOKS`, `CATALOG_LOOKUP_TIMEOUT`. Die Suche findet Titel und Namen in anderer Schrift auch mit lateinischen Buchstaben („voyna“ → „Война и мир“, Spalte `search_aliases`). Die Qualitätsregeln sind sprachneutral (getestet für Kyrillisch, Arabisch, Türkisch, Ostasiatisch). Bewusst nicht gebaut: eine Nationalbibliothek des Herkunftslands als Quelle, erst nach der Auswertung der Sprachen im Bestand.
 
+### Seitenkopf mit Aktionsknöpfen
+
+Die Komponente `x-ui.page-header` hat einen Slot `actions`: Knöpfe mit der wichtigsten Aktion der Seite stehen oben rechts neben der Überschrift, rechtsbündig; auf schmalen Schirmen (unter 40 rem) rutschen sie unter den Titel. Zuerst genutzt in der Katalogpflege („Medium erfassen“); weitere Seiten können den Slot übernehmen:
+
+```blade
+<x-ui.page-header title="…">
+    <x-slot:actions>
+        <x-ui.button href="…">Aktion</x-ui.button>
+    </x-slot:actions>
+</x-ui.page-header>
+```
+
 ### Interne Katalogsuche übersichtlicher (Issue 88)
 
 Die Katalogpflege (`/betrieb/katalog`) ist als **Katalog** in der Hauptnavigation des Bibliotheksbetriebs verlinkt (Recht `catalog.manage`). Die einfache Suche und die Filter (Medientyp, Sprache, Sortierung, „nur aktive“, „nur verfügbare“) sind dauerhaft sichtbar; die **Erweiterte Suche** (Titel, Verantwortliche, Schlagwort, ISBN, Verlag, Ort, Reihe, Thema, Themenbereich, Zielgruppe, Quell-ID, Jahre) sitzt als aufklappbarer Block dazwischen und ist geöffnet, sobald ein Feld darin gefüllt ist. **Medium erfassen** ist ein Button oben; das alte Formular „Neuen Titel anlegen“ unten ist entfernt (Titel entstehen über die Erfassung). Die Route `pos.catalog.titles.store` bleibt bestehen.
