@@ -1,0 +1,144 @@
+/* Designlab: Portal-Hybrid-Musterseite, niemals produktive Portaldaten.
+   Eine gemeinsame VDBS-Marke; großzügiger Kopf, priorisierte Fristen,
+   kompakte Medien-/Vormerkungslisten, responsive und dark-mode-tokenbasiert. */
+.bc-portal-study { min-width: 0; padding: 0 0 4rem; color: var(--text-primary); }
+.bc-portal-study * { box-sizing: border-box; }
+.bc-portal-study__welcome {
+    display: grid;
+    grid-template-columns: minmax(0,1.5fr) minmax(13rem,.5fr);
+    gap: clamp(1.5rem,4vw,4rem);
+    align-items: end;
+    padding: clamp(2.5rem,5vw,5rem) 0 clamp(1.8rem,3vw,3rem);
+}
+.bc-portal-study__welcome h1 {
+    max-width: 17ch;
+    margin: .75rem 0 1rem;
+    font-size: clamp(2.35rem,4.5vw,4rem);
+    line-height: 1.08;
+    letter-spacing: -.04em;
+    overflow-wrap: anywhere;
+}
+.bc-portal-study__welcome-copy > p { max-width: 39rem; margin: 0; color: var(--text-secondary); font-size: 1.1rem; line-height: 1.65; }
+.bc-portal-study__welcome-aside { padding: 1rem 1.25rem; border-left: 4px solid var(--action-primary); background: var(--bg-brand-soft); }
+.bc-portal-study__welcome-aside strong { font-size: 1.05rem; }
+.bc-portal-study__welcome-aside p { margin: .4rem 0 0; color: var(--text-secondary); font-size: .89rem; line-height: 1.55; }
+.bc-portal-study__disclaimer { margin: 0 0 2rem; padding: .8rem 1rem; background: var(--bg-surface-muted); color: var(--text-secondary); font-size: .83rem; line-height: 1.6; }
+.bc-portal-study__section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: .5rem 2rem;
+    padding: 0 0 1.15rem;
+}
+.bc-portal-study__section-head h2 { margin: .35rem 0 0; font-size: clamp(1.55rem,2.8vw,2.25rem); line-height: 1.15; letter-spacing: -.025em; }
+.bc-portal-study__meta { color: var(--text-secondary); font-size: .82rem; }
+.bc-portal-study__deadline-layout {
+    display: grid;
+    grid-template-columns: minmax(0,1.35fr) minmax(0,.65fr);
+    gap: 1rem;
+}
+.bc-portal-study__deadline {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: clamp(1.3rem,2.5vw,2.2rem);
+    border: 1px solid var(--border-default);
+    border-radius: .75rem;
+}
+.bc-portal-study__deadline--urgent { min-height: 18rem; border-left: 5px solid var(--action-danger); background: var(--bg-surface); }
+.bc-portal-study__deadline--soon { background: var(--bg-brand-soft); border-color: transparent; }
+.bc-portal-study__deadline--quiet { background: var(--bg-surface-muted); }
+.bc-portal-study__deadline-upper { display: flex; justify-content: space-between; gap: .8rem; align-items: center; flex-wrap: wrap; font-size: .83rem; }
+.bc-portal-study__deadline-upper > span { color: var(--text-secondary); font-weight: 700; }
+.bc-portal-study__deadline h3 { margin: 1.15rem 0 .6rem; font-size: clamp(1.4rem,2.3vw,2.1rem); line-height: 1.2; overflow-wrap: anywhere; }
+.bc-portal-study__deadline p { max-width: 37rem; margin: 0; color: var(--text-secondary); font-size: .94rem; line-height: 1.6; }
+.bc-portal-study__deadline-caption { display: block; margin-top: auto; padding-top: 1.3rem; color: var(--text-secondary); font-size: .81rem; line-height: 1.5; }
+.bc-portal-study__deadline-side { display: grid; gap: 1rem; }
+.bc-portal-study__deadline-side .bc-portal-study__deadline { min-height: 8.5rem; padding: 1.3rem; }
+.bc-portal-study__deadline-side .bc-portal-study__deadline h3 { margin: .35rem 0 .35rem; font-size: 1.25rem; }
+.bc-portal-study__deadline-side .bc-portal-study__deadline p { font-size: .83rem; }
+.bc-portal-study__relative { font-size: .77rem; font-weight: 900; }
+.bc-portal-study__loans { margin-top: clamp(3rem,5vw,4.8rem); }
+.bc-portal-study__loan-list { border-top: 2px solid var(--border-default); }
+.bc-portal-study__loan {
+    display: grid;
+    grid-template-columns: 3.75rem minmax(0,1.65fr) minmax(6rem,.65fr) minmax(6.8rem,.6fr) auto;
+    gap: .9rem 1.1rem;
+    align-items: center;
+    min-height: 5.9rem;
+    padding: .85rem 0;
+    border-bottom: 1px solid var(--border-default);
+}
+.bc-portal-study__loan-cover { min-width: 0; width: 3.4rem; }
+.bc-portal-study__loan-copy { min-width: 0; }
+.bc-portal-study__loan-copy h3 { margin: 0 0 .35rem; font-size: .98rem; line-height: 1.3; overflow-wrap: anywhere; hyphens: auto; }
+.bc-portal-study__loan-copy p { margin: 0; color: var(--text-secondary); font-size: .81rem; }
+.bc-portal-study__loan-due { display: grid; gap: .15rem; }
+.bc-portal-study__loan-due small { color: var(--text-secondary); font-size: .73rem; }
+.bc-portal-study__loan-due strong { font-size: .87rem; }
+.bc-portal-study__loan-status { min-width: 0; }
+.bc-portal-study__demo-button {
+    padding: .62rem .8rem;
+    min-height: 2.75rem;
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface-muted);
+    color: var(--text-secondary);
+    border-radius: .5rem;
+    font-size: .83rem;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: not-allowed;
+}
+.bc-portal-study__unavailable { display: inline-block; max-width: 9.5rem; color: var(--text-secondary); font-size: .78rem; line-height: 1.4; }
+.bc-portal-study__support { max-width: 50rem; margin: 1.2rem 0 0; color: var(--text-secondary); font-size: .83rem; line-height: 1.6; }
+.bc-portal-study__reservations { margin-top: clamp(3rem,5vw,5rem); }
+.bc-portal-study__reservation-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.bc-portal-study__reservation { display: flex; flex-direction: column; align-items: start; gap: .75rem; min-width: 0; padding: clamp(1.3rem,2.4vw,1.8rem); border: 1px solid var(--border-default); border-radius: .75rem; background: var(--bg-surface); }
+.bc-portal-study__reservation h3 { margin: .2rem 0; font-size: 1.18rem; line-height: 1.25; }
+.bc-portal-study__reservation p { margin: 0; color: var(--text-secondary); font-size: .89rem; line-height: 1.55; }
+.bc-portal-study__reservation > strong { margin-top: auto; padding-top: .5rem; font-size: .82rem; line-height: 1.45; }
+.bc-portal-study__extras { margin-top: clamp(3rem,5vw,5rem); }
+.bc-portal-study__extras-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.bc-portal-study__extras-grid a {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: .75rem;
+    padding: 1.25rem 0;
+    border-top: 2px solid var(--border-default);
+    text-decoration: none;
+    color: var(--text-primary);
+}
+.bc-portal-study__extras-grid a:visited { color: var(--text-primary); }
+.bc-portal-study__extras-grid a:hover { border-color: var(--action-success); }
+.bc-portal-study__extras-grid a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 4px; }
+.bc-portal-study__extras-grid a > strong { font-size: 1.08rem; }
+.bc-portal-study__extras-grid a > span { display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: var(--text-secondary); font-size: .84rem; }
+.bc-portal-study__variants { margin-top: clamp(3rem,5vw,5rem); }
+.bc-portal-study__variant-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+@media(max-width:70rem) {
+    .bc-portal-study__loan { grid-template-columns: 3.25rem minmax(0,1.5fr) minmax(5.5rem,.7fr) minmax(6rem,.7fr); }
+    .bc-portal-study__loan-action { grid-column: 2 / -1; }
+}
+@media(max-width:50rem) {
+    .bc-portal-study__welcome { grid-template-columns: 1fr; gap: 1.1rem; }
+    .bc-portal-study__deadline-layout { grid-template-columns: 1fr; }
+    .bc-portal-study__deadline-side { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .bc-portal-study__loan { grid-template-columns: 3.25rem minmax(0,1fr) auto; gap: .55rem .85rem; }
+    .bc-portal-study__loan-copy { grid-column: 2 / -1; }
+    .bc-portal-study__loan-due { grid-column: 2; }
+    .bc-portal-study__loan-status { grid-column: 3; }
+    .bc-portal-study__loan-action { grid-column: 2 / -1; }
+    .bc-portal-study__reservation-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:36rem) {
+    .bc-portal-study__deadline-side { grid-template-columns: 1fr; }
+    .bc-portal-study__loan { grid-template-columns: 3.25rem minmax(0,1fr); }
+    .bc-portal-study__loan-cover { grid-row: 1 / span 2; grid-column: 1; }
+    .bc-portal-study__loan-copy { grid-column: 2; grid-row: 1; }
+    .bc-portal-study__loan-due { grid-column: 2; grid-row: 2; }
+    .bc-portal-study__loan-status, .bc-portal-study__loan-action { grid-column: 2; grid-row: auto; }
+    .bc-portal-study__extras-grid, .bc-portal-study__variant-grid { grid-template-columns: 1fr; }
+}
+@media(prefers-reduced-motion:reduce) { .bc-portal-study * { transition: none; } }
