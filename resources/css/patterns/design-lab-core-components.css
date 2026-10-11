@@ -72,3 +72,18 @@
   .bc-core-gallery__scene-body { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 @media(prefers-reduced-motion:reduce) { .bc-core-gallery__density-scene { transition:none; } }
+
+
+/* Komponentengalerie v2: alle neuen Beispiele wiederverwendbarer UI-Bausteine. */
+.bc-core-gallery-v2__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+.bc-core-gallery-v2__grid > * { min-width:0; }
+.bc-core-gallery-v2__stack { display:grid; gap:.85rem; }
+.bc-core-gallery-v2__stack > :last-child { margin-bottom:0; }
+.bc-core-gallery-v2__spaced { margin-top:1.5rem; }
+.bc-core-gallery-v2__fieldset { display:grid; gap:.35rem; padding:0; border:0; margin:0; }
+.bc-core-gallery-v2__fieldset legend { font-size:var(--text-sm); font-weight:700; margin-bottom:.65rem; }
+.bc-core-gallery-v2__note { margin:1rem 0 0; color:var(--text-secondary); font-size:.85rem; line-height:1.55; }
+.bc-core-gallery-v2__stack + .bc-core-gallery-v2__note { margin-top:1.2rem; }
+@media(max-width:46rem) {
+ .bc-core-gallery-v2__grid { grid-template-columns:1fr; }
+}
