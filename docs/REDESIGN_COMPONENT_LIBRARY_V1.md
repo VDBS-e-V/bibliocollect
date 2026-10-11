@@ -75,7 +75,15 @@ Die älteren Musterseiten werden in Navigation, Übersicht und jeweiliger Muster
 
 Für die vollständige Umsetzungs- und Freigabematrix siehe [Komponententracker](REDESIGN_COMPONENT_TRACKER.md). **Die Komponenten sind noch nicht vollständig implementiert und nicht visuell freigegeben – finale Seiten sind ausdrücklich noch nicht an der Reihe.**
 
-## 5. Nächste reine Komponentenrunden
+## 5. Erweiterung K3b / K5a – Felder, Filter und Listen
+
+Neu angelegt sind `x-ui.textarea`, `x-ui.file-upload`, `x-ui.autocomplete` (native `datalist` statt bereits vollständig barrierefreier asynchroner Combobox), `x-ui.form-section`, `x-ui.error-summary`, `x-ui.filter-chip` und `x-ui.list-row`.
+
+Alle Feldkomponenten übernehmen die bereits abgestimmte Reihenfolge **Label → Feld → Fehler → Hilfe** und nutzen die gleichen semantischen Farbrollen wie die bisherigen Inputs. Das Designlab illustriert beide Dichten, lange Titel und Fehler; Uploads werden in der Vorschau **nicht** versendet.
+
+Styles in `resources/css/components/foundation-components-v3.css`, Vorführseite `resources/views/pages/partials/design-lab-components-v3.blade.php`, Tests unter `tests/Feature/ComponentLibraryV3Test.php`. Einzelheiten und offene Themen stehen im [Komponententracker](REDESIGN_COMPONENT_TRACKER.md).
+
+## 6. Nächste reine Komponentenrunden
 
 | Runde | Priorität | Universelle Komponenten |
 |---|---|---|
