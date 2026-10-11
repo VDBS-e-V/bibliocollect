@@ -171,7 +171,7 @@ Die bestehenden `--vdbs-*`-Farben und `--font-family-*`-Variablen werden **nicht
 
 | Etappe | Aufgabe | Abnahmematerial |
 |---|---|---|
-| W1 | Foundation-Playground als lokale Route anlegen | Vergleichsübersicht mit beiden Dichteprofilen |
+| W1 | Foundation-Playground als lokale Route anlegen | Vergleichsübersicht für Public, Portal-Hybrid und Workbench |
 | W2 | Typografie und Textlängen prüfen | Skalen und sechs realistische Textproben |
 | W3 | Abstände und Geometrie prüfen | 4px-Skala, Card-/Form-Demos, drei Radius-Richtungen |
 | W4 | Größen, States und Layout prüfen | Buttons/Inputs/Tabellen, Desktop-/Mobilansicht |
