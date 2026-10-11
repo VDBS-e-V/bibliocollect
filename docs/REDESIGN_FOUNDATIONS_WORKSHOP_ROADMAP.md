@@ -4,7 +4,8 @@
 > **Referenz:** [Foundations Hybrid v1](REDESIGN_FOUNDATIONS_HYBRID_V1.md), [Designsystem-Masterplan](REDESIGN_DESIGN_SYSTEM_MASTERPLAN.md), `resources/css/tokens.css`, `docs/BRANDING.md`.  
 > **Fixiert:** VDBS-Farben und Schriftfamilien (Lato/Neuland/Source Serif 4).  
 > **Beschlossen:** öffentlich großzügig/organischer, Bibliotheksbetrieb und Administration klar/kompakt; persönliches Portal mit großzügigem Einstieg und kompakten Medien-/Ausleihlisten. Die Profile basieren auf denselben Farben, Schriftarten und Basistokens.  
-> **Noch offen:** exakte Radien, typografischer Endabgleich, die Hierarchie der Portal-Startseite und das Verhalten der mobilen Navigation.
+> **Neu beschlossen:** Das persönliche Portal priorisiert Ausleihen und Rückgabefristen eindeutig vor Empfehlungen und Medienentdeckung (P-01). Siehe [Portal-Template L08](REDESIGN_PORTAL_TEMPLATE_PRIORITY.md).  
+> **Noch offen:** exakte Radien, typografischer Endabgleich, konkrete Schwellenwerte für Fristwarnungen und das Verhalten der mobilen Navigation.
 
 ## Beschluss H-01 · Persönliches Portal – Hybrid (11.10.2026)
 
