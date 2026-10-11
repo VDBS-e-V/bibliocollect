@@ -263,11 +263,7 @@
                 </section>
             </div>
         @elseif ($screen === 'komponenten')
-            <header class="bc-design-lab__page-head">
-                <span class="bc-design-lab__kicker">Komponentenbibliothek · VDBS</span>
-                <h1>Einmal entwerfen. Überall verwenden.</h1>
-                <p>Die vier Patterns sind echte Blade-Komponenten. Du siehst unterschiedliche Varianten, Zustände und Beispiele für lange Titel.</p>
-            </header>
+            @include('pages.partials.design-lab-core-components')
             <div class="bc-design-lab__component-section">
                 <div class="bc-design-lab__section-intro"><span class="bc-design-lab__kicker">Pattern 01</span><h2>Feature Overlap</h2><p>Für Einstiege, Themen und besondere Inhalte. Desktop überlappend, mobil untereinander.</p></div>
                 <x-library.feature-overlap eyebrow="Bibliothek entdecken" title="Geschichten verbinden Menschen." description="Großzügige Bildfläche und eine bewusste Überlagerung statt gleich breiter nebeneinanderliegender Kästen." tone="mint" />
