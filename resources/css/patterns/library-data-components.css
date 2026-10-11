@@ -121,6 +121,7 @@
    The Designlab's generic input focus selector is deliberately overridden below. */
 .bc-scan-input__control:focus-within {
     border-color:var(--focus-ring);
+    border-width:2px;
     outline:none;
     box-shadow:none;
 }
