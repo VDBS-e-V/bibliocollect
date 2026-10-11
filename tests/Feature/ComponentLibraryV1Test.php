@@ -71,7 +71,6 @@ it('enthält keine schreibenden Demoformulare im Komponentenbereich', function (
     expect($xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " bc-core-gallery ")]//form')->length)->toBe(0);
 });
 
-
 it('platziert Hilfetexte und Fehler unter Eingabefeldern statt zwischen Label und Feld', function (): void {
     $input = Blade::render('<x-ui.input label="Medientitel" name="review-input" hint="Ein erklärender Hinweis." error="Bitte prüfen." />');
     $select = Blade::render('<x-ui.select label="Medientyp" name="review-select" hint="Wähle einen Typ." error="Bitte auswählen."><option value="book">Buch</option></x-ui.select>');
