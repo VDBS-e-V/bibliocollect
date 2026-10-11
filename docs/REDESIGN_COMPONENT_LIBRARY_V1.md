@@ -83,7 +83,15 @@ Alle Feldkomponenten übernehmen die bereits abgestimmte Reihenfolge **Label →
 
 Styles in `resources/css/components/foundation-components-v3.css`, Vorführseite `resources/views/pages/partials/design-lab-components-v3.blade.php`, Tests unter `tests/Feature/ComponentLibraryV3Test.php`. Einzelheiten und offene Themen stehen im [Komponententracker](REDESIGN_COMPONENT_TRACKER.md).
 
-## 6. Nächste reine Komponentenrunden
+## 6. Erweiterung K2b / K4b – Interaktionskomponenten
+
+Neue fachneutrale Bausteine: `x-ui.action-menu`, `x-ui.popover`, `x-ui.tooltip`, `x-ui.dialog`, `x-ui.toast` und `x-ui.spinner`. Sie sind im Designlab demonstrierbar; die zugrunde liegenden Navigationseinträge sind echte Links, Popovers und Menüs verwenden native `details`, der Dialog das native `dialog`-Element und Statusmeldungen semantische Live-Regionen.
+
+Die gemeinsame kleine JS-Verbesserung (`resources/js/ui-interactions.js`) schließt Menüs bei Escape und Außenklick, öffnet/schließt Dialoge und stellt danach den Fokus am Auslöser wieder her. Demo-Dialoge führen keine Fachaktion aus; der bestehende produktive `data-confirm`-Handler bleibt unverändert.
+
+Die Komponenten sind **Entwürfe**, keine freigegebene Library. Siehe [Komponententracker](REDESIGN_COMPONENT_TRACKER.md) für den verbleibenden Umfang.
+
+## 7. Nächste reine Komponentenrunden
 
 | Runde | Priorität | Universelle Komponenten |
 |---|---|---|
