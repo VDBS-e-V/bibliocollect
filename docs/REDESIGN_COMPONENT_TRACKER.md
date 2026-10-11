@@ -61,9 +61,29 @@ CSS: `resources/css/components/foundation-components-v4.css`; kleine gemeinsame 
 
 **Keine Duplikation der produktiven Bestätigungsfunktion:** Der vorhandene `data-confirm`-Handler bleibt für echte Aktionen zuständig; `x-ui.dialog` zeigt hier nur Präsentation und API. Reale Fachaktionen, Bestätigungsfolgen und Erfolgsmeldungen werden erst bei der späteren Seitenintegration angebunden.
 
-**Statusgestaltungs-Review (nach Nutzerfeedback):** Der generische Dialog `x-ui.dialog` nutzt jetzt **10px Radius**; bei `tone=warning` gibt es **keine volle obere Farblinie**, sondern einen kurzen Akzent im Header. Toasts (`x-ui.toast`) nutzen **8px Radius**, dezente Tönung mit bestehenden semantischen Statusfarben und eine kurze 44px-Akzentleiste oben links **anstelle der langen Seitenlinien**. Der Dialogfooter kommt ohne zusätzliche Trennlinie aus. Die Änderungen sind in `foundation-components-v4.css` enthalten und betreffen die Opt-in-Komponenten, nicht die produktive Bestätigungslogik. Tests: `ComponentLibraryV4Test.php`. Visuelle Freigabe noch offen.
+**Statusgestaltungs-Review (nach Nutzerfeedback):** Der generische Dialog `x-ui.dialog` nutzt jetzt **10px Radius**; bei `tone=warning` gibt es **keine volle obere Farblinie**, sondern einen kurzen Akzent im Header. Toasts (`x-ui.toast`) nutzen **8px Radius**, dezente Tönung mit bestehenden semantischen Statusfarben und eine kurze 44px-Akzentleiste oben links **anstelle der langen Seitenlinien**. Der Dialogfooter kommt ohne zusätzliche Trennlinie aus. Die Änderungen sind in `foundation-components-v4.css` enthalten und betreffen die Opt-in-Komponenten, nicht die produktive Bestätigungslogik. Tests: `ComponentLibraryV4Test.php`. **Die gestalterische Richtung wurde vom Projektverantwortlichen bestätigt; technische und vollständige visuelle Freigabe aller Zustände bleiben offen.**
 
 **Weitere Reviewpunkte:** Fokusführung in komplexen Dialogen, Tooltip-Touchverhalten, Menüpositionierung in engen Containern, fokussierbare Popover-Inhalte und automatische Live-Feedback-Anbindung. „Entwurf“ bleibt korrekt bis zur interaktiven Browser- und Accessibility-Abnahme.
+
+### Komponentenrunde K5/K6 – Datenbausteine und Bibliotheksstatus
+
+Sieben weitere fachneutral nutzbare Komponenten/Patterns sind als **Entwurf im Review** angelegt und in der aktiven Galerie `/design-lab/komponenten` sichtbar:
+
+| Komponente | Verwendung | Umsetzung |
+|---|---|---|
+| `x-ui.filter-toolbar` | Trefferzahl, Filter-Slot und Actions-Slot | Comfortable/Compact; reine Struktur, keine Query |
+| `x-ui.bulk-action-bar` | Anzahl ausgewählter Einträge mit optionaler Aktionsleiste | Aktions-Slot erst bei `selected > 0`; keine Fachmutation |
+| `x-ui.sort-header` | Semantischer Tabellenkopf mit `scope=col`, `aria-sort` und optional echtem Link | Sortierlogik bleibt beim aufrufenden Controller |
+| `x-library.media-card` | Cover, lange Titel, Autor:innen und Status-/Actions-Slot | Comfortable/Compact; bestehendes `x-library.media-cover` wiederverwendet |
+| `x-library.availability-status` | Verfügbar / ausgeliehen / vorgemerkt / nicht verfügbar / unbekannt | Bedeutung immer als Text, nicht allein als Farbe |
+| `x-library.due-date-status` | 8+ neutral, **7–1 Tage bald fällig**, heute, überfällig, unbekannt | Prop `daysRemaining` (ganze Kalendertage); **visuelle 7-Tage-Regel**, keine E-Mail-/Ausleihlogik |
+| `x-library.scan-input` | Barcode-Feld mit Label, Hint, Error und Keyboard-Fokus | Hardware-Anbindung bleibt späterem Workflow vorbehalten |
+
+Komponenten-CSS: `resources/css/components/foundation-components-v5.css` und `resources/css/patterns/library-data-components.css`. Designlab: `resources/views/pages/partials/design-lab-components-v5.blade.php`. Demointeraktion für Mehrfachauswahl: `resources/js/ui-data-previews.js` (nur wenn `data-ui-bulk-demo` vorhanden). Tests: `tests/Feature/ComponentLibraryV5Test.php`.
+
+**Die Darstellung ist unabhängig von Geschäftsdaten:** Ein aufrufender Controller muss den Tagesabstand korrekt nach Kalenderdatum und Zeitzone bestimmen; das reine Aussehen sagt nichts über die Verlängerungsberechtigung aus. Echte Datentabellen brauchen sortierte Datensätze und echte Sortierlinks. In der Galerie sind Daten/Links fiktiv; die deaktivierte Sammelaktion schreibt nichts.
+
+**Noch offen:** Serverseitige Auswahl über mehrere Ergebnisseiten, sortierte/paginierte Controller-Queries, Filter-Sidebar, Scanner-Hardware und Scanbestätigung, barrierefrei nutzbare mobile Tabellen-/Listenansicht sowie vollständige Responsive- und Screenreader-Abnahme. Die Komponenten sind nicht produktiv freigegeben.
 
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
@@ -72,8 +92,8 @@ CSS: `resources/css/components/foundation-components-v4.css`; kleine gemeinsame 
 | K2b Navigation | Dropdown/Aktionsmenü, Tooltip und Popover als Entwurf; **offen**: mobile Navigation und globale Seitentoolbar, platzadaptive Menüpositionen | Schließen per Escape, Fokus und Klick außerhalb; zugängliche Bedienung | Teilweise umgesetzt · Review |
 | K3b Formulare | Textarea, native Datums-/Zahleneingabe, `datalist`, Upload, FormSection, ErrorSummary bereits als Entwurf; **noch offen**: echte asynchrone Combobox, dynamischer Zeichenzähler, erweiterte File-Interaktion und Upload-Validierung | Browser-Autofill, Hilfetexte und Error-IDs, Drag/Drop-Fallback | Teilweise umgesetzt · Review |
 | K4b Feedback/Overlay | Allgemeiner Dialog, Toast und Spinner als Entwurf; bestehender Confirm bereits vorhanden; **offen**: live erzeugte Feedback-Region, Busy/Read-only, Bulk-Aktionen, komplexere Dialoge | Dialogfokus, Escape/Close, Async-Feedback | Teilweise umgesetzt · Review |
-| K5 Daten | Filter-Chips und Zeilenlisten als Entwurf; noch offen: Filter-Sidebar, Tabellen-Sortierung/Pagination, Batchtoolbar, Zeitlinie, Diagramme und barrierefreie Datenalternative | Longtext, 320px und datengetriebene Status | Teilweise umgesetzt · Review |
-| K6 Bibliothek | MediaCard, Verfügbarkeit, Fälligkeitsstatus mit 7-Tage-Warnung, ScanInput, Exemplar-/Personenzeile, Cover-Varianten, Personenauswahl | Fachinformationen strikt vom Präsentations-API trennen | Offen |
+| K5 Daten | Filter-Chips, Filter-Toolbar, SortHeader, BulkActionBar und Listenzeilen als Entwurf; noch offen: Filter-Sidebar, echte datengetriebene Sortierung/Pagination, Zeitlinie, Diagramme und barrierefreie Datenalternative | Longtext, 320px und datengetriebene Status | Teilweise umgesetzt · Review |
+| K6 Bibliothek | MediaCard, Verfügbarkeit, Fälligkeitsstatus mit 7-Tage-Warnung und ScanInput als Entwurf; noch offen: Exemplar-/Personenzeile, Cover-Varianten, Personenauswahl und Scannerintegration | Fachinformationen strikt vom Präsentations-API trennen | Teilweise umgesetzt · Review |
 | K7 Spezial / Ausgabe | Inline-Edit, Hierarchien, Kalender-/Öffnungszeiteneditor, Etikett/Druck, Barcodes, Mailkomponenten und Integrationsmuster | Druck/Theme/Fokus | Offen |
 | K8 Qualität | Alle Bausteine mit Variants, Dichten, mobilen Layouts, Dark Mode, Tastatur, Screenreader, Zoom, hohem Kontrast und Fehlerfällen prüfen | Freigabe erst nach sauberem Review | Offen |
 
