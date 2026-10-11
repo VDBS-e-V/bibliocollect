@@ -67,7 +67,7 @@ CSS: `resources/css/components/foundation-components-v4.css`; kleine gemeinsame 
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
 |---|---|---|---|
-| K2b Navigation | Dropdown-/Overflow-Menü, Tooltip, Popover, mobile Navigation, globale Seitentoolbar | echtes Schließen per Escape, Fokus und Klick außerhalb, zugängliche Menüführung | Offen |
+| K2b Navigation | Dropdown/Aktionsmenü, Tooltip und Popover als Entwurf; **offen**: mobile Navigation und globale Seitentoolbar, platzadaptive Menüpositionen | Schließen per Escape, Fokus und Klick außerhalb; zugängliche Bedienung | Teilweise umgesetzt · Review |
 | K3b Formulare | Textarea, native Datums-/Zahleneingabe, `datalist`, Upload, FormSection, ErrorSummary bereits als Entwurf; **noch offen**: echte asynchrone Combobox, dynamischer Zeichenzähler, erweiterte File-Interaktion und Upload-Validierung | Browser-Autofill, Hilfetexte und Error-IDs, Drag/Drop-Fallback | Teilweise umgesetzt · Review |
 | K4b Feedback/Overlay | Modal/Confirm, Toast/Statusregion, Spinner/Indeterminate, Statusblöcke, Busy/Read-only, Bulk-Aktion | Dialogfokus, Escape/Close, Async-Feedback | Offen |
 | K5 Daten | Filter-Chips und Zeilenlisten als Entwurf; noch offen: Filter-Sidebar, Tabellen-Sortierung/Pagination, Batchtoolbar, Zeitlinie, Diagramme und barrierefreie Datenalternative | Longtext, 320px und datengetriebene Status | Teilweise umgesetzt · Review |
