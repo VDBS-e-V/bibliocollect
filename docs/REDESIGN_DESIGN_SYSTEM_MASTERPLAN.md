@@ -6,6 +6,10 @@
 > **Leitbild:** VDBS-Marke verbindlich; Oodi-artige Overlap-Editorials, reduzierte Navigation, Stepper für Prozesse, Bento dort, wo Kennzahlen gewichtet sind.  
 > **Struktur:** Token → Component → Pattern → Template → Page.
 
+## Foundations v1 – konkrete Werte zur Freigabe
+
+Die hybride Designrichtung wurde konkretisiert in [`docs/REDESIGN_FOUNDATIONS_HYBRID_V1.md`](REDESIGN_FOUNDATIONS_HYBRID_V1.md): Schriftgrößen, Abstände, Dichteprofile, Radien, Container, Responsive-Rules, Stepper-Geometrie, Fokus, Schatten und Bewegungs-Tokens. Die Markenfarben und Schriftfamilien bleiben unverändert. **Die Spezifikation ist ein Planungsentwurf, noch kein produktiver CSS-Rollout.**
+
 ## 1. Bereits vorhanden (beobachtet)
 
 - Die kanonische Hierarchie Token → Component → Pattern → Template → Page steht bereits in docs/DESIGN_SYSTEM.md.
