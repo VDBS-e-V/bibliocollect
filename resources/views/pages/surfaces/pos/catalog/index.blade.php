@@ -139,17 +139,21 @@
 
             <form method="post" action="{{ route('pos.catalog.bulk-location.preview') }}">
                 @csrf
-                <div class="bc-action-row">
-                    <label for="bulk-target">Ziel-Regalbrett</label>
-                    <select id="bulk-target" name="shelf" required>
-                        <option value="">Bitte wählen</option>
-                        @foreach (\App\Modules\Catalog\Models\CatalogShelf::query()->where('is_active', true)->orderBy('code')->get() as $shelfOption)
-                            <option value="{{ $shelfOption->code }}">{{ $shelfOption->display() }}</option>
-                        @endforeach
-                    </select>
-                    <x-ui.button type="submit" variant="secondary">Ausgewählte Exemplare: Vorschau</x-ui.button>
-                </div>
-                <p class="bc-section-copy">Maximal 50 Exemplare pro Stapel. Die Vorschau schreibt noch keine Daten.</p>
+                <section class="bc-search-card bc-bulk-bar" aria-labelledby="bulk-heading">
+                    <h3 id="bulk-heading" class="bc-search-card__title">Mehrfachauswahl: Standort ändern</h3>
+                    <div class="bc-search-card__body">
+                        <div class="bc-bulk-bar__body">
+                            <x-ui.select label="Ziel-Regalbrett" name="shelf" id="bulk-target" required>
+                                <option value="">Bitte wählen</option>
+                                @foreach (\App\Modules\Catalog\Models\CatalogShelf::query()->where('is_active', true)->orderBy('code')->get() as $shelfOption)
+                                    <option value="{{ $shelfOption->code }}">{{ $shelfOption->display() }}</option>
+                                @endforeach
+                            </x-ui.select>
+                            <x-ui.button type="submit" variant="secondary">Vorschau für Auswahl</x-ui.button>
+                        </div>
+                        <p class="bc-bulk-bar__hint">Exemplare in der Tabelle ankreuzen, maximal 50 pro Stapel. Die Vorschau schreibt noch keine Daten.</p>
+                    </div>
+                </section>
             <x-ui.table>
                 <thead>
                     <tr>
@@ -169,9 +173,9 @@
                             <td>
                                 @foreach ($title->editions as $edition)
                                     @foreach ($edition->copies as $copy)
-                                        <label style="display:block">
+                                        <label class="bc-copy-pick">
                                             <input type="checkbox" name="copies[]" value="{{ $copy->getKey() }}">
-                                            {{ $copy->barcode }}
+                                            <span>{{ $copy->barcode }}</span>
                                         </label>
                                     @endforeach
                                 @endforeach
