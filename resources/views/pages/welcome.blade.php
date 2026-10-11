@@ -1,44 +1,67 @@
 <x-app-shell surface="public" title="Katalog">
     <x-content.block key="home.notice" />
 
-    <section class="bc-home-intro" aria-labelledby="home-heading">
-        <div class="bc-home-intro__copy">
-            <p class="bc-eyebrow">BiblioCollect · VDBS</p>
+    {{-- Wiederverwendbare öffentliche Markenbühne: Suche bleibt die echte Katalogroute. --}}
+    <section class="bc-public-home-stage" aria-labelledby="home-heading">
+        <div class="bc-public-home-stage__copy">
+            <p class="bc-public-home-stage__eyebrow">BiblioCollect · VDBS</p>
             <h1 id="home-heading">Die Schulbibliothek.</h1>
-            <p class="bc-home-intro__lead">Medien finden, ausleihen und gemeinsam entdecken. BiblioCollect verbindet den öffentlichen Katalog mit den Services der Schulbibliothek – klar, zugänglich und ohne unnötige Hürden.</p>
+            <p class="bc-public-home-stage__lead">Medien finden, ausleihen und gemeinsam entdecken. Deine Schulbibliothek ist ein Ort für Geschichten, Wissen und neue Ideen.</p>
+
+            <div class="bc-public-home-stage__search">
+                <h2 id="catalog-heading">Katalog durchsuchen</h2>
+                <x-library.catalog-search id="catalog-search" />
+                <div class="bc-public-home-stage__links">
+                    <a href="{{ route('public.catalog.advanced') }}">Erweiterte Suche</a>
+                    <a href="{{ route('public.series.index') }}">Buchreihen entdecken</a>
+                </div>
+            </div>
         </div>
 
-        <div class="bc-home-intro__brand" aria-label="Über BiblioCollect">
-            <strong>Für den Schulalltag gemacht.</strong>
-            <p>Die Bibliothek bleibt auch ohne Onlinekonto vollständig nutzbar. Digitale Funktionen ergänzen die Ausleihe vor Ort.</p>
-            <img class="bc-home-intro__figures" src="/brand/vdbs/figures-chain.svg" alt="" aria-hidden="true">
+        <div class="bc-public-home-stage__art" aria-hidden="true">
+            <img src="/brand/vdbs/figures-chain.svg" alt="">
         </div>
     </section>
 
-    <section class="bc-catalog-search" aria-labelledby="catalog-heading">
-        <div class="bc-catalog-search__heading">
-            <h2 id="catalog-heading">Katalog durchsuchen</h2>
-            <p>Suche nach Titel, Autor:in, ISBN oder Stichwort</p>
-        </div>
-
-        <form method="get" action="{{ route('public.catalog.index') }}" class="bc-catalog-search__form bc-home-catalog-form" role="search" aria-label="Katalog durchsuchen">
-            <label class="sr-only" for="catalog-search">Suchbegriff</label>
-            <input
-                id="catalog-search"
-                name="q"
-                class="bc-catalog-search__input"
-                type="search"
-                placeholder="Was möchtest du finden?"
-                minlength="2"
-                maxlength="120"
-                autocomplete="off"
-            >
-            <x-ui.button type="submit">Suchen</x-ui.button>
-        </form>
-
-        <div class="bc-catalog-search__meta">
-            <span>Titel, Verantwortliche, ISBN, Verlag, Medientyp und Sprache durchsuchen.</span>
-            <a href="{{ route('public.catalog.index') }}">Alle Titel und Filter öffnen →</a>
+    <section class="bc-public-shortcuts" aria-labelledby="shortcuts-heading">
+        <header class="bc-public-shortcuts__heading">
+            <p>Schnell zum Ziel</p>
+            <h2 id="shortcuts-heading">Was möchtest du tun?</h2>
+        </header>
+        <div class="bc-public-shortcuts__grid">
+            <x-library.quick-action
+                :href="route('public.catalog.index')"
+                icon="search"
+                title="Medien finden"
+                description="Im gesamten Katalog suchen und stöbern."
+            />
+            @can('surface.portal.access')
+                <x-library.quick-action
+                    :href="route('portal.home')"
+                    icon="user"
+                    title="Meine Ausleihen"
+                    description="Ausleihen, Verlängerungen und Vormerkungen ansehen."
+                />
+            @else
+                <x-library.quick-action
+                    :href="route('login')"
+                    icon="user"
+                    title="Mein Konto"
+                    description="Anmelden und eigene Ausleihen verwalten."
+                />
+            @endcan
+            <x-library.quick-action
+                :href="route('public.series.index')"
+                icon="book"
+                title="Buchreihen"
+                description="Zusammengehörige Geschichten entdecken."
+            />
+            <x-library.quick-action
+                :href="route('public.wishes.create')"
+                icon="heart"
+                title="Buchwunsch abgeben"
+                description="Ein Medium fehlt? Mach einen Vorschlag."
+            />
         </div>
     </section>
 
