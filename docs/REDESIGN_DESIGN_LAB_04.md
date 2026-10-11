@@ -10,6 +10,7 @@ Nur mit `APP_ENV=local` oder `APP_ENV=testing`:
 - `/design-lab/medien` – Medien-Detailseite mit langen Covern und Verfügbarkeit
 - `/design-lab/assistent` – horizontaler Prozess-Stepper mit fünf Schritten
 - `/design-lab/dashboard` – Dashboard mit unterschiedlichen Bento-Modulgrößen und Meldungen
+- `/design-lab/portal` – persönliches Portal mit klarer Priorität für Rückgabefristen und kompakter Ausleihübersicht; echte Daten und Aktionen bleiben im produktiven Portal
 - `/design-lab/komponenten` – Pattern-Bibliothek mit Varianten und Anwendungsbeispielen
 
 Die bisherige Gesamtübersicht `/design-review` verlinkt das neue Studio.
