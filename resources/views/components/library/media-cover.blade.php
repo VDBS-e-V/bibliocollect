@@ -11,7 +11,7 @@
     // Keine externen Requests und keine zusätzlichen Bilddateien notwendig.
     $safeTitle = trim((string) $title) !== '' ? trim((string) $title) : 'Ohne Titel';
     $variants = ['plum', 'mint', 'ink', 'sand'];
-    $palette = in_array($variant, $variants, true) ? $variant : $variants[hexdec(substr(hash('sha256', mb_strtolower($safeTitle)), 0, 2)) % count($variants)];
+    $palette = in_array($variant, $variants, true) ? $variant : $variants[hexdec(substr(hash('sha256', mb_strtolower($safeTitle)), 0, 8)) % count($variants)];
     $hasCover = filled($src) && ! str_contains((string) $src, 'catalog-cover-placeholder.svg');
 @endphp
 
