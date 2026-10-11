@@ -692,6 +692,70 @@
     grid-column: 1 / -1;
 }
 
+/* Staff catalog: simple search and filters always visible, detail search collapsible in between. */
+.bc-catalog-toolbar {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.bc-catalog-search__staff-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.bc-catalog-search__simple {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .75rem;
+    align-items: end;
+}
+
+.bc-catalog-search__advanced {
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface-muted);
+    padding: .65rem 1rem;
+}
+
+.bc-catalog-search__advanced > summary {
+    cursor: pointer;
+    font-weight: 600;
+    min-height: 1.5rem;
+}
+
+.bc-catalog-search__advanced[open] > summary {
+    margin-bottom: .5rem;
+}
+
+.bc-catalog-search__filters {
+    border: 1px solid var(--border-default);
+    padding: .75rem 1rem 1rem;
+    margin: 0;
+}
+
+.bc-catalog-search__filters > legend {
+    font-weight: 600;
+    padding: 0 .35rem;
+}
+
+.bc-catalog-search__filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .9rem 1rem;
+}
+
+.bc-catalog-search__checks {
+    display: grid;
+    gap: .5rem;
+    margin-top: .9rem;
+}
+
+@media (max-width: 48rem) {
+    .bc-catalog-search__simple,
+    .bc-catalog-search__filter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 68rem) {
     .bc-catalog-search__advanced-form {
         grid-template-columns: repeat(2, minmax(0, 1fr));

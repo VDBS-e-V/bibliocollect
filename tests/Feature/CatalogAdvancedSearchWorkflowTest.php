@@ -121,7 +121,7 @@ it('provides a more detailed internal catalog search for catalog managers', func
             'target_audience' => 'Jugendliche',
         ]))
         ->assertOk()
-        ->assertSee('Interne erweiterte Recherche')
+        ->assertSee('Erweiterte Suche')
         ->assertSee('The Giver')
         ->assertDontSee('Momo');
 });

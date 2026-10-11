@@ -80,6 +80,13 @@ return [
                     'order' => 28,
                 ],
                 [
+                    'label' => 'Katalog',
+                    'route' => 'pos.catalog.index',
+                    'active' => 'pos.catalog.index',
+                    'permission' => 'catalog.manage',
+                    'order' => 29,
+                ],
+                [
                     'label' => 'Medium erfassen',
                     'route' => 'pos.catalog.intake.identify',
                     'active' => 'pos.catalog.intake.*',
