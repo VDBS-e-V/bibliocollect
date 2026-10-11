@@ -26,6 +26,24 @@
 
 **Zehn neue K2/K3/K4-Komponenten** sind in \`resources/views/components/ui\` hinzugekommen: \`breadcrumbs\`, \`tabs\`, \`pagination\`, \`disclosure\`, \`checkbox\`, \`radio\`, \`switch\`, \`progress\`, \`skeleton\`, \`search-field\`. Gemeinsame Styles in \`resources/css/components/foundation-components-v2.css\`. Keine produktive Seitenmigration.
 
+### Komponentenschritt K3b / K5a – neu im Review
+
+Sieben weitere fachneutral verwendbare Blade-Komponenten sind im Designlab unter `/design-lab/komponenten` sichtbar:
+
+| Baustein | Einsatz | Status |
+|---|---|---|
+| `x-ui.textarea` | Mehrzeiliger Text mit Rows, Maxlength, Error und Hint | Entwurf |
+| `x-ui.file-upload` | Nativer, gelabelter Datei-Input mit Accept, Multiple, Error und Hint | Entwurf; Speicherung/Dateiprüfung bleibt Aufgabe der echten Anwendung |
+| `x-ui.autocomplete` | Native `datalist`-Vorschläge für kleine bekannte Listen | Entwurf; **keine** vollständige asynchrone ARIA-Combobox |
+| `x-ui.form-section` | Semantisches `fieldset` mit `legend` und Beschreibung | Entwurf |
+| `x-ui.error-summary` | Fehlerüberblick mit Links zu Formularfeldern | Entwurf; in echten Formularen mit Servervalidierung und Fokusmanagement verbinden |
+| `x-ui.filter-chip` | Aktive/nicht aktive Filter; Link nur bei vorhandenem Ziel | Entwurf |
+| `x-ui.list-row` | Universelle Zeile mit Titel, Meta, optionalem Link und Media-/Trailing-Slots | Entwurf |
+
+Gemeinsame Styles: `resources/css/components/foundation-components-v3.css`. Demonstrationsansicht: `resources/views/pages/partials/design-lab-components-v3.blade.php`. Featuretests: `tests/Feature/ComponentLibraryV3Test.php`.
+
+**Nicht automatisch abgeschlossen:** Vollständiger Autocomplete mit asynchroner Suche, Drag-and-drop-Upload, Datums-/Zeit-Picker für Sonderfälle, Fehler-Fokus nach Redirect sowie komplexe Sortier-/Tabellenfilter brauchen eigene Prüfung. Native Datums-/Zahleneingaben sind bereits durch den vorhandenen `x-ui.input`-Typ prop demonstriert.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
