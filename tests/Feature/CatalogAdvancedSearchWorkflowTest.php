@@ -107,8 +107,10 @@ it('renders locally cached covers and individual title-based fallback covers', f
     $this->get(route('public.catalog.index'))
         ->assertOk()
         ->assertSee('catalog/covers/local-test.png', false)
-        ->assertSee('bc-library-cover__art--', false)
+        ->assertSee('catalog/covers/generated/v1/', false)
         ->assertDontSee('brand/vdbs/catalog-cover-placeholder.svg', false);
+
+    expect(Storage::disk('public')->allFiles('catalog/covers/generated/v1'))->toHaveCount(1);
 });
 
 it('provides a more detailed internal catalog search for catalog managers', function (): void {
