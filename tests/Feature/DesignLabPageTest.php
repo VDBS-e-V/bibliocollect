@@ -13,7 +13,7 @@ it('stellt fünf eigenständige Beispielseiten und das Designstudio nur in der T
         'public.design-lab.media' => 'Titel, die Raum bekommen.',
         'public.design-lab.wizard' => 'Schritt für Schritt. Ohne Umwege.',
         'public.design-lab.dashboard' => 'Das Wichtige fällt auf.',
-        'public.design-lab.components' => 'Einmal entwerfen. Überall verwenden.',
+        'public.design-lab.components' => 'Erst die Bausteine.',
     ] as $route => $expected) {
         $this->get(route($route))
             ->assertOk()
