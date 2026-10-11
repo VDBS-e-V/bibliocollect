@@ -16,7 +16,7 @@
             <div class="bc-home-hero__layout">
                 <div class="bc-home-hero__copy">
                     <span class="bc-home-eyebrow bc-home-eyebrow--light">Deine Schulbibliothek</span>
-                    <h1 id="home-heading">Hier beginnt <span>deine nächste</span> Geschichte.</h1>
+                    <h1 id="home-heading"><span>Hier beginnt</span><span class="bc-home-hero__accent">deine nächste</span><span>Geschichte.</span></h1>
                     <p>Finde Bücher, die dich begeistern. Entdecke neue Themen und nutze die Bibliothek ganz nach deinen Ideen.</p>
                     <x-library.catalog-search id="catalog-search" placeholder="Buchtitel, Autor:in oder Thema …" />
                     <div class="bc-home-hero__links">
