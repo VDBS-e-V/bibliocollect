@@ -1,6 +1,7 @@
 # BiblioCollect – Masterplan des Designsystems
 
-> **Status:** Planung / Soll-Katalog, noch keine Freigabe oder automatische Umsetzung aller Bausteine.  
+> **Status:** Planung / Soll-Katalog, noch keine Freigabe oder automatische Umsetzung aller Bausteine.
+> **Grafische Übersicht:** Lokal unter `/design-lab/designsystem` (nur `APP_ENV=local` und `testing`). Die Darstellung verwendet die hier dokumentierten 15 Familien, 22 Grundtemplates und den Rollout-Plan als visuelle Prüfansicht.  
 > **Grundlage:** bestehendes Repository auf `feature/public-home-designsystem-redesign`, `docs/DESIGN_SYSTEM.md`, `docs/BRANDING.md`, Blade-Views und die vier Surfaces.  
 > **Leitbild:** VDBS-Marke verbindlich; Oodi-artige Overlap-Editorials, reduzierte Navigation, Stepper für Prozesse, Bento dort, wo Kennzahlen gewichtet sind.  
 > **Struktur:** Token → Component → Pattern → Template → Page.
