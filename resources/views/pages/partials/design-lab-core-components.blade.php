@@ -21,6 +21,10 @@
         <a href="#bc-core-controls">Auswahl</a>
         <a href="#bc-core-status">Fortschritt</a>
         <a href="#bc-core-disclosures">Akkordeon</a>
+        <a href="#bc-core-inputs-advanced">Erweiterte Felder</a>
+        <a href="#bc-core-form-groups">Formulargruppen</a>
+        <a href="#bc-core-filter-chips">Filterchips</a>
+        <a href="#bc-core-list-rows">Listenzeilen</a>
         <a href="#bc-core-patterns">Größere Patterns</a>
     </nav>
 
@@ -184,6 +188,8 @@
     </section>
 
     @include('pages.partials.design-lab-components-v2')
+
+    @include('pages.partials.design-lab-components-v3')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
