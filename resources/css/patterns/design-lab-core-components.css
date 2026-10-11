@@ -104,3 +104,16 @@
 @media(max-width:34rem) {
     .bc-core-gallery-v3__chips { gap:.55rem; }
 }
+
+
+/* Interaktive Komponenten v4 in der zentralen Review-Galerie. */
+.bc-core-gallery-v4__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+.bc-core-gallery-v4__grid > * { min-width:0; }
+.bc-core-gallery-v4__stack { display:grid; align-content:start; gap:1rem; min-width:0; }
+.bc-core-gallery-v4__loading { display:flex; align-items:center; flex-wrap:wrap; gap:1rem 2rem; }
+.bc-core-gallery-v4__explain { margin:1.2rem 0 0; color:var(--text-secondary); font-size:var(--text-sm); line-height:1.6; }
+.bc-core-gallery-v4__grid .bc-popover__panel { max-width:min(20rem,calc(100vw - 2rem)); }
+@media(max-width:42rem) {
+    .bc-core-gallery-v4__grid { grid-template-columns:1fr; }
+    .bc-core-gallery-v4__loading { display:grid; gap:1rem; }
+}
