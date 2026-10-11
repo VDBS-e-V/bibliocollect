@@ -15,6 +15,7 @@ Die festen **VDBS-Farben und Schriftfamilien** sind unverändert. Zwei Dichten b
 - \`x-ui.button\`: Primary und Secondary; im neuen Review zusätzlich \`tertiary\` und \`danger\`, mit optional \`size="sm|md|lg"\`.
 - \`x-ui.card\`: bisher einfache Karte; neu opt-in \`tone="default|muted|brand|stage"\` und \`density="comfortable|compact"\`.
 - \`x-ui.input\` / \`x-ui.select\`: Label, Hint, Fehlerzustand und ARIA-Zusammenhang.
+  - **Neue verbindliche Reihenfolge:** Label → Eingabefeld → Fehlermeldung (falls vorhanden) → Hilfetext (falls vorhanden). Damit liegen Felder nebeneinander auf gleicher Höhe; aria-describedby verknüpft die Texte weiter mit dem Feld.
 - \`x-ui.badge\`, \`x-ui.alert\`, \`x-ui.table\`, \`x-ui.page-header\`: vorhandene Basiskomponenten mit Beispielen.
 - \`x-library.feature-overlap\`, \`x-library.process-stepper\`, \`x-library.stat-tile\`, \`x-library.notice-panel\`, \`x-library.media-cover\`: Fach-Patterns. Die Basisgalerie verlinkt die bestehenden Demos darunter.
 
