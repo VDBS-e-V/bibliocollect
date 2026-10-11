@@ -48,7 +48,7 @@ final class CatalogIndexController
             static fn (Title $title): string => (string) $title->getKey(),
             $titles->items(),
         ));
-        /** @var array<string, string> $coverUrls */
+        /** @var array<string, string|null> $coverUrls */
         $coverUrls = [];
         /** @var array<string, list<string>> $topicNames */
         $topicNames = [];
@@ -57,8 +57,7 @@ final class CatalogIndexController
         foreach ($titles->items() as $title) {
             $titleId = (string) $title->getKey();
             $holdingSummaries[$titleId] = $holdings->summarizeTitle($title);
-            $coverUrls[$titleId] = $covers->localUrlForTitle($title)
-                ?? asset('brand/vdbs/catalog-cover-placeholder.svg');
+            $coverUrls[$titleId] = $covers->localUrlForTitle($title);
 
             $names = [];
 
