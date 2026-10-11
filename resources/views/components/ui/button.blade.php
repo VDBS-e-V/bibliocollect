@@ -2,6 +2,7 @@
     'href' => null,
     'variant' => 'primary',
     'type' => 'button',
+    'size' => null,
 ])
 
 @php($classes = 'bc-button bc-button--'.$variant)
