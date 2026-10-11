@@ -79,7 +79,7 @@
                     @foreach ($showcase[$key] as $tile)
                         <li class="bc-showcase__tile">
                             <a href="{{ route('public.catalog.show', ['titleId' => $tile['id']]) }}" class="bc-showcase__link">
-                                <span class="bc-showcase__cover"><img src="{{ $tile['cover'] }}" alt="" loading="lazy"></span>
+                                <span class="bc-showcase__cover"><x-library.media-cover :src="$tile['cover']" :title="$tile['title']" :author="$tile['authors']" size="small" /></span>
                                 <strong class="bc-showcase__title">{{ $tile['title'] }}</strong>
                                 @if ($tile['authors'] !== '')<span class="bc-showcase__authors">{{ $tile['authors'] }}</span>@endif
                             </a>
