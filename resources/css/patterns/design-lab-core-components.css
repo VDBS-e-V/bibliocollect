@@ -87,3 +87,20 @@
 @media(max-width:46rem) {
  .bc-core-gallery-v2__grid { grid-template-columns:1fr; }
 }
+
+
+/* Designlab K3b/K5 – real component previews, separate from production pages. */
+.bc-core-gallery-v3__field-stack { display:grid; gap:1.1rem; }
+.bc-core-gallery-v3__stack { display:grid; align-content:start; gap:1rem; }
+.bc-core-gallery-v3__form-layout { display:grid; grid-template-columns:1fr 1fr; align-items:start; gap:1.2rem; }
+.bc-core-gallery-v3__form-layout > * { min-width:0; }
+.bc-core-gallery-v3__chips { display:flex; flex-wrap:wrap; align-items:center; gap:.75rem; }
+.bc-core-gallery-v3__mini-cover { display:block; width:2.8rem; height:3.8rem; border-radius:.22rem; box-shadow:var(--shadow-sm); background:var(--bg-stage); }
+.bc-core-gallery-v3__mini-cover--plum { background:var(--vdbs-purple); }
+.bc-core-gallery-v3__mini-cover--mint { background:var(--vdbs-green); }
+@media(max-width:64rem) {
+    .bc-core-gallery-v3__form-layout { grid-template-columns:1fr; }
+}
+@media(max-width:34rem) {
+    .bc-core-gallery-v3__chips { gap:.55rem; }
+}
