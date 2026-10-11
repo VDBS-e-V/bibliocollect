@@ -92,3 +92,37 @@ it('hält den Ladeindikator lesbar und ohne erfundene Prozente', function (): vo
         ->toContain('bc-spinner--lg')
         ->not->toContain('50 %');
 });
+
+it('gestaltet Dialoge und Toasts ohne durchgehende farbige Statuslinien', function (): void {
+    $css = file_get_contents(resource_path('css/components/foundation-components-v4.css'));
+
+    expect($css)->toBeString()
+        ->toContain('border-radius:.625rem')
+        ->toContain('.bc-ui-dialog--warning .bc-ui-dialog__header::before')
+        ->toContain('width:3.25rem; height:.25rem')
+        ->toContain('.bc-ui-toast::before')
+        ->toContain('width:2.75rem; height:.2rem')
+        ->toContain('background:color-mix(in srgb,var(--bc-toast-accent)')
+        ->toContain('.bc-ui-toast--success { --bc-toast-accent:var(--action-success)')
+        ->toContain('.bc-ui-toast--warning { --bc-toast-accent:var(--action-warning)')
+        ->toContain('.bc-ui-toast--error { --bc-toast-accent:var(--action-danger)')
+        ->not->toContain('border-top:4px solid var(--action-warning)')
+        ->not->toContain('border-left:4px solid var(--border-strong)');
+});
+
+it('zeigt die neue zurückhaltende Statusgestaltung im Designlab mit zugänglichen Zuständen', function (): void {
+    $html = (string) $this->get(route('public.design-lab.components'))
+        ->assertOk()
+        ->assertSee('Neues Grunddesign: 10 px Eckenradius')
+        ->assertSee('Neues Grunddesign: 8 px Eckenradius')
+        ->getContent();
+
+    expect($html)
+        ->toContain('bc-ui-dialog--warning')
+        ->toContain('bc-ui-toast--info')
+        ->toContain('bc-ui-toast--success')
+        ->toContain('bc-ui-toast--warning')
+        ->toContain('bc-ui-toast--error')
+        ->toContain('data-ui-dialog-close')
+        ->toContain('data-ui-toast-dismiss');
+});
