@@ -49,6 +49,10 @@
 
             <div class="bc-review-main">
                 <div class="bc-review-note">
+                    <strong>Neu: Interaktive Designstudie 04</strong>
+                    <p><a href="{{ route('public.design-lab') }}">Fünf neue Musterseiten mit überlappenden Features, Process Stepper, Bento-Dashboard und Komponentenbibliothek ansehen →</a></p>
+                </div>
+                <div class="bc-review-note">
                     <strong>So überprüfst du die Entwürfe</strong>
                     <p>Vergleiche pro Vorlage Navigation, Lesbarkeit, Informationsdichte und mobile Darstellung. Mit dem Theme-Schalter im Seitenkopf kannst du auch den Dunkelmodus testen. Die Beispielschaltflächen sind absichtlich deaktiviert oder rein illustrativ.</p>
                 </div>
