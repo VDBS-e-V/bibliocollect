@@ -29,6 +29,11 @@
         <a href="#bc-core-dialogs">Dialoge</a>
         <a href="#bc-core-notifications">Meldungen</a>
         <a href="#bc-core-loading">Laden</a>
+        <a href="#bc-core-filter-toolbar">Filterleisten</a>
+        <a href="#bc-core-data-table">Tabellen & Auswahl</a>
+        <a href="#bc-core-media-cards">Medienkarten</a>
+        <a href="#bc-core-library-states">Bibliotheksstatus</a>
+        <a href="#bc-core-scan-input">Barcodefeld</a>
         <a href="#bc-core-patterns">Größere Patterns</a>
     </nav>
 
@@ -196,6 +201,8 @@
     @include('pages.partials.design-lab-components-v3')
 
     @include('pages.partials.design-lab-components-v4')
+
+    @include('pages.partials.design-lab-components-v5')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
