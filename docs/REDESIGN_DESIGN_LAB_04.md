@@ -11,7 +11,7 @@ Nur mit `APP_ENV=local` oder `APP_ENV=testing`:
 - `/design-lab/assistent` – horizontaler Prozess-Stepper mit fünf Schritten
 - `/design-lab/dashboard` – Dashboard mit unterschiedlichen Bento-Modulgrößen und Meldungen
 - `/design-lab/portal` – persönliches Portal mit klarer Priorität für Rückgabefristen und kompakter Ausleihübersicht; echte Daten und Aktionen bleiben im produktiven Portal
-- `/design-lab/komponenten` – Pattern-Bibliothek mit Varianten und Anwendungsbeispielen
+- `/design-lab/komponenten` – **Basis-Komponentenbibliothek** mit Varianten, Dichteumschalter, Buttons, Inputs, Flächen, Leerzuständen, Metadaten und darunter den bestehenden größeren Patterns; Details unter `docs/REDESIGN_COMPONENT_LIBRARY_V1.md`
 
 Die bisherige Gesamtübersicht `/design-review` verlinkt das neue Studio.
 
