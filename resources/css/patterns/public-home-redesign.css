@@ -151,7 +151,7 @@
     right: 38%;
     width: 62%;
     aspect-ratio: 1;
-    border: 3.25rem solid rgb(161 68 164 / 43%);
+    border: 3.25rem solid rgb(255 255 255 / 15%);
 }
 .bc-home-hero__caption {
     position: absolute;
@@ -180,46 +180,70 @@
 .bc-home-hero__book .bc-library-cover { width: 100%; height: 100%; }
 .bc-home-hero__footnote { position: absolute; right: 4%; bottom: 6%; font-size: .8rem; }
 
-/* 02: kuratierte Schnelleinstiege, klare typografische Hierarchie. */
-.bc-home-actions { padding: clamp(3.5rem, 6vw, 5.25rem) 0; }
+/* 02: Vier Wege statt vier gleichförmiger Funktions-Kacheln.
+   Offene, klar gegliederte Linkzeilen unterstützen schnelles Scannen. */
+.bc-home-actions { padding: clamp(3.5rem, 6vw, 5rem) 0; }
 .bc-home-actions__grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.15rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 6vw, 5rem);
 }
 .bc-library-quick-action {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .55rem;
-    min-height: 13.5rem;
-    padding: 1.5rem;
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-md);
+    display: grid;
+    grid-template-columns: 2.9rem minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: start;
+    gap: .15rem 1rem;
+    min-height: 8.9rem;
+    padding: 1.55rem .5rem 1.5rem 0;
+    border: 0;
+    border-top: 1px solid var(--border-default);
+    border-radius: 0;
+    background: transparent;
     color: var(--text-primary);
-    background: var(--bg-surface);
     text-decoration: none;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition: background-color var(--transition-fast);
 }
 .bc-library-quick-action:visited { color: var(--text-primary); }
 .bc-library-quick-action:hover,
-.bc-library-quick-action:focus-visible { border-color: var(--action-success); box-shadow: var(--shadow-md); text-decoration: none; }
+.bc-library-quick-action:focus-visible { background: var(--bg-surface-muted); text-decoration: none; }
 .bc-library-quick-action:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
 .bc-library-quick-action__icon {
     display: grid;
+    grid-row: 1 / 3;
+    grid-column: 1;
     place-items: center;
-    width: 3rem;
-    height: 3rem;
-    margin-bottom: .5rem;
-    border-radius: .7rem;
-    background: var(--bg-brand-soft);
+    width: 2.7rem;
+    height: 2.7rem;
+    border: 1px solid var(--border-default);
+    border-radius: 50%;
+    background: transparent;
     color: var(--action-success);
 }
-.bc-library-quick-action__icon svg { width: 1.5rem; height: 1.5rem; }
-.bc-library-quick-action strong { font-size: 1.08rem; line-height: 1.3; }
-.bc-library-quick-action__description { color: var(--text-secondary); font-size: .875rem; line-height: 1.5; }
-.bc-library-quick-action__arrow { width: 1.15rem; height: 1.15rem; margin-top: auto; align-self: flex-end; color: var(--action-success); }
+.bc-library-quick-action__icon svg { width: 1.4rem; height: 1.4rem; }
+.bc-library-quick-action strong {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+    line-height: 1.25;
+    font-weight: 900;
+}
+.bc-library-quick-action__description {
+    grid-column: 2;
+    grid-row: 2;
+    max-width: 30ch;
+    color: var(--text-secondary);
+    font-size: .9rem;
+    line-height: 1.55;
+}
+.bc-library-quick-action__arrow {
+    grid-row: 1 / 3;
+    grid-column: 3;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: .35rem;
+    color: var(--action-success);
+}
 
 /* 03: ein ruhiger, redaktioneller Bereich. Kein Kartengitter mit zusätzlichen Boxen. */
 .bc-home-discovery {
@@ -295,103 +319,97 @@
 .bc-home-discovery__topics ul { display: flex; flex-wrap: wrap; gap: .7rem 1.5rem; margin: 0; padding: 0; list-style: none; }
 .bc-home-discovery__topics a { color: var(--text-primary); font-weight: 700; text-underline-offset: .2em; }
 
-/* 04: asymmetrischer Editorial-Abschnitt aus der Referenzvorlage. */
+/* 04: Echte VDBS-Illustration statt künstlich nachgebauter Regalzeichnung.
+   Asymmetrischer Editorial-Schnitt nach Oodi / ZLB. */
 .bc-home-editorial {
     display: grid;
-    grid-template-columns: 1.07fr .93fr;
-    gap: clamp(2rem, 7vw, 6.5rem);
+    grid-template-columns: 1.05fr .95fr;
+    gap: clamp(2.5rem, 8vw, 7rem);
     align-items: center;
-    padding: clamp(4rem, 8vw, 7rem) 0;
+    padding: clamp(4.5rem, 9vw, 7.5rem) 0;
 }
 .bc-home-editorial__visual {
-    position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 24rem;
+    justify-content: space-between;
+    min-height: 22.5rem;
     overflow: hidden;
-    border-radius: var(--radius-md);
-    padding: 1.7rem;
-    background: var(--vdbs-ink);
+    border-radius: var(--radius-sm);
+    padding: clamp(1.6rem, 3vw, 2.2rem);
+    background: var(--vdbs-purple);
     color: var(--vdbs-white);
 }
-.bc-home-editorial__visual::after {
-    position: absolute;
-    right: -5rem;
-    bottom: -7rem;
-    width: 17rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: var(--vdbs-green);
-    content: '';
+.bc-home-editorial__visual img {
+    display: block;
+    width: 108%;
+    max-width: none;
+    height: auto;
+    margin: 1.8rem 0 1.2rem -4%;
+    object-fit: contain;
 }
 .bc-home-editorial__visual > strong {
-    position: relative;
-    z-index: 2;
-    margin-top: auto;
-    max-width: 19rem;
-    font-size: 1.25rem;
+    display: block;
+    max-width: 20rem;
+    font-size: clamp(1.3rem, 2.5vw, 1.9rem);
     line-height: 1.2;
-}
-.bc-home-editorial__books {
-    position: absolute;
-    inset: 6rem 15% 4rem 15%;
-    display: grid;
-    gap: 1.15rem;
-    align-content: start;
-}
-.bc-home-editorial__books span {
-    height: 3.4rem;
-    border-bottom: .55rem solid var(--vdbs-grey-frame);
-    background: repeating-linear-gradient(90deg,
-        var(--vdbs-purple) 0 1rem,
-        var(--vdbs-grey-frame) 1rem 1.2rem,
-        var(--vdbs-grey-line) 1.2rem 2.4rem,
-        var(--vdbs-ink) 2.4rem 2.7rem,
-        var(--vdbs-green) 2.7rem 3.2rem,
-        var(--vdbs-grey-frame) 3.2rem 3.4rem);
-    opacity: .85;
+    font-weight: 900;
 }
 .bc-home-editorial__copy h2 {
-    max-width: 24rem;
-    margin: .8rem 0 1.1rem;
-    font-size: clamp(2rem, 3.7vw, 3rem);
-    line-height: 1.15;
-    letter-spacing: -.025em;
+    max-width: 23rem;
+    margin: .8rem 0 1.3rem;
+    font-size: clamp(2.2rem, 3.8vw, 3.35rem);
+    line-height: 1.14;
+    letter-spacing: -.03em;
 }
-.bc-home-editorial__copy p { max-width: 33rem; color: var(--text-secondary); font-size: 1.05rem; line-height: 1.65; }
+.bc-home-editorial__copy p {
+    max-width: 33rem;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.65;
+}
 .bc-home-outline-link {
     display: inline-flex;
     align-items: center;
     gap: .5rem;
     min-height: 2.75rem;
-    margin-top: 1.4rem;
-    padding: .7rem 1rem;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
+    margin-top: 1.45rem;
+    padding: .65rem 0;
+    color: var(--link-default);
+    font-size: .95rem;
     font-weight: 800;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: .25em;
 }
-.bc-home-outline-link:visited { color: var(--text-primary); }
-.bc-home-outline-link:hover { background: var(--bg-surface-muted); }
+.bc-home-outline-link:visited { color: var(--link-default); }
+.bc-home-outline-link:hover { text-decoration-thickness: 2px; }
 
-/* 05: Daten aus Schulkonfiguration, keine erfundenen Öffnungszeiten. */
-.bc-home-info { padding-bottom: 4rem; }
-.bc-home-info__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+/* 05: Betriebsinformationen – Klartext und reale Daten statt Deko-Karten. */
+.bc-home-info { padding-bottom: clamp(3rem, 5vw, 5rem); }
+.bc-home-info__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2.5rem, 5vw, 5rem);
+}
 .bc-home-info__panel {
     min-width: 0;
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
-    padding: clamp(1.4rem, 3vw, 2.15rem);
-    background: var(--bg-surface);
+    border: 0;
+    border-top: 2px solid var(--border-default);
+    border-radius: 0;
+    padding: 1.5rem 0 0;
+    background: transparent;
 }
-.bc-home-info__panel--soft { background: var(--bg-brand-soft); }
-.bc-home-info__panel h3 { margin: 0 0 1rem; font-size: 1.35rem; }
-.bc-home-info__panel p { max-width: 34rem; margin: .7rem 0; color: var(--text-secondary); font-size: .96rem; line-height: 1.6; }
+.bc-home-info__panel--soft { border-top-color: var(--vdbs-green); background: transparent; }
+.bc-home-info__panel h3 { margin: 0 0 1.1rem; font-size: 1.45rem; }
+.bc-home-info__panel p {
+    max-width: 34rem;
+    margin: .8rem 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.65;
+}
 .bc-home-info__panel .bc-home-text-link { margin-top: 1rem; }
-.bc-home-hours { width: 100%; border-collapse: collapse; font-size: .91rem; text-align: left; }
-.bc-home-hours th,
-.bc-home-hours td { padding: .75rem .2rem; border-bottom: 1px solid var(--border-default); }
+.bc-home-hours { width: 100%; border-collapse: collapse; font-size: .96rem; text-align: left; }
+.bc-home-hours th, .bc-home-hours td { padding: .85rem .2rem; border-bottom: 1px solid var(--border-default); }
 .bc-home-hours th { font-weight: 600; }
 .bc-home-hours td { font-variant-numeric: tabular-nums; text-align: right; }
 .bc-home-closures { margin-top: 1.5rem; }
@@ -400,7 +418,6 @@
 
 @media (max-width: 70rem) {
     .bc-home-hero h1 { font-size: clamp(3rem, 5.6vw, 4.5rem); }
-    .bc-home-actions__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .bc-home-hero__book { width: min(48%, 11rem); }
 }
 @media (max-width: 50rem) {
@@ -432,15 +449,15 @@
     .bc-home-hero__links { font-size: .77rem; }
     .bc-library-search { grid-template-columns: auto minmax(0, 1fr); }
     .bc-library-search button { grid-column: 1 / -1; width: 100%; }
-    .bc-home-actions__grid { gap: .75rem; }
-    .bc-library-quick-action { min-height: 12.5rem; padding: 1rem; }
-    .bc-library-quick-action strong { font-size: .96rem; }
-    .bc-library-quick-action__description { font-size: .8rem; }
+    .bc-home-actions__grid { grid-template-columns: 1fr; }
+    .bc-library-quick-action { min-height: 6.75rem; padding: 1.15rem .25rem 1.15rem 0; }
+    .bc-library-quick-action strong { font-size: 1.07rem; }
+    .bc-library-quick-action__description { font-size: .88rem; }
     .bc-home-heading { margin-bottom: 1.3rem; }
     .bc-home-discovery__grid { gap: 1.5rem .9rem; }
     .bc-home-media strong { font-size: .9rem; }
     .bc-home-editorial__visual { min-height: 17rem; }
-    .bc-home-editorial__books { inset: 5rem 15% 3rem; }
+    .bc-home-editorial__visual img { margin-block: 1.25rem; }
     .bc-home-hero__circle--ring { border-width: 1.4rem; }
 }
 @media (prefers-reduced-motion: reduce) {
