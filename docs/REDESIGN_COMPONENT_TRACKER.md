@@ -44,6 +44,25 @@ Gemeinsame Styles: `resources/css/components/foundation-components-v3.css`. Demo
 
 **Nicht automatisch abgeschlossen:** Vollständiger Autocomplete mit asynchroner Suche, Drag-and-drop-Upload, Datums-/Zeit-Picker für Sonderfälle, Fehler-Fokus nach Redirect sowie komplexe Sortier-/Tabellenfilter brauchen eigene Prüfung. Native Datums-/Zahleneingaben sind bereits durch den vorhandenen `x-ui.input`-Typ prop demonstriert.
 
+### Komponentenschritt K2b / K4b – Interaktion und Dialoge
+
+Weitere **sechs** wiederverwendbare Blade-Bausteine sind in der aktiven Komponentenbibliothek sichtbar:
+
+| Baustein | Anwendung | Status |
+|---|---|---|
+| `x-ui.action-menu` | Aktionslinks über native `details/summary` mit Disabled und Trennlinien | Entwurf |
+| `x-ui.popover` | Kontextuelle Informationen mit freiem Slot, nativer `details/summary` | Entwurf |
+| `x-ui.tooltip` | Kurzhilfe bei Hover/Fokus, `aria-describedby` mit eindeutiger ID | Entwurf |
+| `x-ui.dialog` | Allgemeiner nativer `dialog`, offene API für Inhalte/Actions, fokussierte Modaldarstellung | Entwurf |
+| `x-ui.toast` | Kurzstatus/Fehler mit passendem `role=status/alert`, optionaler Dismiss-Aktion | Entwurf |
+| `x-ui.spinner` | Indeterminierter Ladezustand mit lesbarem Statuslabel und Reduced-Motion-Fallback | Entwurf |
+
+CSS: `resources/css/components/foundation-components-v4.css`; kleine gemeinsame JS-Steuerung für Menüs, Dialoge und Dismiss in `resources/js/ui-interactions.js`, importiert von `app.js`. Designlab: `resources/views/pages/partials/design-lab-components-v4.blade.php`. Tests: `tests/Feature/ComponentLibraryV4Test.php`.
+
+**Keine Duplikation der produktiven Bestätigungsfunktion:** Der vorhandene `data-confirm`-Handler bleibt für echte Aktionen zuständig; `x-ui.dialog` zeigt hier nur Präsentation und API. Reale Fachaktionen, Bestätigungsfolgen und Erfolgsmeldungen werden erst bei der späteren Seitenintegration angebunden.
+
+**Weitere Reviewpunkte:** Fokusführung in komplexen Dialogen, Tooltip-Touchverhalten, Menüpositionierung in engen Containern, fokussierbare Popover-Inhalte und automatische Live-Feedback-Anbindung. „Entwurf“ bleibt korrekt bis zur interaktiven Browser- und Accessibility-Abnahme.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
