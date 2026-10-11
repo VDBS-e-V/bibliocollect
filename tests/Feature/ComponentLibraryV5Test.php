@@ -130,7 +130,7 @@ it('färbt beim Scanner nur den vorhandenen Fokusrahmen lila statt einen zweiten
         ->toContain('border-width:2px')
         ->toContain('.bc-core-gallery .bc-scan-input .bc-scan-input__field:focus-visible')
         ->not->toContain('.bc-scan-input__control:focus-within { outline:3px')
-        ->not->toContain('outline-offset:3px; }');
+        ->toContain('.bc-scan-input__field:is(:focus,:focus-visible)');
 
     $html = Blade::render('<x-library.scan-input name="test-barcode" label="Exemplarbarcode" />');
 
