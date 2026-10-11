@@ -151,6 +151,8 @@ Kontextzuordnung:
 
 Die Hex-Farben bleiben im Marken-/Semantiksystem. Ob eine Rolle im Dunkelmodus andere Transparenzen benötigt, wird durch konkrete Kontrast- und Sichtprüfung entschieden.
 
+**Komponentenentscheidung (aktuelle Review-Variante):** Dialoge der neuen `x-ui.dialog`-Familie verwenden **10px** Radius und bei Warnungen statt einer durchgehenden Top-Border einen **kurzen, 52px breiten Statusakzent** oben links. Toasts der neuen `x-ui.toast`-Familie verwenden **8px** Radius, eine sehr dezente, semantisch eingefärbte Fläche und einen **44px breiten Akzent** oben links statt durchgehender farbiger Randstreifen. Dialog-Footer trennt nicht über eine zusätzliche horizontale Linie; der Fokus bleibt deutlich sichtbar. Dies betrifft bisher nur die genannten Komponenten und ist noch **nicht** die globale Radius- oder Status-Tokenfreigabe.
+
 ## 7. Contentbreiten & responsive Grids
 
 | Container | Breite | Nutzung |
