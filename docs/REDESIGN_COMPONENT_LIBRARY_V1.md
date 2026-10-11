@@ -105,7 +105,7 @@ Die Komponenten sind **Entwürfe**, keine freigegebene Library. Siehe [Komponent
 
 **Erst nach K7** beginnen wir mit gezielten echten Fachseiten (zunächst je eine repräsentative Seite pro Surface). Bis dahin bleiben deren Controller, Blade-Templates und Aktionen unangetastet.
 
-## 7. Keine unkontrollierte Component-Duplikation
+## 8. Keine unkontrollierte Component-Duplikation
 
 - \`x-ui.card\` bleibt die allgemeine Flächenkomponente, es gibt keine zweite Universal-\`panel\`-Komponente für dieselbe Aufgabe.
 - \`x-ui.page-header\` für H1/Seitenanfang, \`x-ui.section-heading\` für H2–H4.
