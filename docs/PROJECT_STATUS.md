@@ -227,7 +227,7 @@ Die Komponente `x-ui.page-header` hat einen Slot `actions`: Knöpfe mit der wich
 
 ### Interne Katalogsuche übersichtlicher (Issue 88)
 
-Die Katalogpflege (`/betrieb/katalog`) ist als **Katalog** in der Hauptnavigation des Bibliotheksbetriebs verlinkt (Recht `catalog.manage`). Die einfache Suche und die Filter (Medientyp, Sprache, Sortierung, „nur aktive“, „nur verfügbare“) sind dauerhaft sichtbar; die **Erweiterte Suche** (Titel, Verantwortliche, Schlagwort, ISBN, Verlag, Ort, Reihe, Thema, Themenbereich, Zielgruppe, Quell-ID, Jahre) sitzt als aufklappbarer Block dazwischen und ist geöffnet, sobald ein Feld darin gefüllt ist. **Medium erfassen** ist ein Button oben; das alte Formular „Neuen Titel anlegen“ unten ist entfernt (Titel entstehen über die Erfassung). Die Route `pos.catalog.titles.store` bleibt bestehen.
+Die Katalogpflege (`/betrieb/katalog`) ist als **Katalog** in der Hauptnavigation des Bibliotheksbetriebs verlinkt (Recht `catalog.manage`). Die Suche besteht aus **drei getrennten Containern** in einem Formular: **Einfache Suche** (Suchfeld mit Button), **Erweiterte Suche** (aufklappbar, geöffnet sobald ein Feld gefüllt ist: Titel, Verantwortliche, Schlagwort, ISBN, Verlag, Ort, Reihe, Thema, Themenbereich, Zielgruppe, Quell-ID, Jahre) und **Filter** in einer kompakten Zeile (Medientyp, Sprache, Sortierung, „Nur Titel mit aktiven Exemplaren“, „Nur jetzt verfügbare Titel“). **Medium erfassen** ist ein Button oben rechts im Seitenkopf; das alte Formular „Neuen Titel anlegen“ unten ist entfernt (Titel entstehen über die Erfassung). Die Route `pos.catalog.titles.store` bleibt bestehen.
 
 ### Regalübersicht mit Belegung und CSV-Export (Issue 59)
 

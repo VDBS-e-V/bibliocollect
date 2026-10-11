@@ -38,11 +38,10 @@
         ])->contains(fn ($value): bool => $value !== null && $value !== '');
     @endphp
 
-    <section class="bc-catalog-search bc-catalog-search--staff" aria-labelledby="catalog-search-heading">
-        <h2 id="catalog-search-heading" class="sr-only">Suche und Filter</h2>
-
-        <form method="get" action="{{ route('pos.catalog.index') }}" class="bc-catalog-search__staff-form" role="search">
-            <div class="bc-catalog-search__simple">
+    <form method="get" action="{{ route('pos.catalog.index') }}" class="bc-search-stack" role="search" aria-label="Interne Katalogsuche">
+        <section class="bc-search-card" aria-labelledby="search-simple-heading">
+            <h2 id="search-simple-heading" class="bc-search-card__title">Einfache Suche</h2>
+            <div class="bc-search-card__body bc-search-simple">
                 <x-ui.input
                     label="Suche"
                     name="q"
@@ -52,11 +51,13 @@
                 />
                 <x-ui.button type="submit">Suchen</x-ui.button>
             </div>
+        </section>
 
-            <details class="bc-catalog-search__advanced" @if ($advancedActive) open @endif>
-                <summary>Erweiterte Suche</summary>
+        <details class="bc-search-card" @if ($advancedActive) open @endif>
+            <summary class="bc-search-card__title">Erweiterte Suche</summary>
+            <div class="bc-search-card__body">
                 <p class="bc-catalog-muted">Mehrere Felder werden gemeinsam angewendet. Exemplar-Barcodes bleiben außerhalb der Titelsuche.</p>
-                <div class="bc-catalog-search__advanced-form">
+                <div class="bc-search-advanced-grid">
                     <x-ui.input label="Titel / Untertitel" name="title" :value="$criteria->title" />
                     <x-ui.input label="Verantwortliche / GND" name="contributor" :value="$criteria->contributor" />
                     <x-ui.input label="Schlagwort / Inhalt" name="subject" :value="$criteria->subject" />
@@ -71,60 +72,55 @@
                     <x-ui.input label="Jahr von" name="year_from" type="number" :value="$criteria->yearFrom" min="1000" max="2100" />
                     <x-ui.input label="Jahr bis" name="year_to" type="number" :value="$criteria->yearTo" min="1000" max="2100" />
                 </div>
-            </details>
-
-            <fieldset class="bc-catalog-search__filters">
-                <legend>Filter</legend>
-                <div class="bc-catalog-search__filter-grid">
-                    <x-ui.select label="Medientyp" name="media_type" data-auto-submit>
-                        <option value="">Alle Medientypen</option>
-                        @foreach ($filterOptions['mediaTypes'] as $mediaType)
-                            <option value="{{ $mediaType }}" @selected($criteria->mediaType === $mediaType)>{{ $mediaType }}</option>
-                        @endforeach
-                    </x-ui.select>
-
-                    <x-ui.select label="Sprache" name="language_code" data-auto-submit>
-                        <option value="">Alle Sprachen</option>
-                        @foreach ($filterOptions['languageCodes'] as $languageCode)
-                            <option value="{{ $languageCode }}" @selected($criteria->languageCode === $languageCode)>{{ strtoupper($languageCode) }}</option>
-                        @endforeach
-                    </x-ui.select>
-
-                    <x-ui.select label="Sortierung" name="sort" data-auto-submit>
-                        <option value="title" @selected($criteria->sort === 'title')>Titel A–Z</option>
-                        <option value="title_desc" @selected($criteria->sort === 'title_desc')>Titel Z–A</option>
-                        <option value="year_desc" @selected($criteria->sort === 'year_desc')>Erscheinungsjahr neu → alt</option>
-                        <option value="year_asc" @selected($criteria->sort === 'year_asc')>Erscheinungsjahr alt → neu</option>
-                        <option value="recent" @selected($criteria->sort === 'recent')>Zuletzt erfasst</option>
-                    </x-ui.select>
-                </div>
-
-                <div class="bc-catalog-search__checks">
-                    <label class="bc-public-catalog-filter__check" for="staff-active-only">
-                        <input id="staff-active-only" name="active_only" type="checkbox" value="1" @checked($criteria->activeCopiesOnly)>
-                        <span>
-                            <strong>Nur Titel mit aktiven Exemplaren</strong>
-                            <small>Filtert katalogseitig auf CopyStatus „active“.</small>
-                        </span>
-                    </label>
-                    <label class="bc-public-catalog-filter__check" for="staff-available-only">
-                        <input id="staff-available-only" name="available_only" type="checkbox" value="1" @checked($criteria->availableNowOnly)>
-                        <span>
-                            <strong>Nur jetzt verfügbare Titel</strong>
-                            <small>Mindestens ein aktives Exemplar, das weder ausgeliehen noch zurückgelegt ist.</small>
-                        </span>
-                    </label>
-                </div>
-            </fieldset>
-
-            <div class="bc-action-row">
-                <x-ui.button type="submit">Filter anwenden</x-ui.button>
-                @if ($criteria->hasSearchInput())
-                    <x-ui.button href="{{ route('pos.catalog.index') }}" variant="secondary">Suche leeren</x-ui.button>
-                @endif
             </div>
-        </form>
-    </section>
+            <div class="bc-search-card__footer">
+                <x-ui.button type="submit">Erweitert suchen</x-ui.button>
+            </div>
+        </details>
+
+        <section class="bc-search-card" aria-labelledby="search-filter-heading">
+            <h2 id="search-filter-heading" class="bc-search-card__title">Filter</h2>
+            <div class="bc-search-card__body bc-search-filters">
+                <x-ui.select label="Medientyp" name="media_type" data-auto-submit>
+                    <option value="">Alle Medientypen</option>
+                    @foreach ($filterOptions['mediaTypes'] as $mediaType)
+                        <option value="{{ $mediaType }}" @selected($criteria->mediaType === $mediaType)>{{ $mediaType }}</option>
+                    @endforeach
+                </x-ui.select>
+
+                <x-ui.select label="Sprache" name="language_code" data-auto-submit>
+                    <option value="">Alle Sprachen</option>
+                    @foreach ($filterOptions['languageCodes'] as $languageCode)
+                        <option value="{{ $languageCode }}" @selected($criteria->languageCode === $languageCode)>{{ strtoupper($languageCode) }}</option>
+                    @endforeach
+                </x-ui.select>
+
+                <x-ui.select label="Sortierung" name="sort" data-auto-submit>
+                    <option value="title" @selected($criteria->sort === 'title')>Titel A–Z</option>
+                    <option value="title_desc" @selected($criteria->sort === 'title_desc')>Titel Z–A</option>
+                    <option value="year_desc" @selected($criteria->sort === 'year_desc')>Erscheinungsjahr neu → alt</option>
+                    <option value="year_asc" @selected($criteria->sort === 'year_asc')>Erscheinungsjahr alt → neu</option>
+                    <option value="recent" @selected($criteria->sort === 'recent')>Zuletzt erfasst</option>
+                </x-ui.select>
+
+                <label class="bc-search-check" for="staff-active-only" title="Filtert auf Exemplare mit dem Status „aktiv“.">
+                    <input id="staff-active-only" name="active_only" type="checkbox" value="1" @checked($criteria->activeCopiesOnly)>
+                    <span>Nur Titel mit aktiven Exemplaren</span>
+                </label>
+                <label class="bc-search-check" for="staff-available-only" title="Mindestens ein aktives Exemplar, das weder ausgeliehen noch zurückgelegt ist.">
+                    <input id="staff-available-only" name="available_only" type="checkbox" value="1" @checked($criteria->availableNowOnly)>
+                    <span>Nur jetzt verfügbare Titel</span>
+                </label>
+
+                <div class="bc-search-filters__actions">
+                    <x-ui.button type="submit" variant="secondary">Anwenden</x-ui.button>
+                    @if ($criteria->hasSearchInput())
+                        <x-ui.button href="{{ route('pos.catalog.index') }}" variant="secondary">Zurücksetzen</x-ui.button>
+                    @endif
+                </div>
+            </div>
+        </section>
+    </form>
 
     <section class="bc-content-section" aria-labelledby="catalog-results-heading">
         <div class="bc-section-heading bc-section-heading--with-meta">
