@@ -12,6 +12,9 @@ Das Grundtemplate **L08 Personal Overview** priorisiert **Ausleihen und Rückgab
 
 ## Komponenten zuerst – aktueller Umsetzungsmodus
 
+**Aktueller Fortschritt:** [Komponententracker mit bestehendem Bestand, zehn weiteren universellen Bausteinen und noch offenen Familien](REDESIGN_COMPONENT_TRACKER.md). Die bisherigen Musterseiten und der alte Designreview sind klar als ältere Entwürfe gekennzeichnet; finale Seiten entstehen erst nach vollständigem Komponenten-Review.
+
+
 Vor der Migration produktiver Seiten entwerfen und testen wir ausschließlich wiederverwendbare Basis-UI und Patterns. Die lokal verfügbare Galerie `/design-lab/komponenten` ist jetzt in Aktionen, Formulare, Oberflächen, Feedback, Daten und Patterns gegliedert, mit schaltbarem Comfortable-/Compact-Vergleich. Die vollständige neue Komponentenstrategie mit Blade-APIs, Variationsstatus und nächsten Runden steht in [`REDESIGN_COMPONENT_LIBRARY_V1.md`](REDESIGN_COMPONENT_LIBRARY_V1.md). Keine produktive Fachseite ist für diesen Schritt umgestaltet worden.
 
 ## Foundations v1 – konkrete Werte zur Freigabe
