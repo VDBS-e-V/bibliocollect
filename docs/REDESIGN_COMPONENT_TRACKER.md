@@ -49,7 +49,7 @@ Gemeinsame Styles: `resources/css/components/foundation-components-v3.css`. Demo
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
 |---|---|---|---|
 | K2b Navigation | Dropdown-/Overflow-Menü, Tooltip, Popover, mobile Navigation, globale Seitentoolbar | echtes Schließen per Escape, Fokus und Klick außerhalb, zugängliche Menüführung | Offen |
-| K3b Formulare | Textarea mit Längenhinweis, Zahlen-/Datums-/Zeiteingabe, Combobox/Autocomplete, Upload, FormSection, Formular-Fehlerzusammenfassung, Feldgruppen | Browser-Autofill, Hilfetexte und Error-IDs, Drag/Drop-Fallback | Offen |
+| K3b Formulare | Textarea, native Datums-/Zahleneingabe, `datalist`, Upload, FormSection, ErrorSummary bereits als Entwurf; **noch offen**: echte asynchrone Combobox, dynamischer Zeichenzähler, erweiterte File-Interaktion und Upload-Validierung | Browser-Autofill, Hilfetexte und Error-IDs, Drag/Drop-Fallback | Teilweise umgesetzt · Review |
 | K4b Feedback/Overlay | Modal/Confirm, Toast/Statusregion, Spinner/Indeterminate, Statusblöcke, Busy/Read-only, Bulk-Aktion | Dialogfokus, Escape/Close, Async-Feedback | Offen |
 | K5 Daten | Filter-Chips, Filter-Sidebar, Zeilenlisten, Tabellen-Sortierung/Pagination, Batchtoolbar, Zeitlinie, Diagramme und barrierefreie Datenalternative | Longtext, 320px und datengetriebene Status | Offen |
 | K6 Bibliothek | MediaCard, Verfügbarkeit, Fälligkeitsstatus mit 7-Tage-Warnung, ScanInput, Exemplar-/Personenzeile, Cover-Varianten, Personenauswahl | Fachinformationen strikt vom Präsentations-API trennen | Offen |
