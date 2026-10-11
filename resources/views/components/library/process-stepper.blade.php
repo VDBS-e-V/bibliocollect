@@ -11,17 +11,19 @@
                 : 'upcoming';
         @endphp
         <li @class(['bc-process-stepper__step', 'bc-process-stepper__step--'.$status]) @if ($status === 'current') aria-current="step" @endif>
-            <span class="bc-process-stepper__node" aria-hidden="true">
-                @if ($status === 'done') ✓
-                @elseif ($status === 'error') !
-                @else {{ $loop->iteration }}
-                @endif
-            </span>
-            <span class="bc-process-stepper__copy">
-                <strong>{{ $step['label'] ?? 'Schritt '.$loop->iteration }}</strong>
-                @if (filled($step['description'] ?? null))
-                    <span>{{ $step['description'] }}</span>
-                @endif
+            <span class="bc-process-stepper__group">
+                <span class="bc-process-stepper__node" aria-hidden="true">
+                    @if ($status === 'done') ✓
+                    @elseif ($status === 'error') !
+                    @else {{ $loop->iteration }}
+                    @endif
+                </span>
+                <span class="bc-process-stepper__copy">
+                    <strong>{{ $step['label'] ?? 'Schritt '.$loop->iteration }}</strong>
+                    @if (filled($step['description'] ?? null))
+                        <span>{{ $step['description'] }}</span>
+                    @endif
+                </span>
             </span>
         </li>
     @endforeach
