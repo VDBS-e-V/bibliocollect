@@ -1,6 +1,7 @@
 import './class-picker.js';
 import './catalog-suggest.js';
 import './ui-interactions.js';
+import './ui-data-previews.js';
 
 // Texteditor nur laden, wenn die Seite ein Feld dafür hat.
 const richTextFields = document.querySelectorAll('textarea[data-rich-text]');
