@@ -15,7 +15,12 @@
     $hasCover = filled($src) && ! str_contains((string) $src, 'catalog-cover-placeholder.svg');
 @endphp
 
-<span {{ $attributes->class(['bc-library-cover', 'bc-library-cover--'.$size]) }}>
+<span {{ $attributes->class([
+    'bc-library-cover',
+    'bc-library-cover--'.$size,
+    'bc-library-cover--long-title' => mb_strlen($safeTitle) > 39,
+    'bc-library-cover--very-long-title' => mb_strlen($safeTitle) > 72,
+]) }}>
     @if ($hasCover)
         <img class="bc-library-cover__image" src="{{ $src }}" alt="" loading="lazy">
     @else
