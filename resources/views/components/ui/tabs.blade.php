@@ -12,10 +12,10 @@
     <ul class="bc-tabs__list">
         @foreach ($items as $item)
             <li>
-                @if (! empty($item['disabled']))
+                @if (! empty($item['disabled']) || blank($item['href'] ?? null))
                     <span class="bc-tabs__link bc-tabs__link--disabled" aria-disabled="true">{{ $item['label'] ?? 'Tab' }}</span>
                 @else
-                    <a href="{{ $item['href'] ?? '#' }}"
+                    <a href="{{ $item['href'] }}"
                        @class(['bc-tabs__link', 'bc-tabs__link--active' => ! empty($item['active'])])
                        @if (! empty($item['active'])) aria-current="page" @endif>{{ $item['label'] ?? 'Tab' }}</a>
                 @endif
