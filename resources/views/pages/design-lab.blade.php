@@ -3,6 +3,7 @@
         $screen = $screen ?? 'index';
         $nav = [
             ['key' => 'index', 'label' => 'Übersicht', 'route' => 'public.design-lab'],
+            ['key' => 'designsystem', 'label' => 'Designsystem', 'route' => 'public.design-lab.designsystem'],
             ['key' => 'startseite', 'label' => 'Startseite', 'route' => 'public.design-lab.home'],
             ['key' => 'medien', 'label' => 'Mediendetail', 'route' => 'public.design-lab.media'],
             ['key' => 'assistent', 'label' => 'Assistent', 'route' => 'public.design-lab.wizard'],
