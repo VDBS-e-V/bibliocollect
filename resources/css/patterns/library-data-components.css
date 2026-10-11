@@ -21,10 +21,10 @@
 .bc-availability__detail,
 .bc-due-status__detail,
 .bc-due-status__date { color:var(--text-secondary); font-size:.8rem; line-height:1.4; overflow-wrap:anywhere; }
-.bc-availability--available,
-.bc-due-status--normal { --bc-status-accent:var(--action-success); --bc-status-soft:7%; }
+.bc-availability--available { --bc-status-accent:var(--action-success); --bc-status-soft:7%; }
 .bc-availability--on-loan,
-.bc-availability--reserved,
+.bc-due-status--normal { --bc-status-accent:var(--border-strong); --bc-status-soft:3%; }
+.bc-availability--reserved { --bc-status-accent:var(--action-secondary); --bc-status-soft:5%; }
 .bc-due-status--soon,
 .bc-due-status--today { --bc-status-accent:var(--action-warning); --bc-status-soft:8%; }
 .bc-availability--unavailable,
