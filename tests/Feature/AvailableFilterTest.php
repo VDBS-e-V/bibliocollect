@@ -72,7 +72,7 @@ it('offers the filter on the search pages for the public and for staff', functio
 
     $staff = User::factory()->create(['email_verified_at' => now()]);
     app(AssignRoleAction::class)->execute($staff, 'staff');
-    $this->actingAs($staff)->get(route('pos.catalog.index'))->assertOk()->assertSee('Nur jetzt verfügbare Titel');
+    $this->actingAs($staff)->get(route('pos.catalog.index'))->assertOk()->assertSee('Jetzt verfügbar')->assertSee('name="available_only"', false);
     $this->actingAs($staff)->get(route('pos.catalog.index', ['available_only' => 1]))->assertOk();
 
     // Das Filterkennzeichen bleibt beim Blättern erhalten und ungültige Werte werden abgelehnt.
