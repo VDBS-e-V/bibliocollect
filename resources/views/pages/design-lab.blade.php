@@ -1,14 +1,16 @@
 <x-app-shell surface="public" title="Designstudio · BiblioCollect">
     @php
         $screen = $screen ?? 'index';
+        $legacyScreens = ['startseite', 'medien', 'assistent', 'dashboard', 'portal'];
+        $isLegacy = in_array($screen, $legacyScreens, true);
         $nav = [
             ['key' => 'index', 'label' => 'Übersicht', 'route' => 'public.design-lab'],
             ['key' => 'designsystem', 'label' => 'Designsystem', 'route' => 'public.design-lab.designsystem'],
-            ['key' => 'startseite', 'label' => 'Startseite', 'route' => 'public.design-lab.home'],
-            ['key' => 'medien', 'label' => 'Mediendetail', 'route' => 'public.design-lab.media'],
-            ['key' => 'assistent', 'label' => 'Assistent', 'route' => 'public.design-lab.wizard'],
-            ['key' => 'dashboard', 'label' => 'Dashboard', 'route' => 'public.design-lab.dashboard'],
-            ['key' => 'portal', 'label' => 'Portal', 'route' => 'public.design-lab.portal'],
+            ['key' => 'startseite', 'label' => 'Startseite · Alt', 'route' => 'public.design-lab.home'],
+            ['key' => 'medien', 'label' => 'Mediendetail · Alt', 'route' => 'public.design-lab.media'],
+            ['key' => 'assistent', 'label' => 'Assistent · Alt', 'route' => 'public.design-lab.wizard'],
+            ['key' => 'dashboard', 'label' => 'Dashboard · Alt', 'route' => 'public.design-lab.dashboard'],
+            ['key' => 'portal', 'label' => 'Portal · Alt', 'route' => 'public.design-lab.portal'],
             ['key' => 'komponenten', 'label' => 'Komponenten', 'route' => 'public.design-lab.components'],
         ];
         $wizardSteps = [
@@ -31,6 +33,16 @@
                 @endforeach
             </div>
         </nav>
+        @if ($isLegacy)
+            <aside class="bc-design-lab__legacy-notice" aria-label="Status dieses Entwurfs">
+                <div>
+                    <span class="bc-design-lab__legacy-tag">Älterer Entwurf</span>
+                    <strong>Diese Musterseite ist eine frühere Designstudie.</strong>
+                    <p>Wir entwickeln zurzeit ausschließlich die universellen Komponenten. Die endgültigen Seiten gestalten wir erst, wenn die Komponentenbibliothek vollständig geprüft und freigegeben ist.</p>
+                </div>
+                <a href="{{ route('public.design-lab.components') }}">Aktuelle Komponenten ansehen <span aria-hidden="true">→</span></a>
+            </aside>
+        @endif
         @if ($screen === 'designsystem')
             <p class="bc-design-lab__notice">Die folgenden Zahlen stammen aus dem <strong>Designsystem-Masterplan</strong> und beschreiben die geplante Struktur – keine Live-Statistiken oder bereits vollständig umgestellten Seiten.</p>
         @else
@@ -41,7 +53,7 @@
             <header class="bc-design-lab__intro">
                 <span class="bc-design-lab__kicker">VDBS / BiblioCollect · Designstudie 04</span>
                 <h1>Ein System.<br><em>Mehr Raum für Ideen.</em></h1>
-                <p>Fünf eigenständige Beispielseiten und eine Komponentenbibliothek. Die Studie verbindet lebendige Überlagerungen nach deiner Oodi-Referenz mit einer modernen Prozessachse, Bento-Statistiken und klaren Statusmeldungen.</p>
+                <p><strong>Aktueller Arbeitsbereich: die Komponentenbibliothek.</strong> Die fünf eigenständigen Musterseiten sind frühere Designstudien und ausdrücklich noch keine finalen Seiten. Wir gestalten zuerst alle wiederverwendbaren Elemente.</p>
             </header>
 
             <a class="bc-design-lab__system-banner" href="{{ route('public.design-lab.designsystem') }}">
@@ -56,27 +68,32 @@
             </a>
             <div class="bc-design-lab__overview">
                 <a href="{{ route('public.design-lab.home') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--feature">
+                    <span class="bc-design-lab__tile-status">Älterer Entwurf</span>
                     <span class="bc-design-lab__kicker">01 / Startseite</span>
                     <strong>Entdecken<br>beginnt hier.</strong>
                     <span>Editorial Overlap, Suche und Bibliotheksangebote <span aria-hidden="true">↗</span></span>
                     <img src="/brand/vdbs/figures-chain.svg" alt="" loading="lazy">
                 </a>
                 <a href="{{ route('public.design-lab.media') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--media">
+                    <span class="bc-design-lab__tile-status">Älterer Entwurf</span>
                     <span class="bc-design-lab__kicker">02 / Medien</span>
                     <strong>Geschichten<br>mit Raum.</strong>
                     <span>Mediendetails und mehrzeilige Titel <span aria-hidden="true">↗</span></span>
                 </a>
                 <a href="{{ route('public.design-lab.wizard') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--wizard">
+                    <span class="bc-design-lab__tile-status">Älterer Entwurf</span>
                     <span class="bc-design-lab__kicker">03 / Arbeitsablauf</span>
                     <strong>Schritt für<br>Schritt.</strong>
                     <span>Moderner horizontaler Prozess-Tracker <span aria-hidden="true">↗</span></span>
                 </a>
                 <a href="{{ route('public.design-lab.dashboard') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--dashboard">
+                    <span class="bc-design-lab__tile-status">Älterer Entwurf</span>
                     <span class="bc-design-lab__kicker">04 / Dashboard</span>
                     <strong>Alles im<br>Überblick.</strong>
                     <span>Bento-Grid und Statusmeldungen <span aria-hidden="true">↗</span></span>
                 </a>
                 <a href="{{ route('public.design-lab.portal') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--portal">
+                    <span class="bc-design-lab__tile-status">Älterer Entwurf</span>
                     <span class="bc-design-lab__kicker">05 / Persönliches Portal</span>
                     <strong>Fristen zuerst.<br>Deine Bibliothek.</strong>
                     <span>Großzügiger Einstieg und kompakte Medienlisten <span aria-hidden="true">↗</span></span>
