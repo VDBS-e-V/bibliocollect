@@ -89,7 +89,7 @@
                 </x-ui.select>
                 <x-ui.input name="bc-demo-disabled" id="bc-demo-disabled" label="Deaktiviertes Feld" value="Nicht bearbeitbar" disabled />
             </div>
-            <div class="bc-core-gallery__example-footer">Die Beispiele stehen nicht in einem Formular und übertragen keine Daten. Eine Fehleranzeige enthält Text und nicht nur eine andere Rahmenfarbe.</div>
+            <div class="bc-core-gallery__example-footer">Die Felder stehen direkt unter ihren Labels auf derselben Höhe. Hilfetexte und Fehlermeldungen folgen unterhalb des Feldes. Diese Beispiele übertragen keine Daten.</div>
         </div>
         <div class="bc-core-gallery__component-note"><code>&lt;x-ui.input&gt; / &lt;x-ui.select&gt;</code><span>label, hint, error, disabled · Fokus und aria-describedby</span></div>
     </section>
