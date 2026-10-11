@@ -1,25 +1,53 @@
 <x-app-shell surface="public" title="Katalog">
     <x-content.block key="home.notice" />
 
-    {{-- Wiederverwendbare öffentliche Markenbühne: Suche bleibt die echte Katalogroute. --}}
+    {{-- Die Markenbühne verwendet ausschließlich öffentliche, vorhandene Daten. --}}
+    @php
+        $heroSuggestions = array_slice(array_merge($showcase['recommended'] ?? [], $showcase['new'] ?? []), 0, 2);
+    @endphp
+
     <section class="bc-public-home-stage" aria-labelledby="home-heading">
         <div class="bc-public-home-stage__copy">
-            <p class="bc-public-home-stage__eyebrow">BiblioCollect · VDBS</p>
-            <h1 id="home-heading">Die Schulbibliothek.</h1>
-            <p class="bc-public-home-stage__lead">Medien finden, ausleihen und gemeinsam entdecken. Deine Schulbibliothek ist ein Ort für Geschichten, Wissen und neue Ideen.</p>
+            <p class="bc-public-home-stage__eyebrow">Deine Schulbibliothek</p>
+            <h1 id="home-heading">
+                <span>Hier beginnt</span>
+                <span class="bc-public-home-stage__accent">deine nächste</span>
+                <span>Geschichte.</span>
+            </h1>
+            <p class="bc-public-home-stage__lead">Finde Bücher, die dich begeistern. Entdecke neue Themen und nutze die Bibliothek ganz nach deinen Ideen.</p>
 
             <div class="bc-public-home-stage__search">
-                <h2 id="catalog-heading">Katalog durchsuchen</h2>
-                <x-library.catalog-search id="catalog-search" />
+                <h2 id="catalog-heading" class="sr-only">Katalog durchsuchen</h2>
+                <x-library.catalog-search id="catalog-search" placeholder="Buchtitel, Autor:in oder Thema …" />
                 <div class="bc-public-home-stage__links">
+                    <span>Direkt entdecken:</span>
+                    <a href="{{ route('public.catalog.index') }}">Alle Medien</a>
+                    <a href="{{ route('public.series.index') }}">Buchreihen</a>
                     <a href="{{ route('public.catalog.advanced') }}">Erweiterte Suche</a>
-                    <a href="{{ route('public.series.index') }}">Buchreihen entdecken</a>
                 </div>
             </div>
         </div>
 
         <div class="bc-public-home-stage__art" aria-hidden="true">
-            <img src="/brand/vdbs/figures-chain.svg" alt="">
+            <p class="bc-hero-feature-label">{{ $heroSuggestions !== [] ? 'Für dich entdeckt' : 'Lesen öffnet Welten.' }}</p>
+            <div class="bc-hero-books">
+                @if ($heroSuggestions === [])
+                    {{-- Nur dekorative Platzhalter, keine erfundenen Medienbestände. --}}
+                    <div class="bc-hero-book bc-hero-book--back">
+                        <x-library.media-cover title="Was wäre, wenn?" author="Neue Ideen entdecken" variant="mint" size="hero" />
+                    </div>
+                    <div class="bc-hero-book bc-hero-book--front">
+                        <x-library.media-cover title="Zwischen den Zeilen" author="Lesen öffnet Welten" variant="plum" size="hero" />
+                    </div>
+                @else
+                    @foreach ($heroSuggestions as $tile)
+                        <div @class(['bc-hero-book', 'bc-hero-book--back' => $loop->first, 'bc-hero-book--front' => ! $loop->first])>
+                            <x-library.media-cover :src="$tile['cover']" :title="$tile['title']" :author="$tile['authors']" size="hero" />
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <p class="bc-hero-feature-caption">Ein Ort für alle Ideen.</p>
         </div>
     </section>
 
@@ -132,7 +160,7 @@
                 </div>
             </section>
 
-            <section class="bc-content-section" aria-labelledby="hours-heading">
+            <section class="bc-content-section" id="oeffnungszeiten" aria-labelledby="hours-heading">
                 <div class="bc-section-heading">
                     <h2 id="hours-heading">Öffnungszeiten</h2>
                 </div>
