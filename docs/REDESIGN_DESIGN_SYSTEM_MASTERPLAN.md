@@ -9,7 +9,7 @@
 
 - Die kanonische Hierarchie Token → Component → Pattern → Template → Page steht bereits in docs/DESIGN_SYSTEM.md.
 - resources/css/tokens.css enthält VDBS-Farben (Grün #2DC08E, Lila #58275A, Ink #0F172A), semantische Tokens, Lato/Neuland/Source Serif 4 und einen manuell gesteuerten Dunkelmodus.
-- Der Branch enthält 23 Blade-Dateien unter resources/views/components/, darunter app-shell, Buttons, Input, Select, Tabelle, Badge, Alert, MediaCover, FeatureOverlap, ProcessStepper, StatTile, NoticePanel.
+- Der Branch enthält 22 Blade-Dateien unter resources/views/components/, darunter app-shell, Buttons, Input, Select, Tabelle, Badge, Alert, MediaCover, FeatureOverlap, ProcessStepper, StatTile, NoticePanel.
 - Es gibt vier reale Oberflächen: Public, Portal, Pos (Betrieb), Administration. Auth/Identity, Fehlerseiten, Mail und Druck sind Querschnittsbereiche.
 - resources/views/pages/ enthält rund 112 Seitendateien inkl. Teilansichten und Demo-Seiten. Nicht jede davon benötigt ein eigenes Template.
 - Die Designvorschauen /design-review und /design-lab sind Entwürfe und ersetzen keine produktiven Fachseiten.
