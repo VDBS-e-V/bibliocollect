@@ -146,3 +146,14 @@
 @media (prefers-reduced-motion: reduce) {
     .bc-design-lab__overview-card { transition: none; }
 }
+
+
+/* Mark old page concepts explicitly: only components and Foundations are active. */
+.bc-design-lab__legacy-notice { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem 2rem; margin-top:1.15rem; padding:1.1rem 1.4rem; border:1px solid var(--border-strong); border-left:4px solid var(--action-secondary); background:var(--bg-surface-muted); }
+.bc-design-lab__legacy-notice > div { max-width:47rem; }
+.bc-design-lab__legacy-tag { display:inline-block; margin-bottom:.4rem; padding:.15rem .5rem; border:1px solid var(--border-default); border-radius:var(--radius-sm); background:var(--bg-surface); color:var(--text-primary); font-size:.72rem; font-weight:900; }
+.bc-design-lab__legacy-notice strong { display:block; font-size:.96rem; line-height:1.35; }
+.bc-design-lab__legacy-notice p { margin:.3rem 0 0; color:var(--text-secondary); font-size:.85rem; line-height:1.55; }
+.bc-design-lab__legacy-notice a { display:inline-flex; align-items:center; gap:.55rem; min-height:2.75rem; color:var(--link-default); font-size:.85rem; font-weight:800; text-underline-offset:.2em; }
+.bc-design-lab__legacy-notice a:focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px; }
+.bc-design-lab__tile-status { display:inline-block; width:fit-content; margin-bottom:1rem; padding:.25rem .55rem; border:1px solid currentColor; border-radius:.3rem; font-size:.7rem; line-height:1.4; font-weight:900; letter-spacing:.02em; }
