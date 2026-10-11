@@ -348,3 +348,46 @@
     .bc-system-map__section { break-inside: avoid; }
     .bc-system-map__family { break-inside: avoid; }
 }
+
+
+/* Einstiegslink auf der bestehenden Designlab-Startseite */
+.bc-design-lab__system-banner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+    gap: 1.5rem;
+    margin-bottom: 1.2rem;
+    padding: clamp(1.5rem,3vw,2.5rem);
+    background: var(--bg-brand-soft);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    text-decoration: none;
+    align-items: center;
+}
+.bc-design-lab__system-banner:visited { color: var(--text-primary); }
+.bc-design-lab__system-banner:hover { border-color: var(--action-success); text-decoration: none; }
+.bc-design-lab__system-banner:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 4px; }
+.bc-design-lab__system-banner-copy { display: grid; gap: .8rem; min-width: 0; }
+.bc-design-lab__system-banner-copy > small { color: var(--action-success); font-size: .72rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+.bc-design-lab__system-banner-copy > strong { max-width: 29rem; font-size: clamp(1.5rem,2.7vw,2.6rem); line-height: 1.15; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.bc-design-lab__system-banner-copy > span { font-size: .86rem; line-height: 1.55; }
+.bc-design-lab__system-banner-visual { display: grid; gap: .3rem; min-width: 0; }
+.bc-design-lab__system-banner-visual span {
+    padding: .55rem .8rem;
+    background: var(--bg-surface);
+    border-left: 3px solid var(--action-primary);
+    font-size: .75rem;
+    font-weight: 800;
+}
+.bc-design-lab__system-banner-visual span:nth-child(2) { margin-inline-start: 8%; }
+.bc-design-lab__system-banner-visual span:nth-child(3) { margin-inline-start: 16%; }
+.bc-design-lab__system-banner-visual span:nth-child(4) { margin-inline-start: 24%; }
+.bc-design-lab__system-banner-visual span:nth-child(5) { margin-inline-start: 32%; }
+@media(max-width: 46rem) {
+    .bc-design-lab__system-banner { grid-template-columns: 1fr; }
+    .bc-design-lab__system-banner-visual { display: flex; flex-wrap: wrap; }
+    .bc-design-lab__system-banner-visual span,
+    .bc-design-lab__system-banner-visual span:nth-child(n) { margin: 0; }
+}
+@media print {
+    .bc-design-lab__system-banner { break-inside: avoid; }
+}
