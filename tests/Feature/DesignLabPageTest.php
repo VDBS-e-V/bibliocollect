@@ -35,6 +35,9 @@ it('rendert den Fortschrittstracker mit korrekten Schrittsignalen und aria-curre
         ->toContain('bc-process-stepper__step--done')
         ->toContain('bc-process-stepper__step--current')
         ->toContain('bc-process-stepper__step--upcoming')
+        ->toContain('bc-process-stepper__group')
+        ->toContain('bc-process-stepper__node')
+        ->toContain('bc-process-stepper__copy')
         ->toContain('Daten prüfen')
         ->toContain('Importstatus');
 });
