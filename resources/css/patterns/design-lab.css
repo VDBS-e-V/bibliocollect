@@ -38,6 +38,8 @@
 .bc-design-lab__overview-card--feature .bc-design-lab__kicker { color: var(--vdbs-green); }
 .bc-design-lab__overview-card--media { background: var(--bg-brand-soft); color: var(--vdbs-ink); }
 .bc-design-lab__overview-card--media:visited { color: var(--vdbs-ink); }
+.bc-design-lab__overview-card--portal { background: var(--bg-brand-soft); color: var(--text-primary); }
+.bc-design-lab__overview-card--portal > strong { max-width: 20ch; }
 .bc-design-lab__overview-card--dashboard { background: var(--vdbs-ink); color: var(--vdbs-white); }
 .bc-design-lab__overview-card--dashboard:visited { color: var(--vdbs-white); }
 .bc-design-lab__overview-card--library { grid-column: span 2; }
