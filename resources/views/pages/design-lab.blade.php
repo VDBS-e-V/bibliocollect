@@ -8,6 +8,7 @@
             ['key' => 'medien', 'label' => 'Mediendetail', 'route' => 'public.design-lab.media'],
             ['key' => 'assistent', 'label' => 'Assistent', 'route' => 'public.design-lab.wizard'],
             ['key' => 'dashboard', 'label' => 'Dashboard', 'route' => 'public.design-lab.dashboard'],
+            ['key' => 'portal', 'label' => 'Portal', 'route' => 'public.design-lab.portal'],
             ['key' => 'komponenten', 'label' => 'Komponenten', 'route' => 'public.design-lab.components'],
         ];
         $wizardSteps = [
