@@ -97,7 +97,7 @@ Styles in `resources/css/components/foundation-components-v3.css`, Vorführseite
 
 **Erst nach K7** beginnen wir mit gezielten echten Fachseiten (zunächst je eine repräsentative Seite pro Surface). Bis dahin bleiben deren Controller, Blade-Templates und Aktionen unangetastet.
 
-## 6. Keine unkontrollierte Component-Duplikation
+## 7. Keine unkontrollierte Component-Duplikation
 
 - \`x-ui.card\` bleibt die allgemeine Flächenkomponente, es gibt keine zweite Universal-\`panel\`-Komponente für dieselbe Aufgabe.
 - \`x-ui.page-header\` für H1/Seitenanfang, \`x-ui.section-heading\` für H2–H4.
