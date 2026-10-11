@@ -98,7 +98,7 @@ Für die vollständige Umsetzungs- und Freigabematrix siehe [Komponententracker]
 - \`x-ui.badge\` wird nicht zu einer klickbaren Aktion umgedeutet.
 - \`x-library.process-stepper\` bleibt rein visuelle Prozessanzeige, keine indirekte Routen-/Speicherlogik.
 
-## 6. Gezielte Tests in dieser Runde
+## 7. Gezielte Tests in dieser Runde
 
 - \`tests/Feature/ComponentLibraryV1Test.php\`: Gallery, Dichteauswahl, Varianten, Blade-Verträge, sichere nicht schreibende Vorschau.
 - \`tests/Feature/DesignLabPageTest.php\`: vorhandene Designlab-Routen und Stepper.
