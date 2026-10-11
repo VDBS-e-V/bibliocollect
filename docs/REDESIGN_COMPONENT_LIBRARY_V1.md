@@ -106,7 +106,7 @@ Styles in `resources/css/components/foundation-components-v3.css`, Vorführseite
 - \`x-ui.badge\` wird nicht zu einer klickbaren Aktion umgedeutet.
 - \`x-library.process-stepper\` bleibt rein visuelle Prozessanzeige, keine indirekte Routen-/Speicherlogik.
 
-## 7. Gezielte Tests in dieser Runde
+## 8. Gezielte Tests in dieser Runde
 
 - \`tests/Feature/ComponentLibraryV1Test.php\`: Gallery, Dichteauswahl, Varianten, Blade-Verträge, sichere nicht schreibende Vorschau.
 - \`tests/Feature/DesignLabPageTest.php\`: vorhandene Designlab-Routen und Stepper.
