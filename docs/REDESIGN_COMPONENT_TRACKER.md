@@ -61,6 +61,8 @@ CSS: `resources/css/components/foundation-components-v4.css`; kleine gemeinsame 
 
 **Keine Duplikation der produktiven Bestätigungsfunktion:** Der vorhandene `data-confirm`-Handler bleibt für echte Aktionen zuständig; `x-ui.dialog` zeigt hier nur Präsentation und API. Reale Fachaktionen, Bestätigungsfolgen und Erfolgsmeldungen werden erst bei der späteren Seitenintegration angebunden.
 
+**Statusgestaltungs-Review (nach Nutzerfeedback):** Der generische Dialog `x-ui.dialog` nutzt jetzt **10px Radius**; bei `tone=warning` gibt es **keine volle obere Farblinie**, sondern einen kurzen Akzent im Header. Toasts (`x-ui.toast`) nutzen **8px Radius**, dezente Tönung mit bestehenden semantischen Statusfarben und eine kurze 44px-Akzentleiste oben links **anstelle der langen Seitenlinien**. Der Dialogfooter kommt ohne zusätzliche Trennlinie aus. Die Änderungen sind in `foundation-components-v4.css` enthalten und betreffen die Opt-in-Komponenten, nicht die produktive Bestätigungslogik. Tests: `ComponentLibraryV4Test.php`. Visuelle Freigabe noch offen.
+
 **Weitere Reviewpunkte:** Fokusführung in komplexen Dialogen, Tooltip-Touchverhalten, Menüpositionierung in engen Containern, fokussierbare Popover-Inhalte und automatische Live-Feedback-Anbindung. „Entwurf“ bleibt korrekt bis zur interaktiven Browser- und Accessibility-Abnahme.
 
 ## 2. Noch notwendige Komponentenfamilien und Patterns
