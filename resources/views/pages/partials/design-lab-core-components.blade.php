@@ -25,6 +25,10 @@
         <a href="#bc-core-form-groups">Formulargruppen</a>
         <a href="#bc-core-filter-chips">Filterchips</a>
         <a href="#bc-core-list-rows">Listenzeilen</a>
+        <a href="#bc-core-overlays">Menüs & Hilfe</a>
+        <a href="#bc-core-dialogs">Dialoge</a>
+        <a href="#bc-core-notifications">Meldungen</a>
+        <a href="#bc-core-loading">Laden</a>
         <a href="#bc-core-patterns">Größere Patterns</a>
     </nav>
 
@@ -190,6 +194,8 @@
     @include('pages.partials.design-lab-components-v2')
 
     @include('pages.partials.design-lab-components-v3')
+
+    @include('pages.partials.design-lab-components-v4')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
