@@ -52,6 +52,12 @@ it('zeigt lange Titel, Warnzustand und leere Konten ohne produktive Portalaktion
         ->toContain('Überfällig')
         ->toContain('Konto noch nicht verknüpft')
         ->toContain('Noch keine Ausleihen')
-        ->not->toContain('name="_token"')
-        ->not->toContain('route("portal.loans.renew")');
+        ->toContain('Verlängern (Demo)');
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
+    $xpath = new DOMXPath($dom);
+
+    // Die eigene Mustervorlage besitzt keine Schreibformulare.
+    expect($xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " bc-portal-study ")]//form')->length)->toBe(0);
 });
