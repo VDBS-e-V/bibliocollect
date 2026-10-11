@@ -70,3 +70,46 @@ it('enthält keine schreibenden Demoformulare im Komponentenbereich', function (
 
     expect($xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " bc-core-gallery ")]//form')->length)->toBe(0);
 });
+
+
+it('platziert Hilfetexte und Fehler unter Eingabefeldern statt zwischen Label und Feld', function (): void {
+    $input = Blade::render('<x-ui.input label="Medientitel" name="review-input" hint="Ein erklärender Hinweis." error="Bitte prüfen." />');
+    $select = Blade::render('<x-ui.select label="Medientyp" name="review-select" hint="Wähle einen Typ." error="Bitte auswählen."><option value="book">Buch</option></x-ui.select>');
+
+    foreach ([
+        ['html' => $input, 'control' => 'input', 'id' => 'review-input'],
+        ['html' => $select, 'control' => 'select', 'id' => 'review-select'],
+    ] as $case) {
+        $dom = new DOMDocument;
+        @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$case['html'], LIBXML_NOERROR | LIBXML_NOWARNING);
+        $xpath = new DOMXPath($dom);
+
+        $label = $xpath->query('//label[@for="'.$case['id'].'"]')->item(0);
+        $control = $xpath->query('//'.$case['control'].'[@id="'.$case['id'].'"]')->item(0);
+        $error = $xpath->query('//p[@id="'.$case['id'].'-error"]')->item(0);
+        $hint = $xpath->query('//p[@id="'.$case['id'].'-hint"]')->item(0);
+
+        expect($label)->not->toBeNull()
+            ->and($control)->not->toBeNull()
+            ->and($error)->not->toBeNull()
+            ->and($hint)->not->toBeNull();
+
+        $children = [];
+        foreach ($control->parentNode->childNodes as $child) {
+            if ($child instanceof DOMElement) {
+                $children[] = $child->tagName;
+            }
+        }
+
+        expect($children)->toBe(['label', $case['control'], 'p', 'p'])
+            ->and($control->getAttribute('aria-describedby'))->toBe($case['id'].'-error '.$case['id'].'-hint')
+            ->and($control->getAttribute('aria-invalid'))->toBe('true');
+    }
+});
+
+it('zeigt Felder ohne Hilfetext weiterhin direkt nach dem Label an', function (): void {
+    $html = Blade::render('<x-ui.input label="Barcode" name="review-simple" />');
+    expect($html)->toMatch('/<label[^>]*>Barcode<\/label>\s*<input/s')
+        ->not->toContain('review-simple-hint')
+        ->not->toContain('review-simple-error');
+});
