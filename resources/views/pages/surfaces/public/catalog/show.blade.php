@@ -38,7 +38,7 @@
     <header class="bc-public-title-header" id="top">
         <div class="bc-public-title-header__cover">
             <span class="bc-public-title-cover-frame">
-                <img src="{{ $coverUrl }}" alt="" class="bc-public-title-cover">
+                <x-library.media-cover :src="$coverUrl" :title="$title->preferred_title" :author="$title->contributions->pluck('contributor.display_name')->filter()->take(2)->join(', ')" size="large" />
             </span>
         </div>
 
@@ -430,7 +430,7 @@
                 <summary>Hinweise zu den Angaben</summary>
                 <p><strong>Metadaten:</strong> Bibliografische Angaben können aus DNB-/Normdaten und lokalen Kataloginformationen stammen. Die Quelle steht unter „Metadatenquelle“, wenn sie bekannt ist.</p>
                 <p><strong>Verfügbarkeit:</strong> „Verfügbar“ heißt: Mindestens ein nutzbares Exemplar ist gerade nicht ausgeliehen. Beschädigte, verlorene oder ausgesonderte Exemplare zählen nicht mit.</p>
-                <p><strong>Cover:</strong> Der Katalog verwendet nur lokal gespeicherte Cover. Fehlt ein Bild, erscheint ein neutraler Platzhalter.</p>
+                <p><strong>Cover:</strong> Der Katalog verwendet nur lokal gespeicherte Cover. Fehlt ein Bild, wird ein individuell gestaltetes Ersatzcover aus Titel und Verantwortlichen angezeigt.</p>
             </details>
         </aside>
     </div>
