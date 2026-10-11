@@ -26,8 +26,9 @@
 
     <div class="bc-review" id="design-review-top">
         <header class="bc-review-intro">
-            <p class="bc-review-eyebrow">BiblioCollect · Designreview</p>
+            <p class="bc-review-eyebrow">BiblioCollect · Designreview · Älterer Entwurf</p>
             <h1>Alle Vorlagen.<br><span>Ein Designsystem.</span></h1>
+            <p><strong>Älterer Entwurf:</strong> Dieser frühere Vorlagenatlas ist nur Vergleichsmaterial. Der aktuelle Arbeitsstand befindet sich in der <a href="{{ route('public.design-lab.components') }}">Komponentenbibliothek →</a>. Finale Seiten werden erst nach deren vollständiger Abnahme gestaltet.</p>
             <p>Zwölf Seitentypen und die wichtigsten gemeinsamen Komponenten – zum direkten visuellen Vergleich. Alle Medien, Personen und Vorgänge auf dieser Seite sind <strong>fiktive Beispieldaten</strong>. Es werden keine echten Ausleihen oder Verwaltungsaktionen ausgeführt.</p>
             <div class="bc-review-intro__meta">
                 <span>VDBS-Designsystem</span>
