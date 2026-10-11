@@ -94,6 +94,10 @@ Es bleiben `Lato`, `Neuland`, `Source Serif 4`. Eine textliche Rolle entscheidet
 
 **Regel:** vertikalen Rhythmus über `gap` und zentrale Layout-Komponenten erzeugen; keine zufälligen Einzel-`margin`-Werte als neues Layoutsystem.
 
+### Formularfelder – gemeinsame Struktur (beschlossen)
+
+Für `x-ui.input` und `x-ui.select` gilt künftig die visuelle Reihenfolge **Label → Feld → Fehlertext (falls vorhanden) → Hilfetext (falls vorhanden)**. Beim Vergleich in zwei Spalten stehen die Bedienelemente auf gleicher Höhe, auch wenn nur eines einen Hilfetext besitzt. Die `aria-describedby`-Verweise bleiben erhalten. Bei sehr langen Labels kann es dennoch Zeilenumbrüche geben; das wird responsiv geprüft.
+
 ## 4. Größen und Dichte
 
 | Element | Comfortable | Compact | Hinweise |
