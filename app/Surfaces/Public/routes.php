@@ -29,6 +29,7 @@ if (app()->environment(['local', 'testing'])) {
     Route::view('/design-lab/medien', 'pages.design-lab', ['screen' => 'medien'])->name('public.design-lab.media');
     Route::view('/design-lab/assistent', 'pages.design-lab', ['screen' => 'assistent'])->name('public.design-lab.wizard');
     Route::view('/design-lab/dashboard', 'pages.design-lab', ['screen' => 'dashboard'])->name('public.design-lab.dashboard');
+    Route::view('/design-lab/portal', 'pages.design-lab', ['screen' => 'portal'])->name('public.design-lab.portal');
     Route::view('/design-lab/komponenten', 'pages.design-lab', ['screen' => 'komponenten'])->name('public.design-lab.components');
     Route::view('/design-lab/designsystem', 'pages.design-lab', ['screen' => 'designsystem'])->name('public.design-lab.designsystem');
 }
