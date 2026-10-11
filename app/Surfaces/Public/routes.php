@@ -18,6 +18,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', PublicHomeController::class)->name('public.home');
 
+// Designatlas nur auf lokalen/Test-Systemen – keine internen Beispielabläufe in Produktion.
+if (app()->environment(['local', 'testing'])) {
+    Route::view('/design-review', 'pages.design-review')->name('public.design-review');
+}
+
 Route::get('/katalog', CatalogIndexController::class)
     ->name('public.catalog.index');
 
