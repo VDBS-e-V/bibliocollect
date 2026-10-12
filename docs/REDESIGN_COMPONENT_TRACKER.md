@@ -228,3 +228,15 @@ Finale Seiten entstehen **erst**, wenn:
 Zuerst \`/design-lab/komponenten\`: Dichte, Buttons, Formulare, Flächen, Badges, Tabellen; dann die neue Navigation, Auswahl, Ladezustände und Akkordeons. Nach jeder Runde konkrete Reviewfragen beantworten und Änderungen vor Übernahme in die Standard-API prüfen.
 
 Andere Designlab-Musterseiten bleiben Vergleichsmaterial, aber werden während dieser Phase **nicht** als finale Vorlagen oder vollständig auf neue Tokens migrierte Seiten bezeichnet.
+
+### Komponentenrunde K12 – Auswahlkarten, Anlagenliste und Kriterienprüfung
+
+Drei neue, fachneutrale **Entwurfskomponenten** in `/design-lab/komponenten` (Abschnitte 52–54):
+
+| Komponente | Schnittstelle | Abgrenzung |
+|---|---|---|
+| `x-ui.choice-cards` | `name`, `label`, `options[]`, `selected`, `multiple`, `hint/error`, `density` | Native Radio-/Checkbox-Felder, große berührbare Optionskarten; im Gegensatz zu `segmented-choice` mit längeren Erklärungstexten. Keine Speicherung. |
+| `x-ui.attachment-list` | `title`, `items[]` mit Name, Typ, Größe, Beschreibung, URL/Disabled; `density`, Actions-Slot | Metadaten bereits vorhandener Dateien, keine zweite Uploadkomponente, keine Dateiprüfung. Links nur bei echtem Ziel. |
+| `x-ui.criteria-checklist` | `items[]`, `state=met/unmet/pending/not-applicable`, `density`, Actions-Slot | Textliche Kriterienerfüllung statt Bearbeitungsfortschritt; keine automatische Validierung. |
+
+Styles: `resources/css/components/foundation-components-v12.css`; Vorschau: `resources/views/pages/partials/design-lab-components-v12.blade.php`; Tests: `tests/Feature/ComponentLibraryV12Test.php`. VDBS-Tokens bleiben unverändert, Fachseiten sind nicht betroffen. **Keine Freigabe ohne manuellen Review.** Die schon vor K12 bekannte Layoutprüfung auf mobilen Viewports ist weiterhin offen.
