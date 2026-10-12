@@ -77,7 +77,9 @@
 }
 .bc-account__portal-link {
     display: inline-flex;
+    min-width: 2.75rem;
     min-height: 2.75rem;
+    justify-content: center;
     align-items: center;
     gap: .5rem;
     color: var(--text-primary);
