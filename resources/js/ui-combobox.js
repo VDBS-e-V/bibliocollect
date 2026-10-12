@@ -111,9 +111,9 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
         const data = await response.json();
         const result = Array.isArray(data) ? data : data.options;
         if (!Array.isArray(result)) throw new Error('Invalid suggestion response');
+        if (version !== requestVersion) return;
         options = result.filter((item) => item && typeof item.label === 'string' && typeof item.value === 'string')
           .slice(0, 50).map((item) => ({ label: item.label, value: item.value, disabled: !!item.disabled }));
-        if (version !== requestVersion) return;
         render(options);
       } catch (error) {
         if (error.name !== 'AbortError' && version === requestVersion) { close(); status.textContent = 'Vorschläge konnten nicht geladen werden'; }
