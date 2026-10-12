@@ -33,3 +33,10 @@
 .bc-attachment-list__actions,.bc-criteria-checklist__actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
 .bc-attachment-list__action:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
 @media(max-width:40rem){.bc-choice-cards__grid{grid-template-columns:minmax(0,1fr)}.bc-attachment-list__action{width:100%}}
+
+/* Dark mode: error text stays readable; the established VDBS red remains a semantic accent. */
+:root[data-vdbs-theme='dark'] .bc-choice-cards__error {
+    color:var(--text-primary);
+    border-inline-start:3px solid var(--vdbs-error);
+    padding-inline-start:.65rem;
+}

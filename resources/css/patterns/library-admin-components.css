@@ -105,3 +105,8 @@ a.bc-hierarchy-tree__leaf:visited { color:var(--text-primary); }
     .bc-shelf-label-preview { box-shadow:none; }
     .bc-inline-edit__actions { display:none; }
 }
+
+/* On dark surfaces the dark-green eyebrow is too low-contrast; keep the VDBS green family. */
+:root[data-vdbs-theme='dark'] .bc-message-preview__eyebrow {
+    color:var(--vdbs-green);
+}
