@@ -103,6 +103,26 @@ Vorführdatei: `resources/views/pages/partials/design-lab-components-v6.blade.ph
 
 **Noch offen:** Reale Personensuche mit serverseitiger Berechtigung, Personendaten-Privatsphäre, Scannerhardware, mehrfach gefundene Exemplare, Bestätigungsdialoge nach echten Serverantworten, mobile-/Dark-Mode-/Zoom-/Tastatur-Abnahme sowie visuelle Freigabe. Die echten Seiten werden weiterhin nicht migriert.
 
+### Komponentenrunde K7a – Covervarianten und universelle Verwaltungspatterns
+
+Die vorhandene `x-library.media-cover` wurde um **opt-in Größenstile für Thumbnail und Small** ergänzt. Bereits vorhandene Varianten `plum`, `mint`, `ink`, `sand`, `normal` und `hero` bleiben erhalten; echte Coverdateien haben weiterhin Vorrang. Das vollständige Titel-Feld bleibt semantisch außerhalb des ggf. gekürzten Ersatzcovers. **Keine zweite Cover-Komponente.**
+
+Fünf neue fachneutrale Präsentationsbausteine (plus ein internes rekursives Tree-Node-Partial) werden unter `/design-lab/komponenten` gezeigt:
+
+| Komponente | Zweck | Review-Status |
+|---|---|---|
+| `x-ui.inline-edit` | Einzelnes Feld per nativen `details/summary` zum Bearbeiten aufklappen, bestehendes `x-ui.input` wiederverwenden | Entwurf; kein eigener Save-Handler, optionaler Actions-Slot |
+| `x-ui.hierarchy-tree` + internes `x-ui.hierarchy-node` | Verschachtelte Listen, aufklappbare Bereiche, Linkziele und aktive Bereiche | Entwurf; keine Drag-and-drop- oder Mutationslogik |
+| `x-ui.week-schedule` | Öffnungszeiten und wiederkehrende Zeitfenster aus Daten anzeigen, Comfortable/Compact | Entwurf; keine Ferien-/Feiertags- oder Speicherlogik |
+| `x-library.shelf-label-preview` | Regal- und Rückenschilder für den Designvergleich | Entwurf; **keine** alternative produktive Druckroutine/echter Barcode |
+| `x-ui.message-preview` | Empfänger, Betreff und Nachrichtenkörper für die Abnahme visualisieren | Entwurf; keine Versand-/Empfängerberechtigungslogik |
+
+Die bestehenden Druckvorlagen unter `resources/views/pages/surfaces/administration/shelves/labels*.blade.php` und `resources/views/pages/surfaces/pos/labels` bleiben unberührt. Dasselbe gilt für reale Kalender, Dokumentenversand, Benutzerkonten und produktive Medienansichten.
+
+CSS: `resources/css/patterns/library-admin-components.css` und ergänzte `media-cover.css`. Galerie: `resources/views/pages/partials/design-lab-components-v7.blade.php`. Tests: `tests/Feature/ComponentLibraryV7Test.php`.
+
+**Noch offen:** echte Bearbeitung mit Rechteprüfung/Formvalidierung, Hierarchiesortierung, Kalendereditor und Ausnahmeregeln, Druckmaße/Scanqualität, sichere dynamische E-Mail-Templates und mobile/Zoom/Dark-Mode-Abnahme. Erst nach Abnahme in produktive Seiten integrieren.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
@@ -112,7 +132,7 @@ Vorführdatei: `resources/views/pages/partials/design-lab-components-v6.blade.ph
 | K4b Feedback/Overlay | Allgemeiner Dialog, Toast und Spinner als Entwurf; bestehender Confirm bereits vorhanden; **offen**: live erzeugte Feedback-Region, Busy/Read-only, Bulk-Aktionen, komplexere Dialoge | Dialogfokus, Escape/Close, Async-Feedback | Teilweise umgesetzt · Review |
 | K5 Daten | Filter-Chips, Filter-Toolbar, SortHeader, BulkActionBar und Listenzeilen als Entwurf; noch offen: Filter-Sidebar, echte datengetriebene Sortierung/Pagination, Zeitlinie, Diagramme und barrierefreie Datenalternative | Longtext, 320px und datengetriebene Status | Teilweise umgesetzt · Review |
 | K6 Bibliothek | MediaCard, Verfügbarkeit, Fälligkeitsstatus, ScanInput, **Exemplarzeile, Personenauswahl und Scannerfeedback als Entwurf**; noch offen: Cover-Spezialvarianten, echte Personensuche und Scannerintegration | Fachinformationen strikt vom Präsentations-API trennen | Teilweise umgesetzt · Review |
-| K7 Spezial / Ausgabe | Inline-Edit, Hierarchien, Kalender-/Öffnungszeiteneditor, Etikett/Druck, Barcodes, Mailkomponenten und Integrationsmuster | Druck/Theme/Fokus | Offen |
+| K7 Spezial / Ausgabe | Inline-Edit, Hierarchie, Wochenplan, Etiketten- und Nachrichtenvorschau als Entwurf; **offen**: echte Editoren, sichere Fachaktionen, Druckmaße/Barcodes, Versand und Integrationen | Druck/Theme/Fokus | Teilweise umgesetzt · Review |
 | K8 Qualität | Alle Bausteine mit Variants, Dichten, mobilen Layouts, Dark Mode, Tastatur, Screenreader, Zoom, hohem Kontrast und Fehlerfällen prüfen | Freigabe erst nach sauberem Review | Offen |
 
 **Nicht jedes Tabellenfeld, jeder Workflow oder jede Seite wird eine eigene Komponente.** Kleine Komponenten werden kombinierbar; komplexe fachliche Workflows werden erst später aus freigegebenen Bausteinen gebaut.
