@@ -174,3 +174,65 @@
     .bc-core-gallery-v7__covers,
     .bc-core-gallery-v7__sizes { gap:1rem; }
 }
+
+
+/* K8 – review gallery navigation chapters and responsive evaluation cards. */
+.bc-core-gallery__jump { position:relative; flex-wrap:wrap; gap:.5rem; border-bottom:1px solid var(--border-default); }
+.bc-core-gallery__nav-group { position:relative; display:block; min-width:0; }
+.bc-core-gallery__nav-group > summary {
+    display:flex; align-items:center; justify-content:space-between; gap:.65rem;
+    min-height:2.75rem; padding:.6rem .85rem; border:1px solid var(--border-default);
+    border-radius:var(--radius-sm); list-style:none; color:var(--text-primary);
+    background:var(--bg-surface); font-size:var(--text-sm); font-weight:900; cursor:pointer;
+}
+.bc-core-gallery__nav-group > summary::-webkit-details-marker { display:none; }
+.bc-core-gallery__nav-group > summary::after { content:"⌄"; font-size:1rem; color:var(--text-secondary); }
+.bc-core-gallery__nav-group[open] > summary { border-color:var(--vdbs-purple); background:var(--bg-surface-muted); }
+.bc-core-gallery__nav-links {
+    position:absolute; z-index:var(--z-dropdown); top:calc(100% + .35rem); left:0;
+    display:grid; gap:.08rem; width:max-content; min-width:12rem;
+    max-width:min(20rem,calc(100vw - 2rem)); max-height:60vh; overflow-y:auto;
+    padding:.45rem; border:1px solid var(--border-default); border-radius:var(--radius-sm);
+    background:var(--bg-surface); box-shadow:var(--shadow-md);
+}
+.bc-core-gallery__nav-group:nth-last-child(-n+2) .bc-core-gallery__nav-links { left:auto; right:0; }
+.bc-core-gallery__nav-links a {
+    display:flex; align-items:center; min-height:2.65rem; padding:.5rem .75rem;
+    border-radius:var(--radius-sm); font-size:var(--text-sm); font-weight:700;
+    line-height:1.35; overflow-wrap:anywhere;
+}
+.bc-core-gallery__nav-links a:hover { background:var(--bg-brand-soft); text-decoration:none; }
+.bc-core-gallery__nav-group > summary:focus-visible,
+.bc-core-gallery__nav-links a:focus-visible { outline:3px solid var(--focus-ring); outline-offset:2px; }
+
+.bc-core-gallery-v8__stack { display:grid; gap:1rem; min-width:0; }
+.bc-core-gallery-v8__two-col { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; align-items:start; }
+.bc-core-gallery-v8__three-col { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; align-items:start; }
+.bc-core-gallery-v8__two-col > *, .bc-core-gallery-v8__three-col > * { min-width:0; }
+.bc-core-gallery-v8__spacing { margin-top:1rem; }
+.bc-core-gallery-v8__note { margin:1rem 0 0; color:var(--text-secondary); font-size:var(--text-sm); line-height:1.6; }
+.bc-core-gallery-v8__fieldset { display:grid; gap:.35rem; padding:0; margin:0; border:0; min-width:0; }
+.bc-core-gallery-v8__fieldset legend { font-weight:900; font-size:var(--text-sm); margin-bottom:.6rem; }
+.bc-core-gallery-v8__review { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem; padding:.9rem 0; }
+.bc-core-gallery-v8__review fieldset { min-width:0; display:grid; align-content:start; gap:.9rem; padding:0; margin:0; border:0; }
+.bc-core-gallery-v8__review legend { padding:0 0 .8rem; font-size:1rem; font-weight:900; }
+.bc-core-gallery-v8__review label { display:flex; align-items:start; gap:.6rem; min-height:2.75rem; color:var(--text-primary); font-size:var(--text-sm); line-height:1.45; cursor:pointer; }
+.bc-core-gallery-v8__review input[type=checkbox] { flex:0 0 1.2rem; width:1.2rem; height:1.2rem; accent-color:var(--vdbs-green); margin:.1rem 0 0; }
+
+@media(max-width:65rem) {
+    .bc-core-gallery-v8__three-col { grid-template-columns:1fr 1fr; }
+    .bc-core-gallery-v8__three-col > :last-child { grid-column:1 / -1; }
+}
+@media(max-width:48rem) {
+    .bc-core-gallery-v8__two-col, .bc-core-gallery-v8__three-col, .bc-core-gallery-v8__review { grid-template-columns:1fr; }
+    .bc-core-gallery-v8__three-col > :last-child { grid-column:auto; }
+}
+@media(max-width:35rem) {
+    .bc-core-gallery__jump { align-items:stretch; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .bc-core-gallery__nav-group > summary { min-height:2.75rem; padding:.55rem .65rem; font-size:.81rem; }
+    .bc-core-gallery__nav-links {
+        position:static; margin-top:.3rem; max-height:none; width:100%;
+        min-width:0; max-width:none; box-shadow:none;
+    }
+    .bc-core-gallery__nav-group[open] { grid-column:1 / -1; }
+}
