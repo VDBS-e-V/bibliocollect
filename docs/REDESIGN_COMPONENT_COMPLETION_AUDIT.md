@@ -1,8 +1,8 @@
 # Komponentenbibliothek – Abschlussstand der geplanten Runden A–D
 
-**Status: Implementierung vollständig · Freigabe noch offen.**
+**Status: Komponentenbibliothek implementiert und durch den Auftraggeber am 12. Oktober 2026 abgenommen. Technische Projekt-CI und produktive Einführung sind davon getrennt.**
 
-Der ursprünglich gemeinsam definierte Prioritätenkatalog umfasst 24 zusätzliche Komponenten. Der Ausbau ist in der bestehenden Galerie `/design-lab/komponenten` auf dem Branch `feature/public-home-designsystem-redesign` und im **bestehenden Draft-PR #92** abgeschlossen. Diese Dokumentation bedeutet **keinen Merge und keine visuelle oder fachliche Freigabe**.
+Der ursprünglich gemeinsam definierte Prioritätenkatalog umfasst 24 zusätzliche Komponenten. Der Ausbau ist in der bestehenden Galerie `/design-lab/komponenten` auf dem Branch `feature/public-home-designsystem-redesign` und im **bestehenden Draft-PR #92** abgeschlossen. Diese Dokumentation hält die **ausdrückliche Abnahme der Komponenten** fest, bedeutet jedoch **keinen Merge, keine Freigabe fachlicher Abläufe und keine automatische Übernahme in produktive Seiten**.
 
 ## Lieferumfang
 
@@ -25,7 +25,7 @@ Der ursprünglich gemeinsam definierte Prioritätenkatalog umfasst 24 zusätzlic
 
 ## Qualitätsgates
 
-Die folgenden Gates entscheiden über die **Freigabe**, nicht über das Vorhandensein des implementierten Codes:
+Die folgenden Gates dokumentieren die **technische Absicherung vor einer produktiven Übernahme**. Die Gestaltung der Komponentenbibliothek wurde bereits abgenommen; diese Abnahme ersetzt keine nicht belegte Einzelprüfung:
 
 | Gate | Abschlussbedingung |
 |---|---|
@@ -44,7 +44,7 @@ Die folgenden Gates entscheiden über die **Freigabe**, nicht über das Vorhande
 2. Die mobile Accessibility-Pipeline meldete zuletzt Überläufe beim gemeinsam verwendeten Account-Menü sowie eine schmale Tippfläche von `Mein Konto`. Die gemeinsamen CSS-Regeln im selben Komponenten-Branch wurden dafür angepasst; das Ergebnis der **neuen** Layoutprüfung ist ausschlaggebend.
 3. Screenreader-Test und visuelle Freigabe im lokalen Browser können nicht durch PHP-Tests ersetzt werden.
 
-**Offen bleibt die Freigabe, nicht die Implementierung des 24-Komponenten-Katalogs.** Änderungen an produktiven Fachseiten sind ein eigener, späterer Schritt.
+**Die Komponentenbibliothek ist abgenommen.** Offen sind nur die weiterhin separat dokumentierten technischen Befunde, die produktive Einführung und ggf. spezifische manuelle Prüfungen. Änderungen an produktiven Fachseiten sind ein eigener, späterer Schritt.
 
 ## Abschluss-Fixrunde – Mobile/A11y
 
@@ -91,3 +91,14 @@ Der detaillierte Axe-Report zeigte zusätzlich zum K12-Auswahlkartenfehler auch 
 Ein eigener PR-Workflow `Komponentenbibliothek` führt **nur** `tests/Feature/ComponentLibrary*Test.php` unter SQLite aus und erstellt zusätzlich das reguläre Vite-Bundle. Er läuft parallel zum unveränderten allgemeinen Quality-Workflow. Ein grüner Komponenten-Check ist **kein Ersatz** für den Gesamttest, die zweite Datenbank, den erfolgreichen Accessibility-Check oder die manuelle Freigabe; er erlaubt nur die getrennte Diagnose des fachfremden `OperationsCommandsTest`.
 
 Letzter überprüfter unveränderter Gesamtstand vor diesem Workflow: Accessibility `38298666584` **success**, Quality `38298666694` **failure** ausschließlich bei `OperationsCommandsTest.php:115`. SQLite **920 bestanden / 1 übersprungen / 1 fehlgeschlagen**, MariaDB **916 bestanden / 5 übersprungen / 1 fehlgeschlagen**. Alle K14–K18-/Completion-Tests sind dabei bestanden.
+
+## Abnahmeentscheidung – 12. Oktober 2026
+
+Der Auftraggeber hat im Projektgespräch ausdrücklich bestätigt: **„Die Komponenten sind abgenommen.“** Diese Entscheidung gilt für den entwickelten Komponentenbestand einschließlich K14–K18 und beendet die Phase der gestalterischen Komponentenabnahme.
+
+- **Abgenommen:** die wiederverwendbare Komponentenbibliothek und ihr Gestaltungsstand als Grundlage der nächsten Designlab-Seitenentwürfe.
+- **Nicht impliziert:** ein Nachweis einzeln durchgeführter Screenreader-/Zoomtests, eine Freigabe der produktiven Seitenlayouts, Änderungen an Geschäftslogik oder der Merge von PR #92.
+- **Technischer Stand zum Zeitpunkt der Abnahme:** eigenständiger Komponenten-CI erfolgreich, allgemeiner Quality-Check wegen `OperationsCommandsTest.php:115` fehlgeschlagen; die automatisierte Accessibility-Prüfung war im letzten vollständig ausgewerteten Lauf erfolgreich. Ergebnisse immer commitbezogen prüfen.
+- **Nächste Etappe:** öffentliche Startseite, Katalog, Ergebnislisten und Mediendetails als Designlab-Entwürfe auf Basis der freigegebenen Komponenten; produktive Seiten erst nach eigener Zustimmung verändern.
+
+**PR #92 bleibt ausdrücklich Draft und ungemergt.**

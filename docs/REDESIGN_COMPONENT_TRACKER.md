@@ -1,6 +1,6 @@
 # BiblioCollect – Komponententracker vor finalen Seiten
 
-> **Arbeitsmodus:** COMPONENTS FIRST. Öffentlicher Katalog, Portal, Bibliotheksbetrieb und Administration werden vor der Komponenten-Freigabe **nicht** zu finalen Seiten umgebaut.
+> **Arbeitsmodus:** COMPONENTS FIRST. **Die Komponenten wurden am 12. Oktober 2026 vom Auftraggeber abgenommen.** Nächster Schritt sind seitenbezogene Entwürfe im Designlab. Produktive Seiten bleiben bis zu einer gesonderten Freigabe unangetastet.
 >
 > **Aktives Review:** \`/design-lab/komponenten\` (nur \`local\` / \`testing\`).  
 > **Altentwürfe:** \`/design-lab/startseite\`, \`/design-lab/medien\`, \`/design-lab/assistent\`, \`/design-lab/dashboard\`, \`/design-lab/portal\` und \`/design-review\`. Jede alte Vorschau ist sichtbar gekennzeichnet.
@@ -306,3 +306,9 @@ Vier neue **Entwurfs**-Bausteine, vollständig ohne neue JavaScript-Engine:
 | `x-ui.read-more` | Native `details/summary`-Aufklappfunktion mit sichtbarem Exzerpt im geschlossenen Zustand und vollständigem Slottext beim Öffnen | Ergänzt die bestehende Disclosure-Komponente, keine zweite JavaScript-Fokusverwaltung. |
 
 Styles `foundation-components-v18.css`; Galerie `design-lab-components-v18.blade.php`; fünf Tests `ComponentLibraryV18Test.php`. Gesamter geplanter Prioritätenkatalog A–D (24 zusätzliche Bausteine) ist damit **implementiert, nicht automatisch freigegeben**. Weder Tokenänderungen noch produktive Seitenbearbeitung.
+
+## Entscheidung: Komponentenbibliothek abgenommen (12. Oktober 2026)
+
+Der Auftraggeber hat die Komponenten ausdrücklich abgenommen. Damit sind die geplanten Komponentenrunden als **gestalterisch freigegeben** dokumentiert. Frühere, zeitlich verortete Einträge mit Status „Entwurf“ bleiben als historischer Entwicklungsverlauf bestehen; sie beschreiben nicht den aktuellen Abnahmestand.
+
+Die technische Vollqualität des Gesamtprojekts und ein Merge sind **nicht** automatisch bestätigt: der unabhängige `OperationsCommandsTest.php:115` ist weiterhin gesondert zu behandeln. PR #92 bleibt Draft. Für die nächste Phase dürfen die freigegebenen Komponenten in **neuen Designlab-Seitenentwürfen** verwendet werden; keine produktive Seitenmigration ohne gesonderte Zustimmung.

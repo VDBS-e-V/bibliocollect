@@ -1,3 +1,5 @@
+> **Abnahmeentscheidung vom 12. Oktober 2026:** Der Auftraggeber hat die Komponentenbibliothek ausdrücklich abgenommen. Die nachfolgenden manuellen Prüfpunkte sind eine historische und gegebenenfalls ergänzend auszuführende Checkliste; es wird nicht behauptet, jede Einzelprüfung sei nachweislich durchgeführt worden. Der übergreifende Komponenten-CI war grün, der unabhängige Projekt-Quality-Testfehler bleibt separat offen. Kein Merge, keine produktive Seitenumstellung.
+
 # BiblioCollect – Komponentenreview K8
 
 **Stand:** Entwurf vor visueller und barrierefreier Freigabe. Dieses Dokument ist eine Checkliste; nichts daran bestätigt eine bereits durchgeführte manuelle Prüfung. Farben und Schriftfamilien folgen unverändert den VDBS-Foundations.
