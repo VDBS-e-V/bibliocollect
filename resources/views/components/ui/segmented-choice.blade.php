@@ -16,14 +16,10 @@
     <legend class="bc-segmented-choice__legend">{{ $label }}</legend>
     <div class="bc-segmented-choice__group">
         @foreach ($options as $index => $option)
-            @php
-                $choice = (string) ($option['value'] ?? '');
-                $disabled = (bool) ($option['disabled'] ?? false);
-            @endphp
             <label class="bc-segmented-choice__option">
-                <input type="radio" name="{{ $name }}" value="{{ $choice }}"
-                    @checked((string) $selected === $choice)
-                    @disabled($disabled)
+                <input type="radio" name="{{ $name }}" value="{{ $option['value'] ?? '' }}"
+                    @checked((string) $selected === (string) ($option['value'] ?? ''))
+                    @disabled(! empty($option['disabled']))
                     @if (filled($hint)) aria-describedby="{{ $id }}-hint" @endif>
                 <span>{{ $option['label'] ?? 'Auswahl' }}</span>
             </label>
