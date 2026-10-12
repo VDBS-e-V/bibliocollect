@@ -42,7 +42,7 @@ it('verwendet im Seitenpanel native Dialogsemantik und vorhandene Close-Hooks', 
 
 it('verhindert in der ungebundenen Bestätigung echte Aktionen und escaped den Begriff', function (): void {
     $html = Blade::render('<x-ui.confirmation-flow id="check" title="Prüfen" phrase="<TEST>" />');
-    expect($html)->toContain('data-ui-confirm-flow')->toContain('data-ui-confirm-phrase')
+    expect($html)->toContain('data-ui-confirm-flow')->toContain('data-ui-confirm-phrase')->toContain('name="confirmed"')->toContain('name="confirmation_phrase"')
         ->toContain('&lt;TEST&gt;')->toContain('type="button"')
         ->toContain('data-ui-confirm-submit disabled')
         ->not->toContain('data-ui-confirm-submittable')
