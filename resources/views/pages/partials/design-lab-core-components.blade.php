@@ -40,6 +40,8 @@
                 <a href="#bc-core-inputs-advanced">Erweiterte Eingaben</a>
                 <a href="#bc-core-form-groups">Formulargruppen</a>
                 <a href="#bc-core-advanced-forms">Zähler und Dateien</a>
+                <a href="#bc-core-date-range">Datumsbereich</a>
+                <a href="#bc-core-segmented-choice">Segmentierte Auswahl</a>
                 <a href="#bc-core-inline-edit">Inline-Bearbeitung</a>
                 <a href="#bc-core-scan-input">Barcodefeld</a>
             </div>
@@ -54,6 +56,9 @@
                 <a href="#bc-core-list-rows">Listenzeilen</a>
                 <a href="#bc-core-timeline">Zeitachse</a>
                 <a href="#bc-core-data-viz">Datenbalken</a>
+                <a href="#bc-core-record-cards">Datensatzkarten</a>
+                <a href="#bc-core-status-legend">Statuslegende</a>
+                <a href="#bc-core-empty-pagination">Leere Zustände & Pagination</a>
                 <a href="#bc-core-status">Fortschritt</a>
                 <a href="#bc-core-loading">Spinner</a>
                 <a href="#bc-core-busy-panel">Ladeflächen</a>
@@ -260,6 +265,8 @@
     @include('pages.partials.design-lab-components-v7')
 
     @include('pages.partials.design-lab-components-v8')
+
+    @include('pages.partials.design-lab-components-v9')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
