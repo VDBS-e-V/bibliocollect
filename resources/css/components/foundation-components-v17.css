@@ -1,0 +1,79 @@
+/* K17 reusable administration patterns. Preserves established VDBS color tokens. */
+.bc-audit-entry,.bc-repeater-field,.bc-transfer-list,.bc-import-preview,.bc-batch-progress{
+    box-sizing:border-box;min-width:0;max-width:100%;border:1px solid var(--border-default);
+    border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-primary);padding:1.2rem;
+}
+.bc-audit-entry--compact,.bc-repeater-field--compact,.bc-transfer-list--compact,
+.bc-import-preview--compact,.bc-batch-progress--compact{padding:.75rem}
+.bc-audit-entry__header,.bc-import-preview__header,.bc-batch-progress__header{
+    display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.5rem 1rem;
+}
+.bc-audit-entry__heading{min-width:0}
+.bc-audit-entry__heading h3{font-size:1.1rem;line-height:1.4;font-weight:900;overflow-wrap:anywhere;margin:.35rem 0 0}
+.bc-audit-entry__kind{display:inline-flex;font-weight:900;font-size:var(--text-sm);padding:.3rem .55rem;border-radius:var(--radius-sm);
+    background:var(--vdbs-purple);color:var(--vdbs-white)}
+.bc-audit-entry__kind--created,.bc-audit-entry__kind--restored{background:var(--vdbs-green);color:var(--vdbs-ink)}
+.bc-audit-entry__kind--deleted{background:var(--vdbs-error);color:var(--vdbs-white)}
+.bc-audit-entry__kind--access,.bc-audit-entry__kind--system{background:var(--bg-surface-muted);color:var(--text-primary);border:1px solid var(--border-default)}
+.bc-audit-entry__header time,.bc-audit-entry__date{font-size:var(--text-sm);color:var(--text-secondary)}
+.bc-audit-entry__actor,.bc-audit-entry__description{font-size:var(--text-sm);color:var(--text-secondary);line-height:1.55;overflow-wrap:anywhere;margin:.6rem 0 0}
+.bc-audit-entry__actor strong{color:var(--text-primary)}
+.bc-audit-entry .bc-change-review{margin-top:.9rem}
+.bc-audit-entry__link{display:inline-block;margin-top:.75rem;color:var(--link-default);text-underline-offset:.2em;font-weight:800}
+.bc-repeater-field{margin:0}
+.bc-repeater-field legend,.bc-transfer-list__title,.bc-import-preview__header strong,.bc-batch-progress__header strong{
+    font-weight:900;font-size:1.05rem;line-height:1.4
+}
+.bc-repeater-field legend{padding:0 .25rem}
+.bc-repeater-field__hint,.bc-transfer-list__hint{margin:.35rem 0 .75rem;font-size:var(--text-sm);line-height:1.5;color:var(--text-secondary)}
+.bc-repeater-field__rows{display:grid;gap:.65rem}
+.bc-repeater-field__row{display:grid;gap:.7rem;min-width:0;background:var(--bg-surface-muted);border:1px solid var(--border-default);border-radius:var(--radius-sm);padding:.85rem}
+.bc-repeater-field__row-label{font-weight:900;font-size:var(--text-sm)}
+.bc-repeater-field__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));gap:.7rem}
+.bc-repeater-field__field{display:grid;gap:.35rem;min-width:0}
+.bc-repeater-field__field label,.bc-transfer-list__group label{font-weight:800;font-size:var(--text-sm);color:var(--text-primary)}
+.bc-repeater-field__field input{box-sizing:border-box;width:100%;min-width:0;min-height:2.75rem;background:var(--bg-surface);color:var(--text-primary);font:inherit;padding:.5rem .65rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm)}
+.bc-repeater-field__add,.bc-repeater-field__remove,.bc-transfer-list__actions button{
+    display:inline-flex;align-items:center;justify-content:center;min-height:2.75rem;padding:.5rem .75rem;
+    border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg-surface);
+    color:var(--text-primary);font:inherit;font-size:var(--text-sm);font-weight:900;cursor:pointer;
+}
+.bc-repeater-field__remove{justify-self:start}
+.bc-repeater-field__add{margin-top:.75rem;background:var(--vdbs-purple);color:var(--vdbs-white);border-color:var(--vdbs-purple)}
+.bc-repeater-field__add:disabled,.bc-repeater-field__remove:disabled,.bc-transfer-list__actions button:disabled{opacity:.55;cursor:not-allowed}
+.bc-repeater-field__status,.bc-transfer-list__status{font-size:var(--text-sm);margin:.6rem 0 0;color:var(--text-secondary)}
+.bc-repeater-field__error{font-size:var(--text-sm);margin:.6rem 0 0;color:var(--vdbs-error)}
+.bc-repeater-field__empty,.bc-transfer-list__empty,.bc-import-preview__empty,.bc-batch-progress__empty{
+    background:var(--bg-surface-muted);padding:.85rem;margin:.7rem 0 0;border-radius:var(--radius-sm);font-size:var(--text-sm);color:var(--text-secondary)
+}
+.bc-repeater-field__empty[hidden]{display:none}
+.bc-transfer-list__title{display:block}
+.bc-transfer-list__grid{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:.75rem;align-items:center;margin-top:.7rem;min-width:0}
+.bc-transfer-list__group{display:grid;gap:.45rem;min-width:0}
+.bc-transfer-list__group select{min-width:0;width:100%;box-sizing:border-box;min-height:11rem;padding:.35rem;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border-strong);border-radius:var(--radius-sm);font:inherit}
+.bc-transfer-list__group option{padding:.35rem .45rem;overflow-wrap:anywhere}
+.bc-transfer-list__actions{display:grid;gap:.45rem}
+.bc-import-preview__header>span,.bc-batch-progress__header>span{color:var(--text-secondary);font-size:var(--text-sm);font-variant-numeric:tabular-nums}
+.bc-import-preview__scroll{max-width:100%;overflow-x:auto;margin-top:.8rem;border:1px solid var(--border-default);border-radius:var(--radius-sm)}
+.bc-import-preview__scroll table{border-collapse:collapse;width:100%;min-width:38rem;font-size:var(--text-sm)}
+.bc-import-preview__scroll th,.bc-import-preview__scroll td{padding:.65rem .7rem;border-bottom:1px solid var(--border-default);text-align:left;vertical-align:top;overflow-wrap:anywhere}
+.bc-import-preview__scroll thead{background:var(--bg-surface-muted)}
+.bc-import-preview__scroll th{font-weight:900}
+.bc-import-preview__state,.bc-batch-progress__state{display:inline-flex;align-items:center;padding:.35rem .7rem;min-height:2rem;border-radius:var(--radius-sm);font-weight:900;font-size:var(--text-sm);line-height:1.3}
+.bc-import-preview__state--valid,.bc-batch-progress__state--done{background:var(--vdbs-green);color:var(--vdbs-ink)}
+.bc-import-preview__state--warning,.bc-batch-progress__state--running{background:var(--vdbs-group-orange);color:var(--vdbs-ink)}
+.bc-import-preview__state--error,.bc-batch-progress__state--failed{background:var(--vdbs-error);color:var(--vdbs-white)}
+.bc-import-preview__state--skipped,.bc-import-preview__state--unknown,.bc-batch-progress__state--pending,.bc-batch-progress__state--skipped{background:var(--bg-surface-muted);color:var(--text-primary);border:1px solid var(--border-default)}
+.bc-import-preview__actions,.bc-batch-progress__actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
+.bc-batch-progress .bc-progress{margin-top:.9rem}
+.bc-batch-progress__list{display:grid;gap:.55rem;padding:0;margin:.85rem 0 0;list-style:none}
+.bc-batch-progress__item{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.5rem .9rem;padding:.85rem;min-width:0;border:1px solid var(--border-default);border-radius:var(--radius-sm);background:var(--bg-surface-muted)}
+.bc-batch-progress__main{flex:1 1 12rem;min-width:0;overflow-wrap:anywhere}
+.bc-batch-progress__main strong{font-weight:900;line-height:1.4}
+.bc-batch-progress__main p{margin:.3rem 0 0;color:var(--text-secondary);font-size:var(--text-sm);line-height:1.5}
+:is(.bc-audit-entry,.bc-repeater-field,.bc-transfer-list,.bc-import-preview) :is(a,button,input,select,[tabindex="0"]):focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+@media(max-width:42rem){
+    .bc-transfer-list__grid{grid-template-columns:minmax(0,1fr)}
+    .bc-transfer-list__actions{display:flex;flex-wrap:wrap}
+    .bc-import-preview__scroll table{min-width:32rem}
+}
