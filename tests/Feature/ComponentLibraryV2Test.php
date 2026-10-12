@@ -28,7 +28,7 @@ it('markiert frühere Musterseiten sichtbar als ältere Entwürfe', function ():
     $this->get(route('public.design-lab'))
         ->assertOk()
         ->assertSee('Älterer Entwurf')
-        ->assertSee('Aktueller Arbeitsbereich: die Komponentenbibliothek.');
+        ->assertSee('Aktueller Arbeitsbereich: die öffentliche Startseite V1.');
 
     foreach ([
         'public.design-lab.home',

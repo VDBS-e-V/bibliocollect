@@ -42,6 +42,7 @@
                     <p>Die Komponentenbibliothek ist abgenommen. Der aktuelle Startseitenentwurf V1 ist separat verfügbar; dieser alte Stand bleibt für den Vergleich erhalten.</p>
                 </div>
                 <a href="{{ route('public.design-lab.home-v1') }}">Aktuellen Startseitenentwurf ansehen <span aria-hidden="true">→</span></a>
+                <a href="{{ route('public.design-lab.components') }}">Freigegebene Komponenten ansehen <span aria-hidden="true">→</span></a>
             </aside>
         @endif
         @if ($screen === 'designsystem')
