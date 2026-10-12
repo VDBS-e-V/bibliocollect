@@ -20,6 +20,8 @@ Im selben lokalen Designlab `/design-lab/komponenten` prüfen:
 
 Zusätzlicher konkreter Axe-Fund aus vorheriger CI: `.bc-footer-brand small` hatte ca. 3,98:1 Kontrast auf dunklem Grund. Diese Opazität wurde zugunsten von vollem VDBS-Weiß entfernt; erneuter Axe-Lauf bleibt erforderlich.
 
+**Separater Layoutbericht:** Die letzte vollständige Breitenprüfung meldete häufig Überläufe am bereits bestehenden `.bc-account-menu__panel` bei schmalen Bildschirmgrößen (z. B. 375px mit linker Position kleiner als 0). Dieses produktive Kontomenü ist nicht Bestandteil der neuen K9-Komponenten und wird im nächsten gezielten Shell-/Responsive-Review separat behoben. Weitere Kleinst-Tippflächen auf produktiven Fachseiten bleiben offen. Diese Befunde dürfen nicht als durch K9 gelöst bezeichnet werden.
+
 ## Neue Reviewkapitel 32–38
 
 | Abschnitt | Zu prüfen | Sollverhalten |
