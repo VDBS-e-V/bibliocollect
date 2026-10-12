@@ -85,3 +85,9 @@ Der detaillierte Axe-Report zeigte zusätzlich zum K12-Auswahlkartenfehler auch 
 - Quality `38285518002` ist **nicht grün**; alle neuen Komponenten- und Completion-Tests bestehen. SQLite: **920 bestanden, 1 übersprungen, 1 fehlgeschlagen**; MariaDB: **916 bestanden, 5 übersprungen, 1 fehlgeschlagen**. Beide einzigen Ausfälle sind derselbe fachfremde `OperationsCommandsTest.php:115`.
 - Interaktionsschutz: Der asynchrone K14-Combobox-Loader verwirft zusätzlich Antworten veralteter Suchanfragen per Abfrageversion. Der neue Commit muss den CI-Lauf erneut durchlaufen.
 - Für die **Freigabe** bleiben manuelle Screenreader-/Zoom-/Designabnahme und die unabhängig zu klärende Cron-Testabweichung offen. Der Designsystem-Umfang ist implementiert; PR #92 bleibt Draft.
+
+### Getrennter Komponenten-Check
+
+Ein eigener PR-Workflow `Komponentenbibliothek` führt **nur** `tests/Feature/ComponentLibrary*Test.php` unter SQLite aus und erstellt zusätzlich das reguläre Vite-Bundle. Er läuft parallel zum unveränderten allgemeinen Quality-Workflow. Ein grüner Komponenten-Check ist **kein Ersatz** für den Gesamttest, die zweite Datenbank, den erfolgreichen Accessibility-Check oder die manuelle Freigabe; er erlaubt nur die getrennte Diagnose des fachfremden `OperationsCommandsTest`.
+
+Letzter überprüfter unveränderter Gesamtstand vor diesem Workflow: Accessibility `38298666584` **success**, Quality `38298666694` **failure** ausschließlich bei `OperationsCommandsTest.php:115`. SQLite **920 bestanden / 1 übersprungen / 1 fehlgeschlagen**, MariaDB **916 bestanden / 5 übersprungen / 1 fehlgeschlagen**. Alle K14–K18-/Completion-Tests sind dabei bestanden.
