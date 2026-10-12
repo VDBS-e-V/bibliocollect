@@ -51,3 +51,11 @@ Die für die Startseite gewünschten Galerieelemente wurden im Entwurf V1 bewuss
 - **Transparenz:** Ein deutlich sichtbarer Infohinweis über den Plänen kennzeichnet alle Uhrzeiten als **frei erfundene Demonstrationsdaten**. Es findet keinerlei automatische Kalenderauswertung oder produktive Datenanbindung statt.
 
 Zusätzlicher Featuretest prüft zwei `bc-week-schedule`-Abschnitte, genau eine kompakte Variante, zehn Demo-Tage, den Mint-Overlap und die Fiktivkennzeichnung. Die CSS-Anpassung bleibt vollständig auf `.bc-home-v1` begrenzt.
+
+## Nachfolgende Freigabe des realen lokalen Vorschauwegs
+
+Der Auftraggeber hat den Arbeitsmodus geändert: Anstelle ausschließlich separater Designlab-Vorschauen soll die **echte Seite auf dem lokalen Feature-Branch** als direkt sichtbare Vorschau dienen, alternativ eine herunterladbare vollständige Vorschau. Darum ist der V1-Aufbau nun auch in `resources/views/pages/welcome.blade.php` integriert und direkt unter `http://localhost:8000/` sichtbar, sobald der Branch lokal aktualisiert wurde.
+
+**Technische Sicherheitsgrenzen:** kein Hosting-Deployment, kein Merge, keine Änderung von `PublicHomeController`, `HomeShowcase`, Kalender-, Berechtigungs- oder Ausleihlogik. Die neue Blade-Ansicht zeigt weiterhin echte Katalogtitel und Statuswerte, echte Verwaltungskalender und vorhandene Leihbedingungen. Fiktive Demozeiten werden nicht in die echte Ansicht übernommen. Ohne reale Öffnungszeiten erscheint der vorhandene Hinweis zur fehlenden Hinterlegung; geschlossene Tage werden nicht erfunden. Die Designlab-V1 bleibt als Vergleich bestehen.
+
+Neue scoped CSS-Datei: `resources/css/patterns/public-home-v1-live.css`, nach V1-Designlab-CSS importiert. Bestehender `PublicHomeRedesignTest.php` prüft weiterhin fünf Hauptabschnitte, Katalog-GET und ergänzt einen echten Wochenplan mit DB-Daten und den Mint-Overlap.

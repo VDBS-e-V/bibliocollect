@@ -44,14 +44,14 @@
                     @if (isset($heroTiles[0]))
                         <x-library.media-cover :src="$heroTiles[0]['cover']" :title="$heroTiles[0]['title']" :author="$heroTiles[0]['authors']" size="hero" />
                     @else
-                        <x-library.media-cover title="Zwischen den Zeilen" author="Deine Bibliothek" size="hero" variant="plum" />
+                        <x-library.media-cover title="Neue Ideen" author="Deine Bibliothek" size="hero" variant="plum" />
                     @endif
                 </div>
                 <div class="bc-home-v1__book bc-home-v1__book--front">
                     @if (isset($heroTiles[1]))
                         <x-library.media-cover :src="$heroTiles[1]['cover']" :title="$heroTiles[1]['title']" :author="$heroTiles[1]['authors']" size="hero" />
                     @else
-                        <x-library.media-cover title="Was wäre, wenn?" author="Bücher entdecken" size="hero" variant="mint" />
+                        <x-library.media-cover title="Lesen öffnet Welten" author="Bücher entdecken" size="hero" variant="mint" />
                     @endif
                 </div>
             </div>
