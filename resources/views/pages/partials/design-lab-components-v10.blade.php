@@ -51,7 +51,7 @@
         <div class="bc-core-gallery__example">
             <div class="bc-core-gallery__example-head"><strong id="bc-core-step-actions-heading">Aktiver Zwischenschritt</strong><span>x-library.process-stepper + x-ui.step-actions</span></div>
             <div class="bc-core-gallery-v10__stepper">
-                <x-library.process-stepper label="Beispiel-Assistent" :steps="[
+                <x-library.process-stepper label="Beispiel-Assistent" style="--bc-steps:4" :steps="[
                     ['label'=>'Datei auswählen','status'=>'done'],
                     ['label'=>'Daten zuordnen','status'=>'current'],
                     ['label'=>'Prüfen','status'=>'upcoming'],
