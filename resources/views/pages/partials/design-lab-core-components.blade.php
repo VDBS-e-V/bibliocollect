@@ -45,6 +45,7 @@
                 <a href="#bc-core-advanced-forms">Zähler und Dateien</a>
                 <a href="#bc-core-date-range">Datumsbereich</a>
                 <a href="#bc-core-segmented-choice">Segmentierte Auswahl</a>
+                <a href="#bc-core-choice-cards">Auswahlkarten</a>
                 <a href="#bc-core-inline-edit">Inline-Bearbeitung</a>
                 <a href="#bc-core-scan-input">Barcodefeld</a>
             </div>
@@ -89,6 +90,8 @@
                 <a href="#bc-core-week-schedule">Wochenplan</a>
                 <a href="#bc-core-print-preview">Etiketten</a>
                 <a href="#bc-core-message-preview">Nachrichten</a>
+                <a href="#bc-core-attachment-list">Dateianlagen</a>
+                <a href="#bc-core-criteria-checklist">Prüfkriterien</a>
                 <a href="#bc-core-review-overview">Bearbeitungsübersicht</a>
                 <a href="#bc-core-change-review">Änderungsvergleich</a>
             </div>
@@ -279,6 +282,7 @@
     @include('pages.partials.design-lab-components-v10')
 
     @include('pages.partials.design-lab-components-v11')
+    @include('pages.partials.design-lab-components-v12')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
