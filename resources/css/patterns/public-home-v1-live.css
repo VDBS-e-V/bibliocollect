@@ -1,51 +1,352 @@
-/* Echte lokale Startseite: abgenommene Designlab-V1 mit Live-Daten.
-   Alle Änderungen am Layout sind auf .bc-home-live begrenzt, VDBS-Tokens bleiben unverändert. */
-.bc-home-live{min-width:0}
-.bc-home-live .bc-home-hero{box-shadow:none;clip-path:none;min-height:0}
-.bc-home-live .bc-home-hero h1{
-    max-width:13ch;margin:1rem 0 1.3rem;color:var(--vdbs-white);
-    font-size:clamp(2.5rem,5.4vw,5rem);font-weight:900;line-height:1.05;
-    letter-spacing:-.045em;overflow-wrap:anywhere;
+/*
+ * Lokale öffentliche Startseite, offene V2-Komposition auf freigegebenem VDBS-System.
+ * Full-bleed-Markenbühne, dunkle Angebotskarten, ruhiger Katalog, echte Überlagerung,
+ * kompakter Service. Alle Änderungen sind auf .bc-home-live begrenzt.
+ */
+.bc-home-live { min-width: 0; }
+
+/* Der alte Hero behält seine volle Bildschirmbreite und die vertraute Typografie.
+   Die App-Shell begrenzt nur den Inhalt, nicht die farbige Bühne. */
+.bc-home-live .bc-home-hero {
+    display: block;
+    min-width: 0;
+    border-radius: 0;
+    overflow: visible;
+    background: var(--bg-stage);
+    color: var(--text-on-stage);
+    box-shadow: 0 0 0 100vmax var(--bg-stage);
+    clip-path: inset(0 -100vmax);
 }
-.bc-home-live .bc-home-hero h1 em{font-style:normal;color:var(--vdbs-green)}
-.bc-home-live .bc-home-discovery{box-shadow:none;clip-path:none;isolation:auto}
-.bc-home-live .bc-home-editorial{display:block;grid-template-columns:none;gap:0}
-.bc-home-live .bc-home-actions{padding-block:clamp(3.25rem,6vw,5.5rem)}
-.bc-home-live .bc-home-v1__media-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
+.bc-home-live .bc-home-hero__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    align-items: stretch;
+    min-height: 35rem;
 }
-.bc-home-live .bc-home-v1__media-grid .bc-media-card{
-    background:var(--bg-surface);border:1px solid var(--border-default);
+.bc-home-live .bc-home-hero__copy {
+    align-self: center;
+    min-width: 0;
+    padding: clamp(3.25rem, 5vw, 4.8rem) 0;
 }
-.bc-home-live__discovery-labels{
-    display:flex;align-items:center;gap:.7rem 1.2rem;flex-wrap:wrap;
-    font-size:var(--text-sm);font-weight:800;color:var(--text-secondary);margin:0 0 1rem;
+.bc-home-live .bc-home-hero h1 {
+    max-width: 13ch;
+    margin: .85rem 0 1.3rem;
+    color: var(--text-on-stage);
+    font-size: clamp(3rem, 5.5vw, 5.25rem);
+    line-height: 1.035;
+    letter-spacing: -.05em;
+    font-weight: 900;
 }
-.bc-home-live__discovery-labels span+span{
-    padding-inline-start:1rem;border-inline-start:1px solid var(--border-default);
+.bc-home-live .bc-home-hero h1 span { display: block; }
+.bc-home-live .bc-home-hero h1 .bc-home-hero__accent { color: var(--vdbs-green); }
+.bc-home-live .bc-home-hero__art { min-width: 0; }
+.bc-home-live .bc-home-hero__circle--main { right: 0; }
+.bc-home-live .bc-home-hero__book { width: min(48%, 12.5rem); }
+
+/* Drei visuelle Angebotskarten, statt immer wieder zwei Textzeilen und Zähler. */
+.bc-home-live .bc-home-live__offers {
+    position: relative;
+    isolation: isolate;
+    margin-block: clamp(3.25rem, 5.5vw, 5.5rem) 0;
+    padding: clamp(3.25rem, 5.5vw, 5rem) 0 clamp(4rem, 6vw, 5.5rem);
+    background: var(--vdbs-ink);
+    color: var(--vdbs-white);
+    box-shadow: 0 0 0 100vmax var(--vdbs-ink);
+    clip-path: inset(0 -100vmax);
 }
-.bc-home-live__discovery-empty{border-top:1px solid var(--border-default);padding:1rem 0}
-.bc-home-live__discovery-empty p{line-height:1.6;margin:0 0 .9rem;color:var(--text-secondary)}
-.bc-home-live__topics{border-top:1px solid var(--border-default);margin-top:2rem;padding-top:1.25rem}
-.bc-home-live__topics h3{font-size:1.05rem;font-weight:900;margin:0 0 .8rem}
-.bc-home-live__topics ul{display:flex;gap:.6rem 1.5rem;flex-wrap:wrap;list-style:none;margin:0;padding:0}
-.bc-home-live__topics a,.bc-home-live__topics a:visited{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--link-default);font-weight:800;text-underline-offset:.2em}
-.bc-home-live .bc-home-v1__schedule-card{scroll-margin-top:1rem}
-.bc-home-live .bc-home-v1__schedule-card>p{line-height:1.6;color:var(--text-secondary)}
-.bc-home-live__closures{margin-top:1.6rem;padding-top:1.2rem;border-top:1px solid var(--border-default)}
-.bc-home-live__closures h4{font-size:.95rem;font-weight:900;margin:0 0 .7rem}
-.bc-home-live__closures ul{list-style:disc;padding-inline-start:1.3rem;margin:0;display:grid;gap:.45rem;font-size:var(--text-sm);line-height:1.55}
-.bc-home-live__service-extra{border:1px solid var(--border-default);padding:clamp(1.1rem,2.5vw,1.6rem);border-radius:var(--radius-sm)}
-.bc-home-live__service-extra p{margin:.6rem 0 1rem;line-height:1.55;color:var(--text-secondary)}
-.bc-home-live__service-extra a,.bc-home-live__service-extra a:visited{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--link-default);font-weight:900;text-underline-offset:.2em}
-.bc-home-live .bc-home-v1__service-card p{margin:.7rem 0;max-width:none}
-.bc-home-live .bc-home-v1__service-links{margin-top:1rem}
-@media(max-width:60rem){
-    .bc-home-live .bc-home-hero h1{font-size:clamp(2.5rem,6vw,4.2rem)}
+.bc-home-live__offers h2,
+.bc-home-live__section-top h2,
+.bc-home-live .bc-home-v1__service > h2 {
+    color: inherit;
+    margin: 0;
+    font-size: clamp(2rem, 3.5vw, 3.4rem);
+    line-height: 1.12;
+    font-weight: 900;
+    letter-spacing: -.035em;
+    overflow-wrap: anywhere;
 }
-@media(max-width:45rem){
-    .bc-home-live .bc-home-v1__media-grid{grid-template-columns:minmax(0,1fr)}
+.bc-home-live__offer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(.9rem, 2.2vw, 1.8rem);
+    margin-top: clamp(1.75rem, 3vw, 2.6rem);
 }
-@media(max-width:25rem){
-    .bc-home-live .bc-home-hero h1{font-size:clamp(2.25rem,9vw,3.3rem)}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    min-height: 24rem;
+    padding: 0 0 3.4rem;
+    background: rgb(255 255 255 / 11%);
+    border: 1px solid rgb(255 255 255 / 18%);
+    border-radius: .55rem;
+    color: var(--vdbs-white);
+    overflow: hidden;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: transform .2s ease, background-color .2s ease;
+}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action:visited { color: var(--vdbs-white); }
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action:hover {
+    background: rgb(255 255 255 / 17%);
+    transform: translateY(-3px);
+}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action:focus-visible {
+    outline: 3px solid var(--vdbs-green);
+    outline-offset: 4px;
+}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: clamp(12rem, 17vw, 15rem);
+    border: 0;
+    border-radius: 0;
+    flex: 0 0 auto;
+    overflow: hidden;
+    color: var(--vdbs-white);
+}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action__icon svg {
+    position: relative;
+    z-index: 1;
+    width: clamp(3.5rem, 6vw, 5rem);
+    height: clamp(3.5rem, 6vw, 5rem);
+}
+.bc-home-live__offer--catalog .bc-library-quick-action__icon {
+    background: var(--vdbs-purple);
+}
+.bc-home-live__offer--catalog .bc-library-quick-action__icon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('/brand/vdbs/figures-chain.svg') no-repeat center / 80% auto;
+}
+.bc-home-live__offer--catalog .bc-library-quick-action__icon svg { display: none; }
+.bc-home-live__offer--series .bc-library-quick-action__icon {
+    background: var(--vdbs-green);
+    color: var(--vdbs-ink);
+}
+.bc-home-live__offer--series .bc-library-quick-action__icon::before {
+    content: "";
+    position: absolute;
+    width: 8rem;
+    height: 11rem;
+    border-radius: .2rem;
+    background: var(--vdbs-purple);
+    box-shadow: -4.4rem .7rem 0 -.35rem var(--vdbs-ink), 4.1rem -.35rem 0 -.3rem var(--vdbs-white);
+    transform: rotate(-9deg);
+}
+.bc-home-live__offer--series .bc-library-quick-action__icon svg {
+    color: var(--vdbs-white);
+}
+.bc-home-live__offer--wishes .bc-library-quick-action__icon {
+    background: var(--vdbs-purple);
+}
+.bc-home-live__offer--wishes .bc-library-quick-action__icon::before {
+    content: "";
+    position: absolute;
+    width: 14rem;
+    height: 14rem;
+    border-radius: 50%;
+    background: var(--vdbs-green);
+    transform: translate(22%, 23%);
+}
+.bc-home-live__offer--wishes .bc-library-quick-action__icon svg {
+    color: var(--vdbs-ink);
+}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action > strong {
+    display: block;
+    flex: 0 0 auto;
+    margin: 1.45rem 1.4rem .45rem;
+    font-size: clamp(1.3rem, 2vw, 1.65rem);
+    line-height: 1.25;
+    color: var(--vdbs-white);
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action__description {
+    display: block;
+    margin: 0 1.4rem;
+    font-size: .96rem;
+    line-height: 1.55;
+    max-width: 33ch;
+    color: var(--vdbs-white);
+}
+.bc-home-live .bc-home-live__offer-grid .bc-library-quick-action__arrow {
+    position: absolute;
+    right: 1.4rem;
+    bottom: 1.2rem;
+    width: 1.45rem;
+    height: 1.45rem;
+    margin: 0;
+    color: var(--vdbs-green);
+}
+
+/* Katalogteil: eine Aussage, der echte Bestand und ein dezenter Link. */
+.bc-home-live .bc-home-discovery {
+    isolation: auto;
+    margin: 0;
+    padding: clamp(3.75rem, 6vw, 6rem) clamp(1rem, 3vw, 2.5rem);
+    background: var(--bg-surface-muted);
+    box-shadow: none;
+    clip-path: none;
+    border-radius: var(--radius-sm);
+}
+.bc-home-live__section-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-bottom: clamp(1.5rem, 3vw, 2.4rem);
+}
+.bc-home-live .bc-home-v1__media-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(.8rem, 1.6vw, 1.4rem);
+}
+.bc-home-live .bc-home-v1__media-grid .bc-media-card {
+    min-width: 0;
+    height: 100%;
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    border-radius: .3rem;
+    padding: clamp(.7rem, 1.4vw, 1.15rem);
+}
+.bc-home-live .bc-home-v1__media-grid .bc-media-card__title { overflow-wrap: anywhere; }
+.bc-home-live__discovery-labels {
+    display: flex;
+    gap: .65rem 1.2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 800;
+}
+.bc-home-live__discovery-labels span + span {
+    border-inline-start: 1px solid var(--border-default);
+    padding-inline-start: 1rem;
+}
+.bc-home-live__discovery-empty { padding: 1rem 0; border-top: 1px solid var(--border-default); }
+.bc-home-live__discovery-empty p { margin: 0 0 1rem; color: var(--text-secondary); line-height: 1.6; }
+.bc-home-live__topics { margin-top: 1.8rem; border-top: 1px solid var(--border-default); padding-top: 1.1rem; }
+.bc-home-live__topics h3 { font-size: 1rem; margin: 0 0 .5rem; }
+.bc-home-live__topics ul { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; list-style: none; padding: 0; margin: 0; }
+.bc-home-live__topics a, .bc-home-live__topics a:visited {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--link-default);
+    font-weight: 800;
+}
+
+/* Großes Bild/Text-Overlap ohne den zusätzlichen doppelten Abschnittstitel. */
+.bc-home-live .bc-home-editorial {
+    display: block;
+    padding: clamp(4.5rem, 8vw, 7.5rem) 0;
+}
+.bc-home-live .bc-feature-overlap {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    min-height: 31rem;
+    padding: 0;
+}
+.bc-home-live .bc-feature-overlap__media { min-height: 32rem; }
+.bc-home-live .bc-feature-overlap__panel {
+    margin-inline-start: -6.5rem;
+    min-height: 25rem;
+    padding: clamp(2rem, 4.2vw, 4rem);
+}
+.bc-home-live .bc-feature-overlap__eyebrow { display: none; }
+
+/* Betriebsinfos: ein Abschnittstitel und nur notwendige Kartenüberschriften. */
+.bc-home-live .bc-home-info {
+    padding: 0 0 clamp(3rem, 5vw, 5rem);
+}
+.bc-home-live .bc-home-v1__service > h2 { margin-bottom: clamp(1.7rem, 3vw, 2.5rem); }
+.bc-home-live .bc-home-v1__service-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    gap: clamp(1rem, 2.8vw, 2.5rem);
+    align-items: start;
+    margin: 0;
+}
+.bc-home-live .bc-home-v1__schedule-card {
+    min-width: 0;
+    padding: clamp(1.3rem, 2.5vw, 2rem);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: .3rem;
+    scroll-margin-top: 1.5rem;
+}
+.bc-home-live .bc-home-v1__schedule-card > p {
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+.bc-home-live .bc-home-v1__service-side { min-width: 0; }
+.bc-home-live .bc-home-v1__service-card {
+    background: var(--bg-brand-soft);
+    border: none;
+}
+.bc-home-live .bc-home-v1__schedule-header h3 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.35rem, 2vw, 1.65rem);
+}
+.bc-home-live .bc-home-v1__service-card h3 { margin: 0 0 1.3rem; }
+.bc-home-live .bc-home-v1__service-card p { margin: .8rem 0; max-width: none; }
+.bc-home-live .bc-home-v1__service-links { margin-top: 1.2rem; }
+.bc-home-live__closures { margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid var(--border-default); }
+.bc-home-live__closures h4 { margin: 0 0 .7rem; font-weight: 900; font-size: .94rem; }
+.bc-home-live__closures ul { display: grid; gap: .4rem; margin: 0; padding-inline-start: 1.3rem; line-height: 1.55; font-size: var(--text-sm); }
+.bc-home-live__top-link { display: flex; justify-content: flex-end; padding: 1rem 0 2.5rem; }
+
+@media (max-width: 70rem) {
+    .bc-home-live .bc-home-hero__circle--main { right: 0; }
+    .bc-home-live .bc-home-hero h1 { font-size: clamp(3rem, 5.6vw, 4.5rem); }
+}
+@media (max-width: 62rem) {
+    .bc-home-live .bc-home-v1__media-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bc-home-live .bc-feature-overlap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .bc-home-live .bc-feature-overlap__panel { margin-inline-start: -3rem; }
+}
+@media (max-width: 50rem) {
+    .bc-home-live .bc-home-hero__layout { grid-template-columns: minmax(0, 1fr); }
+    .bc-home-live .bc-home-hero__copy { padding: 3.4rem 0 1rem; }
+    .bc-home-live .bc-home-hero h1 { font-size: clamp(3rem, 8vw, 4.5rem); }
+    .bc-home-live .bc-home-hero__art { width: min(100%, 28rem); min-height: 18rem; margin-inline: auto; }
+    .bc-home-live .bc-home-hero__circle--main { top: 0; right: 4%; width: 55%; }
+    .bc-home-live .bc-home-hero__circle--ring { top: 15%; right: 43%; width: 46%; border-width: 2.25rem; }
+    .bc-home-live .bc-home-hero__caption { top: 0; right: 4%; }
+    .bc-home-live .bc-home-hero__book { width: min(35%, 9rem); }
+    .bc-home-live .bc-home-hero__book--back { top: 12%; left: 20%; }
+    .bc-home-live .bc-home-hero__book--front { top: 4%; right: 22%; }
+    .bc-home-live__offer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bc-home-live .bc-feature-overlap { grid-template-columns: minmax(0, 1fr); padding: 0; }
+    .bc-home-live .bc-feature-overlap__media { min-height: 22rem; }
+    .bc-home-live .bc-feature-overlap__panel { margin-inline-start: 0; min-height: 0; }
+    .bc-home-live .bc-home-v1__service-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 35rem) {
+    .bc-home-live .bc-home-hero__copy { padding: 2.8rem 0 1rem; }
+    .bc-home-live .bc-home-hero h1 { font-size: clamp(2.55rem, 10vw, 3.4rem); }
+    .bc-home-live .bc-home-hero__art { min-height: 15rem; }
+    .bc-home-live .bc-home-hero__book { width: min(36%, 7.5rem); }
+    .bc-home-live .bc-home-hero__book--back { left: 17%; }
+    .bc-home-live .bc-home-hero__book--front { right: 18%; }
+    .bc-home-live__offer-grid { grid-template-columns: minmax(0, 1fr); }
+    .bc-home-live .bc-home-live__offer-grid .bc-library-quick-action { min-height: 21rem; }
+    .bc-home-live .bc-home-v1__media-grid { grid-template-columns: minmax(0, 1fr); }
+    .bc-home-live .bc-feature-overlap__media { min-height: 17rem; }
+    .bc-home-live .bc-feature-overlap__panel { padding: 1.6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bc-home-live .bc-home-live__offer-grid .bc-library-quick-action { transition: none; }
+}
+@media print {
+    .bc-home-live .bc-home-hero,
+    .bc-home-live .bc-home-live__offers { box-shadow: none; clip-path: none; }
+    .bc-home-live .bc-home-live__offers { background: transparent; color: var(--text-primary); }
 }
