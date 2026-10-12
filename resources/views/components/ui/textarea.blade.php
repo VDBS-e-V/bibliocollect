@@ -6,15 +6,19 @@
     'error' => null,
     'rows' => 4,
     'maxlength' => null,
+    'showCount' => false,
 ])
 
 @php
     $id = (string) $attributes->get('id', $name);
     $hintId = $id.'-hint';
     $errorId = $id.'-error';
+    $countId = $id.'-count';
+    $hasCounter = $showCount && is_numeric($maxlength) && (int) $maxlength > 0;
     $describedBy = collect([
         $error ? $errorId : null,
         $hint ? $hintId : null,
+        $hasCounter ? $countId : null,
     ])->filter()->implode(' ');
 @endphp
 
@@ -28,6 +32,7 @@
         'name' => $name,
         'rows' => max(2, min(20, (int) $rows)),
         'maxlength' => $maxlength,
+        'data-ui-char-count' => $hasCounter ? $countId : null,
         'aria-invalid' => $error ? 'true' : 'false',
         'aria-describedby' => $describedBy !== '' ? $describedBy : null,
     ]) }}>{{ $value ?? '' }}</textarea>
@@ -36,5 +41,8 @@
     @endif
     @if ($hint)
         <p class="bc-field__hint" id="{{ $hintId }}">{{ $hint }}</p>
+    @endif
+    @if ($hasCounter)
+        <output class="bc-field__counter" id="{{ $countId }}" for="{{ $id }}">{{ mb_strlen((string) ($value ?? '')) }} / {{ (int) $maxlength }} Zeichen</output>
     @endif
 </div>
