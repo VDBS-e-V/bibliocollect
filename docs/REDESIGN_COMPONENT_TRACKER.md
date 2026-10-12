@@ -147,6 +147,23 @@ CSS: `resources/css/components/foundation-components-v8.css`, `resources/css/pat
 
 **Offene Qualitätspunkte:** Tatsächliche Browser-/Screenreaderprüfung aller neuen Komponenten in hell/dunkel, 320–1280px und 200–400% Zoom. Echte Filterparameter, Sortier-/Paging-Queries, Server-Uploadvalidierung, optional asynchrone Combobox, Tastaturdetails komplexer Overlays und dynamische Live-Notifications bleiben separate Integrations- oder Komponentenaufgaben. Die Statuswerte im Tracker bezeichnen **Entwürfe**, keine finale Freigabe.
 
+### Komponentenrunde K9 – Vier Ergänzungen, Statussprache und Barrierefreiheit
+
+Vier zusätzliche, allgemeingültige Blade-Komponenten sind als **Entwurf/Review** in `/design-lab/komponenten` eingebaut:
+
+| Komponente | Verwendung | Abgrenzung |
+|---|---|---|
+| `x-ui.date-range` | Native Datumsfelder „Von“/„Bis“ unter einem `fieldset/legend`, mit `name`, `label`, `from/to`, `min/max`, `hint/error` und `density` | Hinweise **unter** beiden gleich hohen Feldern, Gruppenfehler verlinkt; spätere fachliche Datums-/Zeit-/Berechtigungsvalidierung bleibt separat |
+| `x-ui.segmented-choice` | Eine aus wenigen Ansichts-/Dichte-Optionen auswählen, `options[]`, `selected`, `density` | Native Radiofelder statt künstlichem ARIA-Tab-Pattern; Auswahl allein verändert nicht ungefragt andere Inhalte |
+| `x-ui.record-card` | Langer Datensatztitel, Metadaten als echtes `dl/dt/dd`, Status-/Actions-Slots, Comfortable/Compact | Mobile, zugängliche **Darstellungsalternative** zur breiten Fachdatentabelle; die Daten kommen später aus dem Fachbereich |
+| `x-ui.status-legend` | Kräftige VDBS-Farben mit expliziter Textbedeutung in Bibliothekslisten und Diagrammen | `green/purple/orange/red/blue/neutral`, unbekannte Farben fallen auf neutral zurück; keine Bedeutung allein durch Farbe |
+
+Zusätzlich wurden vorhandene `x-ui.empty-state` und `x-ui.pagination` im Designlab zu einer Mustersektion kombiniert; **keine zweiten Versionen dieser Komponenten**. Neue Abschnitte **39–43** und navigierbare Kapitelverweise. CSS: `resources/css/components/foundation-components-v9.css` und Layoutregeln in `resources/css/patterns/design-lab-core-components.css`. Blade-Tests: `tests/Feature/ComponentLibraryV9Test.php`.
+
+**Konkrete Accessibility-Korrektur:** Axe meldete am gemeinsamen Footer ein Kontrastverhältnis von ca. **3,98:1** für `.bc-footer-brand small`. Der frühere `opacity:.8`-Stil ist entfernt, der Text auf volles vorhandenes VDBS-Weiß gesetzt (`shell-redesign.css`), ohne Änderung der Palette oder Schriftfamilien. Das repariert einen gemeldeten konkreten Fehler, **ersetzt aber nicht den erneut erforderlichen kompletten Axe-/Layout-Check**.
+
+**Noch offen:** Mobile-/Dunkelmodus-/Zoom-/Screenreader-Sichtprüfung der K9-Komponenten, Fachlogik für Filterzeitraum und Paginierung, Datenanbindung, ggf. weitere Kontrast-/Overflow-Funde und vollständige Accessibility-Abnahme. Die Änderungen betreffen zunächst nur Komponenten und Designlab; produktive Seiten bleiben unverändert.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
