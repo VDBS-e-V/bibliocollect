@@ -12,7 +12,7 @@
     </header>
 
     <nav class="bc-core-gallery__jump" aria-label="Komponentengruppen">
-        <details class="bc-core-gallery__nav-group" open>
+        <details class="bc-core-gallery__nav-group" data-ui-dismissable>
             <summary>Grundlagen</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-actions">Aktionen</a>
@@ -22,7 +22,7 @@
                 <a href="#bc-core-patterns">Größere Patterns</a>
             </div>
         </details>
-        <details class="bc-core-gallery__nav-group">
+        <details class="bc-core-gallery__nav-group" data-ui-dismissable>
             <summary>Navigation</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-navigation">Breadcrumbs und Tabs</a>
@@ -32,7 +32,7 @@
                 <a href="#bc-core-dialogs">Dialoge</a>
             </div>
         </details>
-        <details class="bc-core-gallery__nav-group">
+        <details class="bc-core-gallery__nav-group" data-ui-dismissable>
             <summary>Formulare</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-forms">Eingaben</a>
@@ -44,7 +44,7 @@
                 <a href="#bc-core-scan-input">Barcodefeld</a>
             </div>
         </details>
-        <details class="bc-core-gallery__nav-group">
+        <details class="bc-core-gallery__nav-group" data-ui-dismissable>
             <summary>Daten und Status</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-filter-chips">Filterchips</a>
@@ -60,7 +60,7 @@
                 <a href="#bc-core-notifications">Statusmeldungen</a>
             </div>
         </details>
-        <details class="bc-core-gallery__nav-group">
+        <details class="bc-core-gallery__nav-group" data-ui-dismissable>
             <summary>Bibliothek</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-media-cards">Medienkarten</a>
@@ -71,7 +71,7 @@
                 <a href="#bc-core-cover-variants">Covervarianten</a>
             </div>
         </details>
-        <details class="bc-core-gallery__nav-group">
+        <details class="bc-core-gallery__nav-group" data-ui-dismissable>
             <summary>Verwaltung</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-hierarchy">Hierarchien</a>
@@ -80,7 +80,7 @@
                 <a href="#bc-core-message-preview">Nachrichten</a>
             </div>
         </details>
-        <details class="bc-core-gallery__nav-group">
+        <details class="bc-core-gallery__nav-group" data-ui-dismissable>
             <summary>Qualität</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-review-matrix">Review-Matrix</a>
