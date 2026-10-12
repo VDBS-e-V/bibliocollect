@@ -46,7 +46,7 @@
     <div class="bc-core-gallery-v8__two-col">
         <div class="bc-core-gallery__example">
             <div class="bc-core-gallery__example-head"><strong id="bc-core-filter-panel-heading">Filterbereich geöffnet</strong><span>x-ui.filter-panel</span></div>
-            <x-ui.filter-panel title="Medien eingrenzen" :count="2" open clearHref="#bc-core-filter-panel">
+            <x-ui.filter-panel title="Medien eingrenzen" :count="2" open>
                 <x-ui.search-field name="bc-review-filter-text" label="Suchbegriff" placeholder="Titel oder Thema …" />
                 <fieldset class="bc-core-gallery-v8__fieldset">
                     <legend>Medientyp</legend>
