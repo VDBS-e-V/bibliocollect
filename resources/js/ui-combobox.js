@@ -5,6 +5,8 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
   if (!select || select.disabled) return;
   const input = document.createElement('input');
   input.type = 'search';
+  input.id = select.id + '-search';
+  input.placeholder = select.options[0]?.textContent || 'Auswahl suchen';
   input.className = 'bc-combobox__search';
   input.setAttribute('role', 'combobox');
   input.setAttribute('aria-autocomplete', 'list');
@@ -133,6 +135,8 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
   select.addEventListener('change', () => { input.value = selectedLabel(); });
   document.addEventListener('pointerdown', (event) => { if (!root.contains(event.target)) close(); });
   select.hidden = true;
+  const label = root.querySelector('label');
+  if (label) label.htmlFor = input.id;
   select.setAttribute('aria-hidden', 'true');
   select.tabIndex = -1;
   input.value = selectedLabel();
