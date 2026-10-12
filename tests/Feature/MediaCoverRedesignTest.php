@@ -37,9 +37,9 @@ it('ersetzt auch den bisherigen neutralen Platzhalter durch ein gestaltetes Cove
 it('rendert Header und Footer mit den zentralen Einstiegen', function (): void {
     $this->get(route('public.home'))
         ->assertOk()
-        ->assertSee('Deine nächste')
-        ->assertSee('Geschichte')
-        ->assertSee('wartet.')
+        ->assertSee('Hier beginnt')
+        ->assertSee('deine nächste')
+        ->assertSee('Geschichte.')
         ->assertSee('bc-masthead__tools', false)
         ->assertSee('bc-footer-grid', false)
         ->assertSee('Katalog durchsuchen')

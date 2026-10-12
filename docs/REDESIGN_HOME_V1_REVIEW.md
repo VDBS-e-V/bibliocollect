@@ -59,3 +59,19 @@ Der Auftraggeber hat den Arbeitsmodus geändert: Anstelle ausschließlich separa
 **Technische Sicherheitsgrenzen:** kein Hosting-Deployment, kein Merge, keine Änderung von `PublicHomeController`, `HomeShowcase`, Kalender-, Berechtigungs- oder Ausleihlogik. Die neue Blade-Ansicht zeigt weiterhin echte Katalogtitel und Statuswerte, echte Verwaltungskalender und vorhandene Leihbedingungen. Fiktive Demozeiten werden nicht in die echte Ansicht übernommen. Ohne reale Öffnungszeiten erscheint der vorhandene Hinweis zur fehlenden Hinterlegung; geschlossene Tage werden nicht erfunden. Die Designlab-V1 bleibt als Vergleich bestehen.
 
 Neue scoped CSS-Datei: `resources/css/patterns/public-home-v1-live.css`, nach V1-Designlab-CSS importiert. Bestehender `PublicHomeRedesignTest.php` prüft weiterhin fünf Hauptabschnitte, Katalog-GET und ergänzt einen echten Wochenplan mit DB-Daten und den Mint-Overlap.
+
+## V2 – Feedback zur tatsächlichen Startseite: moderner, ruhiger, abwechslungsreicher
+
+Rückmeldung des Auftraggebers: Die V1 wirkte zu schematisch mit wiederkehrendem Aufbau aus Kicker, zwei Überschriften, Erklärung und Abschnittszähler. Gewünscht sind dagegen der **volle violette Hero aus der früheren Startseite**, deutliche visuelle Rhythmen und großzügigere redaktionelle Flächen im Stil der drei bereitgestellten Referenzscreenshots.
+
+Die echte lokale Seite `/` wurde entsprechend überarbeitet:
+
+1. **Hero:** Vollbreite violette Bühne wie früher, große dreizeilige Typografie, zwei reale Mediencover (bzw. gestaltete Leerfall-Cover) und bestehende Katalogsuche. Keine Box mit Designlab-Rand.
+2. **Angebote entdecken:** dunkle, breite Fläche mit drei großflächigen visuellen, vollständig anklickbaren Karten zu vorhandenen Funktionen (Katalog, Reihen, Buchwunsch); bestehende `x-library.quick-action`-Komponente wiederverwendet, nur im Seitenscope neu gestaltet.
+3. **Zum Lesen entdeckt:** eine starke Überschrift, direkter Kataloglink und echte kuratierte/neu hinzugekommene Medien; keine zweite Headline oder Abschnittszähler. Themen und leere Zustände unverändert datenabhängig.
+4. **Geschichten verbinden Menschen:** `x-library.feature-overlap` allein trägt den H2-Titel. Der Mint-Textblock überlappt die VDBS-Figurenillustration auf Desktop; bei schmalen Breiten steht er darunter. Keine doppelte Einleitung.
+5. **Gut zu wissen:** eine Überschrift; die Innentitel „Öffnungszeiten“ und „So funktioniert die Ausleihe“ dienen nur zur Identifikation der beiden Fachinhalte. Der Wochenplan bezieht echte Daten aus der Verwaltung, die Ausleihbedingungen aus den bisherigen Konfigurationen.
+
+Die bestehende App-Shell mit Footer bleibt erhalten; die redundante zweite Abschlusszeile wurde entfernt. **Keinerlei Änderungen an VDBS-Tokens, Backend-Logik oder Daten.** Die CSS-Datei `public-home-v1-live.css` enthält die Variationen ausschließlich unter `.bc-home-live`. Für die Angebotsflächen werden lokale VDBS-Illustrationen, CSS-Formen und vorhandene Mediencover verwendet; keine erfundenen Fotos oder externen Assets.
+
+**Visuelle Prüfpunkte:** vollflächiger violetter Hero auf Desktop; dunkle Angebotskarten, großzügiges Overlap; 320/375/768/1024px sowie Darkmode; funktionierende Suche/Links; echte Medien und Daten; keine Abschnittszähler. Vor einem Merge bleibt eine erneute lokale Sichtprüfung durch den Auftraggeber nötig.

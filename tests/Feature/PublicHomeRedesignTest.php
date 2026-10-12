@@ -56,7 +56,7 @@ it('zeigt die neu gestaltete Startseite mit funktionierender Katalogsuche und Sc
 
 it('zeigt die freigegebene V1-Gestaltung auf der echten Startseitenroute', function (): void {
     $html = (string) $this->get(route('public.home'))->assertOk()
-        ->assertSee('Deine nächste')
+        ->assertSee('Hier beginnt')
         ->assertSee('Geschichten verbinden Menschen.')
         ->assertSee('bc-home-v1__hero', false)
         ->assertSee('bc-feature-overlap--mint', false)
@@ -97,4 +97,27 @@ it('zeigt nur hinterlegte Bibliothekszeiten und erfindet ohne Daten keine Öffnu
 
     expect($xpath->query('//*[@id="oeffnungszeiten"]//*[contains(concat(" ", normalize-space(@class), " "), " bc-week-schedule ")]')->length)->toBe(1)
         ->and($xpath->query('//*[@id="oeffnungszeiten"]//dt[text()="Montag"]')->length)->toBe(1);
+});
+
+it('zeigt den klassischen breiten Hero und drei visuelle Angebotskarten ohne Abschnittszähler', function (): void {
+    $html = (string) $this->get(route('public.home'))->assertOk()
+        ->assertSee('Hier beginnt')
+        ->assertSee('Angebote entdecken')
+        ->assertSee('Zum Lesen entdeckt')
+        ->assertSee('Geschichten verbinden Menschen.')
+        ->getContent();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
+    $xpath = new DOMXPath($dom);
+
+    expect($xpath->query('//*[@id="home-search"]//*[contains(concat(" ", normalize-space(@class), " "), " bc-home-hero__layout ")]')->length)->toBe(1)
+        ->and($xpath->query('//*[@id="home-actions"]//*[contains(concat(" ", normalize-space(@class), " "), " bc-home-live__offer ")]')->length)->toBe(3)
+        ->and($xpath->query('//*[@id="home-actions"]//h2')->length)->toBe(1)
+        ->and($xpath->query('//*[@id="home-discovery"]//h2')->length)->toBe(1)
+        ->and($xpath->query('//*[@id="home-editorial"]//h2')->length)->toBe(1)
+        ->and($xpath->query('//*[@id="home-service"]//h2')->length)->toBe(1)
+        ->and($xpath->query('//main//*[contains(concat(" ", normalize-space(@class), " "), " bc-home-v1__section-number ")]')->length)->toBe(0)
+        ->and($xpath->query('//main//*[contains(concat(" ", normalize-space(@class), " "), " bc-home-v1__section-head ")]')->length)->toBe(0)
+        ->and($xpath->query('//*[@id="home-editorial"]//*[contains(concat(" ", normalize-space(@class), " "), " bc-feature-overlap__panel ")]')->length)->toBe(1);
 });
