@@ -64,7 +64,6 @@ it('hält die produktive Startseite und den bisherigen Altentwurf unverändert e
     $this->get(route('public.home'))->assertOk()->assertSee('bc-home-hero', false);
 });
 
-
 it('kombiniert Feature Overlap und beide Wochenplan-Dichten ohne behauptete Live-Zeiten', function (): void {
     $html = (string) $this->get(route('public.design-lab.home-v1'))->assertOk()
         ->assertSee('Geschichten verbinden Menschen.')
