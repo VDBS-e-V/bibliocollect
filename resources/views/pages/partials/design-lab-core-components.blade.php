@@ -29,6 +29,7 @@
                 <a href="#bc-core-overlays">Menüs und Hilfen</a>
                 <a href="#bc-core-toolbars">Toolbars und Mobile</a>
                 <a href="#bc-core-step-actions">Schrittaktionen</a>
+                <a href="#bc-core-section-index">Abschnittsindex</a>
                 <a href="#bc-core-context-strip">Detailleiste</a>
                 <a href="#bc-core-disclosures">Akkordeon</a>
                 <a href="#bc-core-dialogs">Dialoge</a>
@@ -63,6 +64,7 @@
                 <a href="#bc-core-empty-pagination">Leere Zustände & Pagination</a>
                 <a href="#bc-core-results-overview">Ergebnisübersicht</a>
                 <a href="#bc-core-pagination-size">Seitengröße</a>
+                <a href="#bc-core-result-assistance">Ergebnishilfe</a>
                 <a href="#bc-core-status">Fortschritt</a>
                 <a href="#bc-core-loading">Spinner</a>
                 <a href="#bc-core-busy-panel">Ladeflächen</a>
@@ -87,6 +89,8 @@
                 <a href="#bc-core-week-schedule">Wochenplan</a>
                 <a href="#bc-core-print-preview">Etiketten</a>
                 <a href="#bc-core-message-preview">Nachrichten</a>
+                <a href="#bc-core-review-overview">Bearbeitungsübersicht</a>
+                <a href="#bc-core-change-review">Änderungsvergleich</a>
             </div>
         </details>
         <details class="bc-core-gallery__nav-group" data-ui-dismissable>
@@ -273,6 +277,8 @@
     @include('pages.partials.design-lab-components-v9')
 
     @include('pages.partials.design-lab-components-v10')
+
+    @include('pages.partials.design-lab-components-v11')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>

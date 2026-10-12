@@ -56,3 +56,12 @@ Zusätzlicher konkreter Axe-Fund aus vorheriger CI: `.bc-footer-brand small` hat
 ## Noch offene große Komponenten-Aufgaben
 
 Eine produktionsfähige asynchrone Combobox mit Tastaturführung und geladenen Vorschlägen, robuste Overlays bei engen Bildschirmrändern, dynamische Feedbackregionen, serverseitiges Paging/Sorting und Filterpersistenz, Integration von Scannerhardware, echtes Drucklayout und datenschutzsicherer Nachrichtenausgang sowie vollständige Browser-/Accessibility-Abnahme sind noch nicht erledigt. Sie werden getrennt priorisiert, statt als „fertig“ zu gelten.
+
+## Ergänzender Komponentenreview K11 (Abschnitte 48–51)
+
+- **48 Ergebnishilfe:** Leere Suche, technische Fehlermeldung und nicht verfügbarer Bereich klar unterscheiden. Nur echte Links anklickbar; bestehende Empty-State-/Alert-Stile unverändert.
+- **49 Abschnittsindex:** Tab, Enter, Shift+Tab und Fragmentanker testen. aria-current=location nach Hash-Wechsel am passenden Link; deaktivierte Einträge ohne Ziel.
+- **50 Prüfstand:** Geprüft / In Bearbeitung / Prüfung nötig / Noch offen auch ohne Farbe verständlich; lange Titel, fehlende Links und leerer Prüfstand.
+- **51 Änderungsvergleich:** Vorher/Nachher mit Screenreader und dl/dt/dd, Nullwerte, hinzugefügt/entfernt, 320px und 400%-Zoom prüfen.
+
+Keine dieser Prüfaufgaben ersetzt die praktische Browser-/Screenreader-Abnahme oder ist eine Freigabe.

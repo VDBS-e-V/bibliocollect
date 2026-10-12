@@ -179,6 +179,23 @@ Zusätzlich wurden vorhandene `x-ui.empty-state` und `x-ui.pagination` im Design
 
 **Noch nicht produktiv:** Die Ergebniszahl ist Demo, Seitengrößenauswahl speichert nicht und wechselt keine Ergebnisseite, Demo-Links führen nur zu anderen Komponenten; der Schrittwechsel führt keine Geschäftsfunktion aus. Für die echte Integration sind Controller-seitige Parameter-/Rechteprüfung, stabile Ergebnis-URLs, anwendungsseitige Formularzustände und Navigation erforderlich. Auch für diese Komponenten sind visuelles Review, Dunkelmodus, 320/375/768/1280px, Tastatur und Screenreader **noch nicht vollständig abgenommen**.
 
+### Komponentenrunde K11 – hilfreiche Ergebniszustände, Seitensprünge, Prüfstände und Vergleich
+
+**Vier weitere echte Blade-Komponenten im bestehenden Draft-PR**, weiterhin ausschließlich **Entwurf/Review**. K10 enthielt bereits Ergebnisübersicht, Seitengröße, Schrittaktionen und Detailleiste. K11 setzt deshalb bewusst andere Aufgaben um:
+
+| Komponente | API / Zustände | Abgrenzung und Interaktion |
+|---|---|---|
+| x-ui.result-assistance | title, description, query, state=empty/error/unavailable, suggestions[] mit href/disabled, actions-Slot, density | Hilfen für fehlende, fehlerhafte oder gesperrte Ergebnismengen. **Komponiert** x-ui.empty-state und x-ui.alert statt beides zu duplizieren; nur echte Alternativlinks, keine erfundene Retry-Abfrage. |
+| x-ui.section-index | title, label, items[] mit label/href/disabled, current, density | In-Page-Ankernavigation für lange Detailansichten. Native Fragmentlinks, aria-current=location aktualisiert sich bei Fragmentwechsel, gesperrte Einträge sind keine Links. Nicht x-ui.tabs oder x-ui.mobile-navigation. |
+| x-ui.review-overview | title, label, items[] (title/description/status/href/disabled), actions-Slot, density | **Nichtlinearer** Prüfstand mit complete/current/attention/pending und textlicher Statusangabe statt weiterer Prozess-Stepper. Zahl geprüfter Bereiche wird rein aus Props berechnet, keine Speicherung. |
+| x-ui.change-review | title, label, items[] (label/before/after/status), beforeLabel, afterLabel, emptyLabel, actions, density | Zugänglicher Vorher-/Nachher-Vergleich mit echten dl/dt/dd-Werten, Langtext, hinzugefügt/entfernt/gleich und leeren Daten. Kein Duplikat von x-ui.description-list oder x-ui.context-strip: Fokus auf **Differenzen**. |
+
+**Designlab:** /design-lab/komponenten, neue Abschnitte **48–51** unter den Kapiteln Daten und Status, Navigation sowie Verwaltung. Comfortable/Compact, schmale Ansichten, Langtext, Fehler, Disabled und leere Daten sind als Beispiele vorhanden. Die neuen CSS-Klassen stehen opt-in in resources/css/components/foundation-components-v11.css; JS für aktuelle Fragmentposition in resources/js/ui-section-index.js. VDBS-Tokens, Schriftfamilien, Markenfarben, produktive Controller/Seiten und Datenbankschema sind unverändert.
+
+**Automatisierte Regressionen:** tests/Feature/ComponentLibraryV11Test.php prüft Designlab-Rendering, Alert-/Empty-State-Komposition, HTML-Semantik, echte/gesperrte Links, Statuszustände, sichtbaren Text und strukturierten Vergleich. **CI je Commit gesondert auswerten**: bekannter OperationsCommandsTest.php-Cronfehler ist keine allgemeine Freigabe; bisherige a11y/Layout-Befunde werden nicht stillschweigend als behoben ausgewiesen.
+
+**Manuelle K11-Abnahme offen:** Fokus/Fragmentwechsel, 320/375/768/1280px, 200/400%-Zoom, Light/Dark, Kontrast der kräftigen Statusflächen, langer deutscher Titel, nativ vorgelesene Abschnitts- und Vergleichssemantik. Keine automatisierte Fachsuche, keine Speicherung und keine Seitenfreigabe.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
