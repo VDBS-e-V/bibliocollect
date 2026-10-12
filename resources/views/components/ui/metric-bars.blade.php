@@ -12,15 +12,10 @@
     <figcaption class="bc-metric-bars__title">{{ $title }}</figcaption>
     <div class="bc-metric-bars__plot" aria-hidden="true">
         @foreach ($items as $item)
-            @php
-                $number = max(0, (float) ($item['value'] ?? 0));
-                $percentage = round(min(100, $number / $peak * 100), 1);
-                $tone = in_array($item['tone'] ?? 'green', ['green', 'purple', 'orange', 'blue'], true) ? $item['tone'] : 'green';
-            @endphp
             <div class="bc-metric-bars__line">
                 <span>{{ $item['label'] ?? 'Wert' }}</span>
                 <span class="bc-metric-bars__track">
-                    <span class="bc-metric-bars__fill bc-metric-bars__fill--{{ $tone }}" style="width:{{ $percentage }}%"></span>
+                    <span class="bc-metric-bars__fill bc-metric-bars__fill--{{ in_array($item['tone'] ?? 'green', ['green', 'purple', 'orange', 'blue'], true) ? $item['tone'] : 'green' }}" style="width:{{ round(min(100, max(0, (float) ($item['value'] ?? 0)) / $peak * 100), 1) }}%"></span>
                 </span>
                 <strong>{{ $item['value'] ?? 0 }}</strong>
             </div>
