@@ -430,7 +430,10 @@
 .bc-account-menu__logout button {
     display: block;
     width: 100%;
-    padding: .55rem .3rem;
+    box-sizing: border-box;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: .65rem .7rem;
     border: 0;
     background: none;
     color: var(--text-primary);
@@ -537,4 +540,9 @@
     .bc-account-menu__head > div {
         min-width: 0;
     }
+}
+
+/* Do not expose collapsed account-menu descendants as tiny hit targets. */
+.bc-account-menu:not([open]) > .bc-account-menu__panel {
+    display: none;
 }

@@ -45,3 +45,9 @@ Die folgenden Gates entscheiden über die **Freigabe**, nicht über das Vorhande
 3. Screenreader-Test und visuelle Freigabe im lokalen Browser können nicht durch PHP-Tests ersetzt werden.
 
 **Offen bleibt die Freigabe, nicht die Implementierung des 24-Komponenten-Katalogs.** Änderungen an produktiven Fachseiten sind ein eigener, späterer Schritt.
+
+## Abschluss-Fixrunde – Mobile/A11y
+
+- 110 automatische Axe-Seitenprüfungen im letzten Lauf: 0 Verstöße mit Schweregrad serious oder höher; der separate Layoutcheck schlug bei 1024px wegen einer dekorativen Hero-Kreisfläche fehl (12px Überstand). Der visuelle Hero-Baustein beschränkt diese Kreisposition nun ab Tabletbreite, **ohne** die Startseiten-View oder deren Inhalte zu bearbeiten.
+- Kleinere Linkflächen werden in gemeinsamen Shell-/Visual-Styles vergrößert. Verborgene Account-Menü-Inhalte sind im geschlossenen Zustand auch für geometrische Layoutchecker vollständig ausgeblendet.
+- Die Wirkung muss durch **den nächsten CI-Lauf** bestätigt werden. Hinweise zu den verbleibenden kleinen Linkflächen auf anderen bereits vorhandenen Seiten werden getrennt dokumentiert.

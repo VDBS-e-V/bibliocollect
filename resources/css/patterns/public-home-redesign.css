@@ -257,7 +257,8 @@
 .bc-home-text-link,
 .bc-home-text-link:visited {
     display: inline-flex;
-    align-items: baseline;
+    min-height: 2.75rem;
+    align-items: center;
     gap: .45rem;
     color: var(--link-default);
     font-size: .9rem;
@@ -417,6 +418,8 @@
 .bc-home-closures ul { margin: 0; padding-left: 1.25rem; font-size: .89rem; }
 
 @media (max-width: 70rem) {
+    /* Keep the decorative circle within the visual art at tablet widths (1024px layout gate). */
+    .bc-home-hero__circle--main { right: 0; }
     .bc-home-hero h1 { font-size: clamp(3rem, 5.6vw, 4.5rem); }
     .bc-home-hero__book { width: min(48%, 11rem); }
 }
