@@ -18,74 +18,65 @@
         ])->all();
     @endphp
 
-    {{-- Echte Startseite auf dem Feature-Branch: Layout aus der abgenommenen V1,
-         Daten und Berechtigungen aus der bestehenden produktiven Anwendung. --}}
+
+    {{-- Lokale V2 auf der echten Startseite: durchgehender Hero und unterschiedliche Abschnittsformen. --}}
     <div class="bc-library-home bc-home-v1 bc-home-live" id="bc-home-top">
         <section class="bc-home-hero bc-home-v1__hero" aria-labelledby="home-heading" id="home-search">
-            <div class="bc-home-v1__hero-copy">
-                <span class="bc-home-v1__eyebrow bc-home-v1__eyebrow--light">Deine Schulbibliothek · BiblioCollect</span>
-                <h1 id="home-heading">Deine nächste <em>Geschichte</em> wartet.</h1>
-                <p class="bc-home-v1__hero-description">Finde Bücher und Themen, entdecke neue Perspektiven und folge deiner Neugier.</p>
-                <div class="bc-home-v1__search-wrap">
-                    <strong class="bc-home-v1__search-label">Was möchtest du entdecken?</strong>
-                    <x-library.catalog-search id="catalog-search" placeholder="Titel, Autor:in oder Thema eingeben …" />
+            <div class="bc-home-hero__layout">
+                <div class="bc-home-hero__copy">
+                    <span class="bc-home-eyebrow bc-home-eyebrow--light">Deine Schulbibliothek</span>
+                    <h1 id="home-heading"><span>Hier beginnt</span><span class="bc-home-hero__accent">deine nächste</span><span>Geschichte.</span></h1>
+                    <p>Finde Bücher, die dich begeistern. Entdecke neue Themen und nutze die Bibliothek ganz nach deinen Ideen.</p>
+                    <x-library.catalog-search id="catalog-search" placeholder="Buchtitel, Autor:in oder Thema …" />
+                    <div class="bc-home-hero__links">
+                        <span>Direkt zu:</span>
+                        <a href="{{ route('public.catalog.advanced') }}">Erweiterte Suche</a>
+                        <a href="#oeffnungszeiten">Öffnungszeiten</a>
+                    </div>
                 </div>
-                <div class="bc-home-v1__hero-links">
-                    <span>Oder direkt zu:</span>
-                    <a href="{{ route('public.catalog.advanced') }}">Erweiterte Suche <span aria-hidden="true">↗</span></a>
-                    <a href="#oeffnungszeiten">Öffnungszeiten <span aria-hidden="true">↓</span></a>
-                </div>
-            </div>
-            <div class="bc-home-v1__hero-visual" aria-hidden="true">
-                <span class="bc-home-v1__visual-ring"></span>
-                <span class="bc-home-v1__visual-circle"></span>
-                <span class="bc-home-v1__visual-caption">Eine Bibliothek. Unzählige Ideen.</span>
-                <div class="bc-home-v1__book bc-home-v1__book--back">
-                    @if (isset($heroTiles[0]))
-                        <x-library.media-cover :src="$heroTiles[0]['cover']" :title="$heroTiles[0]['title']" :author="$heroTiles[0]['authors']" size="hero" />
-                    @else
-                        <x-library.media-cover title="Neue Ideen" author="Deine Bibliothek" size="hero" variant="plum" />
-                    @endif
-                </div>
-                <div class="bc-home-v1__book bc-home-v1__book--front">
-                    @if (isset($heroTiles[1]))
-                        <x-library.media-cover :src="$heroTiles[1]['cover']" :title="$heroTiles[1]['title']" :author="$heroTiles[1]['authors']" size="hero" />
-                    @else
-                        <x-library.media-cover title="Lesen öffnet Welten" author="Bücher entdecken" size="hero" variant="mint" />
-                    @endif
+                <div class="bc-home-hero__art" aria-hidden="true">
+                    <span class="bc-home-hero__circle bc-home-hero__circle--main"></span>
+                    <span class="bc-home-hero__circle bc-home-hero__circle--ring"></span>
+                    <span class="bc-home-hero__caption"><small>Entdecken</small><strong>Was liest du als Nächstes?</strong></span>
+                    <div class="bc-home-hero__book bc-home-hero__book--back">
+                        @if (isset($heroTiles[0]))
+                            <x-library.media-cover :src="$heroTiles[0]['cover']" :title="$heroTiles[0]['title']" :author="$heroTiles[0]['authors']" size="hero" />
+                        @else
+                            <x-library.media-cover title="Neue Ideen" author="Bücher entdecken" variant="mint" size="hero" />
+                        @endif
+                    </div>
+                    <div class="bc-home-hero__book bc-home-hero__book--front">
+                        @if (isset($heroTiles[1]))
+                            <x-library.media-cover :src="$heroTiles[1]['cover']" :title="$heroTiles[1]['title']" :author="$heroTiles[1]['authors']" size="hero" />
+                        @else
+                            <x-library.media-cover title="Lesen öffnet Welten" author="Deine Bibliothek" variant="plum" size="hero" />
+                        @endif
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="bc-home-actions bc-home-v1__section bc-home-v1__actions" aria-labelledby="home-actions-heading" id="home-actions">
-            <div class="bc-home-v1__section-head">
-                <div>
-                    <span class="bc-home-v1__eyebrow">Einfach anfangen</span>
-                    <h2 id="home-actions-heading">Wohin soll es gehen?</h2>
-                    <p>Vier Wege in die Bibliothekswelt – ohne verschachtelte Menüs.</p>
-                </div>
-                <span class="bc-home-v1__section-number" aria-hidden="true">01 / 04</span>
-            </div>
-            <div class="bc-home-v1__actions-grid">
-                <x-library.quick-action :href="route('public.catalog.index')" title="Medien finden" description="Im gesamten Bestand stöbern." icon="search" />
-                @can('surface.portal.access')
-                    <x-library.quick-action :href="route('portal.home')" title="Ausleihen verwalten" description="Zum persönlichen Bibliothekskonto." icon="user" />
-                @else
-                    <x-library.quick-action :href="route('login')" title="Ausleihen verwalten" description="Für Verlängerungen und Vormerkungen anmelden." icon="user" />
-                @endcan
-                <x-library.quick-action :href="route('public.series.index')" title="Buchreihen entdecken" description="Zusammenhängende Geschichten und Themen finden." icon="book" />
-                <x-library.quick-action :href="route('public.wishes.create')" title="Buchwunsch abgeben" description="Neue Ideen für die Bibliothek vorschlagen." icon="heart" />
+        {{-- Bildhafte Angebotskarten im dunklen Bereich, nur echte Ziele. --}}
+        <section class="bc-home-actions bc-home-live__offers" aria-labelledby="home-actions-heading" id="home-actions">
+            <h2 id="home-actions-heading">Angebote entdecken</h2>
+            <div class="bc-home-live__offer-grid">
+                <x-library.quick-action class="bc-home-live__offer bc-home-live__offer--catalog"
+                    :href="route('public.catalog.index')" title="Medien finden"
+                    description="Geschichten, Wissen und neue Lieblingsbücher warten im Katalog." icon="search" />
+                <x-library.quick-action class="bc-home-live__offer bc-home-live__offer--series"
+                    :href="route('public.series.index')" title="Buchreihen entdecken"
+                    description="Fortsetzungen lesen und Welten immer wieder besuchen." icon="book" />
+                <x-library.quick-action class="bc-home-live__offer bc-home-live__offer--wishes"
+                    :href="route('public.wishes.create')" title="Buchwunsch abgeben"
+                    description="Dir fehlt ein Titel? Bring deine Ideen in die Bibliothek." icon="heart" />
             </div>
         </section>
+
 
         <section class="bc-home-discovery bc-home-v1__section bc-home-v1__discovery" aria-labelledby="home-discovery-heading" id="home-discovery">
-            <div class="bc-home-v1__section-head">
-                <div>
-                    <span class="bc-home-v1__eyebrow">Aus dem Katalog</span>
-                    <h2 id="home-discovery-heading">Jedes Buch öffnet eine andere Tür.</h2>
-                    <p>Empfehlungen aus deiner Bibliothek und Medien, die neu dazugekommen sind.</p>
-                </div>
-                <x-ui.button :href="route('public.catalog.index')" variant="secondary">Alle Medien ansehen <span aria-hidden="true">↗</span></x-ui.button>
+            <div class="bc-home-live__section-top">
+                <h2 id="home-discovery-heading">Zum Lesen entdeckt</h2>
+                <a class="bc-home-text-link" href="{{ route('public.catalog.index') }}">Alle Medien ansehen <span aria-hidden="true">↗</span></a>
             </div>
 
             @if ($discoverTiles !== [])
@@ -126,17 +117,10 @@
             @endif
         </section>
 
-        <section class="bc-home-editorial bc-home-v1__section bc-home-v1__editorial" aria-labelledby="home-editorial-heading" id="home-editorial">
-            <div class="bc-home-v1__section-head">
-                <div>
-                    <span class="bc-home-v1__eyebrow">Mehr als ein Regal</span>
-                    <h2 id="home-editorial-heading">Raum für Neugier.</h2>
-                    <p>Ein visueller und redaktioneller Gegenpol zur direkten Suche.</p>
-                </div>
-                <span class="bc-home-v1__section-number" aria-hidden="true">03 / 04</span>
-            </div>
+
+        {{-- Das Feature-Overlap liefert die einzige große Überschrift dieses Abschnitts. --}}
+        <section class="bc-home-editorial bc-home-v1__editorial" aria-label="Geschichten verbinden Menschen" id="home-editorial">
             <x-library.feature-overlap
-                eyebrow="Bibliothek entdecken"
                 title="Geschichten verbinden Menschen."
                 description="Eine Schulbibliothek ist mehr als ein Regal: Hier treffen Geschichten, neue Ideen und unterschiedliche Perspektiven aufeinander."
                 :href="route('public.series.index')"
@@ -144,21 +128,13 @@
                 tone="mint" />
         </section>
 
-        <section class="bc-home-info bc-home-v1__section bc-home-v1__service" aria-labelledby="home-info-heading" id="home-service">
-            <div class="bc-home-v1__section-head">
-                <div>
-                    <span class="bc-home-v1__eyebrow">Gut zu wissen</span>
-                    <h2 id="home-info-heading">Deine Bibliothek. Deine Möglichkeiten.</h2>
-                    <p>Deine tatsächlichen Öffnungszeiten und die geltenden Ausleihregeln auf einen Blick.</p>
-                </div>
-                <span class="bc-home-v1__section-number" aria-hidden="true">04 / 04</span>
-            </div>
+
+        <section class="bc-home-info bc-home-v1__service" aria-labelledby="home-info-heading" id="home-service">
+            <h2 id="home-info-heading">Gut zu wissen</h2>
             <div class="bc-home-v1__service-grid">
                 <article class="bc-home-v1__schedule-card" id="oeffnungszeiten" aria-labelledby="home-hours-heading">
                     <div class="bc-home-v1__schedule-header">
-                        <span class="bc-home-v1__eyebrow">Deine Schulbibliothek</span>
                         <h3 id="home-hours-heading">Öffnungszeiten</h3>
-                        <p>Die aktuell in der Bibliotheksverwaltung hinterlegten Zeiten.</p>
                     </div>
                     @if ($scheduleItems === [])
                         <p>Die Öffnungszeiten werden noch eingetragen. Frag bitte in der Schule nach.</p>
@@ -179,7 +155,6 @@
 
                 <div class="bc-home-v1__service-side">
                     <article class="bc-home-v1__service-card" aria-labelledby="home-loans-heading">
-                        <span class="bc-home-v1__eyebrow">Dein Bibliothekskonto</span>
                         <h3 id="home-loans-heading">So funktioniert die Ausleihe</h3>
                         <p>Mit deinem Bibliotheksausweis kannst du bis zu {{ $maxLoans }} Medien gleichzeitig für {{ $loanDays }} Tage ausleihen.</p>
                         @if ($maxRenewals > 0)
@@ -198,22 +173,13 @@
                             @endguest
                         </div>
                     </article>
-                    <div class="bc-home-live__service-extra">
-                        <span class="bc-home-v1__eyebrow">Mehr entdecken</span>
-                        <p>Fehlt ein Buch in der Bibliothek? Deine Wünsche sind willkommen.</p>
-                        <a href="{{ route('public.wishes.create') }}">Buchwunsch abgeben <span aria-hidden="true">↗</span></a>
-                    </div>
                 </div>
             </div>
         </section>
 
-        <footer class="bc-home-v1__closing" aria-label="Startseitenabschluss">
-            <div>
-                <span class="bc-home-v1__eyebrow">BiblioCollect · VDBS</span>
-                <strong>Ein Design. Viele Geschichten.</strong>
-                <p>Stöbern, entdecken und gemeinsam weiterdenken – in deiner Schulbibliothek.</p>
-            </div>
+
+        <div class="bc-home-live__top-link">
             <x-ui.back-to-top href="#bc-home-top" />
-        </footer>
+        </div>
     </div>
 </x-app-shell>
