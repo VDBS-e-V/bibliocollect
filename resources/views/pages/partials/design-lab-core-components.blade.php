@@ -28,6 +28,8 @@
                 <a href="#bc-core-navigation">Breadcrumbs und Tabs</a>
                 <a href="#bc-core-overlays">Menüs und Hilfen</a>
                 <a href="#bc-core-toolbars">Toolbars und Mobile</a>
+                <a href="#bc-core-step-actions">Schrittaktionen</a>
+                <a href="#bc-core-context-strip">Detailleiste</a>
                 <a href="#bc-core-disclosures">Akkordeon</a>
                 <a href="#bc-core-dialogs">Dialoge</a>
             </div>
@@ -59,6 +61,8 @@
                 <a href="#bc-core-record-cards">Datensatzkarten</a>
                 <a href="#bc-core-status-legend">Statuslegende</a>
                 <a href="#bc-core-empty-pagination">Leere Zustände & Pagination</a>
+                <a href="#bc-core-results-overview">Ergebnisübersicht</a>
+                <a href="#bc-core-pagination-size">Seitengröße</a>
                 <a href="#bc-core-status">Fortschritt</a>
                 <a href="#bc-core-loading">Spinner</a>
                 <a href="#bc-core-busy-panel">Ladeflächen</a>
@@ -267,6 +271,8 @@
     @include('pages.partials.design-lab-components-v8')
 
     @include('pages.partials.design-lab-components-v9')
+
+    @include('pages.partials.design-lab-components-v10')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
