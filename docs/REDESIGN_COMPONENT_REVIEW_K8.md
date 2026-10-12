@@ -6,6 +6,20 @@
 
 Lokal: \`http://localhost:8000/design-lab/komponenten\`. Die Navigation ist in sieben Kapitel gegliedert und führt zu den vorhandenen Blade-Komponenten. Alte Musterseiten tragen weiterhin „Älterer Entwurf“. **Finale Fachseiten entstehen erst nach Freigabe der kompletten Komponentenbibliothek.**
 
+## Ergänzung K9: Kapitel 39–43
+
+Im selben lokalen Designlab `/design-lab/komponenten` prüfen:
+
+| Abschnitt | Zu prüfen | Ziel |
+|---|---|---|
+| 39 Datumsbereich | Gleiche Feldhöhe, Label/Hint/Error, 320px, natives Datumspicker-Verhalten | Felder bleiben ausgerichtet; Fehler sind als Text und mit `aria-describedby` zugänglich; keine vorgetäuschte dynamische Fachvalidierung |
+| 40 Segmentierte Auswahl | Tastaturpfeile, 3–4 Optionen, Disabled, Auswahlkontrast, 320px | Native Radiogruppen, kein JS nötig; bei Mobilbreite sinnvoller Umbruch |
+| 41 Datensatzkarte | Langer deutscher Titel, Metadaten, Status, Actions, Compact/Comfortable | Kein Abschneiden bei 320px, semantisches `dl`, berechtigte echte Links nur im Fachkontext |
+| 42 Statuslegende | Grün, Lila, Orange, Rot und neutral in hell/dunkel | Status immer **schriftlich** erklärt, auch ohne Farbwahrnehmung |
+| 43 Leere Ergebnisse/Pagination | Kein Treffer, eine Seite, mehrere Seiten | Vorhandene Komponenten kombiniert, keine doppelten Implementierungen |
+
+Zusätzlicher konkreter Axe-Fund aus vorheriger CI: `.bc-footer-brand small` hatte ca. 3,98:1 Kontrast auf dunklem Grund. Diese Opazität wurde zugunsten von vollem VDBS-Weiß entfernt; erneuter Axe-Lauf bleibt erforderlich.
+
 ## Neue Reviewkapitel 32–38
 
 | Abschnitt | Zu prüfen | Sollverhalten |
