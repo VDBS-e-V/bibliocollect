@@ -1,0 +1,51 @@
+/* Echte lokale Startseite: abgenommene Designlab-V1 mit Live-Daten.
+   Alle Änderungen am Layout sind auf .bc-home-live begrenzt, VDBS-Tokens bleiben unverändert. */
+.bc-home-live{min-width:0}
+.bc-home-live .bc-home-hero{box-shadow:none;clip-path:none;min-height:0}
+.bc-home-live .bc-home-hero h1{
+    max-width:13ch;margin:1rem 0 1.3rem;color:var(--vdbs-white);
+    font-size:clamp(2.5rem,5.4vw,5rem);font-weight:900;line-height:1.05;
+    letter-spacing:-.045em;overflow-wrap:anywhere;
+}
+.bc-home-live .bc-home-hero h1 em{font-style:normal;color:var(--vdbs-green)}
+.bc-home-live .bc-home-discovery{box-shadow:none;clip-path:none;isolation:auto}
+.bc-home-live .bc-home-editorial{display:block;grid-template-columns:none;gap:0}
+.bc-home-live .bc-home-actions{padding-block:clamp(3.25rem,6vw,5.5rem)}
+.bc-home-live .bc-home-v1__media-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.bc-home-live .bc-home-v1__media-grid .bc-media-card{
+    background:var(--bg-surface);border:1px solid var(--border-default);
+}
+.bc-home-live__discovery-labels{
+    display:flex;align-items:center;gap:.7rem 1.2rem;flex-wrap:wrap;
+    font-size:var(--text-sm);font-weight:800;color:var(--text-secondary);margin:0 0 1rem;
+}
+.bc-home-live__discovery-labels span+span{
+    padding-inline-start:1rem;border-inline-start:1px solid var(--border-default);
+}
+.bc-home-live__discovery-empty{border-top:1px solid var(--border-default);padding:1rem 0}
+.bc-home-live__discovery-empty p{line-height:1.6;margin:0 0 .9rem;color:var(--text-secondary)}
+.bc-home-live__topics{border-top:1px solid var(--border-default);margin-top:2rem;padding-top:1.25rem}
+.bc-home-live__topics h3{font-size:1.05rem;font-weight:900;margin:0 0 .8rem}
+.bc-home-live__topics ul{display:flex;gap:.6rem 1.5rem;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+.bc-home-live__topics a,.bc-home-live__topics a:visited{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--link-default);font-weight:800;text-underline-offset:.2em}
+.bc-home-live .bc-home-v1__schedule-card{scroll-margin-top:1rem}
+.bc-home-live .bc-home-v1__schedule-card>p{line-height:1.6;color:var(--text-secondary)}
+.bc-home-live__closures{margin-top:1.6rem;padding-top:1.2rem;border-top:1px solid var(--border-default)}
+.bc-home-live__closures h4{font-size:.95rem;font-weight:900;margin:0 0 .7rem}
+.bc-home-live__closures ul{list-style:disc;padding-inline-start:1.3rem;margin:0;display:grid;gap:.45rem;font-size:var(--text-sm);line-height:1.55}
+.bc-home-live__service-extra{border:1px solid var(--border-default);padding:clamp(1.1rem,2.5vw,1.6rem);border-radius:var(--radius-sm)}
+.bc-home-live__service-extra p{margin:.6rem 0 1rem;line-height:1.55;color:var(--text-secondary)}
+.bc-home-live__service-extra a,.bc-home-live__service-extra a:visited{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--link-default);font-weight:900;text-underline-offset:.2em}
+.bc-home-live .bc-home-v1__service-card p{margin:.7rem 0;max-width:none}
+.bc-home-live .bc-home-v1__service-links{margin-top:1rem}
+@media(max-width:60rem){
+    .bc-home-live .bc-home-hero h1{font-size:clamp(2.5rem,6vw,4.2rem)}
+}
+@media(max-width:45rem){
+    .bc-home-live .bc-home-v1__media-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:25rem){
+    .bc-home-live .bc-home-hero h1{font-size:clamp(2.25rem,9vw,3.3rem)}
+}
