@@ -18,7 +18,7 @@
 .bc-inline-edit__label { color:var(--text-secondary); font-size:var(--text-sm); }
 .bc-inline-edit__value { font-size:var(--text-base); font-weight:900; line-height:1.4; overflow-wrap:anywhere; }
 .bc-inline-edit__trigger { flex:0 0 auto; color:var(--link-default); font-size:var(--text-sm); font-weight:900; }
-.bc-inline-edit[open] .bc-inline-edit__trigger { color:var(--vdbs-purple); }
+.bc-inline-edit[open] .bc-inline-edit__trigger { color:var(--link-visited); }
 .bc-inline-edit__editor { display:grid; gap:1rem; padding:1rem 1.1rem 1.2rem; border-top:1px solid var(--border-default); }
 .bc-inline-edit__actions { display:flex; gap:.6rem; flex-wrap:wrap; }
 .bc-inline-edit--compact .bc-inline-edit__summary { min-height:3rem; padding:.6rem .85rem; }
