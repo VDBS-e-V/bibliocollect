@@ -52,7 +52,7 @@ it('beschriftet Tastenkombinationen und erstellt keine eigenen Tastaturaktionen'
     ]);
     $empty = Blade::render('<x-ui.shortcut-hint :keys="[]" />');
     expect($html)->toContain('<kbd')->toContain('Schnellzugriff')
-        ->toContain('aria-label="Strg plus K"')
+        ->toContain('aria-hidden="true"')->toContain('sr-only')->toContain('Strg plus K')
         ->not->toContain('onkeydown')
         ->and($empty)->not->toContain('<kbd');
 });
