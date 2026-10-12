@@ -266,3 +266,15 @@
 @media(max-width:38rem) {
  .bc-core-gallery-v10__pagination .bc-page-size-selector { max-width:100%; }
 }
+
+/* K18 audit: keep chapter menus and long prop descriptions inside their gallery container. */
+.bc-core-gallery__component-note > span { min-width:0; flex:1 1 12rem; overflow-wrap:anywhere; }
+@media(max-width:55rem) {
+    .bc-core-gallery__nav-group[open] { flex-basis:100%; }
+    .bc-core-gallery__nav-links {
+        position:static;
+        box-sizing:border-box;
+        width:100%; min-width:0; max-width:100%; max-height:none;
+        margin-top:.35rem;
+    }
+}

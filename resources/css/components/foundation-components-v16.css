@@ -54,7 +54,7 @@
 .bc-contact-preferences__options{display:grid;gap:.65rem}
 .bc-contact-preferences__item{padding:.75rem;border:1px solid var(--border-default);border-radius:var(--radius-sm);background:var(--bg-surface-muted);min-width:0}
 .bc-contact-preferences__item:has(input:checked){border-color:var(--vdbs-purple)}
-.bc-contact-preferences__item:has(input:disabled){opacity:.65}
+.bc-contact-preferences__item:has(input:disabled){border-style:dashed} /* Disabled text must retain 4.5:1 contrast. */
 .bc-contact-preferences__disabled{display:block;font-size:var(--text-sm);margin:.3rem 0 0;color:var(--text-secondary)}
 .bc-contact-preferences__error{margin:.75rem 0 0;color:var(--vdbs-error);font-size:var(--text-sm)}
 .bc-identifier-list__empty,.bc-location-path__empty,.bc-contact-preferences__empty{margin:.75rem 0 0;padding:.75rem;background:var(--bg-surface-muted);color:var(--text-secondary);border-radius:var(--radius-sm)}

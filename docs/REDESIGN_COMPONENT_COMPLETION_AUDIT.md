@@ -66,3 +66,7 @@ Mit `npm run check:components` werden unter Chrome mit der bestehenden Designlab
 Der Test ist an den Accessibility-Workflow gekoppelt und benötigt Chrome und den laufenden Laravel-Demoserver; er hat keine schreibende Serveraktion. Er ist zusätzlich zu Axe, dem Layoutcheck und den PHP-Featuretests zu bestehen.
 
 Die öffentliche `/design-lab/komponenten`-Galerie ist nun zusätzlich in `scripts/support/site.mjs` für **alle vorhandenen Axe- und mobilen 320/375/768/1024-Pixel-Layout-Prüfungen** registriert. Auch alte Komponenten werden so automatisch auf ihre reale Darstellung geprüft. Falls der Prüflauf weitere Befunde sichtbar macht, bleibt die Freigabe bis zur Nachbearbeitung offen.
+
+### Konkrete Befunde der erweiterten Galerieprüfung (nach K18)
+
+Der erste vollständige Browserlauf fand ausschließlich in der **neu aufgenommenen Galerie** zwei ernsthafte Kontrastbefunde bei einer deaktivierten Kontaktpräferenz (Container-Opacity 0,65) und Mobilüberläufe bei Aktionsmenü, Kapitelmenü und langer Property-Beschreibung. Außerdem zeigte der neue Interaktionstest, dass Escape im nativen Suchfeld der Command-Palette den Dialog nicht zuverlässig schloss. Die genannten Ursachen wurden in den **gemeinsamen Komponenten-/Galerie-Styles und Interaktionsskripten** korrigiert. Diese Korrekturen erfordern erneut einen CI-Durchlauf; grüne Resultate dürfen erst nach dessen Abschluss eingetragen werden.

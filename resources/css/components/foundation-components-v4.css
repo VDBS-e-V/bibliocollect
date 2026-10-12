@@ -131,3 +131,15 @@ a.bc-action-menu__item:hover { background:var(--bg-brand-soft); }
     .bc-ui-dialog__body { padding:0 1rem 1.25rem; }
     .bc-ui-dialog__footer { padding:1rem; }
 }
+
+/* Ensure hidden native details are not measured as visible tiny menu targets. */
+.bc-action-menu:not([open]) > .bc-action-menu__panel,
+.bc-popover:not([open]) > .bc-popover__panel { display:none; }
+@media(max-width:40rem) {
+    .bc-action-menu--end > .bc-action-menu__panel,
+    .bc-popover--end > .bc-popover__panel {
+        box-sizing:border-box;
+        min-width:min(12rem,calc(100vw - 2rem));
+        max-width:min(12rem,calc(100vw - 2rem));
+    }
+}

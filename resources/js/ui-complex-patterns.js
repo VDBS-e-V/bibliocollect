@@ -18,6 +18,13 @@ document.querySelectorAll('[data-ui-command-dialog]').forEach((dialog) => {
     }
   });
   dialog.addEventListener('keydown', (event) => {
+    // Native search inputs may consume Escape to clear their text instead of closing the dialog.
+    if (event.key === 'Escape' && dialog.open) {
+      event.preventDefault();
+      event.stopPropagation();
+      dialog.close();
+      return;
+    }
     const current = document.activeElement;
     if (!current?.closest?.('[data-ui-command-item]')) return;
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
