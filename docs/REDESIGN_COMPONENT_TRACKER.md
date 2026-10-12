@@ -246,3 +246,20 @@ Styles: `resources/css/components/foundation-components-v12.css`; Vorschau: `res
 Vier neue Entwurfsbausteine im Designlab (55–58): `x-ui.contact-card` zeigt Kontaktwege in einem semantischen `address`; `x-ui.permission-matrix` zeigt zugängliche Tabellen mit Rollen und textlichen Berechtigungszuständen (keine Autorisierung); `x-ui.schedule-exceptions` ergänzt den Wochenplan um datierte Sonderöffnungszeiten (keine Berechnung); `x-ui.selection-summary` listet ausgewählte Datensätze und nur bei vorhandener URL einen Entfernen-Link (keine Mutation).
 
 CSS `foundation-components-v13.css`; Galerie `design-lab-components-v13.blade.php`; fünf Featuretests `ComponentLibraryV13Test.php`. Status sämtlicher vier Bausteine: **Entwurf**, ohne Produktivseitenmigration oder Fachlogik. Mobile, Dark-Mode-, Tastatur- und Screenreaderprüfung ausstehend.
+
+### Priorität A – K14/K15 (Abschnitte 59–66)
+
+Acht zusätzliche **Entwurfs**-Bausteine sind in der bestehenden Galerie verfügbar. Ihre Darstellung bleibt opt-in und ohne Produktseitenmigration:
+
+| Runde | Komponente | Reale UI-Funktion und Abgrenzung |
+|---|---|---|
+| K14 | `x-ui.combobox` | Native Select-Rückfallebene, nach JS-Laden durchsuchbare Listbox mit Pfeiltasten/Enter/Escape; optional GET auf übergebene Same-Origin-Suggest-URL (`?q=`). Keine Fachsuche in der Galerie. Anders als `x-ui.autocomplete` mit nativem datalist. |
+| K14 | `x-ui.date-time-picker` | `datetime-local`, min/max/step, Pflichtfeld, Label, Fehler/Hinweis. Keine Zeitzonen-/Servervalidierung. |
+| K14 | `x-ui.time-range` | Zwei native `time`-Felder in `fieldset`, Fehlertext/Hinweis, zwei Dichten. Keine automatische Endzeitlogik. |
+| K14 | `x-ui.form-actions` | Abschlusspattern aus bestehendem Button mit Cancel-/Back-Link und opt-in Slots; echter Submit nur in einem echten Formular. Im Designlab deaktiviert. |
+| K15 | `x-ui.command-palette` | Bestehender `x-ui.dialog` mit durchsuchbaren echten Links, Disabled-Zustand, optional Strg/⌘+K, Tastaturnavigation. Keine frei erfundenen Aktionen. |
+| K15 | `x-ui.data-grid` | Komposition aus `x-ui.table` und `x-ui.sort-header`; echte übergebene Sortier-URLs, Checkboxen mit gemeinsamem Auswahlzähler, scrollbares Tabellensemantik. Keine Query-/Persistenzlogik. |
+| K15 | `x-ui.side-panel` | Seitlicher nativer `dialog`, vorhandene Fokus-/Schließen-Infrastruktur; Close-/Escape-Rückgabe. Keine zweite Modal-Engine. |
+| K15 | `x-ui.confirmation-flow` | `x-ui.dialog` mit Bestätigungscheckbox und optionaler exakter Phrase, Opt-in POST mit CSRF nur bei echter `action`-URL. Im Designlab absichtlich ohne abschickbare Fachaktion. Serverseitige Autorisierung bleibt Pflicht. |
+
+Dateien: `foundation-components-v14.css`, `foundation-components-v15.css`, `ui-combobox.js`, `ui-complex-patterns.js`, `design-lab-components-v14.blade.php`, `design-lab-components-v15.blade.php`, `ComponentLibraryV14Test.php`, `ComponentLibraryV15Test.php`. Keine Design-Tokens/Farben/Schriften verändert. **CI und reale manuelle Accessibility-Abnahme vor Freigabe zwingend**.

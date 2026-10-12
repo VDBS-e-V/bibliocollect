@@ -73,3 +73,16 @@ Keine dieser Prüfaufgaben ersetzt die praktische Browser-/Screenreader-Abnahme 
 - **54 Prüfkriterien:** Status Erfüllt/Nicht erfüllt/Noch ungeprüft/Nicht anwendbar ohne Farbsehen unterscheiden, Compact/Comfortable und Leerzustand, Screenreader und Dunkelmodus.
 
 Der bestehende Accessibility-CI-Lauf auf K11 meldete weiterhin einen fehlgeschlagenen mobilen/Tablet-Layoutcheck. K12 ist dadurch nicht freigegeben; neue CI und manuelle Prüfung bleiben erforderlich.
+
+## K14/K15 – Priorität A, Reviewabschnitte 59–66
+
+- **59 Combobox:** Select ohne JS; mit JS Trefferfilter, Pfeiltasten, Enter/Escape, deaktivierte Optionen, sichtbarer Fokus, Remote-Laden/Fehler und Abbruch bei Eingabefolge; Prüfen der Eingabebeziehung zum Label und Tastaturnutzung im Screenreader.
+- **60 Datum/Uhrzeit:** native Picker unter Windows, Android, iOS; Format, min/max und Screenreader, Error/Hint unter dem Feld.
+- **61 Zeitfenster:** Fieldset/Legend, zwei getrennte Input-Labels, 320px, Tastatur; fehlender Server-Endzeitcheck ist explizit keine UI-Garantie.
+- **62 Formularaktionen:** Primary/Secondary, Cancel/Back als echte URLs, disabled Demo, Compact sowie Mobile-Umbruch.
+- **63 Command-Palette:** Dialog öffnen, Strg/⌘+K außerhalb von Formularfeldern, Filter, Pfeile, Enter, Escape, Fokus-Rückgabe, Disabled ohne Pseudolink.
+- **64 Data-Grid:** Tabellenköpfe, Checkbox-Select-all, teilselektierter Zustand, deaktivierte Zeile, 320px Scrollfokus, Sortierlink und Statusanzeige. Keine Query im Browser.
+- **65 Side-Panel:** Focus-Trap über nativem Modal, Escape/Close/Rückfokus, Scrollen bei hoher Zoomstufe, Mobile und Dunkelmodus.
+- **66 Confirmation-Flow:** Checkbox und ggf. exakte Phrase, Vorschau ohne POST, reale POST nur durch übergebene URL plus CSRF; Prüfung der serverseitigen Autorisierung und Validierung erst bei Fachintegration.
+
+**Status:** Entwurf, nicht freigegeben. Automatisierte Tests und Browser-/Screenreaderprüfung getrennt erfassen; bekannte bestehende Layoutüberläufe und Cron-Test separat verfolgen.

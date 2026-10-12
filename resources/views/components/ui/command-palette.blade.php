@@ -12,7 +12,7 @@
     <x-ui.dialog :id="$id" :title="$title" class="bc-command-palette__dialog" data-ui-command-dialog>
         <label class="bc-command-palette__label" for="{{ $id }}-search">{{ $label }}</label>
         <input type="search" id="{{ $id }}-search" class="bc-command-palette__search"
-            data-ui-command-search aria-controls="{{ $id }}-items" autocomplete="off">
+            data-ui-command-search role="searchbox" aria-controls="{{ $id }}-items" autocomplete="off">
         <ul id="{{ $id }}-items" class="bc-command-palette__items" data-ui-command-items>
             @foreach ($items as $item)
                 <li data-ui-command-item>

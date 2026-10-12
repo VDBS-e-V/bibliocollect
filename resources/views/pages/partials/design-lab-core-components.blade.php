@@ -33,6 +33,9 @@
                 <a href="#bc-core-context-strip">Detailleiste</a>
                 <a href="#bc-core-disclosures">Akkordeon</a>
                 <a href="#bc-core-dialogs">Dialoge</a>
+                <a href="#bc-core-command-palette">Schnellzugriff</a>
+                <a href="#bc-core-side-panel">Seitenpanel</a>
+                <a href="#bc-core-confirmation-flow">Bestätigungsablauf</a>
             </div>
         </details>
         <details class="bc-core-gallery__nav-group" data-ui-dismissable>
@@ -46,6 +49,10 @@
                 <a href="#bc-core-date-range">Datumsbereich</a>
                 <a href="#bc-core-segmented-choice">Segmentierte Auswahl</a>
                 <a href="#bc-core-choice-cards">Auswahlkarten</a>
+                <a href="#bc-core-combobox">Durchsuchbare Combobox</a>
+                <a href="#bc-core-date-time">Datum und Uhrzeit</a>
+                <a href="#bc-core-time-range">Zeitfenster</a>
+                <a href="#bc-core-form-actions">Formularaktionen</a>
                 <a href="#bc-core-selection-summary">Auswahlübersicht</a>
                 <a href="#bc-core-inline-edit">Inline-Bearbeitung</a>
                 <a href="#bc-core-scan-input">Barcodefeld</a>
@@ -58,6 +65,7 @@
                 <a href="#bc-core-filter-toolbar">Filterleiste</a>
                 <a href="#bc-core-filter-panel">Filterpanel</a>
                 <a href="#bc-core-data-table">Tabellen und Auswahl</a>
+                <a href="#bc-core-data-grid">Erweitertes Datengitter</a>
                 <a href="#bc-core-list-rows">Listenzeilen</a>
                 <a href="#bc-core-timeline">Zeitachse</a>
                 <a href="#bc-core-data-viz">Datenbalken</a>
@@ -288,6 +296,8 @@
     @include('pages.partials.design-lab-components-v11')
     @include('pages.partials.design-lab-components-v12')
     @include('pages.partials.design-lab-components-v13')
+    @include('pages.partials.design-lab-components-v14')
+    @include('pages.partials.design-lab-components-v15')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
