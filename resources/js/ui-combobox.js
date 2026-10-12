@@ -33,6 +33,7 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
   let active = -1;
   let controller = null;
   let queryTimer;
+  let requestVersion = 0;
   const remote = root.dataset.uiComboboxUrl;
   const minimum = Math.max(1, Number(root.dataset.uiComboboxMin) || 2);
   const selectedLabel = () => select.selectedOptions[0]?.value ? select.selectedOptions[0].textContent : '';
@@ -96,6 +97,7 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
     if (!remote) { render(options.filter((o) => o.label.toLocaleLowerCase().includes(needle))); return; }
     clearTimeout(queryTimer);
     controller?.abort();
+    const version = ++requestVersion;
     if (needle.length < minimum) { close(); status.textContent = 'Mindestens ' + minimum + ' Zeichen eingeben'; return; }
     status.textContent = 'Vorschläge werden geladen …';
     queryTimer = setTimeout(async () => {
@@ -111,9 +113,10 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
         if (!Array.isArray(result)) throw new Error('Invalid suggestion response');
         options = result.filter((item) => item && typeof item.label === 'string' && typeof item.value === 'string')
           .slice(0, 50).map((item) => ({ label: item.label, value: item.value, disabled: !!item.disabled }));
+        if (version !== requestVersion) return;
         render(options);
       } catch (error) {
-        if (error.name !== 'AbortError') { close(); status.textContent = 'Vorschläge konnten nicht geladen werden'; }
+        if (error.name !== 'AbortError' && version === requestVersion) { close(); status.textContent = 'Vorschläge konnten nicht geladen werden'; }
       }
     }, 250);
   };
