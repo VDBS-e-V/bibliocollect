@@ -312,3 +312,7 @@ Styles `foundation-components-v18.css`; Galerie `design-lab-components-v18.blade
 Der Auftraggeber hat die Komponenten ausdrücklich abgenommen. Damit sind die geplanten Komponentenrunden als **gestalterisch freigegeben** dokumentiert. Frühere, zeitlich verortete Einträge mit Status „Entwurf“ bleiben als historischer Entwicklungsverlauf bestehen; sie beschreiben nicht den aktuellen Abnahmestand.
 
 Die technische Vollqualität des Gesamtprojekts und ein Merge sind **nicht** automatisch bestätigt: der unabhängige `OperationsCommandsTest.php:115` ist weiterhin gesondert zu behandeln. PR #92 bleibt Draft. Für die nächste Phase dürfen die freigegebenen Komponenten in **neuen Designlab-Seitenentwürfen** verwendet werden; keine produktive Seitenmigration ohne gesonderte Zustimmung.
+
+## Nächste Projektphase: Seitenentwurf öffentliche Startseite V1
+
+Die Komponentenbibliothek ist **abgenommen**. Neuer, getrennter **Seitenentwurf zur Review** unter `/design-lab/startseite-v1`, neben der alten Studie `/design-lab/startseite`; keine produktive Startseitenänderung. Er kombiniert freigegebene Cover, Suche, Quick-Actions, Medienkarten, Feature-Overlap und Servicehinweis. Responsive Styles sind auf `.bc-home-v1` beschränkt; die Vorschau wird in den bestehenden A11y-/Mobilcheck aufgenommen. Eigene Featuretests und Review-Checkliste: `tests/Feature/DesignLabHomeV1Test.php` und `docs/REDESIGN_HOME_V1_REVIEW.md`. **Status: Seitenentwurf V1 zur Abnahme, keine Produktionsfreigabe.**
