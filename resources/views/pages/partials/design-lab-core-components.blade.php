@@ -37,6 +37,12 @@
         <a href="#bc-core-copy-rows">Exemplarzeilen</a>
         <a href="#bc-core-patron-choice">Personenauswahl</a>
         <a href="#bc-core-scan-feedback">Scan-Feedback</a>
+        <a href="#bc-core-cover-variants">Covervarianten</a>
+        <a href="#bc-core-inline-edit">Inline-Edit</a>
+        <a href="#bc-core-hierarchy">Hierarchien</a>
+        <a href="#bc-core-week-schedule">Wochenplan</a>
+        <a href="#bc-core-print-preview">Etiketten</a>
+        <a href="#bc-core-message-preview">Nachrichten</a>
         <a href="#bc-core-patterns">Größere Patterns</a>
     </nav>
 
@@ -208,6 +214,8 @@
     @include('pages.partials.design-lab-components-v5')
 
     @include('pages.partials.design-lab-components-v6')
+
+    @include('pages.partials.design-lab-components-v7')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
