@@ -74,7 +74,7 @@
                     <x-library.quick-action :href="route('login')" title="Ausleihen verwalten" description="Für Verlängerungen und Vormerkungen anmelden." icon="user" />
                 @endcan
                 <x-library.quick-action :href="route('public.series.index')" title="Buchreihen entdecken" description="Zusammenhängende Geschichten und Themen finden." icon="book" />
-                <x-library.quick-action :href="route('public.wishes.create')" title="Buchwunsch abgeben" description="Neue Medien für die Bibliothek vorschlagen." icon="heart" />
+                <x-library.quick-action :href="route('public.wishes.create')" title="Buchwunsch abgeben" description="Neue Ideen für die Bibliothek vorschlagen." icon="heart" />
             </div>
         </section>
 
