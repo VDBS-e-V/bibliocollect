@@ -7,6 +7,7 @@
             ['key' => 'index', 'label' => 'Übersicht', 'route' => 'public.design-lab'],
             ['key' => 'komponenten', 'label' => 'Komponenten', 'route' => 'public.design-lab.components'],
             ['key' => 'designsystem', 'label' => 'Designsystem', 'route' => 'public.design-lab.designsystem'],
+            ['key' => 'startseite-v1', 'label' => 'Startseite · V1', 'route' => 'public.design-lab.home-v1'],
             ['key' => 'startseite', 'label' => 'Startseite · Alt', 'route' => 'public.design-lab.home'],
             ['key' => 'medien', 'label' => 'Mediendetail · Alt', 'route' => 'public.design-lab.media'],
             ['key' => 'assistent', 'label' => 'Assistent · Alt', 'route' => 'public.design-lab.wizard'],
@@ -38,9 +39,9 @@
                 <div>
                     <span class="bc-design-lab__legacy-tag">Älterer Entwurf</span>
                     <strong>Diese Musterseite ist eine frühere Designstudie.</strong>
-                    <p>Wir entwickeln zurzeit ausschließlich die universellen Komponenten. Die endgültigen Seiten gestalten wir erst, wenn die Komponentenbibliothek vollständig geprüft und freigegeben ist.</p>
+                    <p>Die Komponentenbibliothek ist abgenommen. Der aktuelle Startseitenentwurf V1 ist separat verfügbar; dieser alte Stand bleibt für den Vergleich erhalten.</p>
                 </div>
-                <a href="{{ route('public.design-lab.components') }}">Aktuelle Komponenten ansehen <span aria-hidden="true">→</span></a>
+                <a href="{{ route('public.design-lab.home-v1') }}">Aktuellen Startseitenentwurf ansehen <span aria-hidden="true">→</span></a>
             </aside>
         @endif
         @if ($screen === 'designsystem')
@@ -53,16 +54,16 @@
             <header class="bc-design-lab__intro">
                 <span class="bc-design-lab__kicker">VDBS / BiblioCollect · Designstudie 04</span>
                 <h1>Ein System.<br><em>Mehr Raum für Ideen.</em></h1>
-                <p><strong>Aktueller Arbeitsbereich: die Komponentenbibliothek.</strong> Die fünf eigenständigen Musterseiten sind frühere Designstudien und ausdrücklich noch keine finalen Seiten. Wir gestalten zuerst alle wiederverwendbaren Elemente.</p>
+                <p><strong>Aktueller Arbeitsbereich: die öffentliche Startseite V1.</strong> Die freigegebenen Komponenten werden erstmals zu einer ganzen Seite kombiniert. Ältere Designstudien bleiben zum Vergleichen erhalten.</p>
             </header>
 
-            <a class="bc-design-lab__active-library" href="{{ route('public.design-lab.components') }}">
+            <a class="bc-design-lab__active-library" href="{{ route('public.design-lab.home-v1') }}">
                 <span class="bc-design-lab__active-library-copy">
-                    <small>Aktueller Arbeitsbereich · Komponenten zuerst</small>
-                    <strong>Bausteine entwickeln, vergleichen und freigeben.</strong>
-                    <span>Buttons, Navigation, Formulare, Status, Tabellen und weitere Patterns – inklusive Comfortable-/Compact-Vergleich.</span>
+                    <small>Aktueller Arbeitsbereich · Seitenentwurf 01</small>
+                    <strong>Die öffentliche Startseite V1 im Zusammenhang.</strong>
+                    <span>Katalogsuche, Medienkarten, Schnellzugriffe, Bibliotheksgeschichte und Service – aus freigegebenen Bausteinen.</span>
                 </span>
-                <span class="bc-design-lab__active-library-link">Zur Komponentenbibliothek <span aria-hidden="true">↗</span></span>
+                <span class="bc-design-lab__active-library-link">Startseite V1 ansehen <span aria-hidden="true">↗</span></span>
             </a>
 
             <a class="bc-design-lab__system-banner" href="{{ route('public.design-lab.designsystem') }}">
@@ -76,6 +77,12 @@
                 </span>
             </a>
             <div class="bc-design-lab__overview">
+                <a href="{{ route('public.design-lab.home-v1') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--feature">
+                    <span class="bc-design-lab__kicker">Neu / Startseite V1</span>
+                    <strong>Deine nächste<br>Geschichte wartet.</strong>
+                    <span>Abgestimmte Bausteine erstmals als ganze Seite <span aria-hidden="true">↗</span></span>
+                    <img src="/brand/vdbs/figures-chain.svg" alt="" loading="lazy">
+                </a>
                 <a href="{{ route('public.design-lab.home') }}" class="bc-design-lab__overview-card bc-design-lab__overview-card--feature">
                     <span class="bc-design-lab__tile-status">Älterer Entwurf</span>
                     <span class="bc-design-lab__kicker">01 / Startseite</span>
@@ -115,6 +122,8 @@
             </div>
         @elseif ($screen === 'designsystem')
             @include('pages.partials.design-system-map')
+        @elseif ($screen === 'startseite-v1')
+            @include('pages.partials.design-lab-home-v1')
         @elseif ($screen === 'startseite')
             <header class="bc-design-lab__page-head">
                 <span class="bc-design-lab__kicker">Musterseite 01 · Öffentlich</span>

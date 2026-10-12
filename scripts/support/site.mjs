@@ -20,6 +20,7 @@ export const guestPages = [
   ['Anmelden', '/anmelden'],
   ['Reihen', '/reihen'],
   ['Komponentenbibliothek', '/design-lab/komponenten'],
+  ['Startseite V1 (Designlab)', '/design-lab/startseite-v1'],
 ];
 
 export const memberPages = [
