@@ -1,4 +1,5 @@
 // K15: behaviors remain opt-in to the components and do not implement domain actions.
+const commandShortcutOrigins = new WeakMap();
 document.querySelectorAll('[data-ui-command-dialog]').forEach((dialog) => {
   const search = dialog.querySelector('[data-ui-command-search]');
   const items = [...dialog.querySelectorAll('[data-ui-command-item]')];
@@ -27,7 +28,16 @@ document.querySelectorAll('[data-ui-command-dialog]').forEach((dialog) => {
     if (next < 0) search.focus();
     else (options[next] || options[0])?.focus();
   });
-  dialog.addEventListener('close', () => { search.value = ''; filter(); });
+  dialog.addEventListener('click', (event) => {
+    if (event.target.closest('[data-ui-command-item] a')) dialog.close();
+  });
+  dialog.addEventListener('close', () => {
+    search.value = '';
+    filter();
+    const origin = commandShortcutOrigins.get(dialog);
+    if (origin?.isConnected) origin.focus();
+    commandShortcutOrigins.delete(dialog);
+  });
 });
 document.addEventListener('click', (event) => {
   const trigger = event.target.closest('[data-ui-dialog-open]');
@@ -42,6 +52,7 @@ document.addEventListener('keydown', (event) => {
   const dialog = wrapper?.querySelector('[data-ui-command-dialog]');
   if (!dialog || dialog.open) return;
   event.preventDefault();
+  if (document.activeElement instanceof HTMLElement) commandShortcutOrigins.set(dialog, document.activeElement);
   dialog.showModal();
   dialog.querySelector('[data-ui-command-search]')?.focus();
 });
