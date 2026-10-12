@@ -263,3 +263,18 @@ Acht zusätzliche **Entwurfs**-Bausteine sind in der bestehenden Galerie verfüg
 | K15 | `x-ui.confirmation-flow` | `x-ui.dialog` mit Bestätigungscheckbox und optionaler exakter Phrase, Opt-in POST mit CSRF nur bei echter `action`-URL. Im Designlab absichtlich ohne abschickbare Fachaktion. Serverseitige Autorisierung bleibt Pflicht. |
 
 Dateien: `foundation-components-v14.css`, `foundation-components-v15.css`, `ui-combobox.js`, `ui-complex-patterns.js`, `design-lab-components-v14.blade.php`, `design-lab-components-v15.blade.php`, `ComponentLibraryV14Test.php`, `ComponentLibraryV15Test.php`. Keine Design-Tokens/Farben/Schriften verändert. **CI und reale manuelle Accessibility-Abnahme vor Freigabe zwingend**.
+
+### Priorität B – K16: Bibliothek und Portal (Galerie 67–72)
+
+Sechs wiederverwendbare **Entwurfs**-Bausteine, noch keine produktive Integration:
+
+| Baustein | Zweck und Abgrenzung |
+|---|---|
+| `x-library.media-detail-summary` | Kombiniert vorhandene `media-cover`, `availability-status` und `description-list` zu einer größeren Mediendetailübersicht; neue Medienkartenlogik wird nicht dupliziert. |
+| `x-library.hold-status` | Vormerkung in `waiting/ready/paused/expired/cancelled/unknown`; Position und Abholfrist werden nur zustandsbezogen angezeigt, vom Fachsystem übergeben. |
+| `x-library.loan-summary` | Datensatz-/Fristübersicht mit vorhandener `due-date-status`-Komponente und unveränderter visueller 7-Tage-Regel. Keine Verlängerungsentscheidung. |
+| `x-library.identifier-list` | Strukturierte ISBN-/ISSN-/Barcode-Kennungen als `dl`, optionale echte Links; keine Kennungsvalidierung. |
+| `x-library.location-path` | Standort-Hierarchie, optionale Bereichslinks, Signatur und Hinweis; keine zusätzliche Seitennavigation/Breadcrumb-Engine. |
+| `x-ui.contact-preferences` | `fieldset/legend` mit vorhandenen `x-ui.checkbox`-Inputs zur Wahl von Kontaktkanälen; kein Speichern, keine Opt-in- oder Versandfachlogik. |
+
+Stile `resources/css/components/foundation-components-v16.css`; Galerie `resources/views/pages/partials/design-lab-components-v16.blade.php`, Featuretests `tests/Feature/ComponentLibraryV16Test.php` (sieben Tests). Die Markenpalette und Schriften bleiben erhalten; alle sechs Komponenten sind bis zur Browser-/Screenreaderprüfung **Entwurf**. Der bekannte fehlgeschlagene Cron/Job-Test und bestehende mobile Layoutbefunde sind separat zu verfolgen.

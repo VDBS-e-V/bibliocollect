@@ -86,3 +86,14 @@ Der bestehende Accessibility-CI-Lauf auf K11 meldete weiterhin einen fehlgeschla
 - **66 Confirmation-Flow:** Checkbox und ggf. exakte Phrase, Vorschau ohne POST, reale POST nur durch übergebene URL plus CSRF; Prüfung der serverseitigen Autorisierung und Validierung erst bei Fachintegration.
 
 **Status:** Entwurf, nicht freigegeben. Automatisierte Tests und Browser-/Screenreaderprüfung getrennt erfassen; bekannte bestehende Layoutüberläufe und Cron-Test separat verfolgen.
+
+## K16 – Priorität B, Komponenten 67–72
+
+- **67 Mediendetails:** vorhandene Cover-/Verfügbarkeits-/Metadaten-APIs wiederverwenden; lange Titel bei 320/375 px, Compact, Dunkelmodus, Coverfallback, Actions-Fokus.
+- **68 Vormerkungen:** waiting/ready/paused/expired/cancelled/unknown in Farbe und Text klar unterscheiden; Position nur bei waiting, Abholfrist nur bei ready; keine fiktive Fristberechnung.
+- **69 Ausleihen:** bestehende 7-Tage-Grenze (7, 0, überfällig, unbekannt), lange Titel, Links, Rückgabedatum und alle Dichten prüfen.
+- **70 Kennungen:** `dl/dt/dd`, lange ISBN/Barcodes ohne Überlauf, leere Werte, nur echte Links, keine automatische Validierung.
+- **71 Standortpfad:** Standortreihenfolge auch ohne Farbe nachvollziehen, lange Hierarchien und Signaturen, leere Pfade, deaktivierte Ziele ohne Link.
+- **72 Kontaktpräferenzen:** native Checkbox/Fieldset-Semantik, Tastatur, checked/disabled, Gruppenhint/-error, schmale Breiten, kein Formular und keine Datenübertragung in der Galerie.
+
+**Ausstehend:** automatische CI-Prüfung, Zoom 200–400 %, Tastatur, Mobil- und Dunkelmodus, Screenreader. Keine Freigabe bis zur tatsächlichen Prüfung.

@@ -85,11 +85,17 @@
             <summary>Bibliothek</summary>
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-media-cards">Medienkarten</a>
+                <a href="#bc-core-media-detail-summary">Mediendetails</a>
                 <a href="#bc-core-library-states">Bibliotheksstatus</a>
+                <a href="#bc-core-hold-status">Vormerkungen</a>
+                <a href="#bc-core-loan-summary">Ausleihen</a>
                 <a href="#bc-core-copy-rows">Exemplare</a>
                 <a href="#bc-core-patron-choice">Personenauswahl</a>
                 <a href="#bc-core-scan-feedback">Scan-Feedback</a>
                 <a href="#bc-core-cover-variants">Covervarianten</a>
+                <a href="#bc-core-identifier-list">Kennungen</a>
+                <a href="#bc-core-location-path">Standortpfad</a>
+                <a href="#bc-core-contact-preferences">Kontaktwünsche</a>
             </div>
         </details>
         <details class="bc-core-gallery__nav-group" data-ui-dismissable>
@@ -298,6 +304,7 @@
     @include('pages.partials.design-lab-components-v13')
     @include('pages.partials.design-lab-components-v14')
     @include('pages.partials.design-lab-components-v15')
+    @include('pages.partials.design-lab-components-v16')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
