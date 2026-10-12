@@ -1,6 +1,6 @@
 {{-- Komponenten zuerst: echte, wiederverwendbare Blade-Bausteine statt einzelner Seitenlayouts. --}}
 <div class="bc-core-gallery">
-    <header class="bc-core-gallery__intro">
+    <header class="bc-core-gallery__intro" id="bc-core-top">
         <span class="bc-design-lab__kicker">BiblioCollect / Designsystem · Basisbibliothek 01</span>
         <h1>Erst die Bausteine.<br><em>Dann die Seiten.</em></h1>
         <p>Eine einheitliche Komponentenbibliothek für öffentlichen Katalog, persönliches Portal, Bibliotheksbetrieb und Administration. Hier vergleichen wir Varianten und Zustände – ohne die produktiven Seiten anzupassen.</p>
@@ -27,11 +27,15 @@
             <div class="bc-core-gallery__nav-links">
                 <a href="#bc-core-navigation">Breadcrumbs und Tabs</a>
                 <a href="#bc-core-overlays">Menüs und Hilfen</a>
+                <a href="#bc-core-skip-links">Sprunglinks</a>
+                <a href="#bc-core-back-to-top">Seitenanfang</a>
+                <a href="#bc-core-shortcut-hint">Tastaturhilfe</a>
                 <a href="#bc-core-toolbars">Toolbars und Mobile</a>
                 <a href="#bc-core-step-actions">Schrittaktionen</a>
                 <a href="#bc-core-section-index">Abschnittsindex</a>
                 <a href="#bc-core-context-strip">Detailleiste</a>
                 <a href="#bc-core-disclosures">Akkordeon</a>
+                <a href="#bc-core-read-more">Langtext ausklappen</a>
                 <a href="#bc-core-dialogs">Dialoge</a>
                 <a href="#bc-core-command-palette">Schnellzugriff</a>
                 <a href="#bc-core-side-panel">Seitenpanel</a>
@@ -312,6 +316,7 @@
     @include('pages.partials.design-lab-components-v15')
     @include('pages.partials.design-lab-components-v16')
     @include('pages.partials.design-lab-components-v17')
+    @include('pages.partials.design-lab-components-v18')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>

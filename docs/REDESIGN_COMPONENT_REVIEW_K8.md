@@ -108,3 +108,12 @@ Der bestehende Accessibility-CI-Lauf auf K11 meldete weiterhin einen fehlgeschla
 - **78 Stapelfortschritt:** abgeschlossene/laufende/fehlgeschlagene/offene Schritte, vorhandener `x-ui.progress` nur mit echtem Wert, kein erfundener Jobfortschritt; Screenreader und Reduced-Motion.
 
 CI und manuelle Prüfung getrennt bewerten; bekannte CI-/Layoutprobleme gelten nicht durch K17 als behoben. Kein Baustein ist automatisch freigegeben.
+
+## K18 – Priorität D, Galerieabschnitte 79–82
+
+- **79 Skip-Links:** nur Ziele mit echten Ankern, sichtbare Fokusmarkierung mit Tab, Sprung zu vorhandenem Inhalt, keine verdeckten Fokusfallen; erst in späterer Seitenintegration direkt an Dokumentanfang einsetzen.
+- **80 Back-to-Top:** funktionierende Anker mit und ohne URL, Fokus/Scrollposition und Bedienung bei 320–375px.
+- **81 Tastaturhilfe:** `kbd`-Tasten lesbar, zugänglicher Gesamtname; nur tatsächlich existierende Shortcut-Aktionen bewerben.
+- **82 Read-More:** Exzerpt bereits eingeklappt sichtbar, bei geöffnetem Volltext ohne Duplikat; native `details`, langen Inhalt und 400%-Zoom testen.
+
+**Ausstehend für finale Freigabe:** automatisierte CI-Ergebnisse inklusive Accessibility, manuelle Tastatur-/Screenreader-/Darkmode-/Mobilprüfung; alter `OperationsCommandsTest` unabhängig klären. Kein Merge, keine Produktivseitenanpassung.

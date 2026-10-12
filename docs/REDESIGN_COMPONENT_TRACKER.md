@@ -293,3 +293,16 @@ Sechs neue **Entwurfskomponenten** in der aktiven Designlab-Galerie:
 | `x-ui.batch-progress` | Statusliste für Stapelschritte, optional über `x-ui.progress` ein echter vom Aufrufer gelieferter Wert; ohne Wert keine erfundene Prozentangabe. Keine Job-/Queue-Anbindung. |
 
 Gemeinsames CSS: `resources/css/components/foundation-components-v17.css`. Progressive Interaktionen: `resources/js/ui-admin-patterns.js`. Vorschau: `resources/views/pages/partials/design-lab-components-v17.blade.php`. Tests: `tests/Feature/ComponentLibraryV17Test.php` (sieben Tests). Keine Anpassung der VDBS-Tokens, Schriften, produktiven Seiten oder Domain-/Import-/Verarbeitungslogik. **Alle Entwürfe bleiben bis zur Browser- und Screenreaderprüfung ungeprüft.**
+
+### Priorität D – K18: Zugänglichkeit und Feinschliff (Abschnitte 79–82)
+
+Vier neue **Entwurfs**-Bausteine, vollständig ohne neue JavaScript-Engine:
+
+| Baustein | Zweck | Abgrenzung |
+|---|---|---|
+| `x-ui.skip-links` | Fokussichtbare Tastatur-Sprunglinks zu explizit übergebenen tatsächlichen Ankern | Ergänzt Breadcrumbs/Section-Index, am echten Seitenanfang einzusetzen. Keine neuen Ziele erfunden. |
+| `x-ui.back-to-top` | Echter Anker zu bekanntem Seitenanfang, 44px Zielhöhe | Kein Floating-Overlay/Scrollskript und ohne URL kein Scheinlink. |
+| `x-ui.shortcut-hint` | `kbd`-Darstellung einer dokumentierten Kombination, z. B. Strg+K | Bindet selbst keine Tastaturaktionen und bleibt rein informativ. |
+| `x-ui.read-more` | Native `details/summary`-Aufklappfunktion mit sichtbarem Exzerpt im geschlossenen Zustand und vollständigem Slottext beim Öffnen | Ergänzt die bestehende Disclosure-Komponente, keine zweite JavaScript-Fokusverwaltung. |
+
+Styles `foundation-components-v18.css`; Galerie `design-lab-components-v18.blade.php`; fünf Tests `ComponentLibraryV18Test.php`. Gesamter geplanter Prioritätenkatalog A–D (24 zusätzliche Bausteine) ist damit **implementiert, nicht automatisch freigegeben**. Weder Tokenänderungen noch produktive Seitenbearbeitung.

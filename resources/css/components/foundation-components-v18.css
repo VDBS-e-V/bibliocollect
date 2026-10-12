@@ -35,7 +35,7 @@
 .bc-read-more__title{font-weight:800;color:var(--text-secondary)}
 .bc-read-more__excerpt,.bc-read-more__body{margin:.65rem 0 0;line-height:1.6;overflow-wrap:anywhere}
 .bc-read-more__body>*+*{margin-top:.65rem}
-.bc-read-more[open]>.bc-read-more__excerpt{display:none}
-.bc-read-more[open] .bc-read-more__more-label::after{content:" (ausgeklappt)";font-weight:400}
+.bc-read-more details[open]+.bc-read-more__excerpt{display:none}
+.bc-read-more details[open] .bc-read-more__more-label::after{content:" (ausgeklappt)";font-weight:400}
 .bc-read-more__summary:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
 @media(max-width:35rem){.bc-read-more__summary{display:block}.bc-read-more__title{display:block;margin-top:.35rem}}
