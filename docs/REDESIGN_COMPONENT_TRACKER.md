@@ -164,6 +164,21 @@ Zusätzlich wurden vorhandene `x-ui.empty-state` und `x-ui.pagination` im Design
 
 **Noch offen:** Mobile-/Dunkelmodus-/Zoom-/Screenreader-Sichtprüfung der K9-Komponenten, Fachlogik für Filterzeitraum und Paginierung, Datenanbindung, ggf. weitere Kontrast-/Overflow-Funde und vollständige Accessibility-Abnahme. Die Änderungen betreffen zunächst nur Komponenten und Designlab; produktive Seiten bleiben unverändert.
 
+### Komponentenrunde K10 – Suchergebnisse, Paging, Schrittnavigation und Detailkontext
+
+**Vier neue, fachneutral wiederverwendbare Blade-Komponenten**, keine zweite Implementierung von `empty-state`, `pagination`, `process-stepper` oder `page-toolbar`:
+
+| Komponente | API und Verhalten | Abgrenzung |
+|---|---|---|
+| `x-ui.result-summary` | `count`, `query`, `label`, `description`, `density`, optionale `filters`-/`actions`-Slots | Ergebniszusammenfassung mit 0/1/n Treffern; für tatsächlichen Leerzustand bestehendes `x-ui.empty-state` verwenden |
+| `x-ui.page-size-selector` | `name`, `value`, `options`, `label`, `hint`, `density` | Echtes gelabeltes `select` ohne eigenes GET-Formular oder Autosubmit. Mit vorhandener `x-ui.pagination` kombinieren |
+| `x-ui.step-actions` | `previous`, `next`, `cancel`, konfigurierbare Beschriftungen, `label`, `density` | Vor-/Zurück-/Abbruchlinks getrennt vom vorhandenen `x-library.process-stepper`. Ohne URL nicht anklickbar, kein Pseudo-Link |
+| `x-ui.context-strip` | `title`, `items[]` (`label/value`), `backHref`, `backLabel`, `label`, `density`, `status`-/`actions`-Slots | Schmale Detailkontextleiste mit echtem `dl/dt/dd`, kein zweiter allgemeiner Pageheader |
+
+**Review im lokalen Designlab:** `/design-lab/komponenten`, Abschnitte **44–47**, im Menü „Navigation“ und „Daten und Status“. CSS: `resources/css/components/foundation-components-v10.css`; Beispiele: `resources/views/pages/partials/design-lab-components-v10.blade.php`; Tests: `tests/Feature/ComponentLibraryV10Test.php`.
+
+**Noch nicht produktiv:** Die Ergebniszahl ist Demo, Seitengrößenauswahl speichert nicht und wechselt keine Ergebnisseite, Demo-Links führen nur zu anderen Komponenten; der Schrittwechsel führt keine Geschäftsfunktion aus. Für die echte Integration sind Controller-seitige Parameter-/Rechteprüfung, stabile Ergebnis-URLs, anwendungsseitige Formularzustände und Navigation erforderlich. Auch für diese Komponenten sind visuelles Review, Dunkelmodus, 320/375/768/1280px, Tastatur und Screenreader **noch nicht vollständig abgenommen**.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
