@@ -10,13 +10,13 @@
         data-ui-confirm-flow @if (filled($action)) data-ui-confirm-submittable="true" @endif>
         @if (filled($action)) @csrf @endif
         <label class="bc-confirmation-flow__acknowledge" for="{{ $id }}-ack">
-            <input id="{{ $id }}-ack" type="checkbox" required data-ui-confirm-ack>
+            <input id="{{ $id }}-ack" type="checkbox" name="confirmed" value="1" required data-ui-confirm-ack>
             <span>{{ $acknowledgeLabel }}</span>
         </label>
         @if (filled($phrase))
             <label class="bc-confirmation-flow__phrase" for="{{ $id }}-phrase">
                 <span>Zur Bestätigung exakt eingeben: <strong>{{ $phrase }}</strong></span>
-                <input type="text" id="{{ $id }}-phrase" autocomplete="off" required data-ui-confirm-phrase
+                <input type="text" id="{{ $id }}-phrase" name="confirmation_phrase" autocomplete="off" required data-ui-confirm-phrase
                     data-ui-confirm-expect="{{ $phrase }}">
             </label>
         @endif
