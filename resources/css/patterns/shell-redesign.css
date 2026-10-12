@@ -152,8 +152,10 @@
     margin: .8rem 0 1.1rem;
     line-height: 1.55;
 }
+/* Always full contrast on the dark footer; older opacity reduced text to 3.98:1. */
 .bc-footer-brand small {
-    opacity: .8;
+    opacity: 1;
+    color: var(--vdbs-white);
 }
 .bc-footer-group {
     display: grid;
