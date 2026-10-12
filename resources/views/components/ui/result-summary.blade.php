@@ -13,7 +13,7 @@
 
 <section {{ $attributes->class('bc-result-summary bc-result-summary--'.$density) }} aria-label="{{ $label }}">
     <div class="bc-result-summary__copy">
-        <strong class="bc-result-summary__count">{{ $count }} {{ $count === 1 ? 'Treffer' : 'Treffer' }}</strong>
+        <strong class="bc-result-summary__count">{{ $count }} Treffer</strong>
         @if (filled($query))
             <span class="bc-result-summary__query">für „{{ $query }}“</span>
         @endif
