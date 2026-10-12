@@ -278,3 +278,6 @@
         margin-top:.35rem;
     }
 }
+
+/* Closed chapter lists must not participate in mobile geometry or keyboard navigation. */
+.bc-core-gallery__nav-group:not([open]) > .bc-core-gallery__nav-links { display:none; }
