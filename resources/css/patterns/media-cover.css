@@ -84,6 +84,20 @@
 }
 .bc-library-cover--hero .bc-library-cover__title { font-size: clamp(.85rem, 13cqi, 2.2rem); }
 .bc-library-cover--hero .bc-library-cover__art { box-shadow: 0 1.1rem 2rem rgb(0 0 0 / 25%); }
+/* Opt-in image-size variants: one cover component, not separate cover implementations. */
+.bc-library-cover--thumbnail .bc-library-cover__art,
+.bc-library-cover--thumbnail .bc-library-cover__image { border-radius:.22rem; box-shadow:var(--shadow-sm); }
+.bc-library-cover--thumbnail .bc-library-cover__brand,
+.bc-library-cover--thumbnail .bc-library-cover__author { display:none; }
+.bc-library-cover--thumbnail .bc-library-cover__title {
+    font-size:clamp(.38rem,10cqi,.7rem);
+    -webkit-line-clamp:3;
+    line-height:1;
+}
+.bc-library-cover--small .bc-library-cover__art,
+.bc-library-cover--small .bc-library-cover__image { border-radius:.27rem; box-shadow:var(--shadow-sm); }
+.bc-library-cover--small .bc-library-cover__title { -webkit-line-clamp:4; }
+.bc-library-cover--hero .bc-library-cover__image { box-shadow:0 1.1rem 2rem rgb(0 0 0 / 25%); }
 @media print {
     .bc-library-cover__art,
     .bc-library-cover__image { box-shadow: none; border: 1px solid var(--border-default); }
