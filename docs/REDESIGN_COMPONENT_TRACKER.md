@@ -123,17 +123,41 @@ CSS: `resources/css/patterns/library-admin-components.css` und ergänzte `media-
 
 **Noch offen:** echte Bearbeitung mit Rechteprüfung/Formvalidierung, Hierarchiesortierung, Kalendereditor und Ausnahmeregeln, Druckmaße/Scanqualität, sichere dynamische E-Mail-Templates und mobile/Zoom/Dark-Mode-Abnahme. Erst nach Abnahme in produktive Seiten integrieren.
 
+### Komponentenrunde K8a – Navigation, Filter, Daten, Ladezustände und Review
+
+**Größere Components-first-Runde:** Sieben neue wiederverwendbare Blade-Bausteine, eine rückwärtskompatible Erweiterung an der vorhandenen Textarea, bessere Galerie-Navigation und eine sichtbare Review-Matrix:
+
+| Baustein | API / Zustand | Abgrenzung |
+|---|---|---|
+| `x-ui.page-toolbar` | `title`, `description`, Actions-Slot, `density=comfortable/compact` | Für öffentlich, Portal und intern kombinierbar |
+| `x-ui.mobile-navigation` | `label`, `items[]` inkl. `href/active/disabled` | Native `details/summary` + gemeinsames Escape-/Außenklick-Handling; nur Links |
+| `x-ui.filter-panel` | `title`, `count`, `open`, `clearHref`, beliebiger Filter-Slot | Ohne Submit-/Fachlogik; Filter zählen durch aufrufenden Fachbereich |
+| `x-ui.activity-timeline` | `title`, `items[]`, `compact`, optionales `datetime` und Status | Semantisches `ol` und `time`; Textstatus unabhängig von Punktfarben |
+| `x-ui.metric-bars` | `title`, `items[]` mit `label/value/tone`, optional `max` | Farbige Balken **plus ständig sichtbare echte HTML-Datentabelle**, kein Canvas-Only-Chart |
+| `x-ui.busy-panel` | `title`, `description`, `busy`, `compact`, Slot für fertigen Zustand | `aria-busy`, wiederverwendeter Spinner/Skeleton; keine erfundenen Prozentwerte |
+| `x-ui.file-drop-zone` | `name`, `label`, `hint`, `accept`, `multiple` | Native Dateiauswahl; optionales Drag-and-drop zeigt Dateinamen, **kein Upload** |
+
+**Bestehende Textarea erweitert:** `x-ui.textarea` kann optional `showCount` mit `maxlength` anzeigen. Der Anfangszähler funktioniert serverseitig; über `data-ui-char-count` folgt die aktuelle Länge bei Eingabe. Ohne `showCount` bleibt die bisherige Ausgabe unverändert.
+
+Die bisher sehr lange Sprungnavigation der Komponentenbibliothek wurde in **sieben Kapitel** aufgeteilt: Grundlagen, Navigation, Formulare, Daten und Status, Bibliothek, Verwaltung, Qualität. Die Kapitel nutzen native `details`, schließen per Escape/Außenklick und sind auf schmalen Bildschirmen responsiv.
+
+**Aktiver Reviewbereich:** `/design-lab/komponenten`; neue Sektionen 32–38 einschließlich einer nicht gespeicherten **manuellen Prüfliste** für 320/375/768/1280px, Zoom, Dunkelmodus, Tastatur und Screenreader. Häkchen sind ausdrücklich **keine** Abnahme oder verifizierter Testlauf.
+
+CSS: `resources/css/components/foundation-components-v8.css`, `resources/css/patterns/design-lab-core-components.css`. Interaktions-JS: `resources/js/ui-foundations-interactions.js`; Tests: `tests/Feature/ComponentLibraryV8Test.php`. Beispiele: `resources/views/pages/partials/design-lab-components-v8.blade.php`. Produktive Seiten und Geschäftslogik bleiben unverändert, VDBS-Farben und Schriftfamilien fest.
+
+**Offene Qualitätspunkte:** Tatsächliche Browser-/Screenreaderprüfung aller neuen Komponenten in hell/dunkel, 320–1280px und 200–400% Zoom. Echte Filterparameter, Sortier-/Paging-Queries, Server-Uploadvalidierung, optional asynchrone Combobox, Tastaturdetails komplexer Overlays und dynamische Live-Notifications bleiben separate Integrations- oder Komponentenaufgaben. Die Statuswerte im Tracker bezeichnen **Entwürfe**, keine finale Freigabe.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
 |---|---|---|---|
-| K2b Navigation | Dropdown/Aktionsmenü, Tooltip und Popover als Entwurf; **offen**: mobile Navigation und globale Seitentoolbar, platzadaptive Menüpositionen | Schließen per Escape, Fokus und Klick außerhalb; zugängliche Bedienung | Teilweise umgesetzt · Review |
-| K3b Formulare | Textarea, native Datums-/Zahleneingabe, `datalist`, Upload, FormSection, ErrorSummary bereits als Entwurf; **noch offen**: echte asynchrone Combobox, dynamischer Zeichenzähler, erweiterte File-Interaktion und Upload-Validierung | Browser-Autofill, Hilfetexte und Error-IDs, Drag/Drop-Fallback | Teilweise umgesetzt · Review |
-| K4b Feedback/Overlay | Allgemeiner Dialog, Toast und Spinner als Entwurf; bestehender Confirm bereits vorhanden; **offen**: live erzeugte Feedback-Region, Busy/Read-only, Bulk-Aktionen, komplexere Dialoge | Dialogfokus, Escape/Close, Async-Feedback | Teilweise umgesetzt · Review |
-| K5 Daten | Filter-Chips, Filter-Toolbar, SortHeader, BulkActionBar und Listenzeilen als Entwurf; noch offen: Filter-Sidebar, echte datengetriebene Sortierung/Pagination, Zeitlinie, Diagramme und barrierefreie Datenalternative | Longtext, 320px und datengetriebene Status | Teilweise umgesetzt · Review |
+| K2b Navigation | Aktionsmenü, Tooltip, Popover sowie **mobile Navigation und Seitentoolbar** als Entwurf; offen: adaptive Overlay-Positionierung und echte mobile Integration | Schließen per Escape, Fokus und Außenklick; zugängliche Bedienung | Teilweise umgesetzt · Review |
+| K3b Formulare | Textarea mit **opt-in Zeichenzähler**, native Datums-/Zahleneingaben, `datalist`, Upload, **File-Drop-Zone**, FormSection und ErrorSummary als Entwurf; offen: asynchrone Combobox und serverseitige Uploadvalidierung | Browser-Autofill, Hilfetexte, Error-IDs, Drag/Drop-Fallback | Teilweise umgesetzt · Review |
+| K4b Feedback/Overlay | Dialog, Toast, Spinner, **Busy-Panel** und vorhandener Confirm als Entwurf/Bestand; offen: echte dynamische Live-Meldungen, Read-only-/Bulk-Prozesse und komplexe Dialoge | Dialogfokus, Escape/Close, Async-Feedback | Teilweise umgesetzt · Review |
+| K5 Daten | Filter-Chips, Toolbar, **Filterpanel**, SortHeader, BulkActionBar, Listenzeilen, **Timeline und Balkendiagramme mit Datentabelle** als Entwurf; offen: produktive Datenanbindung, Sortierung/Pagination und komplexe Diagramme | Longtext, 320px und datengetriebene Status | Teilweise umgesetzt · Review |
 | K6 Bibliothek | MediaCard, Verfügbarkeit, Fälligkeitsstatus, ScanInput, **Exemplarzeile, Personenauswahl und Scannerfeedback als Entwurf**; noch offen: Cover-Spezialvarianten, echte Personensuche und Scannerintegration | Fachinformationen strikt vom Präsentations-API trennen | Teilweise umgesetzt · Review |
 | K7 Spezial / Ausgabe | Inline-Edit, Hierarchie, Wochenplan, Etiketten- und Nachrichtenvorschau als Entwurf; **offen**: echte Editoren, sichere Fachaktionen, Druckmaße/Barcodes, Versand und Integrationen | Druck/Theme/Fokus | Teilweise umgesetzt · Review |
-| K8 Qualität | Alle Bausteine mit Variants, Dichten, mobilen Layouts, Dark Mode, Tastatur, Screenreader, Zoom, hohem Kontrast und Fehlerfällen prüfen | Freigabe erst nach sauberem Review | Offen |
+| K8 Qualität | **Manuelle Review-Matrix und Featuretests vorhanden**; offen: echte Browser-/Responsive-/Dark-Mode-/Screenreader-/Zoom-/Fokusabnahme aller relevanten Zustände | Freigabe erst nach sauberem Review | Teilweise vorbereitet · keine Freigabe |
 
 **Nicht jedes Tabellenfeld, jeder Workflow oder jede Seite wird eine eigene Komponente.** Kleine Komponenten werden kombinierbar; komplexe fachliche Workflows werden erst später aus freigegebenen Bausteinen gebaut.
 
