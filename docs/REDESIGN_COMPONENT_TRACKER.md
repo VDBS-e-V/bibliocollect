@@ -87,6 +87,22 @@ Komponenten-CSS: `resources/css/components/foundation-components-v5.css` und `re
 
 **Noch offen:** Serverseitige Auswahl über mehrere Ergebnisseiten, sortierte/paginierte Controller-Queries, Filter-Sidebar, Scanner-Hardware und Scanbestätigung, barrierefrei nutzbare mobile Tabellen-/Listenansicht sowie vollständige Responsive- und Screenreader-Abnahme. Die Komponenten sind nicht produktiv freigegeben.
 
+### Komponentenrunde K6b – Exemplar, Personenauswahl und Scanfeedback
+
+Drei weitere echte Blade-Komponenten sind in `/design-lab/komponenten` als **Entwurf/Review** verfügbar:
+
+| Komponente | Zweck und API | Stand |
+|---|---|---|
+| `x-library.copy-row` | Barcodedaten, Exemplarstandort und Status; `title`, `barcode`, `location`, `availability`, `dueDays`, `density`, optional `href` und Actions-Slot | Comfortable/Compact und lange Titel; verwendet die bestehenden Verfügbarkeits-/Frist-Komponenten |
+| `x-library.patron-choice` | Native Radioauswahl einer Person; `name`, `value`, `displayName`, `identifier`, `detail`, `checked`, `disabled`, `density` | Selectable mit Tastatur, zwei Dichten, keine automatische Fachsuche |
+| `x-library.scan-feedback` | Scannerstatus nach Fachsystemantwort; `title`, `message`, `barcode`, `status=info\|success\|warning\|error`, `compact` | Kräftige VDBS-Farbsymbole, Rollen `status`/`alert`, ohne längliche Statusleisten |
+
+Vorführdatei: `resources/views/pages/partials/design-lab-components-v6.blade.php`; Komponenten-CSS: `resources/css/patterns/library-data-components-v2.css`; Tests: `tests/Feature/ComponentLibraryV6Test.php`. Die Daten bleiben ausdrücklich fiktiv, es gibt keine Ausleih- oder Scan-Nebenwirkungen.
+
+**Scanner-Fokus ohne Layoutsprung (nach Review korrigiert):** Der ruhende `x-library.scan-input` reserviert je **1px Margin** bei 1px Border. Auf **Hover/Fokus** entfallen die Margins, der **bestehende** Rahmen wird 2px lila. Die Mindesthöhe kompensiert den Wechsel (Ruhezustand `calc(3.25rem - 2px)`, Hover/Fokus `3.25rem`), das innere Eingabefeld bleibt rahmenlos. Dadurch sollen die nachfolgenden Formularelemente ihre Position behalten. CSS und Regressionstests in `library-data-components.css`/`ComponentLibraryV5Test.php` sowie `ComponentLibraryV6Test.php`.
+
+**Noch offen:** Reale Personensuche mit serverseitiger Berechtigung, Personendaten-Privatsphäre, Scannerhardware, mehrfach gefundene Exemplare, Bestätigungsdialoge nach echten Serverantworten, mobile-/Dark-Mode-/Zoom-/Tastatur-Abnahme sowie visuelle Freigabe. Die echten Seiten werden weiterhin nicht migriert.
+
 ## 2. Noch notwendige Komponentenfamilien und Patterns
 
 | Batch | Gegenstand | Konkrete Unterelemente | Status |
@@ -95,7 +111,7 @@ Komponenten-CSS: `resources/css/components/foundation-components-v5.css` und `re
 | K3b Formulare | Textarea, native Datums-/Zahleneingabe, `datalist`, Upload, FormSection, ErrorSummary bereits als Entwurf; **noch offen**: echte asynchrone Combobox, dynamischer Zeichenzähler, erweiterte File-Interaktion und Upload-Validierung | Browser-Autofill, Hilfetexte und Error-IDs, Drag/Drop-Fallback | Teilweise umgesetzt · Review |
 | K4b Feedback/Overlay | Allgemeiner Dialog, Toast und Spinner als Entwurf; bestehender Confirm bereits vorhanden; **offen**: live erzeugte Feedback-Region, Busy/Read-only, Bulk-Aktionen, komplexere Dialoge | Dialogfokus, Escape/Close, Async-Feedback | Teilweise umgesetzt · Review |
 | K5 Daten | Filter-Chips, Filter-Toolbar, SortHeader, BulkActionBar und Listenzeilen als Entwurf; noch offen: Filter-Sidebar, echte datengetriebene Sortierung/Pagination, Zeitlinie, Diagramme und barrierefreie Datenalternative | Longtext, 320px und datengetriebene Status | Teilweise umgesetzt · Review |
-| K6 Bibliothek | MediaCard, Verfügbarkeit, Fälligkeitsstatus mit 7-Tage-Warnung und ScanInput als Entwurf; noch offen: Exemplar-/Personenzeile, Cover-Varianten, Personenauswahl und Scannerintegration | Fachinformationen strikt vom Präsentations-API trennen | Teilweise umgesetzt · Review |
+| K6 Bibliothek | MediaCard, Verfügbarkeit, Fälligkeitsstatus, ScanInput, **Exemplarzeile, Personenauswahl und Scannerfeedback als Entwurf**; noch offen: Cover-Spezialvarianten, echte Personensuche und Scannerintegration | Fachinformationen strikt vom Präsentations-API trennen | Teilweise umgesetzt · Review |
 | K7 Spezial / Ausgabe | Inline-Edit, Hierarchien, Kalender-/Öffnungszeiteneditor, Etikett/Druck, Barcodes, Mailkomponenten und Integrationsmuster | Druck/Theme/Fokus | Offen |
 | K8 Qualität | Alle Bausteine mit Variants, Dichten, mobilen Layouts, Dark Mode, Tastatur, Screenreader, Zoom, hohem Kontrast und Fehlerfällen prüfen | Freigabe erst nach sauberem Review | Offen |
 
