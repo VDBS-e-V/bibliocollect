@@ -2,6 +2,14 @@
 @php
     $density = in_array($density, ['comfortable', 'compact'], true) ? $density : 'comfortable';
     $labels = ['allowed' => 'Erlaubt', 'denied' => 'Nicht erlaubt', 'conditional' => 'Eingeschränkt', 'unknown' => 'Unbekannt'];
+    $matrixRows = collect($rows)->map(function ($row) use ($columns, $labels) {
+        $row['_cells'] = collect($columns)->map(function ($column) use ($row, $labels) {
+            $state = $row['values'][$column['key'] ?? ''] ?? 'unknown';
+            $state = isset($labels[$state]) ? $state : 'unknown';
+            return ['state' => $state, 'label' => $labels[$state]];
+        })->all();
+        return $row;
+    })->all();
 @endphp
 <section {{ $attributes->class('bc-permission-matrix bc-permission-matrix--'.$density) }} aria-label="{{ $title }}">
     <strong class="bc-permission-matrix__title">{{ $title }}</strong>
@@ -10,11 +18,10 @@
             <table>
                 <thead><tr><th scope="col">Bereich</th>@foreach ($columns as $column)<th scope="col">{{ $column['label'] ?? 'Rolle' }}</th>@endforeach</tr></thead>
                 <tbody>
-                    @foreach ($rows as $row)
+                    @foreach ($matrixRows as $row)
                         <tr><th scope="row">{{ $row['label'] ?? 'Funktion' }}</th>
-                            @foreach ($columns as $column)
-                                @php $state = $row['values'][$column['key'] ?? ''] ?? 'unknown'; $state = isset($labels[$state]) ? $state : 'unknown'; @endphp
-                                <td><span class="bc-permission-matrix__status bc-permission-matrix__status--{{ $state }}">{{ $labels[$state] }}</span></td>
+                            @foreach ($row['_cells'] as $cell)
+                                <td><span class="bc-permission-matrix__status bc-permission-matrix__status--{{ $cell['state'] }}">{{ $cell['label'] }}</span></td>
                             @endforeach
                         </tr>
                     @endforeach
