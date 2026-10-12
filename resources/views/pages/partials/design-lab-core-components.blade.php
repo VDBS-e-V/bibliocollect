@@ -55,6 +55,9 @@
                 <a href="#bc-core-form-actions">Formularaktionen</a>
                 <a href="#bc-core-selection-summary">Auswahlübersicht</a>
                 <a href="#bc-core-inline-edit">Inline-Bearbeitung</a>
+                <a href="#bc-core-key-value-editor">Metadateneditor</a>
+                <a href="#bc-core-repeater-field">Wiederholbare Gruppen</a>
+                <a href="#bc-core-transfer-list">Transferliste</a>
                 <a href="#bc-core-scan-input">Barcodefeld</a>
             </div>
         </details>
@@ -105,6 +108,9 @@
                 <a href="#bc-core-week-schedule">Wochenplan</a>
                 <a href="#bc-core-print-preview">Etiketten</a>
                 <a href="#bc-core-message-preview">Nachrichten</a>
+                <a href="#bc-core-audit-entry">Änderungsprotokoll</a>
+                <a href="#bc-core-import-preview">Importvorschau</a>
+                <a href="#bc-core-batch-progress">Stapelfortschritt</a>
                 <a href="#bc-core-attachment-list">Dateianlagen</a>
                 <a href="#bc-core-criteria-checklist">Prüfkriterien</a>
                 <a href="#bc-core-contact-card">Kontaktkarte</a>
@@ -305,6 +311,7 @@
     @include('pages.partials.design-lab-components-v14')
     @include('pages.partials.design-lab-components-v15')
     @include('pages.partials.design-lab-components-v16')
+    @include('pages.partials.design-lab-components-v17')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>

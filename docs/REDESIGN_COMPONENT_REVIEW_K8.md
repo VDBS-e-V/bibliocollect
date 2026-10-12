@@ -97,3 +97,14 @@ Der bestehende Accessibility-CI-Lauf auf K11 meldete weiterhin einen fehlgeschla
 - **72 Kontaktpräferenzen:** native Checkbox/Fieldset-Semantik, Tastatur, checked/disabled, Gruppenhint/-error, schmale Breiten, kein Formular und keine Datenübertragung in der Galerie.
 
 **Ausstehend:** automatische CI-Prüfung, Zoom 200–400 %, Tastatur, Mobil- und Dunkelmodus, Screenreader. Keine Freigabe bis zur tatsächlichen Prüfung.
+
+## K17 – Priorität C, Galerieabschnitte 73–78
+
+- **73 Änderungsprotokoll:** semantisches `article`, `time` mit vorhandenem ISO-Zeitwert, ausgeschriebene Ereignisart, optionale Person, eingebettetes `change-review`; keine Speicherung, keine Audit-Fachfunktion.
+- **74 Schlüssel/Wert-Editor:** Metadatenschlüssel, leere Werte, min/max, native Eingabefelder; ein Add-/Remove-Mechanismus mit Repeater.
+- **75 Wiederholbare Gruppen:** dynamisches Hinzufügen/Entfernen, fehlende/besetzte Werte, Keyboard-Fokus, eindeutige `id`/indizierte Namen, mindestens/ höchstens N, 320px und 400%-Zoom. Servervalidierung separat.
+- **76 Transferliste:** Strg-Mehrfachwahl, Move-Aktionen, Disabled-Einträge, sichtbarer Zähler, verborgene gewählte Feldwerte, Tastatur und schmale Bildschirme. Kein POST aus der Galerie.
+- **77 Importvorschau:** Textstatus Bereit/Prüfen/Fehler/Übersprungen, Feldzuordnung als Tabelle, Quellzeilennummer, Kontrast und scrollbare Tabelle. Keine Importfunktion.
+- **78 Stapelfortschritt:** abgeschlossene/laufende/fehlgeschlagene/offene Schritte, vorhandener `x-ui.progress` nur mit echtem Wert, kein erfundener Jobfortschritt; Screenreader und Reduced-Motion.
+
+CI und manuelle Prüfung getrennt bewerten; bekannte CI-/Layoutprobleme gelten nicht durch K17 als behoben. Kein Baustein ist automatisch freigegeben.

@@ -278,3 +278,18 @@ Sechs wiederverwendbare **Entwurfs**-Bausteine, noch keine produktive Integratio
 | `x-ui.contact-preferences` | `fieldset/legend` mit vorhandenen `x-ui.checkbox`-Inputs zur Wahl von Kontaktkanälen; kein Speichern, keine Opt-in- oder Versandfachlogik. |
 
 Stile `resources/css/components/foundation-components-v16.css`; Galerie `resources/views/pages/partials/design-lab-components-v16.blade.php`, Featuretests `tests/Feature/ComponentLibraryV16Test.php` (sieben Tests). Die Markenpalette und Schriften bleiben erhalten; alle sechs Komponenten sind bis zur Browser-/Screenreaderprüfung **Entwurf**. Der bekannte fehlgeschlagene Cron/Job-Test und bestehende mobile Layoutbefunde sind separat zu verfolgen.
+
+### Priorität C – K17: Verwaltung und komplexe Arbeitsabläufe (Abschnitte 73–78)
+
+Sechs neue **Entwurfskomponenten** in der aktiven Designlab-Galerie:
+
+| Baustein | Funktion und fachliche Grenze |
+|---|---|
+| `x-ui.audit-entry` | Einzelner Ereigniseintrag mit Art, optionaler Zeit und Person sowie eingebettetem bestehendem `change-review`; keine Audit-Erfassung und keine Logdaten aus dem Controller. |
+| `x-ui.key-value-editor` | Editor für strukturierte Schlüssel/Wert-Paare auf Basis der **gemeinsamen** `x-ui.repeater-field`-Komponente; kein zweites Add/Remove-JavaScript. |
+| `x-ui.repeater-field` | Wiederholte Feldgruppen mit nativen Inputs, indizierten `name`/eindeutigen IDs, Mindest- und Höchstanzahl, Add/Remove mit Fokus-Rückgabe. Kein Speichern und keine Servervalidierung. Ohne JS bleiben vorhandene Felder les-/editierbar. |
+| `x-ui.transfer-list` | Zwei native Mehrfach-Selects, lokal verschiebbare Einträge und versteckte gewählte Formularwerte; ohne JS bleiben die ausgewählten Werte vorhanden. Kein Daten-POST in der Galerie. |
+| `x-ui.import-preview` | Scrollbare, zugängliche Datentabelle mit Spalten/Zeilen, Textstatus und Fehlhinweisen; ausschließlich übergebene Vorschau, kein Dateilesen und keine Importausführung. |
+| `x-ui.batch-progress` | Statusliste für Stapelschritte, optional über `x-ui.progress` ein echter vom Aufrufer gelieferter Wert; ohne Wert keine erfundene Prozentangabe. Keine Job-/Queue-Anbindung. |
+
+Gemeinsames CSS: `resources/css/components/foundation-components-v17.css`. Progressive Interaktionen: `resources/js/ui-admin-patterns.js`. Vorschau: `resources/views/pages/partials/design-lab-components-v17.blade.php`. Tests: `tests/Feature/ComponentLibraryV17Test.php` (sieben Tests). Keine Anpassung der VDBS-Tokens, Schriften, produktiven Seiten oder Domain-/Import-/Verarbeitungslogik. **Alle Entwürfe bleiben bis zur Browser- und Screenreaderprüfung ungeprüft.**
