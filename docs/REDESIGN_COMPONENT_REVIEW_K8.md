@@ -65,3 +65,11 @@ Eine produktionsfähige asynchrone Combobox mit Tastaturführung und geladenen V
 - **51 Änderungsvergleich:** Vorher/Nachher mit Screenreader und dl/dt/dd, Nullwerte, hinzugefügt/entfernt, 320px und 400%-Zoom prüfen.
 
 Keine dieser Prüfaufgaben ersetzt die praktische Browser-/Screenreader-Abnahme oder ist eine Freigabe.
+
+## Ergänzender Komponentenreview K12 (Abschnitte 52–54)
+
+- **52 Auswahlkarten:** native Radio-/Checkbox-Tastaturführung, Klickfläche, `checked`, `disabled`, sichtbarer Fokus; lange Titel bei 320px; Hinweise und Fehler über `aria-describedby`; keinerlei Persistenz.
+- **53 Dateianlagen:** Sonderzeichen und sehr lange Dateinamen, Größenangaben, Disabled ohne Scheinlink, 320px, echte Anker. Keine Speicherung und kein Dateiupload.
+- **54 Prüfkriterien:** Status Erfüllt/Nicht erfüllt/Noch ungeprüft/Nicht anwendbar ohne Farbsehen unterscheiden, Compact/Comfortable und Leerzustand, Screenreader und Dunkelmodus.
+
+Der bestehende Accessibility-CI-Lauf auf K11 meldete weiterhin einen fehlgeschlagenen mobilen/Tablet-Layoutcheck. K12 ist dadurch nicht freigegeben; neue CI und manuelle Prüfung bleiben erforderlich.
