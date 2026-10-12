@@ -86,8 +86,8 @@ it('gibt Datensatzkarten mit echten dl-dt-dd Paaren und langen Titeln aus', func
         ->toContain('bc-availability--available')
         ->toContain('Ein sehr langer, beispielhafter')
         ->and($xpath->query('//article')->length)->toBe(1)
-        ->and($xpath->query('//dl/dt')->length)->toBe(2)
-        ->and($xpath->query('//dl/dd')->length)->toBe(2);
+        ->and($xpath->query('//dl//dt')->length)->toBe(2)
+        ->and($xpath->query('//dl//dd')->length)->toBe(2);
 });
 
 it('zeigt Statuslegenden mit Text und beschränkt Farben auf bekannte VDBS-Tokens', function (): void {
