@@ -39,3 +39,17 @@
 .bc-read-more details[open] .bc-read-more__more-label::after{content:" (ausgeklappt)";font-weight:400}
 .bc-read-more__summary:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
 @media(max-width:35rem){.bc-read-more__summary{display:block}.bc-read-more__title{display:block;margin-top:.35rem}}
+
+/* All new form error messages need readable text on the dark VDBS surface. */
+:root[data-vdbs-theme='dark'] :is(
+    .bc-choice-cards__error,
+    .bc-combobox__error,
+    .bc-date-time-picker__error,
+    .bc-time-range__error,
+    .bc-contact-preferences__error,
+    .bc-repeater-field__error
+) {
+    color:var(--text-primary);
+    border-inline-start:3px solid var(--vdbs-error);
+    padding-inline-start:.65rem;
+}

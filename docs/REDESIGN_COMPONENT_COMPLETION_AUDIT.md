@@ -74,3 +74,7 @@ Der erste vollständige Browserlauf fand ausschließlich in der **neu aufgenomme
 ### Dark-Mode-Kontrast (letzter ernsthafter Axe-Befund)
 
 Im erneuten Lauf bestanden die sechs echten Browser-Interaktionstests und der gesamte Layoutcheck mit **0 Fehlern bei 220 Seitensichten**. Die helle Axe-Prüfung war ohne schwere Verstöße. Im Dunkelmodus meldete Axe drei Textkontraste: zwei `bc-message-preview__eyebrow` (dunkelgrün auf dunklem Grund) und `bc-choice-cards__error` (dunkelrot auf dunklem Grund). Die Nachrichtenvorschau verwendet im dunklen Theme nun das **vorhandene VDBS-Grün**; der Fehlertext verwendet kontrastreiches `--text-primary` mit **vorhandenem VDBS-Rot** als Randakzent. Keine Markentokens verändert. Das Ergebnis des Folge-Workflows bleibt abzuwarten.
+
+### Einheitliche kontrastreiche Fehlermeldungen
+
+Der detaillierte Axe-Report zeigte zusätzlich zum K12-Auswahlkartenfehler auch den K14-Combobox-Fehlertext; weitere gleichartig formatierte `--vdbs-error`-Kleintexte sind in K14, K16 und K17 vorhanden. Ein gemeinsamer Dark-Mode-Override in `foundation-components-v18.css` setzt für **alle sechs betroffenen Error-Textklassen** `--text-primary` und verwendet das existierende `--vdbs-error` unverändert als linken Randakzent. Damit sollen sämtliche gleichartigen textlichen Kontrastfehler ohne Brand-Token-Änderung beseitigt werden.
