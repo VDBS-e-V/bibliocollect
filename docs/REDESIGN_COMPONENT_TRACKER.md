@@ -240,3 +240,9 @@ Drei neue, fachneutrale **Entwurfskomponenten** in `/design-lab/komponenten` (Ab
 | `x-ui.criteria-checklist` | `items[]`, `state=met/unmet/pending/not-applicable`, `density`, Actions-Slot | Textliche Kriterienerfüllung statt Bearbeitungsfortschritt; keine automatische Validierung. |
 
 Styles: `resources/css/components/foundation-components-v12.css`; Vorschau: `resources/views/pages/partials/design-lab-components-v12.blade.php`; Tests: `tests/Feature/ComponentLibraryV12Test.php`. VDBS-Tokens bleiben unverändert, Fachseiten sind nicht betroffen. **Keine Freigabe ohne manuellen Review.** Die schon vor K12 bekannte Layoutprüfung auf mobilen Viewports ist weiterhin offen.
+
+### Komponentenrunde K13 – Kontakt, Rollenmatrix, Sonderzeiten und Auswahl
+
+Vier neue Entwurfsbausteine im Designlab (55–58): `x-ui.contact-card` zeigt Kontaktwege in einem semantischen `address`; `x-ui.permission-matrix` zeigt zugängliche Tabellen mit Rollen und textlichen Berechtigungszuständen (keine Autorisierung); `x-ui.schedule-exceptions` ergänzt den Wochenplan um datierte Sonderöffnungszeiten (keine Berechnung); `x-ui.selection-summary` listet ausgewählte Datensätze und nur bei vorhandener URL einen Entfernen-Link (keine Mutation).
+
+CSS `foundation-components-v13.css`; Galerie `design-lab-components-v13.blade.php`; fünf Featuretests `ComponentLibraryV13Test.php`. Status sämtlicher vier Bausteine: **Entwurf**, ohne Produktivseitenmigration oder Fachlogik. Mobile, Dark-Mode-, Tastatur- und Screenreaderprüfung ausstehend.
