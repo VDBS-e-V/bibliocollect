@@ -20,8 +20,7 @@
             name="{{ $name }}"
             @if (filled($hint)) aria-describedby="{{ $hintId }}" @endif>
         @foreach ($options as $option)
-            @php($optionValue = is_array($option) ? ($option['value'] ?? '') : $option)
-            <option value="{{ $optionValue }}" @selected((string) $optionValue === (string) $value)>{{ is_array($option) ? ($option['label'] ?? $optionValue) : $optionValue }}</option>
+            <option value="{{ is_array($option) ? ($option['value'] ?? '') : $option }}" @selected((string) (is_array($option) ? ($option['value'] ?? '') : $option) === (string) $value)>{{ is_array($option) ? ($option['label'] ?? ($option['value'] ?? '')) : $option }}</option>
         @endforeach
     </select>
     @if (filled($hint))
