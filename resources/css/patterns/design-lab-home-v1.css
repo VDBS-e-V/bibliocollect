@@ -49,7 +49,7 @@
 .bc-home-v1__media-grid .bc-media-card__title{overflow-wrap:anywhere}
 .bc-home-v1__media-footnote{margin:1.25rem 0 0;font-size:.83rem;line-height:1.6;color:var(--text-secondary)}
 .bc-home-v1__editorial .bc-feature-overlap{max-width:100%}
-.bc-home-v1__service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--bc-home-v1-gap)}
+.bc-home-v1__service-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:var(--bc-home-v1-gap);margin-top:1.2rem;align-items:start}
 .bc-home-v1__service-grid>*,.bc-home-v1__service-card{min-width:0}
 .bc-home-v1__service-card{padding:clamp(1.4rem,3.3vw,2.8rem);background:var(--bg-surface-muted);border:1px solid var(--border-default);border-radius:var(--radius-sm)}
 .bc-home-v1__service-card h3{font-weight:900;font-size:clamp(1.4rem,2.4vw,2rem);line-height:1.2;margin:.7rem 0}
@@ -92,3 +92,19 @@
 }
 @media(prefers-reduced-motion:reduce){.bc-home-v1 *{scroll-behavior:auto}}
 @media print{.bc-home-v1__hero,.bc-home-v1__discovery,.bc-home-v1__service-card{print-color-adjust:economy}}
+
+/* Startseite V1: beide ausdrücklich fiktiven Dichten des freigegebenen week-schedule. */
+.bc-home-v1__service>.bc-notice-panel{margin-bottom:1.25rem}
+.bc-home-v1__service-side{min-width:0;display:grid;gap:var(--bc-home-v1-gap)}
+.bc-home-v1__schedule-card{min-width:0;border:1px solid var(--border-default);border-radius:var(--radius-sm);background:var(--bg-surface);padding:clamp(1.1rem,2.6vw,2rem)}
+.bc-home-v1__schedule-card--compact{background:var(--bg-surface-muted)}
+.bc-home-v1__schedule-header{margin-bottom:1rem}
+.bc-home-v1__schedule-header h3{font-size:clamp(1.2rem,2vw,1.65rem);font-weight:900;line-height:1.25;letter-spacing:-.02em;margin:.4rem 0 .45rem;overflow-wrap:anywhere}
+.bc-home-v1__schedule-header p{margin:0;color:var(--text-secondary);font-size:var(--text-sm);line-height:1.55}
+.bc-home-v1__schedule-card .bc-week-schedule{max-width:100%;min-width:0}
+.bc-home-v1__schedule-card .bc-week-schedule__day{grid-template-columns:minmax(5.6rem,.4fr) minmax(0,1fr);gap:.4rem .8rem}
+.bc-home-v1__schedule-card .bc-week-schedule__day :is(dt,dd){min-width:0;overflow-wrap:anywhere}
+@media(max-width:28rem){
+  .bc-home-v1__schedule-card .bc-week-schedule__day{grid-template-columns:minmax(0,1fr)}
+  .bc-home-v1__schedule-card .bc-week-schedule__day dd{padding-left:.1rem}
+}

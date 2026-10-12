@@ -107,10 +107,11 @@
             </div>
             <span class="bc-home-v1__section-number" aria-hidden="true">03 / 04</span>
         </div>
+        {{-- Freigegebenes Feature-Overlap-Muster: VDBS-Figuren links, mintfarbene Textfläche rechts. --}}
         <x-library.feature-overlap
-            eyebrow="Ideen finden"
-            title="Geschichten verbinden. Wissen wächst."
-            description="Ob Sachbuch, Roman oder neue Lieblingsreihe: Der Katalog eröffnet unterschiedliche Wege in die Welt der Medien."
+            eyebrow="Bibliothek entdecken"
+            title="Geschichten verbinden Menschen."
+            description="Eine Schulbibliothek ist mehr als ein Regal: Hier treffen Geschichten, neue Ideen und unterschiedliche Perspektiven aufeinander."
             :href="route('public.series.index')"
             action-label="Buchreihen entdecken"
             tone="mint" />
@@ -121,21 +122,53 @@
             <div>
                 <span class="bc-home-v1__eyebrow">Gut zu wissen</span>
                 <h2 id="bc-home-v1-service-title">Deine Bibliothek. Deine Möglichkeiten.</h2>
-                <p>Informationen verständlich bereitstellen, ohne nicht bestätigte Öffnungszeiten oder Dienstleistungen zu erfinden.</p>
+                <p>Zwei bewährte Wochenplan-Dichten mit klar als fiktiv gekennzeichneten Zeiten; später werden hier echte Schuldaten angebunden.</p>
             </div>
             <span class="bc-home-v1__section-number" aria-hidden="true">04 / 04</span>
         </div>
+        {{-- Die beiden Dichtevarianten stammen direkt aus der freigegebenen Wochenplan-Komponente.
+             Kein Live-Kalender und keine tatsächlichen Schulbibliothekszeiten. --}}
+        <x-library.notice-panel variant="info" title="Öffnungszeiten und Schließtage – nur als Beispiel">
+            <p>Die folgenden Uhrzeiten sind frei erfundene Demonstrationsdaten aus der Komponentenbibliothek. Für die echte Startseite werden ausschließlich die bestätigten Zeiten der jeweiligen Schulbibliothek verwendet.</p>
+        </x-library.notice-panel>
         <div class="bc-home-v1__service-grid">
-            <x-library.notice-panel variant="info" title="Öffnungszeiten und Schließtage">
-                <p>Hier werden später die gültigen Zeiten der jeweiligen Schulbibliothek eingebunden. In dieser Vorschau sind bewusst keine Uhrzeiten eingetragen.</p>
-            </x-library.notice-panel>
-            <div class="bc-home-v1__service-card">
-                <span class="bc-home-v1__eyebrow">Dein nächster Schritt</span>
-                <h3>Du hast einen Buchwunsch?</h3>
-                <p>Schlage neue Titel vor oder entdecke, welche Buchreihen bereits verfügbar sind.</p>
-                <div class="bc-home-v1__service-links">
-                    <x-ui.button :href="route('public.wishes.create')">Buchwunsch öffnen</x-ui.button>
-                    <a href="{{ route('public.series.index') }}">Buchreihen ansehen <span aria-hidden="true">↗</span></a>
+            <div class="bc-home-v1__schedule-card">
+                <div class="bc-home-v1__schedule-header">
+                    <span class="bc-home-v1__eyebrow">Wochenplan · Comfortable</span>
+                    <h3>Ein Blick auf die Woche.</h3>
+                    <p>Beispielplan mit regulären Öffnungen und geschlossenen Tagen.</p>
+                </div>
+                <x-ui.week-schedule label="Fiktiver Wochenplan mit Beispielöffnungszeiten" :items="[
+                    ['day' => 'Montag', 'hours' => '09:00–17:00'],
+                    ['day' => 'Dienstag', 'hours' => '09:00–18:00'],
+                    ['day' => 'Mittwoch', 'hours' => '10:00–16:00', 'note' => 'Lesesaal bis 17:00'],
+                    ['day' => 'Donnerstag', 'hours' => '09:00–18:00'],
+                    ['day' => 'Freitag', 'hours' => '09:00–14:00'],
+                    ['day' => 'Samstag', 'closed' => true],
+                    ['day' => 'Sonntag', 'closed' => true],
+                ]" />
+            </div>
+            <div class="bc-home-v1__service-side">
+                <div class="bc-home-v1__schedule-card bc-home-v1__schedule-card--compact">
+                    <div class="bc-home-v1__schedule-header">
+                        <span class="bc-home-v1__eyebrow">Sonderzeiten · Compact</span>
+                        <h3>Wenn sich Zeiten ändern.</h3>
+                        <p>Ein kompakter Sonderplan – ebenso rein beispielhaft.</p>
+                    </div>
+                    <x-ui.week-schedule label="Fiktiver Sonderzeitenplan als kompakte Vorschau" compact :items="[
+                        ['day' => 'Dienstag', 'hours' => '13:00–17:00', 'note' => 'Ferienöffnungszeiten'],
+                        ['day' => 'Mittwoch', 'closed' => true, 'note' => 'Teamfortbildung'],
+                        ['day' => 'Donnerstag', 'hours' => '08:30–13:30'],
+                    ]" />
+                </div>
+                <div class="bc-home-v1__service-card">
+                    <span class="bc-home-v1__eyebrow">Dein nächster Schritt</span>
+                    <h3>Du hast einen Buchwunsch?</h3>
+                    <p>Schlage neue Titel vor oder entdecke, welche Buchreihen bereits verfügbar sind.</p>
+                    <div class="bc-home-v1__service-links">
+                        <x-ui.button :href="route('public.wishes.create')">Buchwunsch öffnen</x-ui.button>
+                        <a href="{{ route('public.series.index') }}">Buchreihen ansehen <span aria-hidden="true">↗</span></a>
+                    </div>
                 </div>
             </div>
         </div>

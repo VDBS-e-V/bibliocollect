@@ -8,15 +8,15 @@
 
 ## Konzept
 
-Die abgenommene Komponentenbibliothek ist die verbindliche Basis. Die neue Startseite hat eine redaktionelle VDBS-Markenbühne mit funktionierender GET-Katalogsuche, vier unmittelbare Wege in die Anwendung, ein deutlich als Beispiel gekennzeichnetes Medienfeld, eine gemeinsame Bibliotheksgeschichte über `x-library.feature-overlap` und konkrete Service-Orientierung. Die bestehende App-Shell liefert Navigation und Footer; keine zweite globale Navigation oder neue Fachrouten.
+Die abgenommene Komponentenbibliothek ist die verbindliche Basis. Die neue Startseite hat eine redaktionelle VDBS-Markenbühne mit funktionierender GET-Katalogsuche, vier unmittelbare Wege in die Anwendung, ein deutlich als Beispiel gekennzeichnetes Medienfeld, eine gemeinsame Bibliotheksgeschichte über `x-library.feature-overlap`, beide Dichten von `x-ui.week-schedule` und konkrete Service-Orientierung. Die bestehende App-Shell liefert Navigation und Footer; keine zweite globale Navigation oder neue Fachrouten.
 
-**Wiederverwendung statt Kopie:** `x-library.catalog-search`, `x-library.quick-action`, `x-library.media-cover`, `x-library.media-card` in Comfortable und Compact, `x-library.feature-overlap`, `x-library.notice-panel`, `x-ui.button`, `x-ui.back-to-top`.
+**Wiederverwendung statt Kopie:** `x-library.catalog-search`, `x-library.quick-action`, `x-library.media-cover`, `x-library.media-card` in Comfortable und Compact, `x-library.feature-overlap` (Mint-Overlap mit VDBS-Figuren), `x-ui.week-schedule` (Comfortable/Compact), `x-library.notice-panel`, `x-ui.button`, `x-ui.back-to-top`.
 
 ## Bewusste Grenzen
 
 - Nur die zusätzliche Route `public.design-lab.home-v1` unter `/design-lab/startseite-v1`; **ausschließlich** in `local` oder `testing` verfügbar.
 - **Keine Änderung** an `resources/views/pages/welcome.blade.php`, `PublicHomeController`, Suche, Empfehlungsalgorithmus, Öffnungszeiten, Profilrechten oder den Produktivseiten.
-- Keine erfundenen Katalogdatensätze, Kennungen, Ausleihzustände oder Öffnungszeiten. Die gezeigten Medien sind fiktive Cover-/Textbeispiele **ohne** Medien-Detail-Links; für echte Bestände existiert ein klarer Katalog-Link.
+- Keine als real ausgewiesenen Katalogdatensätze, Kennungen, Ausleihzustände oder Öffnungszeiten. Der Wochenplan verwendet die **aus der freigegebenen Komponenten-Galerie übernommenen, ausdrücklich als fiktiv gekennzeichneten Beispieluhrzeiten**; es sind **keine echten Schul-Öffnungszeiten**. Die gezeigten Medien sind fiktive Cover-/Textbeispiele **ohne** Medien-Detail-Links; für echte Bestände existiert ein klarer Katalog-Link.
 - Die Suche ist der vorhandene `x-library.catalog-search`: native GET-Anfrage an den realen Katalog; alle anderen Links sind existierende, erlaubte Navigation. Keine POST-/PUT-/DELETE-Aktionen innerhalb des Entwurfs.
 - Das Portalziel wird mittels bestehender `@can('surface.portal.access')`-Freigabe in Link zum Portal oder zur Anmeldung unterschieden. Die Sicherheitsregeln werden nicht verändert.
 - Alle VDBS-Brandtokens und Schriftfamilien bleiben unverändert. Neue CSS-Regeln sind in `.bc-home-v1` gekapselt und nur über das vorhandene Designlab-Bundle eingebunden.
@@ -30,7 +30,7 @@ Die abgenommene Komponentenbibliothek ist die verbindliche Basis. Die neue Start
 - [ ] **Dark/Light:** Kontrast von grünen VDBS-Akzenten, lila Hero, Button-/Linkzuständen sowie der Servicebox prüfen.
 - [ ] **Tastatur:** Abschnitte-Sprunglinks, Suchfeld/GET-Submit, Schnellzugriffe, Galerie- und Footer-Links, Zurück-zum-Anfang.
 - [ ] **Screenreader:** eine H1 im Seitenentwurf, korrekt benannte Abschnitte, Formlabel, visuell dekorative Cover im Hero `aria-hidden`, sinnvolle Linktexte.
-- [ ] **Inhalt:** keine fiktiven Öffnungszeiten oder real wirkenden Ausleihzusagen; frühere Studie bleibt unter alter Route erreichbar.
+- [ ] **Inhalt:** fiktive Uhrzeiten sind unmissverständlich als **Beispiel** markiert, nicht als reale Öffnungszeiten; keine real wirkenden Ausleihzusagen; frühere Studie bleibt unter alter Route erreichbar.
 - [ ] **Gesamtabnahme:** die neue Seite durch Auftraggeber freigeben, erst danach eine ausdrücklich separate produktive Migration planen.
 
 ## Automatisierte Prüfung
@@ -40,3 +40,14 @@ Die abgenommene Komponentenbibliothek ist die verbindliche Basis. Die neue Start
 `scripts/support/site.mjs`: neue Designlab-V1 als Gastseite in vorhandene axe-core- und 320/375/768/1024-Pixel-Layoutprüfung aufgenommen.
 
 Technische CI-Läufe können unabhängig vom bekannten fachfremden `OperationsCommandsTest.php:115` ausfallen. Das ist **keine** Freigabe durch den automatischen Test; der bestehende Draft-PR #92 bleibt ungemergt.
+
+## Update: Feature Overlap und Wochenplan aus den Abnahmebeispielen
+
+Die für die Startseite gewünschten Galerieelemente wurden im Entwurf V1 bewusst **als wiederverwendbare Komponenten** eingebunden:
+
+- **Feature Overlap:** Der mintfarbene, rechts über der VDBS-Figurenillustration liegende Textblock verwendet `x-library.feature-overlap` mit der Leitidee **„Geschichten verbinden Menschen.“**; er ist in der mobilen Darstellung untereinander angeordnet.
+- **Wochenplan (Comfortable):** sieben Wochentage mit den explizit übernommenen Demozeiten (Montag–Freitag) und geschlossenem Wochenende.
+- **Wochenplan (Compact):** drei Sondertage mit Ferienhinweis, Schließtag und kürzeren Zeiten. So ist auch die zweite Dichte auf einer echten Seitenkomposition sichtbar.
+- **Transparenz:** Ein deutlich sichtbarer Infohinweis über den Plänen kennzeichnet alle Uhrzeiten als **frei erfundene Demonstrationsdaten**. Es findet keinerlei automatische Kalenderauswertung oder produktive Datenanbindung statt.
+
+Zusätzlicher Featuretest prüft zwei `bc-week-schedule`-Abschnitte, genau eine kompakte Variante, zehn Demo-Tage, den Mint-Overlap und die Fiktivkennzeichnung. Die CSS-Anpassung bleibt vollständig auf `.bc-home-v1` begrenzt.

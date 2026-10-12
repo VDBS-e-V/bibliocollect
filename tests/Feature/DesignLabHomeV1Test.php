@@ -52,7 +52,7 @@ it('enthält keine erfundenen Öffnungszeiten oder Scheinlinks für Beispielmedi
     @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
     $xpath = new DOMXPath($dom);
 
-    expect($html)->toContain('bewusst keine Uhrzeiten')
+    expect($html)->toContain('frei erfundene Demonstrationsdaten')
         ->toContain('Vier fiktive Beispiele')
         ->not->toContain('action="/verwaltung')
         ->and($xpath->query('//*[@id="bc-home-v1-discovery"]//a[contains(@href, "#nicht-vorhanden")]')->length)->toBe(0)
@@ -62,4 +62,26 @@ it('enthält keine erfundenen Öffnungszeiten oder Scheinlinks für Beispielmedi
 it('hält die produktive Startseite und den bisherigen Altentwurf unverändert erreichbar', function (): void {
     $this->get(route('public.design-lab.home'))->assertOk()->assertSee('Einladend statt überladen.');
     $this->get(route('public.home'))->assertOk()->assertSee('bc-home-hero', false);
+});
+
+
+it('kombiniert Feature Overlap und beide Wochenplan-Dichten ohne behauptete Live-Zeiten', function (): void {
+    $html = (string) $this->get(route('public.design-lab.home-v1'))->assertOk()
+        ->assertSee('Geschichten verbinden Menschen.')
+        ->assertSee('Ein Blick auf die Woche.')
+        ->assertSee('Wenn sich Zeiten ändern.')
+        ->getContent();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
+    $xpath = new DOMXPath($dom);
+
+    expect($xpath->query('//*[@id="bc-home-v1-world"]//*[contains(concat(" ", normalize-space(@class), " "), " bc-feature-overlap--mint ")]')->length)->toBe(1)
+        ->and($xpath->query('//*[@id="bc-home-v1-service"]//*[contains(concat(" ", normalize-space(@class), " "), " bc-week-schedule ")]')->length)->toBe(2)
+        ->and($xpath->query('//*[@id="bc-home-v1-service"]//*[contains(concat(" ", normalize-space(@class), " "), " bc-week-schedule--compact ")]')->length)->toBe(1)
+        ->and($xpath->query('//*[@id="bc-home-v1-service"]//dl[contains(concat(" ", normalize-space(@class), " "), " bc-week-schedule__list ")]//dt')->length)->toBe(10)
+        ->and($html)->toContain('frei erfundene Demonstrationsdaten')
+        ->toContain('09:00–17:00')
+        ->toContain('Ferienöffnungszeiten')
+        ->toContain('Teamfortbildung');
 });
