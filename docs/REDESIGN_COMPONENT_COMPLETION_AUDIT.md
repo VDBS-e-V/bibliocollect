@@ -78,3 +78,10 @@ Im erneuten Lauf bestanden die sechs echten Browser-Interaktionstests und der ge
 ### Einheitliche kontrastreiche Fehlermeldungen
 
 Der detaillierte Axe-Report zeigte zusätzlich zum K12-Auswahlkartenfehler auch den K14-Combobox-Fehlertext; weitere gleichartig formatierte `--vdbs-error`-Kleintexte sind in K14, K16 und K17 vorhanden. Ein gemeinsamer Dark-Mode-Override in `foundation-components-v18.css` setzt für **alle sechs betroffenen Error-Textklassen** `--text-primary` und verwendet das existierende `--vdbs-error` unverändert als linken Randakzent. Damit sollen sämtliche gleichartigen textlichen Kontrastfehler ohne Brand-Token-Änderung beseitigt werden.
+
+### Abschlussprüfung vom 12. Oktober 2026 – verifizierter Stand vor letzter JS-Nachbesserung
+
+- GitHub-Run `38285518078`, **Barrierefreiheit: erfolgreich**. Damit sind die zuvor protokollierten A11y-/Mobilfehler im automatisch geprüften Umfang behoben.
+- Quality `38285518002` ist **nicht grün**; alle neuen Komponenten- und Completion-Tests bestehen. SQLite: **920 bestanden, 1 übersprungen, 1 fehlgeschlagen**; MariaDB: **916 bestanden, 5 übersprungen, 1 fehlgeschlagen**. Beide einzigen Ausfälle sind derselbe fachfremde `OperationsCommandsTest.php:115`.
+- Interaktionsschutz: Der asynchrone K14-Combobox-Loader verwirft zusätzlich Antworten veralteter Suchanfragen per Abfrageversion. Der neue Commit muss den CI-Lauf erneut durchlaufen.
+- Für die **Freigabe** bleiben manuelle Screenreader-/Zoom-/Designabnahme und die unabhängig zu klärende Cron-Testabweichung offen. Der Designsystem-Umfang ist implementiert; PR #92 bleibt Draft.
