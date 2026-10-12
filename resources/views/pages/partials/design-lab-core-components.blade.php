@@ -12,38 +12,80 @@
     </header>
 
     <nav class="bc-core-gallery__jump" aria-label="Komponentengruppen">
-        <a href="#bc-core-actions">Aktionen</a>
-        <a href="#bc-core-forms">Eingaben</a>
-        <a href="#bc-core-surfaces">Flächen</a>
-        <a href="#bc-core-feedback">Feedback</a>
-        <a href="#bc-core-details">Metadaten</a>
-        <a href="#bc-core-navigation">Navigation</a>
-        <a href="#bc-core-controls">Auswahl</a>
-        <a href="#bc-core-status">Fortschritt</a>
-        <a href="#bc-core-disclosures">Akkordeon</a>
-        <a href="#bc-core-inputs-advanced">Erweiterte Felder</a>
-        <a href="#bc-core-form-groups">Formulargruppen</a>
-        <a href="#bc-core-filter-chips">Filterchips</a>
-        <a href="#bc-core-list-rows">Listenzeilen</a>
-        <a href="#bc-core-overlays">Menüs & Hilfe</a>
-        <a href="#bc-core-dialogs">Dialoge</a>
-        <a href="#bc-core-notifications">Meldungen</a>
-        <a href="#bc-core-loading">Laden</a>
-        <a href="#bc-core-filter-toolbar">Filterleisten</a>
-        <a href="#bc-core-data-table">Tabellen & Auswahl</a>
-        <a href="#bc-core-media-cards">Medienkarten</a>
-        <a href="#bc-core-library-states">Bibliotheksstatus</a>
-        <a href="#bc-core-scan-input">Barcodefeld</a>
-        <a href="#bc-core-copy-rows">Exemplarzeilen</a>
-        <a href="#bc-core-patron-choice">Personenauswahl</a>
-        <a href="#bc-core-scan-feedback">Scan-Feedback</a>
-        <a href="#bc-core-cover-variants">Covervarianten</a>
-        <a href="#bc-core-inline-edit">Inline-Edit</a>
-        <a href="#bc-core-hierarchy">Hierarchien</a>
-        <a href="#bc-core-week-schedule">Wochenplan</a>
-        <a href="#bc-core-print-preview">Etiketten</a>
-        <a href="#bc-core-message-preview">Nachrichten</a>
-        <a href="#bc-core-patterns">Größere Patterns</a>
+        <details class="bc-core-gallery__nav-group" open>
+            <summary>Grundlagen</summary>
+            <div class="bc-core-gallery__nav-links">
+                <a href="#bc-core-actions">Aktionen</a>
+                <a href="#bc-core-surfaces">Flächen</a>
+                <a href="#bc-core-feedback">Feedback</a>
+                <a href="#bc-core-details">Metadaten</a>
+                <a href="#bc-core-patterns">Größere Patterns</a>
+            </div>
+        </details>
+        <details class="bc-core-gallery__nav-group">
+            <summary>Navigation</summary>
+            <div class="bc-core-gallery__nav-links">
+                <a href="#bc-core-navigation">Breadcrumbs und Tabs</a>
+                <a href="#bc-core-overlays">Menüs und Hilfen</a>
+                <a href="#bc-core-toolbars">Toolbars und Mobile</a>
+                <a href="#bc-core-disclosures">Akkordeon</a>
+                <a href="#bc-core-dialogs">Dialoge</a>
+            </div>
+        </details>
+        <details class="bc-core-gallery__nav-group">
+            <summary>Formulare</summary>
+            <div class="bc-core-gallery__nav-links">
+                <a href="#bc-core-forms">Eingaben</a>
+                <a href="#bc-core-controls">Auswahlfelder</a>
+                <a href="#bc-core-inputs-advanced">Erweiterte Eingaben</a>
+                <a href="#bc-core-form-groups">Formulargruppen</a>
+                <a href="#bc-core-advanced-forms">Zähler und Dateien</a>
+                <a href="#bc-core-inline-edit">Inline-Bearbeitung</a>
+                <a href="#bc-core-scan-input">Barcodefeld</a>
+            </div>
+        </details>
+        <details class="bc-core-gallery__nav-group">
+            <summary>Daten und Status</summary>
+            <div class="bc-core-gallery__nav-links">
+                <a href="#bc-core-filter-chips">Filterchips</a>
+                <a href="#bc-core-filter-toolbar">Filterleiste</a>
+                <a href="#bc-core-filter-panel">Filterpanel</a>
+                <a href="#bc-core-data-table">Tabellen und Auswahl</a>
+                <a href="#bc-core-list-rows">Listenzeilen</a>
+                <a href="#bc-core-timeline">Zeitachse</a>
+                <a href="#bc-core-data-viz">Datenbalken</a>
+                <a href="#bc-core-status">Fortschritt</a>
+                <a href="#bc-core-loading">Spinner</a>
+                <a href="#bc-core-busy-panel">Ladeflächen</a>
+                <a href="#bc-core-notifications">Statusmeldungen</a>
+            </div>
+        </details>
+        <details class="bc-core-gallery__nav-group">
+            <summary>Bibliothek</summary>
+            <div class="bc-core-gallery__nav-links">
+                <a href="#bc-core-media-cards">Medienkarten</a>
+                <a href="#bc-core-library-states">Bibliotheksstatus</a>
+                <a href="#bc-core-copy-rows">Exemplare</a>
+                <a href="#bc-core-patron-choice">Personenauswahl</a>
+                <a href="#bc-core-scan-feedback">Scan-Feedback</a>
+                <a href="#bc-core-cover-variants">Covervarianten</a>
+            </div>
+        </details>
+        <details class="bc-core-gallery__nav-group">
+            <summary>Verwaltung</summary>
+            <div class="bc-core-gallery__nav-links">
+                <a href="#bc-core-hierarchy">Hierarchien</a>
+                <a href="#bc-core-week-schedule">Wochenplan</a>
+                <a href="#bc-core-print-preview">Etiketten</a>
+                <a href="#bc-core-message-preview">Nachrichten</a>
+            </div>
+        </details>
+        <details class="bc-core-gallery__nav-group">
+            <summary>Qualität</summary>
+            <div class="bc-core-gallery__nav-links">
+                <a href="#bc-core-review-matrix">Review-Matrix</a>
+            </div>
+        </details>
     </nav>
 
     <section class="bc-core-gallery__density" aria-labelledby="bc-core-density-heading">
@@ -216,6 +258,8 @@
     @include('pages.partials.design-lab-components-v6')
 
     @include('pages.partials.design-lab-components-v7')
+
+    @include('pages.partials.design-lab-components-v8')
 
     <section class="bc-core-gallery__section bc-core-gallery__section--final" id="bc-core-patterns">
         <span class="bc-design-lab__kicker">Nächste Ebene</span>
