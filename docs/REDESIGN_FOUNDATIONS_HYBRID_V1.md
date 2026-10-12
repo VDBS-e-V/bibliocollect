@@ -12,6 +12,8 @@
 
 **Neue gestalterische Leitlinie nach Komponentenreview: „Wir wollen bunt!“** Die Farben bleiben strikt beim bereitgestellten VDBS-Farbsystem 6.0, aber wichtige Zustände dürfen mit **kräftigen vollflächigen Statusfarben** arbeiten, statt in beinahe weißen Pastelltönen unterzugehen. Für `x-library.availability-status`/`due-date-status`: Verfügbar = Grün mit Ink, Vorgemerkt = Lila mit Weiß, Warnung ab sieben Tagen = semantisches Orange mit Ink, Überfällig = Fehlerrot mit Weiß und Warnzeichen. Normale Ausleihen behalten ein neutrales Erscheinungsbild. Status wird auch immer als Text vermittelt, nicht allein farbig. Die sechs Gruppenfarben werden dadurch nicht generell für Dekoration freigegeben; sie behalten die Rollen aus dem VDBS-Farbpaket. Für den Scanner gilt als Fokusprinzip ein einzelner farbig umgeschalteter **bestehender** Rahmen ohne doppeltes Outline oder Innenstrich. Umsetzung zunächst additiv als Komponentenreview, ohne globale Tokenänderung oder produktive Seitenmigration.
 
+**Scanner-Fokusregel (nach weiterem UI-Review):** Ein wachsender Rahmen darf keine nachfolgenden Elemente verschieben. Dafür reserviert das Scannerfeld im Ruhezustand 1px Margin bei 1px Border; bei Hover und Fokus geht dieser Platz in den bestehenden 2px-lila-Rahmen über. Gleichzeitig wird die Mindesthöhe kompensiert, sodass die äußere Höhe konstant bleibt. Keine zusätzliche Outline oder innerer Rahmen. Diese konkrete Ausprägung gilt zunächst für `x-library.scan-input` und kann später als Standard-Pattern für spezielle, zusammengesetzte Eingabefelder überprüft werden.
+
 ## 0. Beobachteter Bestand vs. Neuvorschlag
 
 Das Repository verwendet derzeit:
