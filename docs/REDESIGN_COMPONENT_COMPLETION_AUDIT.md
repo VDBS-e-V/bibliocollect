@@ -64,3 +64,5 @@ Mit `npm run check:components` werden unter Chrome mit der bestehenden Designlab
 6. Read-More: Anriss vor dem Öffnen sichtbar, bei geöffnetem Volltext verborgen.
 
 Der Test ist an den Accessibility-Workflow gekoppelt und benötigt Chrome und den laufenden Laravel-Demoserver; er hat keine schreibende Serveraktion. Er ist zusätzlich zu Axe, dem Layoutcheck und den PHP-Featuretests zu bestehen.
+
+Die öffentliche `/design-lab/komponenten`-Galerie ist nun zusätzlich in `scripts/support/site.mjs` für **alle vorhandenen Axe- und mobilen 320/375/768/1024-Pixel-Layout-Prüfungen** registriert. Auch alte Komponenten werden so automatisch auf ihre reale Darstellung geprüft. Falls der Prüflauf weitere Befunde sichtbar macht, bleibt die Freigabe bis zur Nachbearbeitung offen.

@@ -19,6 +19,7 @@ export const guestPages = [
   ['Barrierefreiheit', '/barrierefreiheit'],
   ['Anmelden', '/anmelden'],
   ['Reihen', '/reihen'],
+  ['Komponentenbibliothek', '/design-lab/komponenten'],
 ];
 
 export const memberPages = [
