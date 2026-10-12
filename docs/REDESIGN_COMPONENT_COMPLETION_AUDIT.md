@@ -51,3 +51,16 @@ Die folgenden Gates entscheiden über die **Freigabe**, nicht über das Vorhande
 - 110 automatische Axe-Seitenprüfungen im letzten Lauf: 0 Verstöße mit Schweregrad serious oder höher; der separate Layoutcheck schlug bei 1024px wegen einer dekorativen Hero-Kreisfläche fehl (12px Überstand). Der visuelle Hero-Baustein beschränkt diese Kreisposition nun ab Tabletbreite, **ohne** die Startseiten-View oder deren Inhalte zu bearbeiten.
 - Kleinere Linkflächen werden in gemeinsamen Shell-/Visual-Styles vergrößert. Verborgene Account-Menü-Inhalte sind im geschlossenen Zustand auch für geometrische Layoutchecker vollständig ausgeblendet.
 - Die Wirkung muss durch **den nächsten CI-Lauf** bestätigt werden. Hinweise zu den verbleibenden kleinen Linkflächen auf anderen bereits vorhandenen Seiten werden getrennt dokumentiert.
+
+## Browser-Interaktionen (zusätzlicher Abschluss-Test)
+
+Mit `npm run check:components` werden unter Chrome mit der bestehenden Designlab-Galerie sechs echte Client-Interaktionen geprüft:
+
+1. Combobox: Vorschläge per Tastatur und synchronisierter nativer Select-Wert.
+2. Data-Grid: Select-all berücksichtigt deaktivierte Zeilen, Zähler aktualisiert sich.
+3. Command-Palette: Dialog-/Filter-/Escape-Zustände.
+4. Repeater: Hinzufügen und Entfernen mit indizierten Formularnamen.
+5. Transferliste: Verschieben erzeugt korrekt synchronisierte versteckte Formwerte.
+6. Read-More: Anriss vor dem Öffnen sichtbar, bei geöffnetem Volltext verborgen.
+
+Der Test ist an den Accessibility-Workflow gekoppelt und benötigt Chrome und den laufenden Laravel-Demoserver; er hat keine schreibende Serveraktion. Er ist zusätzlich zu Axe, dem Layoutcheck und den PHP-Featuretests zu bestehen.

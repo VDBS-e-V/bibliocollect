@@ -65,6 +65,12 @@ jobs:
           BROWSER: /usr/bin/google-chrome
         run: npm run a11y
 
+      - name: Komponenteninteraktionen im Browser
+        if: always()
+        env:
+          BROWSER: /usr/bin/google-chrome
+        run: npm run check:components
+
       - name: Layout bei Handy- und Tabletbreiten
         if: always()
         env:
