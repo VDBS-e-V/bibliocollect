@@ -1,0 +1,27 @@
+/* K14: opt-in advanced form structures; native HTML remains the no-JS baseline. */
+.bc-combobox,.bc-date-time-picker,.bc-time-range{display:grid;gap:.4rem;min-width:0;max-width:100%;color:var(--text-primary)}
+.bc-combobox label,.bc-date-time-picker label,.bc-time-range legend,.bc-time-range label{font-weight:900;font-size:var(--text-sm);color:var(--text-primary)}
+.bc-time-range{margin:0;padding:0;border:0}
+.bc-time-range legend{margin-bottom:.65rem}
+.bc-time-range__fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.bc-time-range__fields>div{display:grid;gap:.4rem;min-width:0}
+.bc-combobox select,.bc-combobox__search,.bc-date-time-picker input,.bc-time-range input{width:100%;min-width:0;min-height:3rem;padding:.55rem .75rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-primary);font:inherit;color-scheme:light}
+:root[data-vdbs-theme='dark'] :is(.bc-combobox select,.bc-combobox__search,.bc-date-time-picker input,.bc-time-range input){color-scheme:dark}
+.bc-combobox--compact select,.bc-combobox--compact .bc-combobox__search,.bc-date-time-picker--compact input,.bc-time-range--compact input{min-height:2.7rem}
+:is(.bc-combobox,.bc-date-time-picker,.bc-time-range) :is(input,select):focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+:is(.bc-combobox,.bc-date-time-picker,.bc-time-range) [aria-invalid='true']{border-color:var(--vdbs-error)}
+.bc-combobox{position:relative}
+.bc-combobox__options{position:absolute;z-index:30;top:calc(100% - .1rem);left:0;right:0;max-height:17rem;overflow-y:auto;list-style:none;margin:0;padding:.3rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg-surface);box-shadow:0 12px 32px #0002}
+.bc-combobox__options[hidden]{display:none}
+.bc-combobox__option{padding:.65rem .7rem;line-height:1.4;overflow-wrap:anywhere;border-radius:var(--radius-sm);cursor:pointer}
+.bc-combobox__option[aria-selected='true']{background:var(--vdbs-purple);color:var(--vdbs-white)}
+.bc-combobox__option[aria-disabled='true']{opacity:.55;cursor:not-allowed}
+.bc-combobox__status{font-size:var(--text-sm);color:var(--text-secondary);margin:0}
+.bc-combobox__hint,.bc-combobox__error,.bc-date-time-picker__hint,.bc-date-time-picker__error,.bc-time-range__hint,.bc-time-range__error{margin:.3rem 0 0;font-size:var(--text-sm);line-height:1.5;color:var(--text-secondary)}
+.bc-combobox__error,.bc-date-time-picker__error,.bc-time-range__error{color:var(--vdbs-error)}
+.bc-form-actions{min-width:0;max-width:100%;padding:1rem 0;border-top:1px solid var(--border-default);color:var(--text-primary)}
+.bc-form-actions__status{margin:0 0 .8rem;color:var(--text-secondary);font-size:var(--text-sm)}
+.bc-form-actions__row,.bc-form-actions__secondary,.bc-form-actions__primary{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem}
+.bc-form-actions__row{justify-content:space-between}
+.bc-form-actions--compact{padding:.65rem 0}
+@media(max-width:36rem){.bc-time-range__fields{grid-template-columns:minmax(0,1fr)}.bc-form-actions__row{align-items:stretch}.bc-form-actions__primary{margin-left:auto}}
