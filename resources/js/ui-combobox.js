@@ -53,17 +53,20 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
   };
   const activate = (position) => {
     if (!shown.length) return;
+    let candidate = ((position % shown.length) + shown.length) % shown.length;
     for (let tries = 0; tries < shown.length; tries += 1) {
-      position = (position + shown.length) % shown.length;
-      if (!shown[position].disabled) break;
-      position += 1;
+      if (!shown[candidate].disabled) {
+        active = candidate;
+        [...list.children].forEach((node, i) => node.setAttribute('aria-selected', String(i === active)));
+        const option = list.children[active];
+        input.setAttribute('aria-activedescendant', option.id);
+        option.scrollIntoView({ block: 'nearest' });
+        return;
+      }
+      candidate = (candidate + 1) % shown.length;
     }
-    if (shown[position]?.disabled) return;
-    active = position;
-    [...list.children].forEach((node, i) => node.setAttribute('aria-selected', String(i === active)));
-    const option = list.children[active];
-    input.setAttribute('aria-activedescendant', option.id);
-    option.scrollIntoView({ block: 'nearest' });
+    input.removeAttribute('aria-activedescendant');
+    active = -1;
   };
   const render = (values, message) => {
     shown = values.slice(0, 50);
@@ -122,7 +125,8 @@ document.querySelectorAll('[data-ui-combobox]').forEach((root, index) => {
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       if (list.hidden) { search(input.value); return; }
-      activate(active + (event.key === 'ArrowDown' ? 1 : -1));
+      const step = event.key === 'ArrowDown' ? 1 : -1;
+      activate(active < 0 ? (step === 1 ? 0 : shown.length - 1) : active + step);
     }
     if (event.key === 'Enter' && !list.hidden && active >= 0) { event.preventDefault(); choose(shown[active]); }
   });
