@@ -102,3 +102,9 @@ Der Auftraggeber hat im Projektgespräch ausdrücklich bestätigt: **„Die Komp
 - **Nächste Etappe:** öffentliche Startseite, Katalog, Ergebnislisten und Mediendetails als Designlab-Entwürfe auf Basis der freigegebenen Komponenten; produktive Seiten erst nach eigener Zustimmung verändern.
 
 **PR #92 bleibt ausdrücklich Draft und ungemergt.**
+
+## QS-Nachtrag 13. Oktober 2026 – 7-Tage-Grenzfälle
+
+Die bereits abgenommene `x-library.due-date-status`-Darstellung wurde gezielt gegen falsch typisierte Prop-Werte abgesichert: Statt einen ungültigen oder gebrochenen Tageswert nach `(int)` stillschweigend als heute oder bald fällig zu behandeln, rendert die Komponente „Frist unbekannt“. Gültige ganzzahlige Eingaben behalten die bestehende Bedeutung: **8 Tage neutral, 7 bis 1 Tage orange, 0 Tage heute fällig, negative Werte rot überfällig**. Die Bestimmung echter Kalendertage bleibt unverändert Sache der aufrufenden Fachschicht.
+
+Die Komponentengalerie in K16 zeigt diese sechs Grenzen nebeneinander; die Matrix nutzt bestehende VDBS-Statusflächen und ergänzt keine produktive Seite. Zwei zusätzliche Featuretests prüfen die Schwelle einschließlich ungültiger Eingaben und die Galerieeinbindung. Die Darstellungsentscheidung vom 12.10.2026 wird nicht aufgehoben; neue technische Änderungen benötigen dennoch commitbezogene CI- und visuelle Prüfung. PR #92 bleibt Draft. Kein Merge, keine Fachlogik, keine Änderung von Marken-Tokens oder Schriftfamilien.

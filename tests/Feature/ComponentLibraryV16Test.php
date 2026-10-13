@@ -83,3 +83,39 @@ it('nutzt bestehende Checkboxen in einer beschrifteten Kontaktwahl ohne echtes F
         ->toContain('Bitte prüfen')->toContain('aria-describedby=')
         ->not->toContain('<form');
 });
+
+it('bewahrt die Grenzwerte des Sieben-Tage-Status und verwirft ungültige Tagesdifferenzen', function (): void {
+    $cases = [
+        [8, 'normal', 'Ausgeliehen'],
+        [7, 'soon', 'Bald fällig'],
+        [1, 'soon', 'Bald fällig'],
+        [0, 'today', 'Heute fällig'],
+        [-1, 'overdue', 'Überfällig'],
+        [null, 'unknown', 'Frist unbekannt'],
+        ['7.5', 'unknown', 'Frist unbekannt'],
+        ['kein Tageswert', 'unknown', 'Frist unbekannt'],
+    ];
+
+    foreach ($cases as [$days, $state, $label]) {
+        $html = Blade::render('<x-library.due-date-status :daysRemaining="$days" />', ['days' => $days]);
+        expect($html)->toContain('bc-due-status--'.$state)->toContain($label);
+
+        if ($state === 'unknown') {
+            expect($html)->not->toContain('Heute fällig')->not->toContain('bc-due-status--today');
+        }
+    }
+});
+
+it('demonstriert alle sechs Fristgrenzen im Designlab ohne echte Rückgabedaten', function (): void {
+    $html = (string) $this->get(route('public.design-lab.components'))->assertOk()->getContent();
+    expect($html)->toContain('Grenzwerte für Rückgabefristen')
+        ->toContain('8 Tage · neutral')
+        ->toContain('7 Tage · Warnung beginnt')
+        ->toContain('0 Tage · heute fällig')
+        ->toContain('−1 Tag · überfällig')
+        ->toContain('Keine Tagesangabe · unbekannt')
+        ->toContain('bc-deadline-matrix__case')
+        ->toContain('bc-due-status--normal')
+        ->toContain('bc-due-status--today')
+        ->toContain('bc-due-status--overdue');
+});

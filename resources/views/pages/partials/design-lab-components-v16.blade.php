@@ -49,6 +49,38 @@
             <x-library.loan-summary title="Ein weiteres Beispiel" density="compact" />
         </div>
     </div>
+
+    {{-- Boundary gallery only: these are explicitly supplied demo day counts, not real dates or reminder rules. --}}
+    <div class="bc-core-gallery__example">
+        <div class="bc-core-gallery__example-head"><strong>Fristgrenzen im direkten Vergleich</strong><span>Fiktive Tagesdifferenzen · keine Berechnung</span></div>
+        <div class="bc-deadline-matrix" role="group" aria-label="Grenzwerte für Rückgabefristen">
+            <div class="bc-deadline-matrix__case">
+                <span class="bc-deadline-matrix__label">8 Tage · neutral</span>
+                <x-library.due-date-status :daysRemaining="8" />
+            </div>
+            <div class="bc-deadline-matrix__case">
+                <span class="bc-deadline-matrix__label">7 Tage · Warnung beginnt</span>
+                <x-library.due-date-status :daysRemaining="7" />
+            </div>
+            <div class="bc-deadline-matrix__case">
+                <span class="bc-deadline-matrix__label">1 Tag · bald fällig</span>
+                <x-library.due-date-status :daysRemaining="1" />
+            </div>
+            <div class="bc-deadline-matrix__case">
+                <span class="bc-deadline-matrix__label">0 Tage · heute fällig</span>
+                <x-library.due-date-status :daysRemaining="0" />
+            </div>
+            <div class="bc-deadline-matrix__case">
+                <span class="bc-deadline-matrix__label">−1 Tag · überfällig</span>
+                <x-library.due-date-status :daysRemaining="-1" />
+            </div>
+            <div class="bc-deadline-matrix__case">
+                <span class="bc-deadline-matrix__label">Keine Tagesangabe · unbekannt</span>
+                <x-library.due-date-status />
+            </div>
+        </div>
+        <p class="bc-core-gallery-v5__note">Alle sechs Fälle sind reine Anzeigezustände. Orange beginnt einschließlich Tag 7, Rot kennzeichnet Überfälligkeit. Berechnung, Verlängerung und Erinnerungsversand bleiben außerhalb der Komponenten.</p>
+    </div>
     <div class="bc-core-gallery__component-note"><code>&lt;x-library.loan-summary&gt;</code><span>title, author, barcode, dueDays, dueDateLabel, href, actions, density; rendert bestehende Due-Date-Status-Regeln.</span></div>
 </section>
 

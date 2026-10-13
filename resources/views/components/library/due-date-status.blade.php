@@ -6,7 +6,10 @@
 
 @php
     // View-only component: callers provide a calendar-day difference, never an e-mail reminder rule.
-    $days = $daysRemaining === null ? null : (int) $daysRemaining;
+    // Invalid or fractional inputs must not be silently cast to 'today' or 'soon'.
+    // The calling domain layer still owns the actual calendar-day calculation.
+    $days = $daysRemaining === null ? null : filter_var($daysRemaining, FILTER_VALIDATE_INT);
+    $days = $days === false ? null : $days;
     $state = $days === null ? 'unknown' : ($days < 0 ? 'overdue' : ($days === 0 ? 'today' : ($days <= 7 ? 'soon' : 'normal')));
     $statusLabel = match ($state) {
         'overdue' => 'Überfällig',

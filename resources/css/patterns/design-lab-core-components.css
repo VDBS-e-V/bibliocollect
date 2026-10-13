@@ -281,3 +281,34 @@
 
 /* Closed chapter lists must not participate in mobile geometry or keyboard navigation. */
 .bc-core-gallery__nav-group:not([open]) > .bc-core-gallery__nav-links { display:none; }
+
+/* Review-only: inspect all 7-day deadline boundaries without changing shared status tokens. */
+.bc-core-gallery .bc-deadline-matrix {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:.75rem;
+    margin-block:.8rem;
+}
+.bc-core-gallery .bc-deadline-matrix__case {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:.7rem;
+    min-width:0;
+    padding:1rem;
+    border:1px solid var(--border-default);
+    border-radius:var(--radius-sm);
+    background:var(--bg-surface-muted);
+}
+.bc-core-gallery .bc-deadline-matrix__label {
+    color:var(--text-primary);
+    font-size:var(--text-sm);
+    font-weight:800;
+    line-height:1.4;
+}
+@media (max-width:48rem) {
+    .bc-core-gallery .bc-deadline-matrix { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:33rem) {
+    .bc-core-gallery .bc-deadline-matrix { grid-template-columns:minmax(0,1fr); }
+}
