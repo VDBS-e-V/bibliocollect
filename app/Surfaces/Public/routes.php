@@ -18,6 +18,23 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', PublicHomeController::class)->name('public.home');
 
+// Designatlas nur auf lokalen/Test-Systemen – keine internen Beispielabläufe in Produktion.
+if (app()->environment(['local', 'testing'])) {
+    Route::view('/design-review', 'pages.design-review')->name('public.design-review');
+
+    // Neue, getrennt prüfbare Musterseiten und Komponentenbibliothek.
+    // Nur local/testing; keine Demodaten auf produktiven Schulinstanzen.
+    Route::view('/design-lab', 'pages.design-lab', ['screen' => 'index'])->name('public.design-lab');
+    Route::view('/design-lab/startseite', 'pages.design-lab', ['screen' => 'startseite'])->name('public.design-lab.home');
+    Route::view('/design-lab/startseite-v1', 'pages.design-lab', ['screen' => 'startseite-v1'])->name('public.design-lab.home-v1');
+    Route::view('/design-lab/medien', 'pages.design-lab', ['screen' => 'medien'])->name('public.design-lab.media');
+    Route::view('/design-lab/assistent', 'pages.design-lab', ['screen' => 'assistent'])->name('public.design-lab.wizard');
+    Route::view('/design-lab/dashboard', 'pages.design-lab', ['screen' => 'dashboard'])->name('public.design-lab.dashboard');
+    Route::view('/design-lab/portal', 'pages.design-lab', ['screen' => 'portal'])->name('public.design-lab.portal');
+    Route::view('/design-lab/komponenten', 'pages.design-lab', ['screen' => 'komponenten'])->name('public.design-lab.components');
+    Route::view('/design-lab/designsystem', 'pages.design-lab', ['screen' => 'designsystem'])->name('public.design-lab.designsystem');
+}
+
 Route::get('/katalog', CatalogIndexController::class)
     ->name('public.catalog.index');
 

@@ -1,184 +1,185 @@
-<x-app-shell surface="public" title="Katalog">
+<x-app-shell surface="public" title="Startseite">
     <x-content.block key="home.notice" />
 
-    <section class="bc-home-intro" aria-labelledby="home-heading">
-        <div class="bc-home-intro__copy">
-            <p class="bc-eyebrow">BiblioCollect · VDBS</p>
-            <h1 id="home-heading">Die Schulbibliothek.</h1>
-            <p class="bc-home-intro__lead">Medien finden, ausleihen und gemeinsam entdecken. BiblioCollect verbindet den öffentlichen Katalog mit den Services der Schulbibliothek – klar, zugänglich und ohne unnötige Hürden.</p>
-        </div>
+    @php
+        // Bewährte Live-Daten unverändert: kuratierte Empfehlungen, Neuerscheinungen,
+        // Themen, Öffnungszeiten, Schließtage und Leihregeln kommen weiterhin aus
+        // dem bestehenden PublicHomeController und HomeShowcase.
+        $recommendedTiles = $showcase['recommended'] ?? [];
+        $newTiles = $showcase['new'] ?? [];
+        $discoverTiles = collect(array_merge($recommendedTiles, $newTiles))->unique('id')->take(4)->values()->all();
+        $heroTiles = array_slice($discoverTiles, 0, 2);
+        $recommendedIds = collect($recommendedTiles)->pluck('id')->all();
+        $showsRecommended = collect($discoverTiles)->contains(fn (array $tile): bool => in_array($tile['id'], $recommendedIds, true));
+        $showsNew = collect($discoverTiles)->contains(fn (array $tile): bool => ! in_array($tile['id'], $recommendedIds, true));
+        $scheduleItems = collect($hours)->map(static fn (array $hour): array => [
+            'day' => $hour['day'],
+            'hours' => $hour['time'],
+        ])->all();
+    @endphp
 
-        <div class="bc-home-intro__brand" aria-label="Über BiblioCollect">
-            <strong>Für den Schulalltag gemacht.</strong>
-            <p>Die Bibliothek bleibt auch ohne Onlinekonto vollständig nutzbar. Digitale Funktionen ergänzen die Ausleihe vor Ort.</p>
-            <img class="bc-home-intro__figures" src="/brand/vdbs/figures-chain.svg" alt="" aria-hidden="true">
-        </div>
-    </section>
 
-    <section class="bc-catalog-search" aria-labelledby="catalog-heading">
-        <div class="bc-catalog-search__heading">
-            <h2 id="catalog-heading">Katalog durchsuchen</h2>
-            <p>Suche nach Titel, Autor:in, ISBN oder Stichwort</p>
-        </div>
-
-        <form method="get" action="{{ route('public.catalog.index') }}" class="bc-catalog-search__form bc-home-catalog-form" role="search" aria-label="Katalog durchsuchen">
-            <label class="sr-only" for="catalog-search">Suchbegriff</label>
-            <input
-                id="catalog-search"
-                name="q"
-                class="bc-catalog-search__input"
-                type="search"
-                placeholder="Was möchtest du finden?"
-                minlength="2"
-                maxlength="120"
-                autocomplete="off"
-            >
-            <x-ui.button type="submit">Suchen</x-ui.button>
-        </form>
-
-        <div class="bc-catalog-search__meta">
-            <span>Titel, Verantwortliche, ISBN, Verlag, Medientyp und Sprache durchsuchen.</span>
-            <a href="{{ route('public.catalog.index') }}">Alle Titel und Filter öffnen →</a>
-        </div>
-    </section>
-
-    @foreach ([
-        'recommended' => ['title' => 'Empfohlene Medien', 'id' => 'recommended-heading', 'lead' => 'Von der Bibliothek ausgesucht und beliebt bei euch.'],
-        'new' => ['title' => 'Neue Medien', 'id' => 'new-heading', 'lead' => 'Frisch ins Regal gekommen.'],
-    ] as $key => $block)
-        @if (($showcase[$key] ?? []) !== [])
-            <section class="bc-showcase" aria-labelledby="{{ $block['id'] }}">
-                <div class="bc-section-heading bc-section-heading--with-meta">
-                    <h2 id="{{ $block['id'] }}">{{ $block['title'] }}</h2>
-                    <span>{{ $block['lead'] }}</span>
+    {{-- Lokale V2 auf der echten Startseite: durchgehender Hero und unterschiedliche Abschnittsformen. --}}
+    <div class="bc-library-home bc-home-v1 bc-home-live" id="bc-home-top">
+        <section class="bc-home-hero bc-home-v1__hero" aria-labelledby="home-heading" id="home-search">
+            <div class="bc-home-hero__layout">
+                <div class="bc-home-hero__copy">
+                    <span class="bc-home-eyebrow bc-home-eyebrow--light">Deine Schulbibliothek</span>
+                    <h1 id="home-heading"><span>Hier beginnt</span><span class="bc-home-hero__accent">deine nächste</span><span>Geschichte.</span></h1>
+                    <p>Finde Bücher, die dich begeistern. Entdecke neue Themen und nutze die Bibliothek ganz nach deinen Ideen.</p>
+                    <x-library.catalog-search id="catalog-search" placeholder="Buchtitel, Autor:in oder Thema …" />
+                    <div class="bc-home-hero__links">
+                        <span>Direkt zu:</span>
+                        <a href="{{ route('public.catalog.advanced') }}">Erweiterte Suche</a>
+                        <a href="#oeffnungszeiten">Öffnungszeiten</a>
+                    </div>
                 </div>
-                <ul class="bc-showcase__grid">
-                    @foreach ($showcase[$key] as $tile)
-                        <li class="bc-showcase__tile">
-                            <a href="{{ route('public.catalog.show', ['titleId' => $tile['id']]) }}" class="bc-showcase__link">
-                                <span class="bc-showcase__cover"><img src="{{ $tile['cover'] }}" alt="" loading="lazy"></span>
-                                <strong class="bc-showcase__title">{{ $tile['title'] }}</strong>
-                                @if ($tile['authors'] !== '')<span class="bc-showcase__authors">{{ $tile['authors'] }}</span>@endif
-                            </a>
-                            <x-ui.badge :variant="$tile['variant']">{{ $tile['badge'] }}</x-ui.badge>
-                        </li>
-                    @endforeach
-                </ul>
-            </section>
-        @endif
-    @endforeach
-
-    @if (($showcase['topics'] ?? []) !== [])
-        <section class="bc-showcase" aria-labelledby="topics-heading">
-            <div class="bc-section-heading bc-section-heading--with-meta">
-                <h2 id="topics-heading">Empfohlene Themen</h2>
-                <span>Stöbern nach Thema.</span>
+                <div class="bc-home-hero__art" aria-hidden="true">
+                    <span class="bc-home-hero__circle bc-home-hero__circle--main"></span>
+                    <span class="bc-home-hero__circle bc-home-hero__circle--ring"></span>
+                    <span class="bc-home-hero__caption"><small>Entdecken</small><strong>Was liest du als Nächstes?</strong></span>
+                    <div class="bc-home-hero__book bc-home-hero__book--back">
+                        @if (isset($heroTiles[0]))
+                            <x-library.media-cover :src="$heroTiles[0]['cover']" :title="$heroTiles[0]['title']" :author="$heroTiles[0]['authors']" size="hero" />
+                        @else
+                            <x-library.media-cover title="Neue Ideen" author="Bücher entdecken" variant="mint" size="hero" />
+                        @endif
+                    </div>
+                    <div class="bc-home-hero__book bc-home-hero__book--front">
+                        @if (isset($heroTiles[1]))
+                            <x-library.media-cover :src="$heroTiles[1]['cover']" :title="$heroTiles[1]['title']" :author="$heroTiles[1]['authors']" size="hero" />
+                        @else
+                            <x-library.media-cover title="Lesen öffnet Welten" author="Deine Bibliothek" variant="plum" size="hero" />
+                        @endif
+                    </div>
+                </div>
             </div>
-            <ul class="bc-showcase__topics">
-                @foreach ($showcase['topics'] as $topic)
-                    <li>
-                        <a href="{{ route('public.topic', ['key' => $topic['key']]) }}" class="bc-showcase__topic">
-                            <strong>{{ $topic['name'] }}</strong>
-                            @if (! empty($topic['description']))<span>{{ \Illuminate\Support\Str::limit($topic['description'], 90) }}</span>@endif
-                            <small>{{ $topic['count'] }} Titel</small>
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
         </section>
-    @endif
 
-    <div class="bc-home-layout">
-        <div class="bc-home-layout__main">
-            <section class="bc-content-section" aria-labelledby="quick-heading">
-                <div class="bc-section-heading">
-                    <h2 id="quick-heading">Schnell finden</h2>
-                </div>
-                <div class="bc-link-list">
-                    <div class="bc-link-list__row">
-                        <div><a href="{{ route('public.catalog.index') }}"><strong>Im Katalog stöbern</strong></a><span>Alle Titel und Ausgaben, mit Filter „nur jetzt verfügbare Titel“</span></div>
-                    </div>
-                    <div class="bc-link-list__row">
-                        <div><a href="{{ route('public.wishes.create') }}"><strong>Buchwunsch abgeben</strong></a><span>Dir fehlt ein Buch? Sag es uns, auch ohne Anmeldung</span></div>
-                    </div>
-                    @guest
-                        <div class="bc-link-list__row">
-                            <div><a href="{{ route('identity.claim.create') }}"><strong>Onlinekonto aktivieren</strong></a><span>Mit dem Code aus der Bibliothek: verlängern, vormerken, eigene Ausleihen sehen</span></div>
-                        </div>
-                    @endguest
-                </div>
-            </section>
+        {{-- Bildhafte Angebotskarten im dunklen Bereich, nur echte Ziele. --}}
+        <section class="bc-home-actions bc-home-live__offers" aria-labelledby="home-actions-heading" id="home-actions">
+            <h2 id="home-actions-heading">Angebote entdecken</h2>
+            <div class="bc-home-live__offer-grid">
+                <x-library.quick-action class="bc-home-live__offer bc-home-live__offer--catalog"
+                    :href="route('public.catalog.index')" title="Medien finden"
+                    description="Geschichten, Wissen und neue Lieblingsbücher warten im Katalog." icon="search" />
+                <x-library.quick-action class="bc-home-live__offer bc-home-live__offer--series"
+                    :href="route('public.series.index')" title="Buchreihen entdecken"
+                    description="Fortsetzungen lesen und Welten immer wieder besuchen." icon="book" />
+                <x-library.quick-action class="bc-home-live__offer bc-home-live__offer--wishes"
+                    :href="route('public.wishes.create')" title="Buchwunsch abgeben"
+                    description="Dir fehlt ein Titel? Bring deine Ideen in die Bibliothek." icon="heart" />
+            </div>
+        </section>
 
-            <section class="bc-content-section" aria-labelledby="hours-heading">
-                <div class="bc-section-heading">
-                    <h2 id="hours-heading">Öffnungszeiten</h2>
-                </div>
-                @if ($hours === [])
-                    <p class="bc-section-copy">Die Öffnungszeiten werden noch eingetragen. Frag bitte in der Schule nach.</p>
-                @else
-                    <table class="bc-calendar-table">
-                        <caption class="sr-only">Öffnungszeiten der Bibliothek</caption>
-                        <thead><tr><th scope="col">Tag</th><th scope="col">Zeit</th></tr></thead>
-                        <tbody>
-                            @foreach ($hours as $hour)
-                                <tr><th scope="row">{{ $hour['day'] }}</th><td class="bc-tabular">{{ $hour['time'] }}</td></tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
 
-                @if ($closures !== [])
-                    <h3>Geschlossen in den nächsten Wochen</h3>
-                    <ul class="bc-plain-links">
-                        @foreach ($closures as $closure)
-                            <li><span class="bc-tabular">{{ $closure['date'] }}</span>@if ($closure['reason']) · {{ $closure['reason'] }}@endif</li>
+        <section class="bc-home-discovery bc-home-v1__section bc-home-v1__discovery" aria-labelledby="home-discovery-heading" id="home-discovery">
+            <div class="bc-home-live__section-top">
+                <h2 id="home-discovery-heading">Zum Lesen entdeckt</h2>
+                <a class="bc-home-text-link" href="{{ route('public.catalog.index') }}">Alle Medien ansehen <span aria-hidden="true">↗</span></a>
+            </div>
+
+            @if ($discoverTiles !== [])
+                <div class="bc-home-live__discovery-labels">
+                    @if ($showsRecommended) <span>Empfohlene Medien</span> @endif
+                    @if ($showsNew) <span>Neue Medien</span> @endif
+                </div>
+                <div class="bc-home-v1__media-grid">
+                    @foreach ($discoverTiles as $tile)
+                        <x-library.media-card
+                            :title="$tile['title']"
+                            :author="$tile['authors']"
+                            :cover="$tile['cover']"
+                            :href="route('public.catalog.show', ['titleId' => $tile['id']])"
+                            :density="$loop->last ? 'compact' : 'comfortable'">
+                            <x-slot:status>
+                                <x-ui.badge :variant="$tile['variant']">{{ $tile['badge'] }}</x-ui.badge>
+                            </x-slot:status>
+                        </x-library.media-card>
+                    @endforeach
+                </div>
+            @else
+                <div class="bc-home-live__discovery-empty">
+                    <p>Hier erscheinen Empfehlungen und Neuerscheinungen, sobald Medien dafür ausgewählt sind.</p>
+                    <x-ui.button :href="route('public.catalog.index')" variant="secondary">Im Katalog stöbern <span aria-hidden="true">↗</span></x-ui.button>
+                </div>
+            @endif
+
+            @if (($showcase['topics'] ?? []) !== [])
+                <div class="bc-home-live__topics">
+                    <h3>Empfohlene Themen</h3>
+                    <ul>
+                        @foreach ($showcase['topics'] as $topic)
+                            <li><a href="{{ route('public.topic', ['key' => $topic['key']]) }}">{{ $topic['name'] }} <span aria-hidden="true">↗</span></a></li>
                         @endforeach
                     </ul>
-                @endif
-            </section>
-
-            <section class="bc-content-section" aria-labelledby="info-heading">
-                <div class="bc-section-heading">
-                    <h2 id="info-heading">So funktioniert die Ausleihe</h2>
                 </div>
-                <div class="bc-notice-row">
-                    <strong>Ausleihe vor Ort</strong>
-                    <p>Du bekommst einen Bibliotheksausweis. Damit kannst du bis zu {{ $maxLoans }} Medien gleichzeitig für {{ $loanDays }} Tage ausleihen. Ein Onlinekonto brauchst du dafür nicht.</p>
-                </div>
-                <div class="bc-notice-row">
-                    <strong>Verlängern und vormerken</strong>
-                    <p>{{ $maxRenewals > 0 ? "Du kannst eine Ausleihe bis zu {$maxRenewals} Mal verlängern, wenn niemand den Titel vorgemerkt hat." : 'Verlängern ist zurzeit nicht vorgesehen.' }} {{ $reservations ? 'Ist ein Titel ausgeliehen, kannst du ihn vormerken. Wir legen ihn für dich zurück, sobald er wieder da ist.' : '' }}</p>
-                </div>
-            </section>
-        </div>
-
-        <aside class="bc-home-layout__aside" aria-label="Service">
-            <section class="bc-side-panel" aria-labelledby="account-heading">
-                <h2 id="account-heading">Mein Konto</h2>
-                <p>Eigene Ausleihen, Vormerkungen und Buchwünsche verwalten.</p>
-                @auth
-                    @can('surface.portal.access')
-                        <x-ui.button class="mt-4" variant="secondary" :href="route('portal.home')">Zum Konto</x-ui.button>
-                    @endcan
-                @else
-                    <x-ui.button class="mt-4" variant="secondary" :href="route('login')">Anmelden</x-ui.button>
-                @endauth
-            </section>
-
-            <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="help-heading">
-                <h2 id="help-heading">Fragen?</h2>
-                <p>Sprich uns in der Bibliothek an. Hinweise zum Datenschutz und zur Barrierefreiheit stehen unten auf jeder Seite.</p>
-            </section>
-
-            @if (app()->environment('local'))
-                <section class="bc-side-panel bc-side-panel--quiet" aria-labelledby="dev-heading">
-                    <h2 id="dev-heading">Entwicklungsansichten</h2>
-                    <ul class="bc-plain-links">
-                        <li><a href="{{ route('preview.pos') }}">Bibliotheksbetrieb</a></li>
-                        <li><a href="{{ route('preview.administration') }}">Verwaltung</a></li>
-                    </ul>
-                </section>
             @endif
-        </aside>
+        </section>
+
+
+        {{-- Das Feature-Overlap liefert die einzige große Überschrift dieses Abschnitts. --}}
+        <section class="bc-home-editorial bc-home-v1__editorial" aria-label="Geschichten verbinden Menschen" id="home-editorial">
+            <x-library.feature-overlap
+                title="Geschichten verbinden Menschen."
+                description="Eine Schulbibliothek ist mehr als ein Regal: Hier treffen Geschichten, neue Ideen und unterschiedliche Perspektiven aufeinander."
+                :href="route('public.series.index')"
+                action-label="Buchreihen entdecken"
+                tone="mint" />
+        </section>
+
+
+        <section class="bc-home-info bc-home-v1__service" aria-labelledby="home-info-heading" id="home-service">
+            <h2 id="home-info-heading">Gut zu wissen</h2>
+            <div class="bc-home-v1__service-grid">
+                <article class="bc-home-v1__schedule-card" id="oeffnungszeiten" aria-labelledby="home-hours-heading">
+                    <div class="bc-home-v1__schedule-header">
+                        <h3 id="home-hours-heading">Öffnungszeiten</h3>
+                    </div>
+                    @if ($scheduleItems === [])
+                        <p>Die Öffnungszeiten werden noch eingetragen. Frag bitte in der Schule nach.</p>
+                    @else
+                        <x-ui.week-schedule label="Öffnungszeiten der Bibliothek" :items="$scheduleItems" />
+                    @endif
+                    @if ($closures !== [])
+                        <div class="bc-home-live__closures">
+                            <h4>Geschlossen in den nächsten Wochen</h4>
+                            <ul>
+                                @foreach ($closures as $closure)
+                                    <li>{{ $closure['date'] }}@if ($closure['reason']) · {{ $closure['reason'] }}@endif</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </article>
+
+                <div class="bc-home-v1__service-side">
+                    <article class="bc-home-v1__service-card" aria-labelledby="home-loans-heading">
+                        <h3 id="home-loans-heading">So funktioniert die Ausleihe</h3>
+                        <p>Mit deinem Bibliotheksausweis kannst du bis zu {{ $maxLoans }} Medien gleichzeitig für {{ $loanDays }} Tage ausleihen.</p>
+                        @if ($maxRenewals > 0)
+                            <p>Verlängerungen sind bis zu {{ $maxRenewals }} Mal möglich, solange niemand den Titel vorgemerkt hat.</p>
+                        @endif
+                        @if ($reservations)
+                            <p>Ausgeliehene Titel kannst du vormerken.</p>
+                        @endif
+                        <div class="bc-home-v1__service-links">
+                            @guest
+                                <x-ui.button :href="route('identity.claim.create')" variant="secondary">Onlinekonto aktivieren <span aria-hidden="true">↗</span></x-ui.button>
+                            @else
+                                @can('surface.portal.access')
+                                    <x-ui.button :href="route('portal.home')" variant="secondary">Zum Bibliothekskonto <span aria-hidden="true">↗</span></x-ui.button>
+                                @endcan
+                            @endguest
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="bc-home-live__top-link">
+            <x-ui.back-to-top href="#bc-home-top" />
+        </div>
     </div>
 </x-app-shell>

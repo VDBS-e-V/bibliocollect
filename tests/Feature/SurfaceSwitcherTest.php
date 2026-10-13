@@ -16,11 +16,10 @@ function switcherUser(string $role): User
     return $user;
 }
 
-/** Linktexte der Bereichsleiste aus der Kopfzeile. */
+/** Rollenabhängige Bereichslinks der gemeinsamen Hauptnavigation. */
 function switcherAreas(string $html): array
 {
-    preg_match('/<div class="bc-utility-bar__actions">(.*?)<button class="bc-theme-toggle"/s', $html, $match);
-    preg_match_all('/<a href="[^"]*"[^>]*>([^<]+)<\/a>/', $match[1] ?? '', $links);
+    preg_match_all('/<a\b[^>]*\bdata-area-link\b[^>]*>([^<]+)<\/a>/', $html, $links);
 
     return array_map('trim', $links[1]);
 }
@@ -74,8 +73,7 @@ it('shows a login button and the activation link in the masthead for visitors', 
 
     preg_match('/<div class="bc-account">(.*?)<\/div>/s', $html, $account);
 
-    expect($account[1] ?? '')->toContain('Anmelden')->toContain('Konto aktivieren');
-    expect(substr_count($html, 'Anmelden'))->toBe(1);
+    expect($account[1] ?? '')->toContain('Mein Konto')->toContain('Konto aktivieren')->toContain(route('login'));
 });
 
 it('offers only start page and catalog to anonymous visitors', function (): void {

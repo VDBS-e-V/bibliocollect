@@ -140,7 +140,7 @@ final readonly class HomeShowcase
                 'id' => $id,
                 'title' => $title->preferred_title,
                 'authors' => $title->contributions->pluck('contributor.display_name')->filter()->take(2)->join(', '),
-                'cover' => $this->covers->localUrlForTitle($title) ?? asset('brand/vdbs/catalog-cover-placeholder.svg'),
+                'cover' => $this->covers->displayUrlForTitle($title),
                 'badge' => $this->presenter->availabilityLabel($holding, $availability),
                 'variant' => $this->presenter->availabilityVariant($holding, $availability),
             ];

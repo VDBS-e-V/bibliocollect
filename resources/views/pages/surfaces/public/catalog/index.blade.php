@@ -240,7 +240,7 @@
                             aria-label="{{ $title->preferred_title }} öffnen"
                         >
                             <span class="bc-public-result__cover-frame">
-                                <img class="bc-public-result__cover" src="{{ $coverUrls[$titleId] }}" alt="" loading="lazy">
+                                <x-library.media-cover :src="$coverUrls[$titleId]" :title="$title->preferred_title" :author="$title->contributions->pluck('contributor.display_name')->filter()->take(2)->join(', ')" size="small" />
                             </span>
                         </a>
 

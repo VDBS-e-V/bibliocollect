@@ -1,0 +1,479 @@
+/*
+ * BiblioCollect · Öffentliche Startseite
+ * Struktur und Rhythmus: vom Projekt bereitgestellte index.html / style.css.
+ * Layout nur für die Startseite; gemeinsame Suche und Schnellzugriffe bleiben
+ * wiederverwendbare Blade-Komponenten. Kein eigenes paralleles Designsystem.
+ */
+
+.bc-library-home {
+    --bc-home-content: min(100%, 78rem);
+}
+.bc-home-eyebrow {
+    display: block;
+    color: var(--action-success);
+    font-size: .75rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    line-height: 1.6;
+    text-transform: uppercase;
+}
+.bc-home-eyebrow--light { color: var(--vdbs-green); }
+.bc-home-heading { margin-bottom: 1.9rem; }
+.bc-home-heading h2 {
+    margin: .3rem 0 .55rem;
+    color: var(--text-primary);
+    font-size: clamp(1.8rem, 2.8vw, 2.35rem);
+    font-weight: 900;
+    letter-spacing: -.025em;
+    line-height: 1.15;
+}
+.bc-home-heading p {
+    max-width: 43rem;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.55;
+}
+.bc-home-heading--split {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+}
+
+/* 01: breite Markenbühne mit einladender Suche und echten Mediencovern. */
+.bc-home-hero {
+    position: relative;
+    isolation: isolate;
+    background: var(--bg-stage);
+    color: var(--text-on-stage);
+    box-shadow: 0 0 0 100vmax var(--bg-stage);
+    clip-path: inset(0 -100vmax);
+}
+.bc-home-hero__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    min-height: 35.75rem;
+    max-width: var(--bc-home-content);
+    align-items: stretch;
+}
+.bc-home-hero__copy {
+    min-width: 0;
+    padding: clamp(3rem, 5vw, 4.7rem) 0;
+    align-self: center;
+}
+.bc-home-hero h1 {
+    max-width: 12.8ch;
+    margin: .85rem 0 1.2rem;
+    color: var(--text-on-stage);
+    font-size: clamp(3.1rem, 5.5vw, 5.25rem);
+    font-weight: 900;
+    line-height: 1.035;
+    letter-spacing: -.05em;
+    text-wrap: balance;
+}
+.bc-home-hero h1 span { display: block; }
+.bc-home-hero h1 .bc-home-hero__accent { color: var(--vdbs-green); }
+.bc-home-hero__copy > p {
+    max-width: 32rem;
+    margin: 0 0 1.95rem;
+    font-size: clamp(1rem, 1.6vw, 1.125rem);
+    line-height: 1.6;
+}
+
+/* Die Komponente bleibt auch für weitere Seiten wiederverwendbar. */
+.bc-library-search {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: .65rem;
+    align-items: center;
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    padding: .4rem;
+    background: var(--vdbs-white);
+    color: var(--vdbs-ink);
+    box-shadow: 0 .65rem 1.6rem rgb(0 0 0 / 9%);
+}
+.bc-library-search:focus-within { border-color: var(--vdbs-green); }
+.bc-library-search__icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-left: .7rem;
+}
+.bc-library-search input {
+    min-width: 0;
+    width: 100%;
+    min-height: var(--control-min-height);
+    padding: .5rem .1rem;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--vdbs-ink);
+    font: inherit;
+}
+.bc-library-search input::placeholder { color: var(--vdbs-grey-text); }
+.bc-library-search input:focus-visible { outline: 0; }
+.bc-library-search button { min-height: var(--control-min-height); white-space: nowrap; }
+.bc-home-hero__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .4rem .85rem;
+    margin-top: 1rem;
+    color: var(--text-on-stage);
+    font-size: .82rem;
+}
+.bc-home-hero__links a,
+.bc-home-hero__links a:visited { color: var(--text-on-stage); text-underline-offset: .22em; }
+.bc-home-hero__links a:hover { color: var(--vdbs-green); }
+
+.bc-home-hero__art {
+    position: relative;
+    min-height: 33rem;
+    isolation: isolate;
+}
+.bc-home-hero__circle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.bc-home-hero__circle--main {
+    top: 13%;
+    right: -9%;
+    width: 83%;
+    aspect-ratio: 1;
+    background: var(--vdbs-green);
+}
+.bc-home-hero__circle--ring {
+    top: 46%;
+    right: 38%;
+    width: 62%;
+    aspect-ratio: 1;
+    border: 3.25rem solid rgb(255 255 255 / 15%);
+}
+.bc-home-hero__caption {
+    position: absolute;
+    z-index: 3;
+    top: 9%;
+    right: 4%;
+    display: grid;
+    text-align: right;
+    transform: rotate(6deg);
+}
+.bc-home-hero__caption small {
+    font-size: .64rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.bc-home-hero__caption strong { font-size: 1rem; }
+.bc-home-hero__book {
+    position: absolute;
+    width: min(48%, 12.5rem);
+    aspect-ratio: 2 / 3;
+    filter: drop-shadow(0 1.3rem 1rem rgb(0 0 0 / 19%));
+}
+.bc-home-hero__book--back { top: 28%; left: 12%; transform: rotate(-11deg); z-index: 1; }
+.bc-home-hero__book--front { top: 19%; right: 10%; transform: rotate(7deg); z-index: 2; }
+.bc-home-hero__book .bc-library-cover { width: 100%; height: 100%; }
+.bc-home-hero__footnote { position: absolute; right: 4%; bottom: 6%; font-size: .8rem; }
+
+/* 02: Vier Wege statt vier gleichförmiger Funktions-Kacheln.
+   Offene, klar gegliederte Linkzeilen unterstützen schnelles Scannen. */
+.bc-home-actions { padding: clamp(3.5rem, 6vw, 5rem) 0; }
+.bc-home-actions__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 6vw, 5rem);
+}
+.bc-library-quick-action {
+    display: grid;
+    grid-template-columns: 2.9rem minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: start;
+    gap: .15rem 1rem;
+    min-height: 8.9rem;
+    padding: 1.55rem .5rem 1.5rem 0;
+    border: 0;
+    border-top: 1px solid var(--border-default);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+}
+.bc-library-quick-action:visited { color: var(--text-primary); }
+.bc-library-quick-action:hover,
+.bc-library-quick-action:focus-visible { background: var(--bg-surface-muted); text-decoration: none; }
+.bc-library-quick-action:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+.bc-library-quick-action__icon {
+    display: grid;
+    grid-row: 1 / 3;
+    grid-column: 1;
+    place-items: center;
+    width: 2.7rem;
+    height: 2.7rem;
+    border: 1px solid var(--border-default);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--action-success);
+}
+.bc-library-quick-action__icon svg { width: 1.4rem; height: 1.4rem; }
+.bc-library-quick-action strong {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+    line-height: 1.25;
+    font-weight: 900;
+}
+.bc-library-quick-action__description {
+    grid-column: 2;
+    grid-row: 2;
+    max-width: 30ch;
+    color: var(--text-secondary);
+    font-size: .9rem;
+    line-height: 1.55;
+}
+.bc-library-quick-action__arrow {
+    grid-row: 1 / 3;
+    grid-column: 3;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: .35rem;
+    color: var(--action-success);
+}
+
+/* 03: ein ruhiger, redaktioneller Bereich. Kein Kartengitter mit zusätzlichen Boxen. */
+.bc-home-discovery {
+    position: relative;
+    isolation: isolate;
+    padding: clamp(3.8rem, 6vw, 5.75rem) 0;
+    background: var(--bg-surface-muted);
+    box-shadow: 0 0 0 100vmax var(--bg-surface-muted);
+    clip-path: inset(0 -100vmax);
+}
+.bc-home-text-link,
+.bc-home-text-link:visited {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: .45rem;
+    color: var(--link-default);
+    font-size: .9rem;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: .2em;
+}
+.bc-home-discovery__labels {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin: 0 0 1rem;
+    color: var(--text-secondary);
+    font-size: .77rem;
+    font-weight: 700;
+}
+.bc-home-discovery__labels span + span { border-left: 1px solid var(--border-default); padding-left: 1rem; }
+.bc-home-discovery__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.7rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.bc-home-discovery__grid li { min-width: 0; }
+.bc-home-media {
+    display: grid;
+    gap: .5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+.bc-home-media:visited { color: var(--text-primary); }
+.bc-home-media:hover,
+.bc-home-media:focus-visible { text-decoration: none; }
+.bc-home-media:hover strong,
+.bc-home-media:focus-visible strong { text-decoration: underline; }
+.bc-home-media__cover {
+    width: min(100%, 14.5rem);
+    margin-bottom: .35rem;
+    transition: transform var(--transition-fast);
+}
+.bc-home-media:hover .bc-home-media__cover { transform: translateY(-.2rem); }
+.bc-home-media__cover .bc-library-cover { max-width: 14.5rem; }
+.bc-home-media strong { font-size: 1rem; font-weight: 800; line-height: 1.32; }
+.bc-home-media small { color: var(--text-secondary); font-size: .83rem; }
+.bc-home-media__availability { margin-top: .75rem; }
+.bc-home-discovery__empty {
+    padding: 1.3rem 0;
+    border-top: 1px solid var(--border-default);
+}
+.bc-home-discovery__empty p { margin: 0 0 .5rem; color: var(--text-secondary); }
+.bc-home-discovery__topics {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-default);
+}
+.bc-home-discovery__topics h3 { margin: 0 0 1rem; font-size: 1rem; }
+.bc-home-discovery__topics ul { display: flex; flex-wrap: wrap; gap: .7rem 1.5rem; margin: 0; padding: 0; list-style: none; }
+.bc-home-discovery__topics a { color: var(--text-primary); font-weight: 700; text-underline-offset: .2em; }
+
+/* 04: Echte VDBS-Illustration statt künstlich nachgebauter Regalzeichnung.
+   Asymmetrischer Editorial-Schnitt nach Oodi / ZLB. */
+.bc-home-editorial {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: clamp(2.5rem, 8vw, 7rem);
+    align-items: center;
+    padding: clamp(4.5rem, 9vw, 7.5rem) 0;
+}
+.bc-home-editorial__visual {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 22.5rem;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    padding: clamp(1.6rem, 3vw, 2.2rem);
+    background: var(--vdbs-purple);
+    color: var(--vdbs-white);
+}
+.bc-home-editorial__visual img {
+    display: block;
+    width: 108%;
+    max-width: none;
+    height: auto;
+    margin: 1.8rem 0 1.2rem -4%;
+    object-fit: contain;
+}
+.bc-home-editorial__visual > strong {
+    display: block;
+    max-width: 20rem;
+    font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+    line-height: 1.2;
+    font-weight: 900;
+}
+.bc-home-editorial__copy h2 {
+    max-width: 23rem;
+    margin: .8rem 0 1.3rem;
+    font-size: clamp(2.2rem, 3.8vw, 3.35rem);
+    line-height: 1.14;
+    letter-spacing: -.03em;
+}
+.bc-home-editorial__copy p {
+    max-width: 33rem;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.65;
+}
+.bc-home-outline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    min-height: 2.75rem;
+    margin-top: 1.45rem;
+    padding: .65rem 0;
+    color: var(--link-default);
+    font-size: .95rem;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: .25em;
+}
+.bc-home-outline-link:visited { color: var(--link-default); }
+.bc-home-outline-link:hover { text-decoration-thickness: 2px; }
+
+/* 05: Betriebsinformationen – Klartext und reale Daten statt Deko-Karten. */
+.bc-home-info { padding-bottom: clamp(3rem, 5vw, 5rem); }
+.bc-home-info__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2.5rem, 5vw, 5rem);
+}
+.bc-home-info__panel {
+    min-width: 0;
+    border: 0;
+    border-top: 2px solid var(--border-default);
+    border-radius: 0;
+    padding: 1.5rem 0 0;
+    background: transparent;
+}
+.bc-home-info__panel--soft { border-top-color: var(--vdbs-green); background: transparent; }
+.bc-home-info__panel h3 { margin: 0 0 1.1rem; font-size: 1.45rem; }
+.bc-home-info__panel p {
+    max-width: 34rem;
+    margin: .8rem 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.65;
+}
+.bc-home-info__panel .bc-home-text-link { margin-top: 1rem; }
+.bc-home-hours { width: 100%; border-collapse: collapse; font-size: .96rem; text-align: left; }
+.bc-home-hours th, .bc-home-hours td { padding: .85rem .2rem; border-bottom: 1px solid var(--border-default); }
+.bc-home-hours th { font-weight: 600; }
+.bc-home-hours td { font-variant-numeric: tabular-nums; text-align: right; }
+.bc-home-closures { margin-top: 1.5rem; }
+.bc-home-closures h4 { margin: 0 0 .7rem; font-size: .92rem; }
+.bc-home-closures ul { margin: 0; padding-left: 1.25rem; font-size: .89rem; }
+
+@media (max-width: 70rem) {
+    /* Keep the decorative circle within the visual art at tablet widths (1024px layout gate). */
+    .bc-home-hero__circle--main { right: 0; }
+    .bc-home-hero h1 { font-size: clamp(3rem, 5.6vw, 4.5rem); }
+    .bc-home-hero__book { width: min(48%, 11rem); }
+}
+@media (max-width: 50rem) {
+    .bc-home-hero__layout { grid-template-columns: minmax(0, 1fr); }
+    .bc-home-hero__copy { padding: 3.4rem 0 1rem; }
+    .bc-home-hero h1 { font-size: clamp(3rem, 8vw, 4.5rem); }
+    .bc-home-hero__art { width: min(100%, 28rem); min-height: 18rem; margin-inline: auto; }
+    .bc-home-hero__circle--main { top: 0; right: 4%; width: 55%; }
+    .bc-home-hero__circle--ring { top: 15%; right: 43%; width: 46%; border-width: 2.25rem; }
+    .bc-home-hero__caption { top: 0; right: 4%; }
+    .bc-home-hero__book { width: min(35%, 9rem); }
+    .bc-home-hero__book--back { top: 12%; left: 20%; }
+    .bc-home-hero__book--front { top: 4%; right: 22%; }
+    .bc-home-hero__footnote { bottom: 1%; }
+    .bc-home-discovery__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bc-home-editorial { grid-template-columns: 1fr; gap: 2.25rem; }
+    .bc-home-editorial__visual { min-height: 20rem; }
+    .bc-home-info__grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 35rem) {
+    .bc-home-hero__copy { padding: 2.8rem 0 1rem; }
+    .bc-home-hero h1 { font-size: clamp(2.55rem, 10vw, 3.4rem); }
+    .bc-home-hero__art { min-height: 15rem; }
+    .bc-home-hero__book { width: min(36%, 7.5rem); }
+    .bc-home-hero__book--back { left: 17%; }
+    .bc-home-hero__book--front { right: 18%; }
+    .bc-home-hero__caption { font-size: .72rem; }
+    .bc-home-hero__caption strong { font-size: .84rem; }
+    .bc-home-hero__links { font-size: .77rem; }
+    .bc-library-search { grid-template-columns: auto minmax(0, 1fr); }
+    .bc-library-search button { grid-column: 1 / -1; width: 100%; }
+    .bc-home-actions__grid { grid-template-columns: 1fr; }
+    .bc-library-quick-action { min-height: 6.75rem; padding: 1.15rem .25rem 1.15rem 0; }
+    .bc-library-quick-action strong { font-size: 1.07rem; }
+    .bc-library-quick-action__description { font-size: .88rem; }
+    .bc-home-heading { margin-bottom: 1.3rem; }
+    .bc-home-discovery__grid { gap: 1.5rem .9rem; }
+    .bc-home-media strong { font-size: .9rem; }
+    .bc-home-editorial__visual { min-height: 17rem; }
+    .bc-home-editorial__visual img { margin-block: 1.25rem; }
+    .bc-home-hero__circle--ring { border-width: 1.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bc-home-media__cover,
+    .bc-library-quick-action { transition: none; }
+}
+@media print {
+    .bc-home-hero,
+    .bc-home-discovery { box-shadow: none; clip-path: none; }
+    .bc-home-hero { background: transparent; color: var(--text-primary); }
+    .bc-home-hero h1,
+    .bc-home-hero__copy > p { color: var(--text-primary); }
+    .bc-home-hero__art { display: none; }
+    .bc-home-hero h1 .bc-home-hero__accent { color: var(--text-primary); }
+    .bc-home-editorial__visual { display: none; }
+}

@@ -105,7 +105,7 @@ final class CatalogTitleController
             'editionAvailabilities' => $editionAvailabilities,
             'titleAvailability' => $titleAvailability,
             'editionTopics' => $editionTopics,
-            'coverUrl' => $covers->localUrlForTitle($title) ?? asset('brand/vdbs/catalog-cover-placeholder.svg'),
+            'coverUrl' => $covers->displayUrlForTitle($title),
             'presenter' => $presenter,
         ]);
     }

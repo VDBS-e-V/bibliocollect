@@ -11,6 +11,22 @@ use Illuminate\Support\Facades\Storage;
 
 final class CatalogCoverService
 {
+    public function __construct(private readonly CatalogGeneratedCoverService $generated) {}
+
+    /** Originalcover hat Vorrang; nur ohne Original wird ein persistiertes SVG verwendet. */
+    public function displayUrlForTitle(Title $title): ?string
+    {
+        $original = $this->localUrlForTitle($title);
+
+        if ($original !== null) {
+            return $original;
+        }
+
+        $path = $this->generated->ensureForTitle($title);
+
+        return $path !== null ? $this->urlFor($path) : null;
+    }
+
     public function localUrlForTitle(Title $title): ?string
     {
         $title->loadMissing('editions');

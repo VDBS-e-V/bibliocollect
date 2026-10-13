@@ -1,0 +1,80 @@
+/* BiblioCollect K10: opt-in result summaries, page sizes, step actions and detail context.
+   Existing semantic VDBS tokens and accessible native elements only. */
+.bc-result-summary {
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    min-width:0; gap:.85rem 1.2rem; padding:1.15rem 1.35rem;
+    border:1px solid var(--border-default); border-radius:var(--radius-sm);
+    background:var(--bg-surface); color:var(--text-primary);
+}
+.bc-result-summary__copy { display:flex; align-items:baseline; flex-wrap:wrap; gap:.3rem .55rem; min-width:0; flex:1 1 13rem; }
+.bc-result-summary__count { font-size:1.16rem; font-weight:900; font-variant-numeric:tabular-nums; line-height:1.3; }
+.bc-result-summary__query { color:var(--text-secondary); font-size:var(--text-sm); overflow-wrap:anywhere; }
+.bc-result-summary__description { flex-basis:100%; margin:.2rem 0 0; color:var(--text-secondary); font-size:var(--text-sm); line-height:1.5; }
+.bc-result-summary__filters { display:flex; align-items:center; flex-wrap:wrap; gap:.45rem; min-width:0; }
+.bc-result-summary__actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-left:auto; }
+.bc-result-summary--compact { padding:.65rem .85rem; gap:.5rem .75rem; }
+.bc-result-summary--compact .bc-result-summary__count { font-size:var(--text-base); }
+
+.bc-page-size-selector { display:grid; gap:.35rem; min-width:0; max-width:100%; }
+.bc-page-size-selector__label { font-weight:800; font-size:var(--text-sm); line-height:1.35; }
+.bc-page-size-selector__control {
+    display:block; min-width:0; width:100%; min-height:3rem; padding:.5rem 2.1rem .5rem .8rem;
+    color:var(--text-primary); background:var(--bg-surface);
+    border:1px solid var(--border-strong); border-radius:var(--radius-sm);
+    font:inherit; font-size:var(--text-base);
+}
+.bc-page-size-selector__control:focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px; }
+.bc-page-size-selector__hint { margin:0; color:var(--text-secondary); font-size:var(--text-sm); line-height:1.5; }
+.bc-page-size-selector--compact .bc-page-size-selector__control { min-height:2.75rem; font-size:var(--text-sm); }
+
+.bc-step-actions {
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; min-width:0;
+    gap:.8rem 1.3rem; padding:1rem 0; border-top:1px solid var(--border-default);
+}
+.bc-step-actions__secondary { flex:0 1 auto; min-width:0; }
+.bc-step-actions__cancel { display:inline-flex; align-items:center; min-height:2.75rem; color:var(--link-default); font-size:var(--text-sm); font-weight:800; text-underline-offset:.2em; }
+.bc-step-actions__movement { display:flex; justify-content:end; flex-wrap:wrap; gap:.6rem; align-items:center; margin-left:auto; min-width:0; }
+.bc-step-actions__control {
+    display:inline-flex; align-items:center; justify-content:center; gap:.35rem;
+    min-height:3rem; padding:.65rem 1rem; text-align:center; font-size:var(--text-sm);
+    font-weight:900; line-height:1.4; border:1px solid var(--border-strong);
+    border-radius:var(--radius-sm); background:var(--bg-surface); color:var(--text-primary);
+    text-decoration:none; overflow-wrap:anywhere;
+}
+a.bc-step-actions__control:visited { color:var(--text-primary); }
+a.bc-step-actions__control:hover { background:var(--bg-brand-soft); text-decoration:none; }
+.bc-step-actions__control--next { background:var(--vdbs-green); color:var(--vdbs-ink); border-color:var(--vdbs-green); }
+a.bc-step-actions__control--next:visited { color:var(--vdbs-ink); }
+a.bc-step-actions__control--next:hover { background:var(--vdbs-green-soft); color:var(--vdbs-ink); }
+.bc-step-actions__control--disabled { opacity:.55; cursor:not-allowed; background:var(--bg-surface-muted); color:var(--text-secondary); }
+.bc-step-actions--compact .bc-step-actions__control { min-height:2.75rem; padding:.45rem .75rem; }
+:is(.bc-step-actions__control,.bc-step-actions__cancel):focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px; }
+
+.bc-context-strip {
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    gap:.85rem 1.4rem; min-width:0; padding:1.1rem 1.3rem;
+    border:1px solid var(--border-default); border-radius:.625rem;
+    background:var(--bg-surface); color:var(--text-primary);
+}
+.bc-context-strip__identity { min-width:0; display:grid; gap:.4rem; flex:1 1 13rem; }
+.bc-context-strip__back { display:inline-flex; align-items:center; width:fit-content; min-height:2.75rem; gap:.35rem; color:var(--link-default); font-size:var(--text-sm); font-weight:800; line-height:1.3; text-underline-offset:.2em; }
+.bc-context-strip__title { display:block; font-size:1.08rem; line-height:1.32; font-weight:900; overflow-wrap:anywhere; hyphens:auto; }
+.bc-context-strip__facts { display:flex; align-items:start; flex-wrap:wrap; gap:.8rem 1.3rem; margin:0; flex:1 1 15rem; min-width:0; }
+.bc-context-strip__facts > div { display:grid; min-width:0; gap:.15rem; }
+.bc-context-strip__facts dt { color:var(--text-secondary); font-size:.76rem; font-weight:700; }
+.bc-context-strip__facts dd { color:var(--text-primary); font-size:var(--text-sm); font-weight:900; margin:0; line-height:1.4; overflow-wrap:anywhere; }
+.bc-context-strip__status { flex:0 1 auto; min-width:0; }
+.bc-context-strip__actions { display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; min-width:0; }
+.bc-context-strip--compact { padding:.65rem .9rem; gap:.5rem 1rem; border-radius:var(--radius-sm); }
+.bc-context-strip--compact .bc-context-strip__title { font-size:var(--text-sm); }
+.bc-context-strip--compact .bc-context-strip__back { min-height:2.5rem; }
+@media(max-width:40rem) {
+    .bc-result-summary__actions, .bc-step-actions__movement { margin-left:0; }
+    .bc-step-actions__secondary, .bc-step-actions__movement { flex:1 1 100%; }
+    .bc-step-actions__movement { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .bc-step-actions__control { min-width:0; }
+    .bc-context-strip__identity, .bc-context-strip__facts { flex:1 1 100%; }
+}
+@media(prefers-reduced-motion:reduce) {
+    .bc-step-actions__control { transition:none; }
+}

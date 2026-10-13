@@ -1,0 +1,104 @@
+/* Typografische Ersatzcover für Medien ohne lokales Coverbild.
+   Die Variantentöne sind illustrative Buchgestaltung, keine neuen UI-Aktionsfarben. */
+.bc-library-cover {
+    display: block;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    container-type: inline-size;
+}
+.bc-library-cover__image,
+.bc-library-cover__art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: .32rem;
+    box-shadow: var(--shadow-md);
+}
+.bc-library-cover__image { object-fit: cover; }
+.bc-library-cover__art {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--cover-bg);
+    color: var(--cover-text);
+    padding: 10% 9%;
+}
+.bc-library-cover__art--plum { --cover-bg: #58275a; --cover-arc: #85518b; --cover-arc-inner: #6c3372; --cover-text: #fff; }
+.bc-library-cover__art--mint { --cover-bg: #bbefd6; --cover-arc: #7bcbb1; --cover-arc-inner: #a4e4ca; --cover-text: #0f172a; }
+.bc-library-cover__art--ink { --cover-bg: #1b2937; --cover-arc: #45647a; --cover-arc-inner: #29465b; --cover-text: #fff; }
+.bc-library-cover__art--sand { --cover-bg: #e9dfd2; --cover-arc: #c9bba9; --cover-arc-inner: #dfd0c0; --cover-text: #201d2b; }
+.bc-library-cover__brand {
+    position: relative;
+    z-index: 2;
+    display: block;
+    font-size: clamp(.32rem, 4cqi, .58rem);
+    font-weight: 900;
+    letter-spacing: .1em;
+}
+.bc-library-cover__arc {
+    position: absolute;
+    z-index: 0;
+    top: 19%;
+    left: -22%;
+    width: 144%;
+    height: 85%;
+    border-radius: 50%;
+    background: var(--cover-arc);
+}
+.bc-library-cover__arc--inner {
+    top: 34%;
+    left: 15%;
+    width: 100%;
+    height: 72%;
+    background: var(--cover-arc-inner);
+}
+.bc-library-cover__text {
+    position: absolute;
+    z-index: 2;
+    left: 9%;
+    right: 9%;
+    bottom: 12%;
+    display: grid;
+    gap: 3cqi;
+}
+.bc-library-cover__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    font-size: clamp(.7rem, 12.5cqi, 2.15rem);
+    font-weight: 900;
+    line-height: .96;
+    letter-spacing: -.035em;
+    text-wrap: balance;
+}
+.bc-library-cover__author {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    font-size: clamp(.46rem, 6cqi, .95rem);
+    line-height: 1.2;
+}
+.bc-library-cover--hero .bc-library-cover__title { font-size: clamp(.85rem, 13cqi, 2.2rem); }
+.bc-library-cover--hero .bc-library-cover__art { box-shadow: 0 1.1rem 2rem rgb(0 0 0 / 25%); }
+/* Opt-in image-size variants: one cover component, not separate cover implementations. */
+.bc-library-cover--thumbnail .bc-library-cover__art,
+.bc-library-cover--thumbnail .bc-library-cover__image { border-radius:.22rem; box-shadow:var(--shadow-sm); }
+.bc-library-cover--thumbnail .bc-library-cover__brand,
+.bc-library-cover--thumbnail .bc-library-cover__author { display:none; }
+.bc-library-cover--thumbnail .bc-library-cover__title {
+    font-size:clamp(.38rem,10cqi,.7rem);
+    -webkit-line-clamp:3;
+    line-height:1;
+}
+.bc-library-cover--small .bc-library-cover__art,
+.bc-library-cover--small .bc-library-cover__image { border-radius:.27rem; box-shadow:var(--shadow-sm); }
+.bc-library-cover--small .bc-library-cover__title { -webkit-line-clamp:4; }
+.bc-library-cover--hero .bc-library-cover__image { box-shadow:0 1.1rem 2rem rgb(0 0 0 / 25%); }
+@media print {
+    .bc-library-cover__art,
+    .bc-library-cover__image { box-shadow: none; border: 1px solid var(--border-default); }
+}

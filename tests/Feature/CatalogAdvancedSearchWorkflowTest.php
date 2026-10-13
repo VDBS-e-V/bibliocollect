@@ -85,7 +85,7 @@ it('combines public advanced filters on the same bibliographic edition', functio
         ->assertDontSee('Fußball total');
 });
 
-it('renders locally cached covers and falls back to the bundled placeholder', function (): void {
+it('renders locally cached covers and individual title-based fallback covers', function (): void {
     Storage::fake('public');
     config()->set('catalog.covers.disk', 'public');
 
@@ -107,7 +107,10 @@ it('renders locally cached covers and falls back to the bundled placeholder', fu
     $this->get(route('public.catalog.index'))
         ->assertOk()
         ->assertSee('catalog/covers/local-test.png', false)
-        ->assertSee('brand/vdbs/catalog-cover-placeholder.svg', false);
+        ->assertSee('catalog/covers/generated/v1/', false)
+        ->assertDontSee('brand/vdbs/catalog-cover-placeholder.svg', false);
+
+    expect(Storage::disk('public')->allFiles('catalog/covers/generated/v1'))->toHaveCount(1);
 });
 
 it('provides a more detailed internal catalog search for catalog managers', function (): void {

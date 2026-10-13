@@ -6,7 +6,8 @@
     "build": "vite build",
     "dev": "vite",
     "a11y": "node scripts/a11y/axe-check.mjs",
-    "check:layout": "node scripts/layout-check/layout-check.mjs"
+    "check:layout": "node scripts/layout-check/layout-check.mjs",
+    "check:components": "node scripts/a11y/component-interactions.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

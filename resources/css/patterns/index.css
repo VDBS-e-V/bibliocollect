@@ -5,6 +5,20 @@
 @import './circulation.css';
 @import './catalog-management.css';
 @import './public-catalog.css';
+@import './public-home-redesign.css';
+@import './media-cover.css';
+@import './design-review.css';
+@import './library-patterns-v2.css';
+@import './library-data-components.css';
+@import './library-data-components-v2.css';
+@import './library-admin-components.css';
+@import './process-stepper-inline.css';
+@import './design-lab.css';
+@import './design-lab-core-components.css';
+@import './design-lab-portal.css';
+@import './design-lab-home-v1.css';
+@import './public-home-v1-live.css';
+@import './design-system-map.css';
 @import './legacy-catalog-metadata.css';
 @import './catalog-discovery.css';
 @import './catalog-intake.css';
@@ -22,3 +36,4 @@
 @import "./responsive.css";
 
 @import "./help.css";
+@import "./shell-redesign.css";

@@ -1,0 +1,180 @@
+/* Components-first library K6b: copies, patron choice and scan results.
+   All states are view-only; no production data access or business actions. */
+
+.bc-copy-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem 1.5rem;
+    flex-wrap:wrap;
+    min-width:0;
+    padding:1.15rem 1.3rem;
+    border:1px solid var(--border-default);
+    border-radius:var(--radius-sm);
+    background:var(--bg-surface);
+}
+.bc-copy-row__main { flex:1 1 15rem; min-width:0; }
+.bc-copy-row__eyebrow {
+    display:block;
+    margin-bottom:.35rem;
+    color:var(--text-secondary);
+    font-size:.7rem;
+    font-weight:900;
+    letter-spacing:.075em;
+    text-transform:uppercase;
+}
+.bc-copy-row__title {
+    display:block;
+    color:var(--text-primary);
+    font-size:1rem;
+    font-weight:900;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+    hyphens:auto;
+}
+a.bc-copy-row__title { text-underline-offset:.2em; text-decoration-color:var(--border-strong); }
+a.bc-copy-row__title:hover { color:var(--link-default); }
+a.bc-copy-row__title:focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px; }
+.bc-copy-row__meta {
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem 1.35rem;
+    margin:.65rem 0 0;
+    padding:0;
+}
+.bc-copy-row__meta > div { display:flex; flex-wrap:wrap; align-items:baseline; gap:.3rem; min-width:0; font-size:var(--text-sm); }
+.bc-copy-row__meta dt { color:var(--text-secondary); }
+.bc-copy-row__meta dd { margin:0; color:var(--text-primary); font-weight:700; overflow-wrap:anywhere; }
+.bc-copy-row__side { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:.5rem; min-width:0; }
+.bc-copy-row__actions { display:flex; flex-wrap:wrap; gap:.4rem; }
+.bc-copy-row--compact { padding:.75rem .95rem; gap:.65rem 1rem; }
+.bc-copy-row--compact .bc-copy-row__meta { margin-top:.35rem; }
+.bc-copy-row--compact .bc-copy-row__title { font-size:var(--text-sm); }
+
+.bc-patron-choice {
+    display:flex;
+    align-items:center;
+    gap:.8rem;
+    padding:.8rem .95rem;
+    border:1px solid var(--border-default);
+    border-radius:var(--radius-sm);
+    background:var(--bg-surface);
+    color:var(--text-primary);
+    min-height:4.65rem;
+    cursor:pointer;
+    min-width:0;
+    position:relative;
+}
+.bc-patron-choice:has(.bc-patron-choice__input:checked) {
+    border-color:var(--vdbs-green-dark);
+    background:var(--bg-brand-soft);
+    box-shadow:inset 0 0 0 1px var(--vdbs-green-dark);
+}
+.bc-patron-choice:has(.bc-patron-choice__input:focus-visible) {
+    outline:3px solid var(--focus-ring);
+    outline-offset:3px;
+}
+.bc-patron-choice--disabled { opacity:.6; cursor:not-allowed; }
+.bc-patron-choice__input {
+    position:absolute;
+    width:1px;
+    height:1px;
+    opacity:0;
+}
+.bc-patron-choice__avatar {
+    flex:0 0 2.4rem;
+    width:2.4rem;
+    height:2.4rem;
+    display:grid;
+    place-items:center;
+    border-radius:var(--radius-sm);
+    background:var(--vdbs-purple);
+    color:var(--vdbs-white);
+    font-weight:900;
+    font-size:1.05rem;
+}
+.bc-patron-choice__copy { flex:1 1 auto; min-width:0; display:grid; gap:.2rem; }
+.bc-patron-choice__name { font-size:var(--text-sm); line-height:1.4; overflow-wrap:anywhere; }
+.bc-patron-choice__detail { font-size:.78rem; line-height:1.5; color:var(--text-secondary); overflow-wrap:anywhere; }
+.bc-patron-choice__check {
+    display:grid;
+    place-items:center;
+    flex:0 0 1.45rem;
+    width:1.45rem;
+    height:1.45rem;
+    border:1.5px solid var(--border-strong);
+    border-radius:50%;
+    background:var(--bg-surface);
+    color:transparent;
+    font-size:.85rem;
+    font-weight:900;
+}
+.bc-patron-choice:has(.bc-patron-choice__input:checked) .bc-patron-choice__check {
+    background:var(--vdbs-green);
+    border-color:var(--vdbs-green-dark);
+    color:var(--vdbs-ink);
+}
+.bc-patron-choice--compact { padding:.5rem .7rem; min-height:3.6rem; gap:.55rem; }
+.bc-patron-choice--compact .bc-patron-choice__avatar { width:2rem; height:2rem; flex-basis:2rem; }
+.bc-patron-choice--compact .bc-patron-choice__name { font-size:.82rem; }
+
+.bc-scan-feedback {
+    --bc-scan-feedback-accent:var(--vdbs-purple);
+    --bc-scan-feedback-foreground:var(--vdbs-white);
+    --bc-scan-feedback-tint:7%;
+    display:flex;
+    align-items:flex-start;
+    gap:.8rem;
+    min-width:0;
+    padding:1rem 1.15rem;
+    border:1px solid var(--border-default);
+    border-radius:var(--radius-sm);
+    background:color-mix(in srgb,var(--bc-scan-feedback-accent) var(--bc-scan-feedback-tint),var(--bg-surface));
+    color:var(--text-primary);
+}
+.bc-scan-feedback--success {
+    --bc-scan-feedback-accent:var(--vdbs-green);
+    --bc-scan-feedback-foreground:var(--vdbs-ink);
+    --bc-scan-feedback-tint:13%;
+}
+.bc-scan-feedback--warning {
+    --bc-scan-feedback-accent:var(--action-warning);
+    --bc-scan-feedback-foreground:var(--vdbs-ink);
+    --bc-scan-feedback-tint:12%;
+}
+.bc-scan-feedback--error {
+    --bc-scan-feedback-accent:var(--vdbs-error);
+    --bc-scan-feedback-foreground:var(--vdbs-white);
+    --bc-scan-feedback-tint:10%;
+}
+.bc-scan-feedback__symbol {
+    display:grid;
+    place-items:center;
+    flex:0 0 2.15rem;
+    width:2.15rem;
+    height:2.15rem;
+    border-radius:var(--radius-sm);
+    background:var(--bc-scan-feedback-accent);
+    color:var(--bc-scan-feedback-foreground);
+    font-weight:900;
+    font-size:1.15rem;
+}
+.bc-scan-feedback__content { min-width:0; flex:1 1 auto; }
+.bc-scan-feedback__content strong { display:block; font-size:.97rem; line-height:1.4; overflow-wrap:anywhere; }
+.bc-scan-feedback__content p { margin:.4rem 0 0; font-size:var(--text-sm); line-height:1.55; overflow-wrap:anywhere; }
+.bc-scan-feedback__content .bc-scan-feedback__barcode {
+    color:var(--text-secondary);
+    font-size:.79rem;
+    font-variant-numeric:tabular-nums;
+}
+.bc-scan-feedback__barcode code {
+    font-family:ui-monospace,Consolas,monospace;
+    overflow-wrap:anywhere;
+}
+.bc-scan-feedback--compact { padding:.65rem .85rem; gap:.55rem; }
+.bc-scan-feedback--compact .bc-scan-feedback__symbol { width:1.75rem; height:1.75rem; flex-basis:1.75rem; font-size:1rem; }
+
+@media(max-width:38rem) {
+    .bc-copy-row__side { justify-content:flex-start; flex:1 1 100%; }
+    .bc-copy-row__meta { gap:.25rem .8rem; }
+}

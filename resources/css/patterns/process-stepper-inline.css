@@ -1,0 +1,55 @@
+/*
+ * Universal inline-label stepper: [✓ Title] — [2 Title] — [3 Title]
+ * Each group masks the connector so the label interrupts the line.
+ * The component remains semantically an ordered list.
+ */
+.bc-process-stepper__step {
+    display:block;
+    min-width:0;
+    min-height:4.6rem;
+}
+.bc-process-stepper__step:not(:last-child)::before {
+    left:0;
+    right:0;
+    top:1.16rem;
+    height:.22rem;
+    width:auto;
+    bottom:auto;
+    transform:none;
+}
+.bc-process-stepper__group {
+    position:relative;
+    z-index:1;
+    display:inline-flex;
+    align-items:center;
+    gap:.65rem;
+    width:auto;
+    max-width:calc(100% - .6rem);
+    min-height:2.5rem;
+    padding-right:.85rem;
+    background:var(--bc-stepper-bg,var(--bg-surface));
+}
+.bc-process-stepper__group .bc-process-stepper__node { flex:0 0 2.45rem; }
+.bc-process-stepper__group .bc-process-stepper__copy {
+    display:grid;
+    align-content:center;
+    padding:0;
+    gap:.18rem;
+    min-width:0;
+}
+.bc-process-stepper__group .bc-process-stepper__copy strong { font-size:.92rem; line-height:1.3; overflow-wrap:anywhere; }
+.bc-process-stepper__group .bc-process-stepper__copy > span { font-size:.75rem; line-height:1.4; }
+@media(max-width:44rem) {
+    .bc-process-stepper__step { min-height:3.9rem; }
+    .bc-process-stepper__step:not(:last-child)::before {
+        top:2.45rem;
+        left:1.16rem;
+        right:auto;
+        bottom:-.2rem;
+        width:.2rem;
+        height:auto;
+        transform:none;
+    }
+    .bc-process-stepper__group { display:flex; width:100%; max-width:100%; padding:0 0 .9rem; background:transparent; align-items:flex-start; }
+    .bc-process-stepper__group .bc-process-stepper__copy { padding-top:.38rem; }
+}

@@ -2,9 +2,13 @@
     'href' => null,
     'variant' => 'primary',
     'type' => 'button',
+    'size' => null,
 ])
 
-@php($classes = 'bc-button bc-button--'.$variant)
+@php
+    $size = in_array($size, ['sm', 'md', 'lg'], true) ? $size : null;
+    $classes = 'bc-button bc-button--'.$variant.($size ? ' bc-button--'.$size : '');
+@endphp
 
 @if ($href)
     <a {{ $attributes->class($classes)->merge(['href' => $href]) }}>{{ $slot }}</a>

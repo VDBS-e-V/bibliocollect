@@ -22,7 +22,7 @@
     // Bereiche, zwischen denen man wechseln kann: nur die, auf die die Person Zugriff hat.
     $areas = collect([
         ['label' => 'Startseite', 'url' => route('public.home'), 'permission' => null, 'current' => request()->routeIs('public.home')],
-        ['label' => 'Katalog', 'url' => route('public.catalog.index'), 'permission' => null, 'current' => $surface === 'public' && ! request()->routeIs('public.home')],
+        ['label' => 'Katalog', 'url' => route('public.catalog.index'), 'permission' => null, 'current' => request()->routeIs('public.catalog.*', 'public.series*', 'public.shelf', 'public.topic')],
                 ['label' => 'Bibliotheksbetrieb', 'url' => route('pos.home'), 'permission' => 'surface.pos.access', 'current' => $surface === 'pos'],
         ['label' => 'Verwaltung', 'url' => route('administration.home'), 'permission' => 'surface.administration.access', 'current' => $surface === 'administration'],
     ])->filter(static fn (array $area): bool => $area['permission'] === null || Gate::allows($area['permission']))->values();
@@ -64,22 +64,7 @@
     <img class="bc-letterhead" src="/brand/vdbs/{{ $letterheadFile }}" alt="" aria-hidden="true" width="793" height="1122">
 @endif
 <div class="bc-shell">
-    <header class="bc-shell__header">
-        <div class="bc-utility-bar">
-            <div class="bc-utility-bar__inner">
-                <span>VDBS e. V.</span>
-                <div class="bc-utility-bar__actions">
-                    @foreach ($areas as $area)
-                        <a href="{{ $area['url'] }}" @if ($area['current']) aria-current="page" class="bc-utility-link--current" @endif>{{ $area['label'] }}</a>
-                        <span aria-hidden="true">·</span>
-                    @endforeach
-                    <button class="bc-theme-toggle" type="button" data-theme-toggle aria-pressed="false">
-                        <span data-theme-label>Dunkel</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
+    <header class="bc-shell__header" id="seitenanfang">
         <div class="bc-masthead">
             <div class="bc-masthead__inner">
                 <a href="{{ route('public.home') }}" class="bc-brand-lockup" aria-label="BiblioCollect Schulbibliothek, zur Startseite">
@@ -93,70 +78,91 @@
                     </span>
                 </a>
 
-                <div class="bc-account">
-                    @auth
-                        <details class="bc-account-menu" data-account-menu>
-                            <summary class="bc-account-menu__button" aria-label="{{ $initials }}, Profilmenü von {{ $profile->name }}">
-                                <span class="bc-avatar" aria-hidden="true">{{ $initials }}</span>
-                            </summary>
-                            <div class="bc-account-menu__panel">
-                                <div class="bc-account-menu__head">
-                                    <span class="bc-avatar bc-avatar--large" aria-hidden="true">{{ $initials }}</span>
-                                    <div>
-                                        <strong>{{ $profile->name }}</strong>
-                                        <small>{{ $profile->email }}</small>
+                <div class="bc-masthead__tools">
+                    <span class="bc-masthead__context">{{ $surface === 'public' ? 'Öffentlicher Bereich' : $surfaceLabel }}</span>
+                    <button class="bc-theme-toggle bc-theme-toggle--icon" type="button" data-theme-toggle aria-pressed="false" aria-label="Darstellung umschalten">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M20 15.1A8 8 0 0 1 8.9 4a8 8 0 1 0 11.1 11.1Z"/></svg>
+                        <span class="sr-only" data-theme-label>Dunkel</span>
+                    </button>
+                    <div class="bc-account">
+                        @auth
+                            @can('surface.portal.access')
+                                <a class="bc-account__portal-link" href="{{ route('portal.home') }}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                                    <span>Mein Konto</span>
+                                </a>
+                            @endcan
+                            <details class="bc-account-menu" data-account-menu>
+                                <summary class="bc-account-menu__button" aria-label="{{ $initials }}, Profilmenü von {{ $profile->name }}">
+                                    <span class="bc-avatar" aria-hidden="true">{{ $initials }}</span>
+                                </summary>
+                                <div class="bc-account-menu__panel">
+                                    <div class="bc-account-menu__head">
+                                        <span class="bc-avatar bc-avatar--large" aria-hidden="true">{{ $initials }}</span>
+                                        <div>
+                                            <strong>{{ $profile->name }}</strong>
+                                            <small>{{ $profile->email }}</small>
+                                        </div>
                                     </div>
+                                    @if ($accountLinks !== [])
+                                        <ul class="bc-account-menu__list">
+                                            @foreach ($accountLinks as $link)
+                                                <li><a href="{{ $link['url'] }}" @if ($link['current']) aria-current="page" @endif>{{ $link['label'] }}</a></li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                    <form method="POST" action="{{ route('logout') }}" class="bc-account-menu__logout">
+                                        @csrf
+                                        <button type="submit">Abmelden</button>
+                                    </form>
                                 </div>
-                                @if ($accountLinks !== [])
-                                    <ul class="bc-account-menu__list">
-                                        @foreach ($accountLinks as $link)
-                                            <li><a href="{{ $link['url'] }}" @if ($link['current']) aria-current="page" @endif>{{ $link['label'] }}</a></li>
-                                        @endforeach
-                                    </ul>
-                                @endif
-                                <form method="POST" action="{{ route('logout') }}" class="bc-account-menu__logout">
-                                    @csrf
-                                    <button type="submit">Abmelden</button>
-                                </form>
-                            </div>
-                        </details>
-                    @else
-                        <a class="bc-account__login" href="{{ route('login') }}">Anmelden</a>
-                        <a class="bc-account__claim" href="{{ route('identity.claim.create') }}">Konto aktivieren</a>
-                    @endauth
+                            </details>
+                        @else
+                            <a class="bc-account__portal-link" href="{{ route('login') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                                <span>Mein Konto</span>
+                            </a>
+                            <a class="bc-account__claim" href="{{ route('identity.claim.create') }}">Konto aktivieren</a>
+                        @endauth
+                    </div>
                 </div>
             </div>
         </div>
 
-        @if ($navigationItems !== [])
+        @if ($navigationItems !== [] || $areas->isNotEmpty())
             <nav class="bc-nav" aria-label="Hauptnavigation" data-nav>
                 <div class="bc-nav__inner">
+                    @foreach ($areas as $area)
+                        <a href="{{ $area['url'] }}" @class(['bc-nav__link', 'bc-nav__link--active' => $area['current']]) @if ($area['current']) aria-current="page" @endif data-area-link data-nav-item>{{ $area['label'] }}</a>
+                    @endforeach
                     @foreach ($navigationItems as $item)
                         @php
                             $routeName = $preview && $item->previewRoute !== null ? $item->previewRoute : $item->route;
+                            $url = route($routeName);
                             $isCurrent = request()->routeIs($item->activePattern) || ($preview && request()->routeIs($item->previewRoute ?? ''));
                         @endphp
-                        <a
-                            href="{{ route($routeName) }}"
-                            @class(['bc-nav__link', 'bc-nav__link--active' => $isCurrent])
-                            @if ($isCurrent) aria-current="page" @endif
-                            data-nav-item
-                        >{{ $item->label }}</a>
+                        @continue($areas->contains('url', $url))
+                        <a href="{{ $url }}" @class(['bc-nav__link', 'bc-nav__link--active' => $isCurrent]) @if ($isCurrent) aria-current="page" @endif data-nav-item>{{ $item->label }}</a>
                     @endforeach
 
-                    {{-- Passt nicht alles in die Zeile, kommen die übrigen Punkte hierher (siehe app.js). Ohne JavaScript bleibt das Menü verborgen und die Leiste bricht um. --}}
+                    {{-- Für die JavaScript-Navigation müssen dieselben Einträge in derselben Reihenfolge vorhanden sein. --}}
                     <div class="bc-nav__more" data-nav-more hidden>
                         <details class="bc-nav__more-menu" data-account-menu>
                             <summary class="bc-nav__more-button" aria-label="Weitere Menüpunkte">
                                 <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
                             </summary>
                             <ul class="bc-nav__more-list">
+                                @foreach ($areas as $area)
+                                    <li data-nav-more-item hidden><a href="{{ $area['url'] }}" @if ($area['current']) aria-current="page" @endif>{{ $area['label'] }}</a></li>
+                                @endforeach
                                 @foreach ($navigationItems as $item)
                                     @php
                                         $moreRoute = $preview && $item->previewRoute !== null ? $item->previewRoute : $item->route;
+                                        $moreUrl = route($moreRoute);
                                         $moreCurrent = request()->routeIs($item->activePattern) || ($preview && request()->routeIs($item->previewRoute ?? ''));
                                     @endphp
-                                    <li data-nav-more-item hidden><a href="{{ route($moreRoute) }}" @if ($moreCurrent) aria-current="page" @endif>{{ $item->label }}</a></li>
+                                    @continue($areas->contains('url', $moreUrl))
+                                    <li data-nav-more-item hidden><a href="{{ $moreUrl }}" @if ($moreCurrent) aria-current="page" @endif>{{ $item->label }}</a></li>
                                 @endforeach
                             </ul>
                         </details>
@@ -172,19 +178,46 @@
         </div>
     @endif
 
-    <main id="main-content" class="bc-shell__main" tabindex="-1">
+    <main id="main-content" @class(['bc-shell__main', 'bc-shell__main--home' => request()->routeIs('public.home')]) tabindex="-1">
         {{ $slot }}
     </main>
 
     <footer class="bc-shell__footer">
         <div class="bc-shell__footer-inner">
-            <strong>BiblioCollect</strong>
-            <span>Eine Anwendung des VDBS e. V.</span>
-            <nav class="bc-footer-links" aria-label="Rechtliches">
-                <a href="{{ route('public.page', ['slug' => 'impressum']) }}">Impressum</a>
-                <a href="{{ route('public.page', ['slug' => 'datenschutz']) }}">Datenschutz</a>
-                <a href="{{ route('public.page', ['slug' => 'barrierefreiheit']) }}">Barrierefreiheit</a>
-            </nav>
+            <div class="bc-footer-grid">
+                <div class="bc-footer-brand">
+                    <p class="bc-footer-brand__eyebrow">VDBS · Schulbibliothek</p>
+                    <strong>BiblioCollect</strong>
+                    <p>Ein Ort für Geschichten, Wissen und neue Ideen.</p>
+                    <small>Eine Anwendung des VDBS e. V.</small>
+                </div>
+                <nav class="bc-footer-group" aria-label="Entdecken">
+                    <strong>Entdecken</strong>
+                    <a href="{{ route('public.catalog.index') }}">Katalog</a>
+                    <a href="{{ route('public.series.index') }}">Buchreihen</a>
+                    <a href="{{ route('public.wishes.create') }}">Buchwunsch abgeben</a>
+                </nav>
+                <nav class="bc-footer-group" aria-label="Nutzung">
+                    <strong>Bibliothek nutzen</strong>
+                    <a href="{{ route('public.home') }}#oeffnungszeiten">Öffnungszeiten</a>
+                    @can('surface.portal.access')
+                        <a href="{{ route('portal.home') }}">Mein Konto</a>
+                    @else
+                        <a href="{{ route('login') }}">Anmelden</a>
+                    @endcan
+                    <a href="{{ route('identity.claim.create') }}">Konto aktivieren</a>
+                </nav>
+                <nav class="bc-footer-group" aria-label="Rechtliches">
+                    <strong>Informationen</strong>
+                    <a href="{{ route('public.page', ['slug' => 'impressum']) }}">Impressum</a>
+                    <a href="{{ route('public.page', ['slug' => 'datenschutz']) }}">Datenschutz</a>
+                    <a href="{{ route('public.page', ['slug' => 'barrierefreiheit']) }}">Barrierefreiheit</a>
+                </nav>
+            </div>
+            <div class="bc-footer-bottom">
+                <span>Weil Schule uns alle angeht!</span>
+                <a href="#seitenanfang">Zum Seitenanfang ↑</a>
+            </div>
         </div>
     </footer>
 </div>
