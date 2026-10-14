@@ -71,14 +71,14 @@ jobs:
           BROWSER: /usr/bin/google-chrome
         run: npm run check:layout
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: a11y-report
           path: a11y-report/
           retention-days: 14
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: layout-report
