@@ -11,9 +11,9 @@ use App\Modules\Catalog\Models\CatalogTopic;
 use App\Modules\Catalog\Models\Copy;
 use App\Modules\Catalog\Models\Edition;
 use App\Modules\Catalog\Models\Title;
-use App\Modules\Catalog\Services\CatalogInventoryRenumberer;
 use App\Modules\Identity\Actions\AssignRoleAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 
 uses(RefreshDatabase::class);
 
@@ -151,8 +151,8 @@ it('shows the stack on the workplace and in the menu', function (): void {
     $this->actingAs(stackUser('staff'))->get(route('pos.processes'))->assertSee('Medien einsortieren');
 });
 
-it('lets staff but not students maintain shelves and renumber inventory numbers', function (): void {
-    foreach (['administration.shelves.index', 'administration.inventory.index'] as $route) {
+it('lets staff but not students maintain shelves', function (): void {
+    foreach (['administration.shelves.index'] as $route) {
         $this->actingAs(stackUser('student_ag_basic'))->get(route($route))->assertForbidden();
         $this->actingAs(stackUser('student_ag_extended'))->get(route($route))->assertForbidden();
         $this->actingAs(stackUser('staff'))->get(route($route))->assertOk();
@@ -164,41 +164,16 @@ it('lets staff but not students maintain shelves and renumber inventory numbers'
     expect(CatalogShelf::query()->pluck('code')->all())->toBe(['R5-B1']);
 });
 
-it('renumbers old inventory numbers only on explicit request and continues after the highest new number', function (): void {
-    $staff = stackUser('staff');
-    $legacyA = stackCopy('12482', 'Alt A');
-    $legacyB = stackCopy('BC-MOMO-001', 'Alt B');
-    $legacyC = stackCopy('7', 'Alt C');
-    $modern = stackCopy('0000042', 'Schon neu');
+it('no longer offers a way to renumber old inventory numbers', function (): void {
+    $legacy = stackCopy('12482', 'Alt A');
 
-    // Nichts passiert von selbst.
-    $this->actingAs($staff)->get(route('administration.inventory.index'))->assertOk()->assertSee('Alt A')->assertSee('Alt B')->assertSee('Alt C')->assertDontSee('Schon neu')->assertSee('0000043');
-    expect($legacyA->refresh()->barcode)->toBe('12482')->and(app(CatalogInventoryRenumberer::class)->legacyCount())->toBe(3);
+    foreach (['get', 'post'] as $method) {
+        $this->actingAs(stackUser('management'))->{$method}('/verwaltung/inventarnummern')->assertNotFound();
+    }
 
-    $this->actingAs($staff)->post(route('administration.inventory.store'), ['copies' => []])->assertSessionHasErrors('copies');
-
-    // Nur die ausgewählten werden umgestellt, in der Reihenfolge ihrer alten Nummern.
-    $this->actingAs($staff)->post(route('administration.inventory.store'), ['copies' => [(string) $legacyA->getKey(), (string) $legacyB->getKey(), (string) $modern->getKey()]])
-        ->assertRedirect(route('administration.inventory.index'))->assertSessionHas('renumbered');
-
-    expect($legacyA->refresh()->barcode)->toBe('0000043')
-        ->and($legacyB->refresh()->barcode)->toBe('0000044')
-        ->and($legacyC->refresh()->barcode)->toBe('7')
-        ->and($modern->refresh()->barcode)->toBe('0000042');
-
-    $event = AuditEvent::query()->where('action', 'catalog.copy.renumbered')->orderBy('id')->firstOrFail();
-    expect(AuditEvent::query()->where('action', 'catalog.copy.renumbered')->count())->toBe(2)->and($event->context)->toHaveKeys(['old', 'new']);
-
-    $this->actingAs($staff)->get(route('administration.inventory.index'))->assertSee('Neue Etiketten drucken')->assertSee('Alt C');
-    $this->actingAs($staff)->get(route('administration.inventory.index', ['q' => 'Alt C']))->assertSee('Alt C');
-});
-
-it('does not touch copies that already have a seven digit number', function (): void {
-    $staff = stackUser('staff');
-    $modern = stackCopy('0001234', 'Neu');
-
-    $this->actingAs($staff)->post(route('administration.inventory.store'), ['copies' => [(string) $modern->getKey()]])->assertSessionHasErrors('copies');
-    expect($modern->refresh()->barcode)->toBe('0001234');
+    expect($legacy->refresh()->barcode)->toBe('12482')
+        ->and(Route::has('administration.inventory.index'))->toBeFalse()
+        ->and(config('authorization.permissions'))->not->toHaveKey('inventory.renumber');
 });
 
 it('counts every copy without a location as not yet shelved, but not weeded out or lost ones', function (): void {

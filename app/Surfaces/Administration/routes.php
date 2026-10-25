@@ -10,7 +10,6 @@ use App\Surfaces\Administration\Http\Controllers\CatalogTopicController;
 use App\Surfaces\Administration\Http\Controllers\ClassificationImportController;
 use App\Surfaces\Administration\Http\Controllers\ContentBlockAdminController;
 use App\Surfaces\Administration\Http\Controllers\ContentPageAdminController;
-use App\Surfaces\Administration\Http\Controllers\InventoryRenumberController;
 use App\Surfaces\Administration\Http\Controllers\LibraryCalendarController;
 use App\Surfaces\Administration\Http\Controllers\MailPreviewController;
 use App\Surfaces\Administration\Http\Controllers\RulesController;
@@ -159,11 +158,6 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
         Route::patch('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'update'])->name('administration.shelves.update');
         Route::delete('/verwaltung/regalbretter/{shelfId}', [CatalogShelfController::class, 'destroy'])->name('administration.shelves.destroy');
-    });
-
-    Route::middleware('permission:inventory.renumber')->group(function (): void {
-        Route::get('/verwaltung/inventarnummern', [InventoryRenumberController::class, 'index'])->name('administration.inventory.index');
-        Route::post('/verwaltung/inventarnummern', [InventoryRenumberController::class, 'store'])->name('administration.inventory.store');
     });
 });
 

@@ -15,7 +15,7 @@ Jede Person hat eine oder mehrere Rollen. Ob ein Menüpunkt sichtbar ist und fun
 | **Schüler:in**, **Lehrkraft** | Nur das eigene Konto (Ausleihen, Vormerkungen, Merkliste, Buchwünsche). Kein Bibliotheksbetrieb. |
 | **Schüler-AG Basis** | Ausleihe und Rückgabe, Ausleihkonten nachschlagen, Medien einsortieren, Bücher aussortieren. |
 | **Schüler-AG Erweitert** | Wie Basis, dazu Medium erfassen und Katalog pflegen, Inventur, Buchwünsche bearbeiten. |
-| **Mitarbeiter:in** | Alles im Bibliotheksbetrieb: Ausleihkonten verwalten, sperren, ausscheiden, Onlinekonto-Codes, Katalog, Import, Klassenlisten, Statistik, Regalbretter, Inventarnummern umstellen. |
+| **Mitarbeiter:in** | Alles im Bibliotheksbetrieb: Ausleihkonten verwalten, sperren, ausscheiden, Onlinekonto-Codes, Katalog, Import, Klassenlisten, Statistik, Regalbretter. |
 | **Verwaltung** | Wie Mitarbeiter:in, dazu die **Verwaltung**: Schule, Seiten, Benutzerkonten, Regeln, Systemzustand, Update, Protokoll, Löschverlangen. |
 | **Technische Administration** | Nur Systemzustand und Update. Keine Personendaten. |
 

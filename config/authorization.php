@@ -80,10 +80,6 @@ return [
             'label' => 'Systemzustand einsehen',
             'description' => 'Erlaubt, den Zustand von Cron, Warteschlange, Sicherung und die letzten Fehler einzusehen.',
         ],
-        'inventory.renumber' => [
-            'label' => 'Inventarnummern umstellen',
-            'description' => 'Erlaubt, alte Inventarnummern ausdrücklich auf siebenstellige Nummern umzustellen.',
-        ],
         'system.update' => [
             'label' => 'Updates einspielen',
             'description' => 'Erlaubt, ein neues Programmpaket hochzuladen und einzuspielen (mit Wartungsmodus und vorheriger Sicherung) sowie das nächtliche automatische Einspielen einzuschalten.',
@@ -162,7 +158,6 @@ return [
                 'shelves.manage',
                 'catalog.withdraw',
                 'inventory.count',
-                'inventory.renumber',
             ],
         ],
         'management' => [
@@ -189,7 +184,6 @@ return [
                 'wishes.manage',
                 'reading_lists.manage',
                 'shelves.manage',
-                'inventory.renumber',
                 'system.view',
                 'system.update',
                 'users.manage',
