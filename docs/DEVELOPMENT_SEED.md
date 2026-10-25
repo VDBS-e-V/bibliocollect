@@ -58,7 +58,7 @@ Der Seed enthält drei Schuljahre:
 - `2026/27` als aktives Schuljahr,
 - `2027/28` als vorbereitetes Folgejahr.
 
-Je Schuljahr werden sechs Klassen angelegt. Die Klassenstufen bilden einen einfachen Übergang vom Vorjahr über das aktive Jahr zum Folgejahr ab.
+Je Schuljahr werden die Klassen `1a` bis `13a` angelegt (Klassenstufen 1 bis 13, wie in der Schule). Damit lassen sich Schuljahreswechsel, Klassenlisten und Stufenfilter über alle Stufen testen.
 
 Zusätzlich werden Öffnungszeiten für alle sieben Wochentage angelegt:
 
@@ -221,3 +221,25 @@ Diese Datensätze sind die feste Testbasis für die ab T3 v0.4.4 vorhandene Exem
 - den englischsprachigen öffentlichen Suchzustand `The Giver`,
 - den Titel `Die Welle` ohne physische Exemplare,
 - Idempotenz bei erneutem Seed-Aufruf.
+
+## Übersicht: welcher Seeder wann (Stand Audit zu Issue #56)
+
+| Seeder | Aufruf | Zweck | Produktionsschutz |
+| --- | --- | --- | --- |
+| `DatabaseSeeder` | `migrate:fresh --seed`, `db:seed` | Einstieg; ruft nacheinander `DemoSeeder` (mit `PublicCatalogDemoSeeder`), `LegacyCatalogMetadataDemoSeeder`, `CatalogCoverDemoSeeder`, `CatalogImportDemoSeeder`, `CirculationDemoSeeder` auf | beendet sich in `production` ohne Änderung |
+| `DemoSeeder` | über `DatabaseSeeder` | Schule (Klassen 1 bis 13), Konten und Rollen, Ausleihkonten, Katalog | wirft in `production` |
+| `SampleOperationsSeeder` | nur ausdrücklich: `db:seed --class=SampleOperationsSeeder` | größerer Betriebsbestand (Klassen, 45 Schüler:innen, Ausleihen, Vormerkungen) auf vorhandenen Exemplaren; Grundlage der Zugänglichkeitsprüfung | beendet sich in `production` ohne Änderung |
+
+Die Demodaten lassen sich mit `php artisan app:launch-reset` entfernen.
+
+### Befunde und Plan
+
+Befunde der Bestandsaufnahme, noch nicht umgesetzt:
+
+1. **Feste Kalenderdaten.** Schuljahre, Schließtage (Herbstferien 19./20.10.2026) und die beiden Demo-Ausleihen (01.10.2026, 10.09.2026) sind fest eingetragen und veralten. Die offene Ausleihe ist inzwischen überfällig. Plan: Daten relativ zum Seed-Tag ableiten, dazu die Schlüssel der Ausleihen auf Ausleihkonto und Exemplar statt auf den Zeitstempel stellen, damit wiederholtes Seeden keine Duplikate erzeugt.
+2. **Ein Beispielbestand pro Zweck fehlt.** `SampleOperationsSeeder` und `DemoSeeder` überschneiden sich bei Klassen und Konten. Plan: gemeinsame Stammdaten (Schuljahre, Klassen, Öffnungszeiten) in einen eigenen Seeder auslagern.
+3. **Legacy-Seeder im Normalfall.** `LegacyCatalogMetadataDemoSeeder` reichert den Normalbestand mit Altsystem-Feldern an. Plan: nur noch als ausdrücklich gewählten Testfall aufrufen und die Legacy-Fixtures nur in Legacy-Tests verwenden.
+4. **Abdeckung neuerer Funktionen.** Nicht im Demo-Seed: Vormerkungen (nur in `SampleOperationsSeeder`), Buchwünsche, Leselisten, Regalbretter und Themenbereiche, Inventurzustände, Aussonderungen. Plan: je einen kleinen, festen Beispieldatensatz ergänzen.
+5. **Zugangsdaten.** Das feste Demo-Passwort steht im Quelltext. Es ist nur außerhalb von `production` erreichbar; das bleibt so und wird durch einen Test abgesichert.
+
+Umgesetzt mit diesem Audit: Klassen 1 bis 13 in allen drei Demo-Schuljahren.
