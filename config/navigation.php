@@ -205,13 +205,6 @@ return [
                     'order' => 31,
                 ],
                 [
-                    'label' => 'Inventarnummern',
-                    'route' => 'administration.inventory.index',
-                    'active' => 'administration.inventory.*',
-                    'permission' => 'inventory.renumber',
-                    'order' => 33,
-                ],
-                [
                     'label' => 'Öffnungszeiten',
                     'route' => 'administration.calendar.index',
                     'active' => 'administration.calendar.*',
