@@ -89,17 +89,9 @@ final class DemoSeeder extends Seeder
         ];
 
         $classes = [];
-        $classPlans = [
-            'previous' => [
-                ['4a', 4], ['5a', 5], ['6a', 6], ['7a', 7], ['8a', 8], ['9a', 9],
-            ],
-            'current' => [
-                ['5a', 5], ['6a', 6], ['7a', 7], ['8a', 8], ['9a', 9], ['10a', 10],
-            ],
-            'next' => [
-                ['6a', 6], ['7a', 7], ['8a', 8], ['9a', 9], ['10a', 10], ['11a', 11],
-            ],
-        ];
+        // Die Schule führt die Klassen 1 bis 13; jedes Schuljahr bekommt je Stufe eine Klasse „a“.
+        $plan = array_map(static fn (int $grade): array => [$grade.'a', $grade], range(1, 13));
+        $classPlans = ['previous' => $plan, 'current' => $plan, 'next' => $plan];
 
         foreach ($classPlans as $period => $plan) {
             foreach ($plan as [$name, $gradeLevel]) {

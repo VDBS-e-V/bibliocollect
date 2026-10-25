@@ -33,7 +33,7 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
     $this->seed(DatabaseSeeder::class);
 
     expect(SchoolYear::query()->count())->toBe(3)
-        ->and(SchoolClass::query()->count())->toBe(18)
+        ->and(SchoolClass::query()->count())->toBe(39)
         ->and(LibraryOpeningHour::query()->count())->toBe(7)
         ->and(LibraryClosure::query()->count())->toBe(4)
         ->and(Patron::query()->count())->toBe(9)
@@ -122,7 +122,7 @@ it('provides comprehensive idempotent demo data for the implemented domains', fu
     $this->seed(DatabaseSeeder::class);
 
     expect(SchoolYear::query()->count())->toBe(3)
-        ->and(SchoolClass::query()->count())->toBe(18)
+        ->and(SchoolClass::query()->count())->toBe(39)
         ->and(Patron::query()->count())->toBe(9)
         ->and(User::query()->where('email', 'like', '%@demo.bibliocollect.test')->count())->toBe(8)
         ->and(PatronBlockEvent::query()->count())->toBe(3)
