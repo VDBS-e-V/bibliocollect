@@ -127,7 +127,7 @@
 
                 <x-ui.select label="Empfohlen ab" name="alter" data-auto-submit>
                     <option value="">Alle Altersstufen</option>
-                    @foreach (['0-6' => 'Bis 6 Jahre', '7-10' => '7 bis 10 Jahre', '11-13' => '11 bis 13 Jahre', '14-99' => 'Ab 14 Jahren'] as $stage => $stageLabel)
+                    @foreach (['0-6' => 'Bis 6 Jahre', '7-10' => '7 bis 10 Jahre', '11-13' => '11 bis 13 Jahre', '14-17' => 'Young Adult (14 bis 17)', '18-99' => 'Erwachsene (ab 18)', '14-99' => 'Ab 14 Jahren', 'keine' => 'Keine Altersangabe'] as $stage => $stageLabel)
                         <option value="{{ $stage }}" @selected($criteria->ageStage === $stage)>{{ $stageLabel }}</option>
                     @endforeach
                 </x-ui.select>

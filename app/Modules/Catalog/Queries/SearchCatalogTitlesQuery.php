@@ -417,11 +417,18 @@ final class SearchCatalogTitlesQuery
 
     /**
      * Altersstufe: empfohlenes Mindestalter der Ausgabe liegt in „von-bis“ (zum Beispiel 7-10).
+     * „keine“ findet Ausgaben ohne Altersangabe. Ein Alter wird nie aus Thema oder Genre abgeleitet.
      *
      * @param  Builder<Edition>  $editionQuery
      */
     private function applyAgeStage(Builder $editionQuery, ?string $stage): void
     {
+        if ($stage === 'keine') {
+            $editionQuery->whereNull('minimum_age');
+
+            return;
+        }
+
         if ($stage === null || preg_match('/^(\d{1,2})-(\d{1,2})$/', $stage, $m) !== 1) {
             return;
         }
