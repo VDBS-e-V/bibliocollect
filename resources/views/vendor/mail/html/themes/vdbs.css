@@ -252,16 +252,16 @@ img {
 .button-blue,
 .button-primary {
     background-color: #2dc08e;
-    border-bottom: 1px solid #1fa377;
-    border-left: 1px solid #1fa377;
-    border-right: 1px solid #1fa377;
-    border-top: 1px solid #1fa377;
+    border-bottom: 1px solid #057f5b;
+    border-left: 1px solid #057f5b;
+    border-right: 1px solid #057f5b;
+    border-top: 1px solid #057f5b;
 }
 
 .button-green,
 .button-success {
     background-color: #2dc08e;
-    border: 1px solid #1fa377;
+    border: 1px solid #057f5b;
 }
 
 .button-red,

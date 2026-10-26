@@ -9,9 +9,9 @@
 }
 
 .bc-dot--group { background: var(--vdbs-purple); }
-.bc-dot--area { background: var(--vdbs-group-petrol); }
+.bc-dot--area { background: var(--text-primary); }
 .bc-dot--rack { background: var(--vdbs-green); }
-.bc-dot--board { background: var(--vdbs-group-orange); }
+.bc-dot--board { background: var(--text-secondary); }
 
 .bc-loc-legend {
     display: flex;
@@ -49,7 +49,7 @@
 .bc-acc--group { border: 1px solid var(--border-default); border-radius: .3rem; margin: 0 0 .75rem; background: var(--bg-surface); }
 .bc-acc--area { margin: .5rem 0; border-radius: .25rem; background: var(--bg-surface-muted); }
 .bc-acc--rack { margin: .35rem 0; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: .25rem; }
-.bc-acc--loose { margin-top: 1rem; border: 1px dashed var(--vdbs-group-orange); border-radius: .3rem; }
+.bc-acc--loose { margin-top: 1rem; border: 1px dashed var(--border-strong); border-radius: .3rem; }
 
 .bc-acc > summary {
     display: flex;
@@ -200,7 +200,7 @@ ol.bc-section-copy li { margin: .3rem 0; }
 /* Füllstand eines Regalbretts */
 .bc-meter { display: inline-block; vertical-align: middle; width: 5rem; height: .55rem; margin-right: .4rem; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg-surface); overflow: hidden; }
 .bc-meter__bar { display: block; height: 100%; background: var(--vdbs-green); }
-.bc-meter__bar--full { background: var(--vdbs-group-orange); }
+.bc-meter__bar--full { background: var(--action-secondary); }
 
 /* Stapel nach Thema */
 .bc-topic-stack { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0 1rem; padding: 0; list-style: none; }

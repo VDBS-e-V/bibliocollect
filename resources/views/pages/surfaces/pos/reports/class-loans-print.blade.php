@@ -15,24 +15,24 @@
         /* Je Klasse eine Seite (bei vielen Zeilen mehrere) auf dem Briefpapier, Hoch- oder Querformat. */
         @page { size: A4 {{ $landscape ? 'landscape' : 'portrait' }}; margin: 0; }
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        body { margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #111; background: #fff; }
-        .bar { padding: 8px 12px; background: #eee; font-size: 14px; }
+        body { margin: 0; font-family: Lato, Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; background: #fff; }
+        .bar { padding: 8px 12px; background: #f5f7f6; font-size: 14px; }
         .bar button { padding: 4px 12px; margin-right: 12px; }
         .bar a { margin-right: 12px; }
         .paper { position: fixed; z-index: -1; top: 0; left: 0; width: {{ $landscape ? '297mm' : '210mm' }}; height: {{ $landscape ? '210mm' : '297mm' }}; display: none; }
         .class { padding: {{ $landscape ? '5cm 2.2cm 3cm 2cm' : '5cm 2.4cm 3.2cm 2.6cm' }}; break-after: page; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
         .class:last-of-type { break-after: auto; }
         h1 { margin: 0 0 1mm; font-size: 14pt; color: #58275a; }
-        .meta { margin: 0 0 4mm; color: #333; }
+        .meta { margin: 0 0 4mm; color: #52605b; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1.4mm 2mm; border-bottom: .2mm solid #bbb; text-align: left; vertical-align: top; }
+        th, td { padding: 1.4mm 2mm; border-bottom: .2mm solid #d4dbd8; text-align: left; vertical-align: top; }
         th { font-size: 8.5pt; text-transform: uppercase; letter-spacing: .02em; border-bottom: .4mm solid #58275a; }
         tr { break-inside: avoid; }
         thead { display: table-header-group; }
         .num { white-space: nowrap; font-variant-numeric: tabular-nums; }
-        .note { margin-top: 5mm; color: #333; font-size: 9pt; }
+        .note { margin-top: 5mm; color: #52605b; font-size: 9pt; }
         @media print { .bar { display: none; } @if ($letterheadFile) .paper { display: block; } @endif }
-        @media screen { body { background: #ddd; } .class { max-width: {{ $landscape ? '297mm' : '210mm' }}; margin: 12px auto; background: #fff; padding: 12mm; } }
+        @media screen { body { background: #d4dbd8; } .class { max-width: {{ $landscape ? '297mm' : '210mm' }}; margin: 12px auto; background: #fff; padding: 12mm; } }
     </style>
 </head>
 <body>

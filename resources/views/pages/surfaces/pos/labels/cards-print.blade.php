@@ -14,8 +14,8 @@
         @page { size: A4; margin: 0; }
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         :root { --dx: 0mm; --dy: 0mm; }
-        body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
-        .bar { padding: 8px 12px; background: #eee; font-size: 14px; }
+        body { margin: 0; font-family: Lato, Arial, Helvetica, sans-serif; color: #000; background: #fff; }
+        .bar { padding: 8px 12px; background: #f5f7f6; font-size: 14px; }
         .bar button { padding: 4px 12px; margin-right: 12px; }
         .bar label { margin-left: 12px; }
         .bar input { width: 4.5em; }
@@ -27,11 +27,11 @@
         .card.empty { visibility: hidden; }
         /* Weiße Fläche mit 6 mm Rand rund um das Motiv. */
         .card .panel { position: absolute; inset: 6mm; background: #fff; border-radius: 3mm; padding: 3mm 3.9mm 2.6mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-        .card .namebox { height: 12.7mm; background: #f4f6f5; border: .5mm solid #d8dcda; border-radius: 1.7mm; padding: 1.8mm 2.7mm; }
-        .card .namebox span { font: bold 7pt Arial, sans-serif; letter-spacing: .03em; text-transform: uppercase; color: #4a5a55; }
+        .card .namebox { height: 12.7mm; background: #f5f7f6; border: .5mm solid #d4dbd8; border-radius: 1.7mm; padding: 1.8mm 2.7mm; }
+        .card .namebox span { font: bold 7pt Lato, Arial, sans-serif; letter-spacing: .03em; text-transform: uppercase; color: #52605b; }
         .card .brand { display: flex; align-items: center; justify-content: space-between; gap: 3mm; }
         .card .brand img { height: 6.5mm; width: auto; display: block; }
-        .card .brand span { font: bold 7pt Arial, sans-serif; letter-spacing: .4px; text-transform: uppercase; text-align: right; }
+        .card .brand span { font: bold 7pt Lato, Arial, sans-serif; letter-spacing: .4px; text-transform: uppercase; text-align: right; }
         .card svg { width: 100%; height: 8.5mm; display: block; }
         .card .code { font: 8pt 'Courier New', monospace; text-align: center; line-height: 1.1; }
         /* Fertige Vorlage (Motiv mit weißer Fläche und Namensfeld): nur Logo, Strichcode und Nummer kommen darauf. */
@@ -40,7 +40,7 @@
         .card.back .badge { background: #fff; border-radius: 3mm; padding: 3mm 5mm; width: 62mm; }
         .card.back .badge img { width: 100%; height: auto; display: block; }
         @media print { .bar { display: none; } }
-        @media screen { body { background: #ddd; } .sheet { background: #fff; margin: 12px auto; box-shadow: 0 0 6px rgba(0,0,0,.3); } .sheet > .card { outline: 1px dotted #aaa; outline-offset: -1px; } }
+        @media screen { body { background: #d4dbd8; } .sheet { background: #fff; margin: 12px auto; box-shadow: 0 0 6px rgba(0,0,0,.3); } .sheet > .card { outline: 1px dotted #7f8d88; outline-offset: -1px; } }
     </style>
 </head>
 <body>

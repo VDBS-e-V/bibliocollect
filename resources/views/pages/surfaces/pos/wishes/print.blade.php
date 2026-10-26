@@ -12,25 +12,25 @@
         /* Querformat mit Briefpapier (297 × 210 mm). Freie Fläche: unter dem Kopf (ca. 5 cm), vor dem Punktband rechts und über dem Fuß. */
         @page { size: A4 landscape; margin: 0; }
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        body { margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; color: #111; background: #fff; }
-        .bar { padding: 8px 12px; background: #eee; font-size: 14px; }
+        body { margin: 0; font-family: Lato, Arial, Helvetica, sans-serif; font-size: 9.5pt; color: #000; background: #fff; }
+        .bar { padding: 8px 12px; background: #f5f7f6; font-size: 14px; }
         .bar button { padding: 4px 12px; margin-right: 12px; }
         .bar a { margin-right: 12px; }
         .paper { position: fixed; z-index: -1; top: 0; left: 0; width: 297mm; height: 210mm; display: none; }
         .page { padding: 5cm 2.2cm 3cm 2cm; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
         h1 { margin: 0 0 1mm; font-size: 14pt; color: #58275a; }
-        .meta { margin: 0 0 4mm; color: #333; }
+        .meta { margin: 0 0 4mm; color: #52605b; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1.4mm 2mm; border-bottom: .2mm solid #bbb; text-align: left; vertical-align: top; }
+        th, td { padding: 1.4mm 2mm; border-bottom: .2mm solid #d4dbd8; text-align: left; vertical-align: top; }
         th { font-size: 8.5pt; text-transform: uppercase; letter-spacing: .02em; border-bottom: .4mm solid #58275a; }
         tr { break-inside: avoid; }
         thead { display: table-header-group; }
-        .num { width: 8mm; color: #555; }
+        .num { width: 8mm; color: #52605b; }
         .nowrap, .isbn { white-space: nowrap; }
         .isbn { font-variant-numeric: tabular-nums; }
-        .note { color: #444; font-size: 8.5pt; }
+        .note { color: #52605b; font-size: 8.5pt; }
         @media print { .bar { display: none; } @if ($letterheadFile) .paper { display: block; } @endif }
-        @media screen { body { background: #ddd; } .page { max-width: 297mm; margin: 12px auto; background: #fff; padding: 12mm; } }
+        @media screen { body { background: #d4dbd8; } .page { max-width: 297mm; margin: 12px auto; background: #fff; padding: 12mm; } }
     </style>
 </head>
 <body>
