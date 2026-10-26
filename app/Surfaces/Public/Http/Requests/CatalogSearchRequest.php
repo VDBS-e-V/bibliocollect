@@ -32,7 +32,7 @@ final class CatalogSearchRequest extends FormRequest
             'year_to' => ['nullable', 'integer', 'min:1000', 'max:2100', Rule::when($this->filled('year_from'), ['gte:year_from'])],
             'media_type' => ['nullable', 'string', 'max:80'],
             'language_code' => ['nullable', 'string', 'max:16'],
-            'alter' => ['nullable', Rule::in(['0-6', '7-10', '11-13', '14-99'])],
+            'alter' => ['nullable', Rule::in(['0-6', '7-10', '11-13', '14-17', '18-99', '14-99', 'keine'])],
             'active_only' => ['nullable', 'boolean'],
             'available_only' => ['nullable', 'boolean'],
             'sort' => ['nullable', Rule::in(['relevance', 'title', 'title_desc', 'year_desc', 'year_asc', 'recent'])],

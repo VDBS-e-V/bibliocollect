@@ -78,3 +78,26 @@ it('offers the filter on the search pages for the public and for staff', functio
     // Das Filterkennzeichen bleibt beim Blättern erhalten und ungültige Werte werden abgelehnt.
     $this->get(route('public.catalog.index', ['available_only' => 'vielleicht']))->assertSessionHasErrors('available_only');
 });
+
+it('filters the public catalog by age stage, including titles without an age', function (): void {
+    foreach ([['Kinderbuch', 8], ['Jugendbuch', 15], ['Erwachsenenroman', 18], ['Ohne Altersangabe', null]] as [$name, $age]) {
+        [$title] = availableTitle($name);
+        Edition::query()->where('title_id', $title->getKey())->update(['minimum_age' => $age]);
+    }
+
+    $names = ['Kinderbuch', 'Jugendbuch', 'Erwachsenenroman', 'Ohne Altersangabe'];
+    $expect = function (array $params, array $visible) use ($names): void {
+        $response = $this->get(route('public.catalog.index', $params))->assertOk();
+
+        foreach ($names as $name) {
+            in_array($name, $visible, true) ? $response->assertSee($name) : $response->assertDontSee($name);
+        }
+    };
+
+    $expect(['alter' => '7-10'], ['Kinderbuch']);
+    $expect(['alter' => '14-17'], ['Jugendbuch']);
+    $expect(['alter' => '18-99'], ['Erwachsenenroman']);
+    $expect(['alter' => '14-99'], ['Jugendbuch', 'Erwachsenenroman']);
+    $expect(['alter' => 'keine'], ['Ohne Altersangabe']);
+    $this->get(route('public.catalog.index', ['alter' => 'unsinn']))->assertSessionHasErrors('alter');
+});
